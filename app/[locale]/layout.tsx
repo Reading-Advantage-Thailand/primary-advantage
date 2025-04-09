@@ -1,0 +1,88 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono, Cabin_Sketch } from "next/font/google";
+import "@/styles/globals.css";
+import { NextIntlClientProvider, hasLocale, Locale } from "next-intl";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
+import { siteConfig } from "@/configs/site-config";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ModeToggle } from "@/components/switchers/theme-switcher-toggle";
+import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
+
+const cabinSketch = Cabin_Sketch({
+  variable: "--font-cabin-sketch",
+  subsets: ["latin"],
+  weight: "400",
+});
+const cabinSketchBold = Cabin_Sketch({
+  variable: "--font-cabin-sketch-bold",
+  subsets: ["latin"],
+  weight: "700",
+});
+
+export const metadata: Metadata = {
+  title: {
+    default: siteConfig.name,
+    template: "%s | " + siteConfig.name,
+  },
+  description: siteConfig.description,
+  keywords: [
+    "primary advantage",
+    "primary",
+    "advantage",
+    "primary advantage app",
+    "primary advantage web",
+  ],
+  // openGraph: {
+  //   type: "website",
+  //   locale: "en_US",
+  //   url: siteConfig.url,
+  //   title: siteConfig.name,
+  //   description: siteConfig.description,
+  //   siteName: siteConfig.name,
+  // },
+  icons: {
+    icon: "/favicon.ico",
+    // shortcut: "/favicon-16x16.png",
+    // apple: "/apple-touch-icon.png",
+  },
+  // manifest: `${siteConfig.url}/site.webmanifest`,
+  // manifest: `http://localhost:3000/site.webmanifest`,
+};
+
+export default async function RootLayout({
+  children,
+  params,
+}: Readonly<{
+  children: React.ReactNode;
+  params: Promise<{
+    locale: Locale;
+  }>;
+}>) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
+  return (
+    <html lang={locale} suppressHydrationWarning>
+      <body
+        className={`${cabinSketch.variable} ${cabinSketchBold.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          enableColorScheme
+        >
+          <NextIntlClientProvider>
+            <LocaleSwitcher />
+            <ModeToggle />
+            {children}
+          </NextIntlClientProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
