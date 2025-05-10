@@ -1,0 +1,16 @@
+{
+  "HomePage": {
+    "title": "Willkommen auf der Startseite",
+    "about": "Über diese Seite"
+  },
+  "LocaleSwitcher": {
+    "label": "Change language",
+    "locale": "{locale, select, th {🇹🇭 ไทย} en {🇺🇸 English} tw {🇹🇼 中文} cn {🇨🇳 台灣} vi {🇻🇳 Tiếng Việt} other {Unknown}}"
+  },
+  "MainNav": {
+    "home": "Trang chủ",
+    "about": "Về chúng tôi",
+    "contact": "Liên hệ",
+    "authors": "tác giả"
+  }
+}

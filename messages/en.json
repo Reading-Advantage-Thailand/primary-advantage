@@ -5,6 +5,12 @@
   },
   "LocaleSwitcher": {
     "label": "Change language",
-    "locale": "{locale, select, de {🇩🇪 Deutsch} en {🇺🇸 English} other {Unknown}}"
+    "locale": "{locale, select, th {🇹🇭 ไทย} en {🇺🇸 English} tw {🇹🇼 中文} cn {🇨🇳 台灣} vi {🇻🇳 Tiếng Việt} other {Unknown}}"
+  },
+  "MainNav": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "authors": "Authors"
   }
 }

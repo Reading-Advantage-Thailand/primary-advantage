@@ -1,0 +1,16 @@
+{
+  "HomePage": {
+    "title": "Willkommen auf der Startseite",
+    "about": "Über diese Seite"
+  },
+  "LocaleSwitcher": {
+    "label": "Change language",
+    "locale": "{locale, select, th {🇹🇭 ไทย} en {🇺🇸 English} tw {🇹🇼 中文} cn {🇨🇳 台灣} vi {🇻🇳 Tiếng Việt} other {Unknown}}"
+  },
+  "MainNav": {
+    "home": "หน้าหลัก",
+    "about": "เกี่ยวกับ",
+    "contact": "ติดต่อ",
+    "authors": "ผู้เขียน"
+  }
+}

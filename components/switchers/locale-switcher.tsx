@@ -43,7 +43,7 @@ export function LocaleSwitcher() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
-            <Globe className="h-[1.2rem] w-[1.2rem]" />
+            <Globe width={30} height={30} />
             <span className="sr-only">Toggle Locale</span>
           </Button>
         </DropdownMenuTrigger>

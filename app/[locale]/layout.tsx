@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Cabin_Sketch } from "next/font/google";
+import { Cabin_Sketch } from "next/font/google";
 import "@/styles/globals.css";
 import { NextIntlClientProvider, hasLocale, Locale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { siteConfig } from "@/configs/site-config";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { ModeToggle } from "@/components/switchers/theme-switcher-toggle";
-import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
+import { Inter as FontSans } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 
 const cabinSketch = Cabin_Sketch({
   variable: "--font-cabin-sketch",
@@ -18,6 +18,11 @@ const cabinSketchBold = Cabin_Sketch({
   variable: "--font-cabin-sketch-bold",
   subsets: ["latin"],
   weight: "700",
+});
+
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
@@ -67,7 +72,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${cabinSketch.variable} ${cabinSketchBold.variable} antialiased`}
+        className={`${cabinSketch.variable} ${cabinSketchBold.variable} ${fontSans.variable} min-h-screen bg-background font-sans antialiased`}
       >
         <ThemeProvider
           attribute="class"
@@ -76,11 +81,8 @@ export default async function RootLayout({
           disableTransitionOnChange
           enableColorScheme
         >
-          <NextIntlClientProvider>
-            <LocaleSwitcher />
-            <ModeToggle />
-            {children}
-          </NextIntlClientProvider>
+          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

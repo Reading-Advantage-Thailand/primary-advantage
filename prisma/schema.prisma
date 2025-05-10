@@ -14,11 +14,196 @@ datasource db {
 }
 
 model User {
-  id                   String    @id @default(cuid())
-  name                 String?
-  email                String    @unique
-  password             String
-  image                String?
+  id            String          @id @default(cuid())
+  name          String?
+  email         String?         @unique
+  password      String?
+  emailVerified DateTime?       @map("email_verified")
+  image         String?
+  role          Role            @default(USER)
+  xp            Int             @default(0)
+  level         Int             @default(1)
+  cefrLevel     String?         @default("")
+  accounts      Account[]
+  sessions      Session[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
+  UserActiclity UserActiclity[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum Role {
+  USER
+  STUDENT
+  TEACHER
+  ADMIN
+  SYSTEM
+}
+
+model UserActiclity {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  levelTestAt DateTime?
+
+  multipleChoiceQuestion_ActivityLog MultipleChoiceQuestion_ActivityLog[]
+  ShortAnswerQuestion_ActivityLog    ShortAnswerQuestion_ActivityLog[]
+  LongAnswerQuestion_ActivityLog     LongAnswerQuestion_ActivityLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Article {
+  id               String   @id @default(cuid())
+  type             String
+  genre            String
+  subGenre         String
+  title            String
+  summary          String
+  passage          String
+  imageDescription String
+  cefrLevel        String
+  raLevel          Int
+  rating           Float
+  timepoints       Json?
+  authorId         String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  multipleChoiceQuestions            MultipleChoiceQuestion[]
+  shortAnswerQuestions               ShortAnswerQuestion[]
+  longAnswerQuestions                LongAnswerQuestion[]
+  WordList                           WordList[]
+  MultipleChoiceQuestion_ActivityLog MultipleChoiceQuestion_ActivityLog[]
+  ShortAnswerQuestion_ActivityLog    ShortAnswerQuestion_ActivityLog[]
+  LongAnswerQuestion_ActivityLog     LongAnswerQuestion_ActivityLog[]
+}
+
+model MultipleChoiceQuestion {
+  id              String   @id @default(cuid())
+  question        String
+  options         String[]
+  answer          String
+  textualEvidence String?
+  articleId       String   @map("article_id")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model ShortAnswerQuestion {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  articleId String   @map("article_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model LongAnswerQuestion {
+  id        String   @id @default(cuid())
+  question  String
+  articleId String   @map("article_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model WordList {
+  id         String   @id @default(cuid())
+  wordlist   Json?
+  timepoints Json?
+  articleId  String   @unique @map("article_id")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model MultipleChoiceQuestion_ActivityLog {
+  id         String   @id @default(cuid())
+  activityId String   @map("activity_id")
+  articleId  String   @map("article_id")
+  answer     Json
+  xpEarned   Int
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userActiclity UserActiclity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  Article       Article       @relation(fields: [articleId], references: [id])
+}
+
+model ShortAnswerQuestion_ActivityLog {
+  id         String   @id @default(cuid())
+  activityId String   @map("activity_id")
+  articleId  String   @map("article_id")
+  answer     Json
+  xpEarned   Int
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userActiclity UserActiclity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  Article       Article       @relation(fields: [articleId], references: [id])
+}
+
+model LongAnswerQuestion_ActivityLog {
+  id         String   @id @default(cuid())
+  activityId String   @map("activity_id")
+  articleId  String   @map("article_id")
+  answer     Json
+  xpEarned   Int
+  completed  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userActiclity UserActiclity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  Article       Article       @relation(fields: [articleId], references: [id])
 }

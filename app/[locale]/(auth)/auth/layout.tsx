@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { siteConfig } from "@/configs/site-config";
 import Link from "next/link";
 import { Icons } from "@/components/icons";
@@ -14,16 +15,12 @@ export default function AuthLayout({ children }: Props) {
         <div className="lg:border-solid lg:border lg:rounded-lg bg-slate-50 dark:bg-background">
           <div className="relative h-[800px] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-              <div
-                className="absolute inset-0 bg-zinc-900"
-                style={{
-                  backgroundImage: `url('https://storage.googleapis.com/artifacts.reading-advantage.appspot.com/article-images/3OdR9eoaNqmHfxV3KnHW.png')`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  opacity: 0.5,
-                  backgroundRepeat: "no-repeat",
-                  borderRadius: "10px 0px 0px 10px",
-                }}
+              <Image
+                src="https://storage.googleapis.com/artifacts.reading-advantage.appspot.com/article-images/3OdR9eoaNqmHfxV3KnHW.png"
+                alt="Image"
+                className="absolute inset-0 bg-zinc-900 h-full w-full object-cover opacity-50 bg-center bg-no-repeat rounded-s-xl"
+                width={512}
+                height={512}
               />
               <Link
                 href="/"
@@ -40,7 +37,9 @@ export default function AuthLayout({ children }: Props) {
                 </p>
               </div>
             </div>
-            {children}
+            <div className="flex flex-1 items-center justify-center">
+              <div className="w-full max-w-xs">{children}</div>
+            </div>
           </div>
         </div>
       </div>
