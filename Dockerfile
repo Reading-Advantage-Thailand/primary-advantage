@@ -12,8 +12,9 @@ COPY . .
 # Generate Prisma client and run Next.js build
 # DATABASE_URL is needed during build for Prisma client generation
 # It will be provided via Cloud Build's secretEnv or substitutions
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
+
+ENV DATABASE_URL
+ENV RESEND_API_KEY
 
 RUN npm run prisma:generate && npm run build
 

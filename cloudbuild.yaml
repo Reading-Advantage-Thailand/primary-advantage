@@ -9,14 +9,14 @@ steps:
       - "-c"
       - |
         # Check if DATABASE_URL_SECRET_NAME is provided (e.g., DATABASE_URL_DEV or DATABASE_URL_PROD)
-        if [ -z "${_DATABASE_URL_SECRET_NAME}" ]; then
-          echo "Error: _DATABASE_URL_SECRET_NAME substitution is missing."
+        if [ -z "${_DATABASE_URL}" ]; then
+          echo "Error: _DATABASE_URL substitution is missing."
           exit 1
         fi
         # Fetch the secret value
-        DB_URL=$(gcloud secrets versions access latest --secret=${_DATABASE_URL_SECRET_NAME} --project=${_TARGET_PROJECT_ID})
+        DB_URL=$(gcloud secrets versions access latest --secret=${_DATABASE_URL} --project=${_TARGET_PROJECT_ID})
         echo "DB_URL_SECRET=$DB_URL" >> /workspace/env_vars.txt
-    secretEnv: ["DATABASE_URL_SECRET"] # Define a placeholder for the secret
+    secretEnv: ["DATABASE_URL"] # Define a placeholder for the secret
 
   # Step 2: Install Node.js dependencies
   - name: "node:22-alpine"
@@ -30,7 +30,7 @@ steps:
         # This is passed as a build-arg to the Dockerfile
         npm ci
     env:
-      - "DATABASE_URL=${_DATABASE_URL_SECRET}" # Pass the secret to the build environment
+      - "DATABASE_URL=${_DATABASE_URL}" # Pass the secret to the build environment
 
   # Step 3: Generate Prisma Client & Run Next.js Build
   # This step uses the Dockerfile's ARG DATABASE_URL_ARG to pass the DB URL for Prisma generate
@@ -41,9 +41,11 @@ steps:
       - "-t"
       - "asia-southeast1-docker.pkg.dev/${_TARGET_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:${_COMMIT_SHA}"
       - "."
-      - "--build-arg=DATABASE_URL=${_DATABASE_URL_SECRET}" # Pass DB URL as build arg
+      - "--build-arg=DATABASE_URL=${_DATABASE_URL}" # Pass DB URL as build arg
+      - "--build-arg=RESEND_API_KEY=${_RESEND_API_KEY}" # Pass DB URL as build arg
     env:
-      - "DATABASE_URL=${_DATABASE_URL_SECRET}" # Also ensure it's in the env for npm scripts
+      - "DATABASE_URL=${_DATABASE_URL}" # Also ensure it's in the env for npm scripts
+      - "RESEND_API_KEY=${_RESEND_API_KEY}" # Also ensure it's in the env for npm scripts
 
   # Step 4: Run Prisma Migrations
   # IMPORTANT: This step applies migrations to the database.
@@ -59,7 +61,7 @@ steps:
         npm install prisma --save-dev
         npx prisma migrate deploy --schema=./prisma/schema.prisma
     env:
-      - "DATABASE_URL=${_DATABASE_URL_SECRET}" # Use the fetched secret DB URL
+      - "DATABASE_URL=${_DATABASE_URL}" # Use the fetched secret DB URL
 
   # Step 5: Push Docker Image to Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
@@ -88,11 +90,14 @@ steps:
 # Define substitutions for dynamic values
 substitutions:
   _COMMIT_SHA: "COMMIT_SHA" # Automatically provided by Cloud Build
-  _DATABASE_URL_SECRET_NAME: "DATABASE_URL" # Default for dev trigger
+  _DATABASE_URL: "DATABASE_URL" # Default for dev trigger
+  _RESEND_API_KEY: "RESEND_API_KEY" # Default for dev trigger
   _TARGET_PROJECT_ID: "primary-advantage" # Default target project for dev trigger
 
 # Secrets for fetching from Secret Manager
 availableSecrets:
   secretManager:
-    - versionName: projects/${_TARGET_PROJECT_ID}/secrets/${_DATABASE_URL_SECRET_NAME}/versions/latest
-      env: "DATABASE_URL_SECRET" # This name is used in secretEnv above
+    - versionName: projects/${_TARGET_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/latest
+      env: "DATABASE_URL" # This name is used in secretEnv above
+    - versionName: projects/${_TARGET_PROJECT_ID}/secrets/${_RESEND_API_KEY}/versions/latest
+      env: "RESEND_API_KEY" # This name is used in secretEnv above
