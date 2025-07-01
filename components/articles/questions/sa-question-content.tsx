@@ -1,6 +1,6 @@
 "use client";
 import { QuizContext } from "@/contexts/question-context";
-import React, { useContext } from "react";
+import React, { useContext, useState, useTransition } from "react";
 import {
   Card,
   CardContent,
@@ -11,99 +11,182 @@ import { Badge } from "@/components/ui/badge";
 import { SAQuestion } from "@/types";
 import { Button } from "@/components/ui/button";
 import TextareaAutosize from "react-textarea-autosize";
+import { toast } from "sonner";
+import { ActivityType } from "@/types/enum";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Icons } from "@/components/icons";
+import { finishQuiz, getFeedback } from "@/actions/question";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
-export default function SAQuestionContent({ data }: { data: SAQuestion[] }) {
+interface SAQFeedback {
+  score: number;
+  feedback: string;
+}
+
+export default function SAQuestionContent({
+  articleId,
+  questions,
+}: {
+  articleId: string;
+  questions: SAQuestion;
+}) {
   const { timer, setPaused } = useContext(QuizContext);
+  const [feedback, setFeedback] = useState<SAQFeedback | null>(null);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isPanding, startTransition] = useTransition();
+  const t = useTranslations("Question.SAQuestion");
+  const tc = useTranslations("Components");
+  const router = useRouter();
+
+  const formSchema = z.object({
+    answer: z.string().trim().min(1, { message: "Please enter your answer" }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      answer: "",
+    },
+  });
+
+  const handleGetFeedback = async (value: z.infer<typeof formSchema>) => {
+    setPaused(true);
+    startTransition(async () => {
+      await getFeedback({
+        data: {
+          articleId: questions.articleId,
+          question: questions.question,
+          suggestedResponse: questions.answer,
+          answer: value.answer,
+          preferredLanguage: "en",
+        },
+        activityType: ActivityType.SA_QUESTION,
+      }).then((res) => {
+        setFeedback(res as SAQFeedback);
+        setIsOpenModal(true);
+      });
+    });
+  };
+
+  const handleFinishQuiz = async () => {
+    setPaused(true);
+    const data = {
+      ...feedback,
+      question: questions.question,
+      suggestedAnswer: questions.answer,
+      yourAnswer: form.getValues("answer"),
+      timer: timer,
+    };
+    startTransition(async () => {
+      await finishQuiz(articleId, data, ActivityType.SA_QUESTION).then(
+        (res) => {
+          if (res.success) {
+            toast.success("Quiz finished");
+            setIsOpenModal(false);
+            router.refresh();
+          } else {
+            toast.error(res.error);
+          }
+        },
+      );
+    });
+  };
 
   return (
-    <CardContent className="flex flex-col gap-4">
-      <div className="flex gap-2 items-end">
-        <Badge className="flex-1 justify-start" variant="destructive">
-          {timer} seconds elapsed
-        </Badge>
-      </div>
-      <CardTitle className="font-bold text-3xl md:text-3xl">
-        Short Answer Questions
-      </CardTitle>
-      <CardDescription className="text-2xl md:text-2xl">
-        {data[0]?.question}
-      </CardDescription>
-      <TextareaAutosize
-        autoFocus
-        // disabled={isCompleted}
-        placeholder="Type your answer here..."
-        className="border-input resize-none focus:outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-        // {...register("answer")}
-      />
-      <div>
-        <Button variant={"outline"} size={"sm"} className="">
-          Submit
-        </Button>
-      </div>
-
-      {/* <Dialog>
-          <DialogTrigger asChild>
+    <CardContent>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handleGetFeedback)}
+          className="flex flex-col gap-4"
+        >
+          <div className="flex items-end gap-2">
+            <Badge className="flex-1 justify-start" variant="destructive">
+              {tc("timer", { elapsed: timer })}
+            </Badge>
+          </div>
+          <CardTitle className="text-3xl font-bold md:text-2xl">
+            {t("title")}
+          </CardTitle>
+          <CardDescription className="md:text-1xl text-2xl">
+            {questions?.question}
+          </CardDescription>
+          <FormField
+            control={form.control}
+            name="answer"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div>
             <Button
               type="submit"
-              size="sm"
-              variant="outline"
-              disabled={isLoading}
+              disabled={isPanding}
+              variant={"outline"}
+              size={"sm"}
             >
-              {isLoading && (
+              {isPanding && (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
               )}
-              {t("submitButton")}
+              {tc("submitButton")}
             </Button>
-          </DialogTrigger>
-          {!isLoading && (
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader className="text-left">
-                <DialogTitle className="font-bold text-2xl">
-                  {t("scorerate")}
-                </DialogTitle>
-                <DialogDescription>
-                  <p className="font-bold text-lg mt-4">{t("question")}</p>
-                  <p>{resp.result.question}</p>
-                  <p className="font-bold text-lg mt-4">
-                    {t("suggestedAnswer")}
+          </div>
+          <AlertDialog open={isOpenModal} onOpenChange={setIsOpenModal}>
+            <AlertDialogContent className="sm:max-w-[425px]">
+              <AlertDialogHeader className="text-left">
+                <AlertDialogTitle className="text-2xl font-bold">
+                  Feedback and your score
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  <p className="mt-4 text-lg font-bold">Question</p>
+                  <p>{questions.question}</p>
+                  <p className="mt-4 text-lg font-bold">Suggested Answer</p>
+                  <p>{questions.answer}</p>
+                  <p className="mt-4 text-lg font-bold">Feedback</p>
+                  <p>{feedback?.feedback}</p>
+                  <p className="mt-4 text-lg font-bold">Your Answer</p>
+                  <p className="mt-2 inline font-bold text-green-500 dark:text-green-400">
+                    {form.getValues("answer")}
                   </p>
-                  <p>{data.suggested_answer}</p>
-                  <p className="font-bold text-lg mt-4">{t("yourAnswer")}</p>
-                  <p className="text-green-500 dark:text-green-400 inline font-bold mt-2">
-                    {data.answer}
-                  </p>
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex items-center justify-center">
-                <Rating
-                  sx={{
-                    // change unselected color
-                    "& .MuiRating-iconEmpty": {
-                      color: "#f6a904",
-                    },
-                  }}
-                  name="simple-controlled"
-                  value={rating}
-                  onChange={(event, newValue) => {
-                    setRating(newValue ? newValue : 0);
-                  }}
-                  size="large"
-                />
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="flex items-center">
+                <p className="mt-4 text-lg font-bold">
+                  Score : {feedback?.score}
+                </p>
               </div>
-              <DialogFooter>
-                <Button
-                  disabled={isLoading}
-                  onClick={() => {
-                    setIsCompleted(true);
-                    onRating();
-                  }}
-                >
-                  {t("rateButton")}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          )}
-        </Dialog> */}
+              <AlertDialogFooter>
+                <Button onClick={handleFinishQuiz}>{tc("closeButton")}</Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </form>
+      </Form>
     </CardContent>
   );
 }

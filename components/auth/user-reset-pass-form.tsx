@@ -23,6 +23,21 @@ export function UserResetPassForm({ className, ...props }: UserAuthFormProps) {
       email: { value: string };
     };
     const email = target.email.value;
+    try {
+      const response = await fetch("/api/send", {
+        method: "POST",
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+      setIsEmailSent(true);
+      setIsLoading(false);
+    } catch (error) {
+      setError("Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
     // sendPasswordResetEmail(firebaseAuth, email, {
     //     url: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/signin`,
     //     handleCodeInApp: true,
@@ -39,11 +54,11 @@ export function UserResetPassForm({ className, ...props }: UserAuthFormProps) {
     <>
       {!isEmailSent ? (
         <>
-          <div className="flex flex-col space-y-2 text-center mb-2">
+          <div className="mb-2 flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
               Forgot your password?
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Enter your email and we’ll send you a link to reset your password.
             </p>
           </div>
@@ -65,7 +80,7 @@ export function UserResetPassForm({ className, ...props }: UserAuthFormProps) {
                     required
                   />
                 </div>
-                {error && <div className="text-red-500 text-sm">{error}</div>}
+                {error && <div className="text-sm text-red-500">{error}</div>}
                 <Button disabled={isLoading}>
                   {isLoading && (
                     <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
@@ -77,7 +92,7 @@ export function UserResetPassForm({ className, ...props }: UserAuthFormProps) {
           </div>
         </>
       ) : (
-        <div className="flex flex-col space-y-2 text-center justify-center items-center">
+        <div className="flex flex-col items-center justify-center space-y-2 text-center">
           <ShieldCheck width={88} height={88} className="stroke-[#73f79c]" />
           <h1 className="text-2xl font-semibold tracking-tight text-green-300">
             The email has been sent!. Please check your email to reset your

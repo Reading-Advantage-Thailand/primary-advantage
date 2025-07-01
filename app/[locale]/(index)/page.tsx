@@ -5,7 +5,7 @@ import {
   BrainCircuit,
   BarChart4,
   BookOpen,
-  Bot,
+  Book,
   Volume2,
   Settings,
   Users,
@@ -33,95 +33,94 @@ import { Button } from "@/components/ui/button";
 
 const features = [
   {
-    title: "AI-Powered Content Generation",
+    title: "Fun Story Adventures",
     description:
-      "Enjoy an ever-expanding library of level-appropriate articles tailored to CEFR standards",
-    icon: Bot,
+      "Discover exciting stories and articles just for kids your age, always something new to read!",
+    icon: Book,
   },
   {
-    title: "Intelligent Comprehension Exercises",
+    title: "Understand the Story",
     description:
-      "Enhance understanding with AI-generated multiple-choice, short-answer, and long-answer questions",
+      "Answer fun questions about what you read to help you remember and understand better.",
     icon: BrainCircuit,
   },
   {
-    title: "Adaptive CEFR Leveling",
+    title: "Just Right Reading Levels",
     description:
-      "Experience precise language difficulty matching from A1 to C2 levels",
-    icon: GitBranch,
+      "Read stories that are perfect for how you read, making it easy and enjoyable.",
+    icon: GitBranch, // Keep GitBranch but description is adapted
   },
   {
-    title: "Interactive Vocabulary Tools",
+    title: "Learn New Words",
     description:
-      "Build lexicon through contextual learning, flashcards, and spaced repetition exercises",
+      "Find new and interesting words in the stories and learn what they mean with fun tools.",
     icon: BookOpen,
   },
   {
-    title: "Text-to-Speech Narration",
+    title: "Listen Along",
     description:
-      "Improve listening skills with high-quality audio narration of all articles",
+      "Hear the stories read aloud to you, great for listening and following along.",
     icon: Volume2,
   },
   {
-    title: "Progress Analytics Dashboard",
+    title: "See How You're Growing",
     description:
-      "Track learning journey with detailed insights on reading habits, vocabulary growth, and CEFR progression",
+      "Check out your reading progress and see all the cool things you're learning!",
     icon: BarChart4,
   },
   {
-    title: "Customizable Reading Experience",
+    title: "Make It Yours",
     description:
-      "Tailor content preferences, set personal goals, and create a personalized learning path",
-    icon: Settings,
+      "Pick stories you like and set goals for reading, creating your own reading adventure.",
+    icon: Settings, // Keep Settings but description is adapted
   },
   {
-    title: "Classroom Management Tools",
+    title: "Help for Teachers",
     description:
-      "Empower teachers with student progress tracking, assignment capabilities, and performance reports",
+      "Tools for teachers to see how the class is doing and help everyone learn.",
     icon: Users,
   },
 ];
 
 const benefits = [
   {
-    title: "Accelerated Language Acquisition",
+    title: "Become a Super Reader",
     description:
-      "Boost students' language skills through extensive reading and AI-powered comprehension exercises",
+      "Read lots of exciting stories and play games to boost your reading skills!",
   },
   {
-    title: "Personalized Learning Paths",
+    title: "Your Own Reading Path",
     description:
-      "Tailor content to each student's CEFR level, interests, and learning pace",
+      "Read stories that match your reading level and interests, made just for you.",
   },
   {
-    title: "Engaging Multimedia Content",
+    title: "Stories You'll Love",
     description:
-      "Captivate learners with diverse articles, audio narration, and interactive exercises",
+      "Enjoy different kinds of stories with pictures and sounds that make reading fun.",
   },
   {
-    title: "Real-Time Progress Tracking",
+    title: "Watch Your Reading Power Grow",
     description:
-      "Monitor student growth with detailed analytics and CEFR level progression insights",
+      "See your progress and how you're becoming a better reader every day.",
   },
   {
-    title: "Efficient Vocabulary Expansion",
+    title: "Learn Lots of New Words",
     description:
-      "Enhance lexical knowledge through context-based learning and spaced repetition",
+      "Discover fun words in stories and remember them with cool activities.",
   },
   {
-    title: "Seamless Classroom Integration",
-    description:
-      "Complement traditional instruction with flexible, anytime-anywhere access to learning materials",
+    title: "Easy to Use Anywhere",
+    description: "Read and learn at school or at home, whenever you want!",
   },
   {
-    title: "Cost-Effective Solution",
+    title: "Great for Schools",
     description:
-      "Maximize resources with a scalable platform that grows with your student population",
+      "A smart way for schools to help all students become great readers.",
   },
   {
-    title: "Enhanced Teacher Productivity",
+    title: "More Time for Teaching Fun",
     description:
-      "Streamline lesson planning and assessment with automated tools and rich content library",
+      "Our tools help teachers find great stories and see student progress easily.",
   },
 ];
 
@@ -137,17 +136,17 @@ export default function Home() {
             {siteConfig.name}
           </h1>
           <h2 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl ">
-            <span>Empower Your Students with</span>
-            <span className="text-green-500"> AI-Enhanced </span>
-            <span>Language Learning</span>
+            <span>Help Young Students Become</span>
+            <span className="text-green-500"> Amazing Readers </span>
+            <span>with AI-Powered Fun!</span>
           </h2>
           <p className="max-w-[42rem] font-heading leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-            Revolutionize language education with our cutting-edge platform
+            Reading adventures tailored for ages 8-12 (Grades 3-6).
           </p>
           <div className="relative">
             <div className="absolute -inset-2 rounded-lg bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-gray-600 via-purple-600 to-zinc-600 opacity-50 blur-2xl"></div>
             <div className="relative flex w-60 h-14 items-center justify-center border border-zinc-700 rounded-lg text-white bg-[#172554] font-heading text-xl cursor-pointer hover:scale-105 transition-transform duration-300 ease-in-out dark:bg-white dark:text-black">
-              <Link href={"/auth/signin"}>Start Your Free Trial</Link>
+              <Link href={"/auth/signin"}>Get Started Now!</Link>
             </div>
           </div>
         </div>
@@ -163,15 +162,15 @@ export default function Home() {
       <div className="bg-[#172554]">
         <section
           id="features"
-          className="container space-y-6 py-8 md:py-12 lg:py-24 my-[-2px]"
+          className="container space-y-6 py-8 md:py-12 lg:py-24 my-[-2px]" // Keep styling
         >
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
             <h2 className="font-heading text-white animate-glow text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
-              Features
+              Cool Features
             </h2>
             <p className="max-w-[85%] leading-normal text-gray-400 sm:text-lg sm:leading-7">
-              Our platform is packed with features to help you learn faster and
-              more effectively than ever before with AI-enhanced learning tools.
+              Discover how Primary Advantage makes reading fun and helps you
+              learn!
             </p>
           </div>
           <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
@@ -181,17 +180,16 @@ export default function Home() {
           </div>
         </section>
         <section
-          id="features"
+          id="benefits"
           className="container space-y-6 py-8 md:py-12 lg:py-24 bg-[#172554] my-[-2px]"
         >
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
             <h2 className="font-heading text-white animate-glow text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
-              Benefits for Educational Institutions
+              Why Schools Love Primary Advantage
             </h2>
             <p className="max-w-[85%] leading-normal text-gray-400 sm:text-lg sm:leading-7">
-              Benefites of using our platform for educational institutions to
-              help students learn faster and more effectively than ever before
-              with AI-enhanced learning tools.
+              See how Primary Advantage can help teachers and students in
+              schools!
             </p>
           </div>
           <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
@@ -206,7 +204,7 @@ export default function Home() {
           fillRule="evenodd"
           clipRule="evenodd"
           fill="#172554"
-          d="M-1 0.5C265.64 0.5 532.359 0.5 799 0.5C799 13.499 799 4.30099 799 17.3C797.021 17.049 795.81 15.79 793.5 16.3C791.427 16.758 789.102 19.636 785.5 18.3C784.137 17.794 784.555 16.758 782.5 16.3C777.611 22.721 764.713 21.743 756 19.8C750.679 18.613 748.204 22.495 744 21.3C741.856 20.691 741.23 17.966 739 18.8C736.152 19.536 736.046 21.154 732 21.3C731.62 20.831 727.857 17.431 727.5 17.3C724.916 16.352 720.938 18.288 719 16.8C718.235 16.213 717.018 13.621 716.5 12.8C713.162 14.796 703.635 17.509 697.5 15.8C695.221 15.165 693.973 11.784 690.5 12.8C690 13.3 689.5 13.8 689 14.3C685.334 14.3 681.666 14.3 678 14.3C675.646 14.989 671.109 16.712 669 17.3C666.5 16.967 664 16.633 661.5 16.3C657.461 17.64 657.715 21.181 650.5 21.3C648.303 18.291 646.427 19.874 642 18.8C641.762 18.742 641.018 17.716 640.5 17.8C639.23 18.006 638.467 19.904 636 19.3C633.544 18.699 631.979 15.866 630 15.3C627.542 14.597 624.047 16.47 621.5 14.8C620.217 13.958 618.95 11.452 617.5 10.8C615.834 10.633 614.166 10.467 612.5 10.3C611.834 9.63299 611.166 8.96699 610.5 8.29999C608.392 7.72599 608.076 9.44799 607 9.79999C604.5 9.79999 602 9.79999 599.5 9.79999C598.287 10.172 597.176 11.738 595 11.3C592.523 10.802 591.648 8.48999 590 7.79999C587.5 7.96699 585 8.13299 582.5 8.29999C581.847 8.13899 579.955 6.90399 579.5 6.79999C577.004 6.22999 573.029 8.25399 571.5 8.79999C569.167 8.79999 566.833 8.79999 564.5 8.79999C561.116 9.80099 556.419 9.88599 553 10.8C550 10.967 547 11.133 544 11.3C541.924 12.11 538.666 14.228 536.5 14.8C531.913 16.011 522.442 10.277 519 10.8C510.449 12.1 503.805 16.492 496 17.8C491.428 18.566 487.295 15.091 482 16.8C479.205 17.702 478.311 19.217 474 19.3C473.918 19.19 459.672 10.351 459.5 10.3C456.924 9.53299 449.85 11.433 446 10.8C444.256 10.513 444.834 8.76899 442.5 9.29999C442 9.79999 441.5 10.3 441 10.8C437 10.8 433 10.8 429 10.8C428.5 11.467 428 12.133 427.5 12.8C424.857 14.422 420.627 13.554 418 12.8C415.334 12.8 412.666 12.8 410 12.8C407.152 11.898 396.328 8.08799 394 11.8C392.825 13.327 393.081 15.218 392.5 16.3C391.91 16.701 391.659 16.687 390.5 16.8C388.3 14.678 382.601 18.588 380.5 17.8C379.029 17.248 378.953 15.909 376 15.8C376 16.133 376 16.467 376 16.8C376.376 17.336 376.301 17.273 376.5 18.3C375.476 18.656 374.163 18.797 372.5 18.8C371.927 18.072 371.499 17.7 371 16.8C367.337 19.691 354.6 24.178 347 21.8C345.379 21.293 345.316 19.146 342.5 19.8C342.167 20.133 341.833 20.467 341.5 20.8C337.334 20.633 333.166 20.467 329 20.3C327.495 20.909 323.433 23.775 320 22.8C319.5 22.3 319 21.8 318.5 21.3C316 21.133 313.5 20.967 311 20.8C310.5 20.3 310 19.8 309.5 19.3C306.814 18.254 304.318 19.284 302 18.3C300.358 17.603 299.379 15.821 297.5 15.3C293.334 15.133 289.166 14.967 285 14.8C284.049 14.517 283.137 13.065 282.5 12.8C279.667 12.8 276.833 12.8 274 12.8C272.456 14.763 267.424 18.029 265 18.8C260 18.633 255 18.467 250 18.3C249.667 18.8 249.333 19.3 249 19.8C243.146 22.45 234.539 16.506 231 14.8C228.459 13.575 227.34 16.346 225 15.8C221.661 15.022 217.59 12.132 213.5 11.8C209.859 16.878 204.933 12.047 200 11.3C195.103 10.558 191.704 16.07 186 13.8C183.368 12.752 179.596 9.38999 174.5 10.8C171.346 11.673 168.228 14.916 165 15.8C162.085 16.598 159.123 14.786 157 14.3C151.353 13.007 148.567 16.947 144 15.8C141.958 15.287 140.72 13.482 139 12.8C136.414 11.775 134.393 12.077 132 10.8C131.333 10.133 130.667 9.46699 130 8.79999C126 8.79999 122 8.79999 118 8.79999C117.212 8.53399 116.289 7.06499 115.5 6.79999C113.212 6.03099 99.708 6.08199 98 6.79999C96.717 7.33899 94.279 9.31899 92.5 9.79999C89.894 10.505 88.987 8.95999 86.5 8.79999C85.515 10.386 84.223 11.484 83 12.8C77.458 12.853 72.294 12.182 68 11.8C66.945 13.518 66.311 14.206 63.5 14.3C62.487 13.24 62.029 12.975 60 12.8C59.014 14.224 58.494 14.307 56 14.3C54.007 12.333 52.357 13.79 49 12.8C47.147 12.254 41.788 7.80399 39 8.79999C38.346 9.03299 36.982 10.661 36 10.8C33.471 11.158 32.179 7.23299 29 8.79999C25.112 10.716 22.286 14.453 17 14.8C10.278 8.81999 4.213 15.842 -1 16.8C-1 3.96799 -1 13.332 -1 0.5Z"
+          d="M-1 0.5C265.64 0.5 532.359 0.5 799 0.5C799 13.499 799 4.30099 799 17.3C797.021 17.049 795.81 15.79 793.5 16.3C791.427 16.758 789.102 19.636 785.5 18.3C784.137 17.794 784.555 16.758 782.5 16.3C777.611 22.721 764.713 21.743 756 19.8C750.679 18.613 748.204 22.495 744 21.3C741.856 20.691 741.23 17.966 739 18.8C736.152 19.536 736.046 21.154 732 21.3C731.62 20.831 727.857 17.431 727.5 17.3C724.916 16.352 720.938 18.288 719 16.8C718.235 16.213 717.018 13.621 716.5 12.8C713.162 14.796 703.635 17.509 697.5 15.8C695.221 15.165 693.973 11.784 690.5 12.8C690 13.3 689.5 13.8 689 14.3C685.334 14.3 681.666 14.3 678 14.3C675.646 14.989 671.109 16.712 669 17.3C666.5 16.967 664 16.633 661.5 16.3C657.461 17.64 657.715 21.181 650.5 21.3C648.303 18.291 646.427 19.874 642 18.8C641.762 18.742 641.018 17.716 640.5 17.8C639.23 18.006 638.467 19.904 636 19.3C633.544 18.699 631.979 15.866 630 15.3C627.542 14.597 624.047 16.47 621.5 14.8C620.217 13.958 618.95 11.452 617.5 10.8C615.834 10.633 614.166 10.467 612.5 10.3C611.834 9.63299 611.166 8.96699 610.5 8.29999C608.392 7.72599 608.076 9.44799 607 9.79999C604.5 9.79999 602 9.79999 599.5 9.79999C598.287 10.172 597.176 11.738 595 11.3C592.523 10.802 591.648 8.48999 590 7.79999C587.5 7.96699 585 8.13299 582.5 8.29999C581.847 8.13899 579.955 6.90399 579.5 6.79999C577.004 6.22999 573.029 8.25399 571.5 8.79999C569.167 8.79999 566.833 8.79999 564.5 8.79999C561.116 9.80099 556.419 9.88599 553 10.8C550 10.967 547 11.133 544 11.3C541.924 12.11 538.666 14.228 536.5 14.8C531.913 16.011 522.442 10.277 519 10.8C510.449 12.1 503.805 16.492 496 17.8C491.428 18.566 487.295 15.091 482 16.8C479.205 17.702 478.311 19.217 474 19.3C473.918 19.19 459.672 10.351 459.5 10.3C456.924 9.53299 449.85 11.433 446 10.8C444.256 10.513 444.834 8.76899 442.5 9.29999C442 9.79999 441.5 10.3 441 10.8C437 10.8 433 10.8 429 10.8C428.5 11.467 428 12.133 427.5 12.8C424.857 14.422 420.627 13.554 418 12.8C415.334 12.8 412.666 12.8 410 12.8C407.152 11.898 396.328 8.08799 394 11.8C392.825 13.327 393.081 15.218 392.5 16.3C391.91 16.701 391.659 16.687 390.5 16.8C388.3 14.678 382.601 18.588 380.5 17.8C379.029 17.248 378.953 15.909 377.5 15.8C376.085 15.098 373.123 16.916 371 17.4C365.353 18.693 362.567 14.753 357 15.8C354.958 16.313 353.72 18.118 352 18.8C349.414 19.825 347.393 19.523 345 18.8C344.333 18.133 343.667 17.467 343 16.8C339 16.8 335 16.8 331 16.8C330.212 16.534 329.289 15.065 328.5 14.8C326.212 14.031 312.708 14.082 311 14.8C309.717 15.339 307.279 17.319 305.5 17.8C302.894 18.505 301.987 16.959 299.5 16.8C298.515 18.386 297.223 19.484 296 20.8C290.458 20.853 285.294 20.182 281 19.8C279.945 21.518 279.311 22.206 276.5 22.3C275.487 20.74 275.029 20.075 273 19.8C272.014 21.224 271.494 21.307 269 21.3C267.007 19.333 265.357 20.79 262 21.8C260.147 22.346 254.788 26.796 252 25.8C251.346 25.567 249.982 23.939 249 23.8C246.529 23.442 245.179 27.367 242 25.8C238.112 23.884 235.286 20.053 230 20.3C223.278 26.281 217.213 19.258 212 18.3C205.278 12.319 199.213 19.342 194 18.3C187.278 12.319 181.213 19.342 176 18.3C169.278 12.319 163.213 19.342 158 18.3C151.278 12.319 145.213 19.342 140 18.3C133.278 12.319 127.213 19.342 122 18.3C115.278 12.319 109.213 19.342 104 18.3C97.278 12.319 91.213 19.342 86 18.3C79.278 12.319 73.213 19.342 68 18.3C61.278 12.319 55.213 19.342 50 18.3C43.278 12.319 37.213 19.342 32 18.3C25.278 12.319 19.213 19.342 14 18.3C7.278 12.319 1.213 19.342 -4 18.3C-4 5.46799 -4 14.832 -4 2.5Z"
         />
       </svg>
       <section id="contact-us" className="container py-8 md:py-12 lg:py-24">
@@ -274,19 +272,20 @@ export default function Home() {
       >
         <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
           <h2 className="font-heading text-white animate-glow text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
-            Ready to Transform Language Learning?
+            Ready for a Primary Adventure?
           </h2>
           <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-            Start a free trial to see how our AI-enhanced learning tools can
-            help you achieve your language learning goals.
+            Start your free trial and see how fun reading can be with Primary
+            Advantage!{" "}
             <Link
               href="/auth/signin"
               target="_blank"
               rel="noreferrer"
               className="underline underline-offset-4"
             >
-              Start Your Free Trial
-            </Link>
+              Get Started Now!
+            </Link>{" "}
+            It's perfect for students aged 8-12.
           </p>
         </div>
       </section>

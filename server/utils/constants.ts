@@ -14,3 +14,21 @@ export const AVAILABLE_VOICES = [
   "en-US-Neural2-I",
   "en-US-Neural2-J",
 ];
+export const VOICES_AI = [
+  "heart",
+  "bella",
+  "michael",
+  "alloy",
+  "aoede",
+  "kore",
+  "nova",
+  "river",
+  "sarah",
+  "sky",
+  "echo",
+  "eric",
+  "fenrir",
+  "liam",
+  "onyx",
+  "puck",
+];

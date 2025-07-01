@@ -1,35 +1,30 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+import Link from "next/link";
+
+export default function ArticleError() {
   return (
-    <div className="mt-20 flex flex-col items-center justify-center space-y-4">
-      {/* <Image
-        src={"/man-mage-light.svg"}
-        alt="man-mage"
-        width={92 * 2}
-        height={115 * 2}
-      /> */}
-      <h2 className="text-2xl font-bold text-center text-red-600 dark:text-red-400">
-        Something went wrong
-      </h2>
-      {process.env.NODE_ENV === "development" && error.digest ? (
-        <p className="text-center text-red-500 dark:text-red-300">
-          {error.message}
-          <br />
-          <small>{error.stack}</small>
-        </p>
-      ) : null}
-      <Button onClick={reset} variant={"destructive"}>
-        Try again
-      </Button>
+    <div className="flex items-center min-h-[calc(100vh-4rem)] px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+      <div className="w-full space-y-6 text-center">
+        <div className="space-y-3">
+          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl animate-bounce">
+            404
+          </h1>
+          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl">
+            Article Not Found
+          </h1>
+          <p className="text-gray-500">
+            Sorry, we couldn't find the article you're looking for.
+          </p>
+        </div>
+        <Link
+          href="/student/read"
+          className="inline-flex h-10 items-center rounded-md bg-gray-900 px-8 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
+          prefetch={false}
+        >
+          Return to Articles
+        </Link>
+      </div>
     </div>
   );
 }

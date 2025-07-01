@@ -1,6 +1,6 @@
 import React from "react";
-import { MCQuestion } from "@/types";
-import { QuestionState, AnswerStatus } from "@/types/enum";
+import { MCQuestion, QuestionResponse } from "@/types";
+import { AnswerStatus, QuestionState } from "@/types/enum";
 import {
   Card,
   CardContent,
@@ -10,55 +10,103 @@ import {
 } from "@/components/ui/card";
 import { QuizContextProvider } from "@/contexts/question-context";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getQuestionsWithArticleId } from "@/server/models/articles";
+import { getQuestionsByArticleId } from "@/server/models/articles";
 import { ActivityType } from "@/types/enum";
 import MCQuestionContent from "./mc-question-content";
 import QuestionHeader from "./question-header";
-
-interface QuestionResponse {
-  questions: MCQuestion[];
-  questionStatus?: AnswerStatus[];
-}
+import { $Enums } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { retakeQuiz } from "@/actions/question";
+import RetakeButton from "./retake-button";
+import { getTranslations } from "next-intl/server";
 
 export default async function MCQuestionCard({
   articleId,
 }: {
   articleId: string;
 }) {
-  const questionsData: QuestionResponse = await getQuestionsWithArticleId(
+  const questionsData: QuestionResponse = await getQuestionsByArticleId(
     articleId,
-    ActivityType.MC_Question
+    ActivityType.MC_QUESTION,
   );
 
-  if (!questionsData.questions) {
+  let correct;
+
+  if (questionsData.result) {
+    correct = questionsData.result?.details?.score ?? 0;
+  }
+
+  const t = await getTranslations("Question");
+  const tc = await getTranslations("Components");
+
+  if (questionsData.questionStatus === QuestionState.ERROR) {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="font-bold text-3xl md:text-3xl text-muted-foreground">
-            Multiple Choice Questions
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("MCQuestion.title")}
           </CardTitle>
           <CardDescription className="text-red-500 dark:text-red-400">
-            There was an error getting the question.
+            {t("descriptionError")}
           </CardDescription>
-          <Skeleton className="h-8 w-full mt-2" />
         </CardHeader>
       </Card>
     );
   }
 
-  if (questionsData.questions) {
+  if (questionsData.questionStatus === QuestionState.LOADING) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("MCQuestion.title")}
+          </CardTitle>
+          <CardDescription>{t("descriptionLoading")}</CardDescription>
+          <Skeleton className="mt-2 h-8 w-full" />
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  if (questionsData.questionStatus === QuestionState.INCOMPLETE) {
     return (
       <Card className="w-full">
         <QuestionHeader
-          heading="Multiple Choice Questions"
-          description="Take the quiz to check your understanding"
-          buttonLabel="Start Quiz"
+          heading={t("MCQuestion.title")}
+          description={t("MCQuestion.description")}
+          buttonLabel={tc("startQuiz")}
           disabled={false}
         >
           <QuizContextProvider>
-            <MCQuestionContent questions={questionsData.questions} />
+            <MCQuestionContent
+              articleId={articleId}
+              questions={questionsData.questions as MCQuestion[]}
+            />
           </QuizContextProvider>
         </QuestionHeader>
+      </Card>
+    );
+  }
+
+  if (questionsData.questionStatus === QuestionState.COMPLETED) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("MCQuestion.title")}
+          </CardTitle>
+          <CardDescription>
+            <p>{t("descriptionSuccess")}</p>
+            <p className="inline font-bold text-green-500 dark:text-green-400">
+              {t("descriptionSuccess2", {
+                score: correct ?? 0,
+                total: 5,
+              })}
+            </p>
+          </CardDescription>
+
+          <RetakeButton articleId={articleId} type={ActivityType.MC_QUESTION} />
+        </CardHeader>
       </Card>
     );
   }

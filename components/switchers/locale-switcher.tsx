@@ -42,8 +42,8 @@ export function LocaleSwitcher() {
     <div id="onborda-language">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <Globe width={30} height={30} />
+          <Button className="cursor-pointer" variant="ghost" size="icon">
+            <Globe />
             <span className="sr-only">Toggle Locale</span>
           </Button>
         </DropdownMenuTrigger>
@@ -51,6 +51,7 @@ export function LocaleSwitcher() {
           {sortedLocales.map((locales) => (
             <DropdownMenuItem
               key={locales}
+              className="cursor-pointer"
               onClick={() => onSelectChange(locales)}
             >
               <span

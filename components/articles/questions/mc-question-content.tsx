@@ -1,18 +1,23 @@
 "use client";
 import { QuizContext } from "@/contexts/question-context";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useTransition } from "react";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MCQuestion } from "@/types";
-import { AnswerStatus } from "@/types/enum";
+import { ActivityType, AnswerStatus } from "@/types/enum";
 import { CheckCircle2, MinusCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { finishQuiz } from "@/actions/question";
+import { useTranslations } from "next-intl";
 
 export default function MCQuestionContent({
+  articleId,
   questions,
 }: {
+  articleId: string;
   questions: MCQuestion[];
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -22,14 +27,22 @@ export default function MCQuestionContent({
   const [responses, setResponses] = useState<any[]>([]);
   const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
   const [progress, setProgress] = useState<AnswerStatus[]>(
-    Array(5).fill(AnswerStatus.UNANSWERED)
+    Array(5).fill(AnswerStatus.UNANSWERED),
   );
   const [textualEvidence, setTextualEvidence] = useState("");
+  const router = useRouter();
+  const [isPanding, startTransition] = useTransition();
+
+  const t = useTranslations("Question");
+  const tc = useTranslations("Components");
 
   useEffect(() => {
     if (questions[currentIndex]) {
       // shuffle options for the current question
-      setShuffledOptions(shuffleArray([...questions[currentIndex].options]));
+
+      setShuffledOptions(
+        shuffleArray([...(questions[currentIndex].options ?? [])]),
+      );
     }
   }, [questions, currentIndex]);
 
@@ -105,14 +118,42 @@ export default function MCQuestionContent({
   };
 
   const handleFinishQuiz = async () => {
-    console.log(responses);
+    setPaused(true);
+    // handle finish quiz logic here
+    const data = {
+      responses,
+      score: progress.filter((status) => status === AnswerStatus.CORRECT)
+        .length,
+      timer,
+    };
+
+    startTransition(async () => {
+      await finishQuiz(articleId, data, ActivityType.MC_QUESTION).then(
+        (res) => {
+          if (res.success) {
+            toast("Quiz finished successfully", {
+              style: {
+                background: `var(--success)`,
+              },
+            });
+            router.refresh();
+          } else {
+            toast("Failed to finish quiz", {
+              style: {
+                background: `var(--destructive)`,
+              },
+            });
+          }
+        },
+      );
+    });
   };
 
   return (
     <CardContent>
-      <div className="flex gap-2 items-end">
+      <div className="flex items-end gap-2">
         <Badge className="flex-1 justify-start" variant="destructive">
-          {timer} seconds elapsed
+          {tc("timer", { elapsed: timer })}
         </Badge>
         {progress.map((status, index) => {
           if (status === AnswerStatus.CORRECT) {
@@ -127,17 +168,20 @@ export default function MCQuestionContent({
           );
         })}
       </div>
-      <CardTitle className="font-bold text-3xl md:text-3xl mt-3">
-        Question {currentIndex + 1} of {questions.length}
+      <CardTitle className="mt-3 text-3xl font-bold md:text-3xl">
+        {t("MCQuestion.questionOf", {
+          index: currentIndex + 1,
+          total: questions.length,
+        })}
       </CardTitle>
-      <CardDescription className="text-2xl md:text-2xl mt-3">
+      <CardDescription className="mt-3 text-2xl md:text-2xl">
         {questions[currentIndex].question}
       </CardDescription>
 
       {textualEvidence && (
-        <div className="mt-4 p-4 font-semibold bg-gray-100 text-gray-700 rounded">
+        <div className="mt-4 rounded bg-gray-100 p-4 font-semibold text-gray-700">
           <p>
-            <span className="font-bold text-lg text-gray-800">Feedback: </span>
+            <span className="text-lg font-bold text-gray-800">Feedback: </span>
             {`"${textualEvidence}"`}
           </p>
         </div>
@@ -151,7 +195,7 @@ export default function MCQuestionContent({
             activeQuestion === option &&
               (correctAnswer
                 ? "bg-green-500 hover:bg-green-600"
-                : "bg-red-500 hover:bg-red-600")
+                : "bg-red-500 hover:bg-red-600"),
           )}
           onClick={() => {
             if (!activeQuestion) {
@@ -169,6 +213,7 @@ export default function MCQuestionContent({
           variant={"outline"}
           size={"sm"}
           className="mt-2"
+          disabled={isPanding}
           onClick={() => {
             if (currentIndex < questions.length - 1) {
               if (activeQuestion) {
@@ -194,9 +239,11 @@ export default function MCQuestionContent({
           }}
         >
           {currentIndex < questions.length - 1 ? (
-            <span className="flex items-center gap-2">Next</span>
+            <span className="flex items-center gap-2">{tc("nextButton")}</span>
           ) : (
-            <span className="flex items-center gap-2">Finish</span>
+            <span className="flex items-center gap-2">
+              {tc("finishButton")}
+            </span>
           )}
         </Button>
       }

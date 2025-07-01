@@ -30,7 +30,7 @@ export async function generateImage(
 
       const localPath = path.join(
         process.cwd(),
-        "data/images",
+        "public/images",
         `${params.articleId}.png`
       );
       fs.writeFileSync(localPath, base64Image as Uint8Array);

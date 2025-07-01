@@ -1,52 +1,52 @@
-import rs from "text-readability";
+// import rs from "text-readability";
 
-interface IReadability {
-  raLevel: number;
-  cefrLevel: string;
-}
+// interface IReadability {
+//   raLevel: number;
+//   cefrLevel: string;
+// }
 
-const levels: string[] = [
-  "A1-",
-  "A1",
-  "A1+",
-  "A2-",
-  "A2",
-  "A2+",
-  "B1-",
-  "B1",
-  "B1+",
-  "B2-",
-  "B2",
-  "B2+",
-  "C1-",
-  "C1",
-  "C1+",
-  "C2-",
-  "C2",
-  "C2+",
-];
+// const levels: string[] = [
+//   "A1-",
+//   "A1",
+//   "A1+",
+//   "A2-",
+//   "A2",
+//   "A2+",
+//   "B1-",
+//   "B1",
+//   "B1+",
+//   "B2-",
+//   "B2",
+//   "B2+",
+//   "C1-",
+//   "C1",
+//   "C1+",
+//   "C2-",
+//   "C2",
+//   "C2+",
+// ];
 
-function calculateLevel(text: string, cefrLevelInput: string): IReadability {
-  const textStandard = Math.max(
-    1,
-    Math.min(readability.textStandard(text, true) as number, levels.length)
-  );
-  const inputLevelNum = levels.indexOf(cefrLevelInput) + 1;
+// function calculateLevel(text: string, cefrLevelInput: string): IReadability {
+//   const textStandard = Math.max(
+//     1,
+//     Math.min(readability.textStandard(text, true) as number, levels.length)
+//   );
+//   const inputLevelNum = levels.indexOf(cefrLevelInput) + 1;
 
-  let adjustedLevel = textStandard;
+//   let adjustedLevel = textStandard;
 
-  if (inputLevelNum > textStandard) {
-    adjustedLevel = inputLevelNum - 1;
-  } else if (inputLevelNum < textStandard) {
-    adjustedLevel = inputLevelNum + 1;
-  }
+//   if (inputLevelNum > textStandard) {
+//     adjustedLevel = inputLevelNum - 1;
+//   } else if (inputLevelNum < textStandard) {
+//     adjustedLevel = inputLevelNum + 1;
+//   }
 
-  // Ensure adjusted level is within valid range
-  adjustedLevel = Math.max(1, Math.min(adjustedLevel, levels.length));
+//   // Ensure adjusted level is within valid range
+//   adjustedLevel = Math.max(1, Math.min(adjustedLevel, levels.length));
 
-  const adjustedCefrLevel = levels[adjustedLevel - 1];
+//   const adjustedCefrLevel = levels[adjustedLevel - 1];
 
-  return { raLevel: adjustedLevel, cefrLevel: adjustedCefrLevel };
-}
+//   return { raLevel: adjustedLevel, cefrLevel: adjustedCefrLevel };
+// }
 
-export { calculateLevel };
+// export { calculateLevel };

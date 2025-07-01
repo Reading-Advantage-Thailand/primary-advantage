@@ -34,8 +34,8 @@ const info = [
     title: "Contact",
     links: [
       {
-        title: "Email: info@readingadvantage.com",
-        href: "mailto:info@readingadvantage.com",
+        title: "Email: info@primaryadvantage.com",
+        href: "mailto:info@primaryadvantage.com",
       },
       { title: "Phone: +1 (123) 456-7890", href: "tel:+11234567890" },
     ],
@@ -58,7 +58,7 @@ export function Footer({ className }: FooterProps) {
           <div className="md:flex md:justify-between">
             <div className="mb-6 md:mb-0">
               <a className="flex items-center">
-                <Icons.logo className="h-8 me-3" />
+                <Icons.logo className="mr-2" />
                 <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
                   {siteConfig.name}
                 </span>
@@ -90,8 +90,8 @@ export function Footer({ className }: FooterProps) {
           <div className="sm:flex sm:items-center sm:justify-between">
             <span className="text-sm text-gray-400 sm:text-center">
               © 2024{" "}
-              <a href="https://flowbite.com/" className="hover:underline">
-                Reading Advantage™
+              <a href="" className="hover:underline">
+                Primary Advantage™
               </a>
               . All Rights Reserved.
             </span>

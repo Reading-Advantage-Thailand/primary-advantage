@@ -4,60 +4,33 @@ import { Badge } from "../ui/badge";
 import { usePathname } from "next/navigation";
 import { ArticleShowcase } from "@/types";
 import { ActivityStatus, ActivityType } from "@/types/enum";
-import { StarRating } from "../ui/rating";
+import StarRating from "../ui/rating";
+import { useLocale, useTranslations } from "next-intl";
+import { sanitizeTranslationKey } from "@/lib/utils";
 
 type Props = {
   article: ArticleShowcase;
   userId?: string;
 };
 
-async function getTranslateSentence(
-  articleId: string,
-  targetLanguage: string
-): Promise<{ message: string; translated_sentences: string[] }> {
-  try {
-    const res = await fetch(`/api/v1/assistant/translate/${articleId}`, {
-      method: "POST",
-      body: JSON.stringify({ type: "summary", targetLanguage }),
-    });
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    return { message: "error", translated_sentences: [] };
-  }
-}
-
 const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
   ({ article, userId }, ref) => {
-    const [summarySentence, setSummarySentence] = React.useState<string[]>([]);
+    const locale = useLocale();
     const pathName = usePathname();
+    const t = useTranslations("Article");
     const systemPathRegex = /\/(?:[a-z]{2}\/)?system\/.*\/?$/i;
 
-    // React.useEffect(() => {
-    //   handleTranslateSummary();
-    // }, [article, locale]);
+    // Function to get the translated summary based on locale
+    const getLocalizedSummary = () => {
+      if (!locale || locale === "en") {
+        return article.summary;
+      }
 
-    // async function handleTranslateSummary() {
-    //   const articleId = article.id;
-    //   if (!locale || locale === "en") {
-    //     return;
-    //   }
-    //   type ExtendedLocale = "th" | "cn" | "tw" | "vi" | "zh-CN" | "zh-TW";
-    //   let localeTarget: ExtendedLocale = locale as ExtendedLocale;
+      // Map locale to translatedSummary keys
+      const localeKey = locale as "th" | "cn" | "tw" | "vi";
 
-    //   switch (locale) {
-    //     case "cn":
-    //       localeTarget = "zh-CN";
-    //       break;
-    //     case "tw":
-    //       localeTarget = "zh-TW";
-    //       break;
-    //   }
-
-    //   const data = await getTranslateSentence(articleId, localeTarget);
-
-    //   setSummarySentence(data.translated_sentences);
-    // }
+      return article.translatedSummary?.[localeKey] || article.summary;
+    };
 
     return (
       <Link
@@ -83,7 +56,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
       >
         <div
           ref={ref}
-          className="w-full flex flex-col gap-1 h-[20rem] bg-cover bg-center p-3 rounded-md hover:scale-105 transition-all duration-300 bg-black "
+          className="flex h-[20rem] flex-col gap-1 rounded-md bg-black bg-cover bg-center p-3 transition-all duration-300 hover:scale-105"
           style={{
             backgroundImage: `url(/images/${article.id}.png)`,
             boxShadow: "inset 80px 10px 90px 10px rgba(0, 0, 0, 0.9)",
@@ -95,41 +68,36 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
           }}
         >
           {article.raLevel && (
-            <Badge className="shadow-lg max-w-max" variant="destructive">
-              Reading Advantage Level: {article.raLevel}
+            <Badge className="max-w-max shadow-lg" variant="destructive">
+              {t("raLevel", { level: article.raLevel ?? 0 })}
             </Badge>
           )}
-          <Badge className="shadow-lg max-w-max" variant="destructive">
-            CEFR Level: {article.cefrLevel}
+          <Badge className="max-w-max shadow-lg" variant="destructive">
+            {t("cefrLevel", { level: article.cefrLevel ?? 0 })}
           </Badge>
-          <Badge className="shadow-lg max-w-max" variant="destructive">
-            {article.genre}, {article.subGenre}
+          <Badge className="max-w-max shadow-lg" variant="destructive">
+            {t(`subgenres.${sanitizeTranslationKey(article.subGenre ?? "")}`)},{" "}
+            {t(`genres.${sanitizeTranslationKey(article.genre ?? "")}`)}
           </Badge>
-          <Badge className="shadow-lg max-w-max" variant="destructive">
-            <StarRating />
-            {/* <Rating name="read-only" value={article.average_rating} readOnly /> */}
+          <Badge className="max-w-max shadow-lg" variant="destructive">
+            <StarRating initialRating={article.rating} readOnly />
           </Badge>
           <div className="mt-auto">
-            <div className=" bg-black bg-opacity-40">
-              <p className="text-xl drop-shadow-lg font-bold text-white">
+            <div className="bg-black/40">
+              <p className="text-xl font-bold text-white drop-shadow-lg">
                 {article.title}
               </p>
             </div>
-            <div className=" bg-black bg-opacity-40">
-              <div className="text-sm drop-shadow-lg line-clamp-4 text-white">
-                {/* {locale == "en" ? (
-                  <p>{article.summary}</p>
-                ) : (
-                  <p>{summarySentence}</p>
-                )} */}
-                <p>{article.summary}</p>
+            <div className="bg-black/40">
+              <div className="line-clamp-4 text-sm text-white drop-shadow-lg">
+                <p>{getLocalizedSummary()}</p>
               </div>
             </div>
           </div>
         </div>
         {article.is_read && !article.is_completed && (
           <div className="flex justify-center">
-            <Badge className="relative m-auto -top-[11rem] text-md left-0 right-0 shadow-lg max-w-max bg-slate-200 text-slate-900">
+            <Badge className="text-md relative -top-[11rem] right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
               Started
             </Badge>
           </div>
@@ -137,7 +105,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
 
         {article.is_read && article.is_completed && (
           <div className="flex justify-center">
-            <Badge className="relative m-auto -top-[11rem] text-md left-0 right-0 shadow-lg max-w-max bg-slate-200 text-slate-900">
+            <Badge className="text-md relative -top-[11rem] right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
               Completed
             </Badge>
           </div>
@@ -145,14 +113,14 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
 
         {article.is_approved && systemPathRegex.test(pathName) && (
           <div className="flex justify-center">
-            <Badge className="relative m-auto -top-[11rem] text-md left-0 right-0 shadow-lg max-w-max bg-slate-200 text-slate-900">
+            <Badge className="text-md relative -top-[11rem] right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
               Approved
             </Badge>
           </div>
         )}
       </Link>
     );
-  }
+  },
 );
 
 ArticleShowcaseCard.displayName = "ArticleShowcaseCard";

@@ -34,6 +34,7 @@ export function ChangeUsernameForm({
   userId: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const { update: updateSession } = useSession();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -58,8 +59,12 @@ export function ChangeUsernameForm({
         // Reset the form
         form.reset({ name: data.name });
 
-        // update user session token
-        useSession();
+        // Update the session with the complete user data
+        await updateSession({
+          user: {
+            ...data,
+          },
+        });
 
         // refresh the page
         router.refresh();

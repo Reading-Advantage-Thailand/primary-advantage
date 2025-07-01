@@ -2,13 +2,13 @@ import { Footer } from "@/components/index/footer";
 import { MainNav } from "@/components/nav/main-nav";
 import { UserAccountNav } from "@/components/nav/user-account-nav";
 import { buttonVariants } from "@/components/ui/button";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { indexPageConfig } from "@/configs/index-page-config";
 import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ReactNode } from "react";
 // import ProgressBar from "@/components/progress-bar-xp";
-// import { UserAccountNav } from "@/components/user-account-nav";
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const session = await auth();
@@ -44,7 +44,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
               <MainNav items={indexPageConfig.mainNav} />
               {/* <ProgressBar progress={user.xp} level={user.level!} /> */}
               <nav>
-                <UserAccountNav user={session.user} />
+                <UserAccountNav user={session?.user} />
               </nav>
             </div>
           </header>

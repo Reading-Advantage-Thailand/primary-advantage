@@ -8,6 +8,8 @@ import { siteConfig } from "@/configs/site-config";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Inter as FontSans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/lib/auth";
 
 const cabinSketch = Cabin_Sketch({
   variable: "--font-cabin-sketch",
@@ -47,7 +49,7 @@ export const metadata: Metadata = {
   //   siteName: siteConfig.name,
   // },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/primary-advantage.png",
     // shortcut: "/favicon-16x16.png",
     // apple: "/apple-touch-icon.png",
   },
@@ -69,22 +71,26 @@ export default async function RootLayout({
     notFound();
   }
 
+  const session = await auth();
+
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body
-        className={`${cabinSketch.variable} ${cabinSketchBold.variable} ${fontSans.variable} min-h-screen bg-background font-sans antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          enableColorScheme
+    <SessionProvider session={session}>
+      <html lang={locale} suppressHydrationWarning>
+        <body
+          className={`${cabinSketch.variable} ${cabinSketchBold.variable} ${fontSans.variable} bg-background min-h-screen font-sans antialiased`}
         >
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
-          <Toaster />
-        </ThemeProvider>
-      </body>
-    </html>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            enableColorScheme
+          >
+            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+            <Toaster />
+          </ThemeProvider>
+        </body>
+      </html>
+    </SessionProvider>
   );
 }

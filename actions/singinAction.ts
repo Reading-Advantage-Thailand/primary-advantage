@@ -1,8 +1,40 @@
 "use server";
 
-export async function signInAction(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+import { signIn } from "@/lib/auth";
+import { signInSchema } from "@/lib/zod";
+import { AuthError } from "next-auth";
+import { z } from "zod";
 
-  console.log(email, password);
+export async function signInAction(value: z.infer<typeof signInSchema>) {
+  const validation = signInSchema.safeParse(value);
+
+  if (!validation.success) {
+    return {
+      error: "Invalid input data",
+    };
+  }
+
+  const { email, password, type } = validation.data;
+
+  try {
+    await signIn("credentials", {
+      type,
+      email,
+      password,
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return {
+            error: "Invalid email or password",
+          };
+        default:
+          return {
+            error: "An unknown error occurred",
+          };
+      }
+    }
+    throw error;
+  }
 }

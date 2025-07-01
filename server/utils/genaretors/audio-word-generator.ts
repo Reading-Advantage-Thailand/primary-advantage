@@ -7,6 +7,7 @@ import {
 import base64 from "base64-js";
 import fs from "fs";
 import path from "path";
+import { generateWordList } from "./wordlist-generator";
 
 export type WordListResponse = {
   vocabulary: string;
@@ -17,6 +18,7 @@ export type WordListResponse = {
     tw: string;
     vi: string;
   };
+  timeSeconds?: number;
 };
 
 export type GenerateAudioParams = {
@@ -46,10 +48,36 @@ function contentToSSML(content: string[]): string {
   return ssml;
 }
 
+export async function generateWordLists(articleId: string) {
+  const article = await prisma.article.findUnique({
+    where: {
+      id: articleId,
+    },
+    select: {
+      passage: true,
+    },
+  });
+
+  if (!article?.passage) {
+    throw new Error("Article not found");
+  }
+
+  const wordlist = await generateWordList({
+    passage: article.passage,
+  });
+
+  await generateAudioForWord({
+    wordList: wordlist,
+    articleId,
+  });
+
+  return wordlist;
+}
+
 export async function generateAudioForWord({
   wordList,
   articleId,
-}: GenerateAudioParams): Promise<TimePoint[]> {
+}: GenerateAudioParams): Promise<void> {
   {
     try {
       const voice =
@@ -59,7 +87,7 @@ export async function generateAudioForWord({
         ? wordList.map((item: any) => item?.vocabulary)
         : [];
 
-      let allTimePoints: TimePoint[] = [];
+      let allTimePoints: WordListResponse[] = [];
 
       const response = await fetch(
         `${BASE_TEXT_TO_SPEECH_URL}/v1beta1/text:synthesize?key=${process.env.GOOGLE_API_KEY}`,
@@ -79,7 +107,7 @@ export async function generateAudioForWord({
             },
             enableTimePointing: ["SSML_MARK"],
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -88,13 +116,21 @@ export async function generateAudioForWord({
 
       const data = await response.json();
       const audio = data.audioContent;
-      allTimePoints = data?.timepoints;
+      const timepoints: TimePoint[] = data?.timepoints;
+
+      // Combine wordList with timepoints
+      allTimePoints = wordList.map((word, index) => ({
+        vocabulary: word.vocabulary,
+        definition: word.definition,
+        timeSeconds: timepoints[index]?.timeSeconds,
+      }));
+
       const MP3 = base64.toByteArray(audio);
 
       const localPath = path.join(
         process.cwd(),
-        "data/audios/words",
-        `${articleId}.mp3`
+        "public/audios/words",
+        `${articleId}.mp3`,
       );
       fs.writeFileSync(localPath, MP3);
 
@@ -105,18 +141,19 @@ export async function generateAudioForWord({
       //     id: articleId,
       //   });
 
-      await prisma.wordList.update({
+      await prisma.article.update({
         where: {
-          articleId: articleId,
+          id: articleId,
         },
         data: {
-          timepoints: JSON.parse(JSON.stringify(allTimePoints)),
+          words: JSON.parse(JSON.stringify(allTimePoints)),
+          audioWordUrl: `/audios/words/${articleId}.mp3`,
         },
       });
-      return allTimePoints;
+      return;
     } catch (error: any) {
       throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(
-        error.response.data
+        error.response.data,
       )}`;
     }
   }

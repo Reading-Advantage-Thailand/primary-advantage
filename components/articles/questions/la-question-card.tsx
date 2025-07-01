@@ -5,51 +5,85 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getQuestionsWithArticleId } from "@/server/models/articles";
-import { ActivityType } from "@/types/enum";
+import { getQuestionsByArticleId } from "@/server/models/articles";
+import { ActivityType, QuestionState } from "@/types/enum";
 import QuestionHeader from "./question-header";
 import { QuizContextProvider } from "@/contexts/question-context";
 import LAQuestionContent from "./la-question-content";
+import { LAQuestion, QuestionResponse } from "@/types";
+import { getTranslations } from "next-intl/server";
 
 export default async function LAQuestionCard({
   articleId,
 }: {
   articleId: string;
 }) {
-  const Data = await getQuestionsWithArticleId(
+  const questionsData: QuestionResponse = await getQuestionsByArticleId(
     articleId,
-    ActivityType.LA_Question
+    ActivityType.LA_QUESTION,
   );
 
-  if (!Data.questions) {
+  const t = await getTranslations("Question");
+  const tc = await getTranslations("Components");
+
+  if (questionsData.questionStatus === QuestionState.ERROR) {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="font-bold text-3xl md:text-3xl text-muted-foreground">
-            Long Answer Questions
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("LAQuestion.title")}
           </CardTitle>
           <CardDescription className="text-red-500 dark:text-red-400">
-            There was an error getting the question.
+            {t("descriptionError")}
           </CardDescription>
-          <Skeleton className="h-8 w-full mt-2" />
         </CardHeader>
       </Card>
     );
   }
 
-  if (Data.questions) {
+  if (questionsData.questionStatus === QuestionState.LOADING) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("LAQuestion.title")}
+          </CardTitle>
+          <CardDescription>{t("descriptionLoading")}</CardDescription>
+          <Skeleton className="mt-2 h-8 w-full" />
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  if (questionsData.questionStatus === QuestionState.INCOMPLETE) {
     return (
       <Card className="w-full">
         <QuestionHeader
-          heading="Long Answer Questions"
-          description="Take the quiz to check your understanding"
-          buttonLabel="Start Quiz"
+          heading={t("LAQuestion.title")}
+          description={t("LAQuestion.description")}
+          buttonLabel={tc("startQuiz")}
           disabled={false}
         >
           <QuizContextProvider>
-            <LAQuestionContent data={Data.questions} />
+            <LAQuestionContent
+              articleId={articleId}
+              questions={questionsData.questions as LAQuestion}
+            />
           </QuizContextProvider>
         </QuestionHeader>
+      </Card>
+    );
+  }
+
+  if (questionsData.questionStatus === QuestionState.COMPLETED) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("LAQuestion.title")}
+          </CardTitle>
+          <CardDescription>{t("descriptionSuccess")}</CardDescription>
+        </CardHeader>
       </Card>
     );
   }

@@ -1,9 +1,9 @@
-import z from "zod";
 import path from "path";
 import fs from "fs";
 import { generateObject } from "ai";
 import { google, googleModel } from "@/utils/google";
 import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
+import { articleGeneratorSchema } from "@/lib/zod";
 
 export interface GenerateArticleParams {
   type: ArticleType;
@@ -19,6 +19,12 @@ export interface GenerateArticleResponse {
   title: string;
   summary: string;
   imageDesc: string;
+  translatedSummary: {
+    th: string;
+    cn: string;
+    tw: string;
+    vi: string;
+  };
 }
 
 type CefrLevelPromptType = {
@@ -33,47 +39,13 @@ type CefrLevelType = {
   userPromptTemplate: string;
 };
 
-// schema
-const schema = z.object({
-  brainstorming: z
-    .string()
-    .describe(
-      "Brainstorm various ideas for the article or passage in short phrases."
-    ),
-  planning: z
-    .string()
-    .describe(
-      "Planning for the passage: a strategy for incorporating vocabulary and grammar features suited to the specified CEFR level, including sentence structures, common phrases, and appropriate linguistic complexity. For nonfiction, focus on a logical organization of ideas and clear transitions; for fiction, consider narrative techniques, character development, and descriptive language. Provide a bullet-point outline covering the structure, key content points, and any specific stylistic or thematic elements to include."
-    ),
-  title: z
-    .string()
-    .describe(
-      "An interesting title for the article written at the same CEFR level"
-    ),
-  passage: z
-    .string()
-    .describe(
-      "The reading passage written to the supplied specifications for both CEFR and type."
-    ),
-  summary: z
-    .string()
-    .describe(
-      "A one-sentence summary of the article written at the same CEFR level"
-    ),
-  imageDesc: z
-    .string()
-    .describe(
-      "A detailed description of an image to go along with the passage"
-    ),
-});
-
 export async function generateArticle(
-  params: GenerateArticleParams
+  params: GenerateArticleParams,
 ): Promise<GenerateArticleResponse> {
   const dataFilePath = path.join(
     process.cwd(),
     "data",
-    "cefr-article-prompts.json"
+    "cefr-article-prompts.json",
   );
 
   // read prompts from file
@@ -97,12 +69,12 @@ export async function generateArticle(
   // generate article
   try {
     console.log(
-      `${params.cefrLevel} generating article model ID: ${googleModel} type: ${params.type}`
+      `${params.cefrLevel} generating article model ID: ${googleModel} type: ${params.type}`,
     );
 
     const { object: article } = await generateObject({
       model: google(googleModel),
-      schema: schema,
+      schema: articleGeneratorSchema,
       system: levelConfig.systemPrompt,
       prompt: userPrompt,
       seed: Math.floor(Math.random() * 1000),

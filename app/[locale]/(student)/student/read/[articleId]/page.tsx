@@ -3,8 +3,9 @@ import LAQuestionCard from "@/components/articles/questions/la-question-card";
 import MCQuestionCard from "@/components/articles/questions/mc-question-card";
 import SAQuestionCard from "@/components/articles/questions/sa-question-card";
 import WordList from "@/components/articles/word-list";
-import { getArticleWithId } from "@/server/models/articles";
+import { getArticleById } from "@/server/models/articles";
 import React from "react";
+import { Article, WordListTimestamp } from "@/types";
 
 export const metadata = {
   title: "Article",
@@ -15,16 +16,14 @@ type Params = Promise<{ articleId: string }>;
 
 export default async function ArticleQuizPage({ params }: { params: Params }) {
   const { articleId } = await params;
-  const articleResponse = await getArticleWithId(articleId);
-
-  // if (!articleResponse) return <CustomError />;
+  const { article } = await getArticleById(articleId);
 
   return (
     <>
-      <div className="flex flex-col gap-4 md:flex md:flex-row md:gap-3 md:mb-5">
-        <ArticleCard article={articleResponse.article} />
+      <div className="flex flex-col gap-4 md:mb-5 md:flex md:flex-row md:gap-3">
+        <ArticleCard article={article as unknown as Article} />
         <div className="flex flex-col items-start gap-4 md:basis-2/5">
-          <div className="flex gap-2 justify-center items-center sm:flex-nowrap flex-wrap">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap">
             {/* {isAtLeastTeacher(user.role) && (
               <>
                 <PrintArticle
@@ -40,7 +39,11 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
               />
             )} */}
 
-            <WordList />
+            <WordList
+              articleId={articleId}
+              words={article.words as unknown as WordListTimestamp[]}
+              audioUrl={article.audioWordUrl as string}
+            />
           </div>
 
           <MCQuestionCard articleId={articleId} />

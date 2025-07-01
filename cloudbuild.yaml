@@ -1,0 +1,98 @@
+steps:
+  # Step 1: Fetch secrets from Secret Manager (DATABASE_URL)
+  # This step uses the gcloud CLI to access secrets.
+  # The secret value is then available as an environment variable for subsequent steps.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "fetch-secrets"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        # Check if DATABASE_URL_SECRET_NAME is provided (e.g., DATABASE_URL_DEV or DATABASE_URL_PROD)
+        if [ -z "${_DATABASE_URL_SECRET_NAME}" ]; then
+          echo "Error: _DATABASE_URL_SECRET_NAME substitution is missing."
+          exit 1
+        fi
+        # Fetch the secret value
+        DB_URL=$(gcloud secrets versions access latest --secret=${_DATABASE_URL_SECRET_NAME} --project=${_TARGET_PROJECT_ID})
+        echo "DB_URL_SECRET=$DB_URL" >> /workspace/env_vars.txt
+    secretEnv: ["DATABASE_URL_SECRET"] # Define a placeholder for the secret
+
+  # Step 2: Install Node.js dependencies
+  - name: "node:22-alpine"
+    id: "install-dependencies"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        source /workspace/env_vars.txt
+        # Ensure DATABASE_URL is available for Prisma generate during build
+        # This is passed as a build-arg to the Dockerfile
+        npm ci
+    env:
+      - "DATABASE_URL=${_DATABASE_URL_SECRET}" # Pass the secret to the build environment
+
+  # Step 3: Generate Prisma Client & Run Next.js Build
+  # This step uses the Dockerfile's ARG DATABASE_URL_ARG to pass the DB URL for Prisma generate
+  - name: "gcr.io/cloud-builders/docker"
+    id: "build-nextjs-app"
+    args:
+      - "build"
+      - "-t"
+      - "asia-southeast1-docker.pkg.dev/${_TARGET_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:${_COMMIT_SHA}"
+      - "."
+      - "--build-arg=DATABASE_URL=${_DATABASE_URL_SECRET}" # Pass DB URL as build arg
+    env:
+      - "DATABASE_URL=${_DATABASE_URL_SECRET}" # Also ensure it's in the env for npm scripts
+
+  # Step 4: Run Prisma Migrations
+  # IMPORTANT: This step applies migrations to the database.
+  # Ensure the Cloud Build service account has Cloud SQL Client permissions for the target DB.
+  - name: "node:20-alpine" # Use a Node.js image with Prisma installed
+    id: "run-prisma-migrations"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        source /workspace/env_vars.txt
+        # Install Prisma CLI globally or ensure it's in node_modules/.bin
+        npm install prisma --save-dev
+        npx prisma migrate deploy --schema=./prisma/schema.prisma
+    env:
+      - "DATABASE_URL=${_DATABASE_URL_SECRET}" # Use the fetched secret DB URL
+
+  # Step 5: Push Docker Image to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    id: "push-image"
+    args:
+      [
+        "push",
+        "asia-southeast1-docker.pkg.dev/${_TARGET_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:${_COMMIT_SHA}",
+      ]
+
+  # Step 6: Trigger Cloud Deploy Release (for CD)
+  - name: "gcr.io/google.com/cloudsdk/cloud-sdk"
+    id: "trigger-cloud-deploy"
+    entrypoint: "gcloud"
+    args:
+      - "deploy"
+      - "releases"
+      - "create"
+      - "primary-advantage-app-release-${_COMMIT_SHA}"
+      - "--delivery-pipeline=primary-advantage-app-pipeline" # Name of your Cloud Deploy pipeline
+      - "--region=asia-southeast1" # Region where Cloud Deploy pipeline is defined
+      - "--images=primary-advantage-app-image=asia-southeast1-docker.pkg.dev/${_TARGET_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:${_COMMIT_SHA}"
+      - "--skaffold-file=skaffold.yaml" # Path to your Skaffold configuration
+      - "--source=." # Source directory containing skaffold.yaml and k8s manifests
+
+# Define substitutions for dynamic values
+substitutions:
+  _COMMIT_SHA: "COMMIT_SHA" # Automatically provided by Cloud Build
+  _DATABASE_URL_SECRET_NAME: "DATABASE_URL" # Default for dev trigger
+  _TARGET_PROJECT_ID: "primary-advantage" # Default target project for dev trigger
+
+# Secrets for fetching from Secret Manager
+availableSecrets:
+  secretManager:
+    - versionName: projects/${_TARGET_PROJECT_ID}/secrets/${_DATABASE_URL_SECRET_NAME}/versions/latest
+      env: "DATABASE_URL_SECRET" # This name is used in secretEnv above

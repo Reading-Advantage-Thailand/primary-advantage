@@ -1,9 +1,9 @@
 export enum Role {
-  USER = "user",
-  STUDENT = "student",
-  TEACHER = "teacher",
-  ADMIN = "admin",
-  SYSTEM = "system",
+  USER = "USER",
+  STUDENT = "STUDENT",
+  TEACHER = "TEACHER",
+  ADMIN = "ADMIN",
+  SYSTEM = "SYSTEM",
 }
 
 export enum ArticleType {
@@ -42,23 +42,23 @@ export enum ArticleCefrLevel {
 }
 
 export enum ActivityType {
-  ArticleRating = "article_rating",
-  ArticleRead = "article_read",
-  StoriesRating = "stories_rating",
-  StoriesRead = "stories_read",
-  ChapterRating = "chapter_rating",
-  ChapterRead = "chapter_read",
-  LevelTest = "level_test",
-  MC_Question = "mc_question",
-  SA_Question = "sa_question",
-  LA_Question = "la_question",
-  SentenceFlashcards = "sentence_flashcards",
-  SentenceMatching = "sentence_matching",
-  SentenceOrdering = "sentence_ordering",
-  SentenceWordOrdering = "sentence_word_ordering",
-  SentenceClozeTest = "sentence_cloze_test",
-  VocabularyFlashcards = "vocabulary_flashcards",
-  VocabularyMatching = "vocabulary_matching",
+  ARTICLE_RATING = "ARTICLE_RATING",
+  ARTICLE_READ = "ARTICLE_READ",
+  STORIES_RATING = "STORIES_RATING",
+  STORIES_READ = "STORIES_READ",
+  CHAPTER_RATING = "CHAPTER_RATING",
+  CHAPTER_READ = "CHAPTER_READ",
+  LEVEL_TEST = "LEVEL_TEST",
+  MC_QUESTION = "MC_QUESTION",
+  SA_QUESTION = "SA_QUESTION",
+  LA_QUESTION = "LA_QUESTION",
+  SENTENCE_FLASHCARDS = "SENTENCE_FLASHCARDS",
+  SENTENCE_MATCHING = "SENTENCE_MATCHING",
+  SENTENCE_ORDERING = "SENTENCE_ORDERING",
+  SENTENCE_WORD_ORDERING = "SENTENCE_WORD_ORDERING",
+  SENTENCE_CLOZE_TEST = "SENTENCE_CLOZE_TEST",
+  VOCABULARY_FLASHCARDS = "VOCABULARY_FLASHCARDS",
+  VOCABULARY_MATCHING = "VOCABULARY_MATCHING",
 }
 
 export enum ActivityStatus {
@@ -70,10 +70,29 @@ export enum QuestionState {
   LOADING = 0,
   INCOMPLETE = 1,
   COMPLETED = 2,
+  ERROR = 3,
 }
 
 export enum AnswerStatus {
   CORRECT = 0,
   INCORRECT = 1,
   UNANSWERED = 2,
+}
+
+export enum UserXpEarned {
+  MCQuestion = 2,
+  Article_Rating = 10,
+  Chapter_Rating = 10,
+  Vocabulary_Flashcards = 15,
+  Vocabulary_Matching = 5,
+  Sentence_Flashcards = 15,
+  Sentence_Matching = 5,
+  Sentence_Cloze_Test = 2,
+  Sentence_Ordering = 5,
+  Sentence_Word_Ordering = 5,
+}
+
+export enum FlashcardType {
+  VOCABULARY = "VOCABULARY",
+  SENTENCE = "SENTENCE",
 }

@@ -5,51 +5,96 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getQuestionsWithArticleId } from "@/server/models/articles";
-import { ActivityType } from "@/types/enum";
+import { getQuestionsByArticleId } from "@/server/models/articles";
+import { ActivityType, QuestionState } from "@/types/enum";
 import SAQuestionContent from "./sa-question-content";
 import QuestionHeader from "./question-header";
 import { QuizContextProvider } from "@/contexts/question-context";
+import { QuestionResponse, SAQuestion } from "@/types";
+import { getTranslations } from "next-intl/server";
 
 export default async function SAQuestionCard({
   articleId,
 }: {
   articleId: string;
 }) {
-  const Data = await getQuestionsWithArticleId(
+  const questionsData: QuestionResponse = await getQuestionsByArticleId(
     articleId,
-    ActivityType.SA_Question
+    ActivityType.SA_QUESTION,
   );
 
-  if (!Data.questions) {
+  const t = await getTranslations("Question");
+  const tc = await getTranslations("Components");
+
+  if (questionsData.questionStatus === QuestionState.ERROR) {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="font-bold text-3xl md:text-3xl text-muted-foreground">
-            Short Answer Questions
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("SAQuestion.title")}
           </CardTitle>
           <CardDescription className="text-red-500 dark:text-red-400">
-            There was an error getting the question.
+            {t("descriptionError")}
           </CardDescription>
-          <Skeleton className="h-8 w-full mt-2" />
         </CardHeader>
       </Card>
     );
   }
 
-  if (Data.questions) {
+  if (questionsData.questionStatus === QuestionState.LOADING) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("SAQuestion.title")}
+          </CardTitle>
+          <CardDescription>{t("descriptionLoading")}</CardDescription>
+          <Skeleton className="mt-2 h-8 w-full" />
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  if (questionsData.questionStatus === QuestionState.INCOMPLETE) {
     return (
       <Card className="w-full">
         <QuestionHeader
-          heading="Short Answer Questions"
-          description="Take the quiz to check your understanding"
-          buttonLabel="Start Quiz"
+          heading={t("SAQuestion.title")}
+          description={t("SAQuestion.description")}
+          buttonLabel={tc("startQuiz")}
           disabled={false}
         >
           <QuizContextProvider>
-            <SAQuestionContent data={Data.questions} />
+            <SAQuestionContent
+              articleId={articleId}
+              questions={questionsData.questions as SAQuestion}
+            />
           </QuizContextProvider>
         </QuestionHeader>
+      </Card>
+    );
+  }
+
+  if (questionsData.questionStatus === QuestionState.COMPLETED) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
+            {t("SAQuestion.title")}
+          </CardTitle>
+          <CardDescription>
+            <p className="mt-4 text-lg font-bold">Question</p>
+            <p>{questionsData.result?.details.question}</p>
+            <p className="mt-4 text-lg font-bold">Suggested Answer</p>
+            <p>{questionsData.result?.details.suggestedAnswer}</p>
+            <p className="mt-4 text-lg font-bold">Feedback</p>
+            <p>{questionsData.result?.details.feedback}</p>
+            <p className="mt-4 text-lg font-bold">Your Answer</p>
+            <p className="mt-2 inline font-bold text-green-500 dark:text-green-400">
+              {questionsData.result?.details.yourAnswer}
+            </p>
+          </CardDescription>
+        </CardHeader>
       </Card>
     );
   }

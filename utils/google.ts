@@ -16,7 +16,7 @@ const google = createVertex({
   },
 });
 
-const googleModelAudio = "gemini-2.0-flash-lite";
+const googleModelLite = "gemini-2.0-flash-lite";
 const googleModel = "gemini-2.0-flash-001";
 const googleFlashThinking = "gemini-2.0-flash-thinking-exp-01-21";
 const googleImages = "imagen-3.0-generate-001";
@@ -27,6 +27,6 @@ export {
   googleModel,
   googleImages,
   googleFlashThinking,
-  googleModelAudio,
+  googleModelLite,
   googleProPrewiew,
 };

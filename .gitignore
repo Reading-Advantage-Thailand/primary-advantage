@@ -44,5 +44,5 @@ next-env.d.ts
 docker-compose.yml*
 
 #file local
-/public/images/*.png
-/data/audios/*
+/public/images/*
+/public/audios/*

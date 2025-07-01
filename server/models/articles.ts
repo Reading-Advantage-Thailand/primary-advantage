@@ -1,171 +1,283 @@
 import { prisma } from "@/lib/prisma";
 import { randomSelectGenre } from "../utils/genaretors/random-select-genre";
-import { ActivityType, ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
+import {
+  ActivityType,
+  ArticleBaseCefrLevel,
+  ArticleType,
+  QuestionState,
+} from "@/types/enum";
 import { generateTopic } from "../utils/genaretors/topic-generator";
 import { generateArticle } from "../utils/genaretors/article-generator";
 import { evaluateRating } from "../utils/genaretors/evaluate-rating-generator";
 import { generateImage } from "../utils/genaretors/image-generator";
-import { calculateLevel } from "../../lib/calculateLevel";
 import { generateMCQuestion } from "../utils/genaretors/mc-question-generator";
 import { generateSAQuestion } from "../utils/genaretors/sa-question-generator";
 import { generateLAQuestion } from "../utils/genaretors/la-question-generator";
-import { generateWordList } from "../utils/genaretors/wordlist-generator";
+import {
+  generateWordList,
+  WordListResponse,
+} from "../utils/genaretors/wordlist-generator";
 import { generateAudio } from "../utils/genaretors/audio-generator";
-import { generateAudioForWord } from "../utils/genaretors/audio-word-generator";
-import { LAQuestion, MCQuestion, SAQuestion } from "@/types";
+import { generateWordLists } from "../utils/genaretors/audio-word-generator";
+import {
+  LAQuestion,
+  MCQuestion,
+  QuestionResult,
+  SAQuestion,
+  WordList,
+  Article,
+} from "@/types";
+import { cleanGenre, convertCefrLevel } from "@/lib/utils";
 
-export const generateArticles = async (
+interface GenerateArticleParams {
+  type: ArticleType;
+  level: ArticleBaseCefrLevel;
+}
+
+interface GeneratedContent {
+  article: {
+    title: string;
+    passage: string;
+    summary: string;
+    translatedSummary: {
+      th: string;
+      cn: string;
+      tw: string;
+      vi: string;
+    };
+    imageDesc: string;
+    rating: number;
+    cefrLevel: string;
+  };
+  mcq: {
+    questions: Array<{
+      question: string;
+      options: string[];
+      answer: string;
+    }>;
+  };
+  saq: {
+    questions: Array<{
+      question: string;
+      answer: string;
+    }>;
+  };
+  laq: {
+    question: string;
+  };
+}
+
+const MAX_ATTEMPTS = 3;
+const MIN_RATING = 2;
+
+async function generateContent(
   type: ArticleType,
-  level: ArticleBaseCefrLevel
-) => {
+  level: ArticleBaseCefrLevel,
+  topic: string,
+  genre: string,
+  subgenre: string,
+): Promise<GeneratedContent> {
+  const generatedArticle = await generateArticle({
+    type,
+    genre,
+    subgenre,
+    topic,
+    cefrLevel: level,
+  });
+
+  const evaluatedArticle = await evaluateRating({
+    passage: generatedArticle.passage,
+    cefrLevel: level,
+  });
+
+  if (evaluatedArticle.rating < MIN_RATING) {
+    throw new Error("Article rating too low");
+  }
+
+  const [mcq, saq, laq] = await Promise.all([
+    generateMCQuestion({
+      type,
+      cefrlevel: level,
+      passage: generatedArticle.passage,
+      title: generatedArticle.title,
+      summary: generatedArticle.summary,
+      imageDesc: generatedArticle.imageDesc,
+    }),
+    generateSAQuestion({
+      type,
+      cefrlevel: level,
+      passage: generatedArticle.passage,
+      title: generatedArticle.title,
+      summary: generatedArticle.summary,
+      imageDesc: generatedArticle.imageDesc,
+    }),
+    generateLAQuestion({
+      type,
+      cefrlevel: level,
+      passage: generatedArticle.passage,
+      title: generatedArticle.title,
+      summary: generatedArticle.summary,
+      imageDesc: generatedArticle.imageDesc,
+    }),
+  ]);
+
+  return {
+    article: {
+      ...generatedArticle,
+      rating: evaluatedArticle.rating,
+      cefrLevel: evaluatedArticle.cefrLevel as string,
+    },
+    mcq,
+    saq,
+    laq,
+  };
+}
+
+async function saveArticleContent(
+  content: GeneratedContent,
+  genre: string,
+  subgenre: string,
+  type: ArticleType,
+): Promise<void> {
+  const { article, mcq, saq, laq } = content;
+
+  // First create the article to get its ID
+  const createdArticle = await prisma.article.create({
+    data: {
+      title: article.title,
+      passage: article.passage,
+      summary: article.summary,
+      translatedSummary: article.translatedSummary,
+      imageDescription: article.imageDesc,
+      genre: cleanGenre(genre),
+      subGenre: cleanGenre(subgenre),
+      type,
+      rating: article.rating,
+      raLevel: convertCefrLevel(article.cefrLevel),
+      cefrLevel: article.cefrLevel,
+    },
+  });
+
+  const articleId = createdArticle.id;
+
+  await Promise.all([
+    // Generate and save image
+    generateImage({
+      imageDesc: article.imageDesc,
+      articleId,
+    }),
+
+    // Save questions
+    prisma.longAnswerQuestion.create({
+      data: {
+        question: laq.question,
+        articleId,
+      },
+    }),
+
+    // Save short answer questions
+    ...saq.questions.map((question) =>
+      prisma.shortAnswerQuestion.create({
+        data: {
+          question: question.question,
+          answer: question.answer,
+          articleId,
+        },
+      }),
+    ),
+
+    // Save multiple choice questions
+    ...mcq.questions.map((mcq) =>
+      prisma.multipleChoiceQuestion.create({
+        data: {
+          question: mcq.question,
+          options: mcq.options,
+          answer: mcq.answer,
+          articleId,
+        },
+      }),
+    ),
+
+    // Save word list
+    // prisma.wordList.create({
+    //   data: {
+    //     wordlist: wordList.word_list,
+    //     article: {
+    //       connect: {
+    //         id: articleId,
+    //       },
+    //     },
+    //   },
+    // }),
+
+    // Generate audio
+    generateAudio({
+      passage: article.passage,
+      articleId,
+    }),
+
+    // Generate word audio
+    generateWordLists(articleId),
+  ]);
+}
+
+export const generateArticles = async ({
+  type,
+  level,
+}: GenerateArticleParams): Promise<void> => {
   try {
     const randomGenre = await randomSelectGenre({ type });
+    if (!randomGenre?.genre || !randomGenre?.subgenre) {
+      throw new Error("Failed to generate genre");
+    }
 
     const generatedTopic = await generateTopic({
-      type: type,
+      type,
       genre: randomGenre.genre,
       subgenre: randomGenre.subgenre,
     });
 
-    if (
-      !generatedTopic.topics ||
-      !generatedTopic.genre ||
-      !generatedTopic.subgenre
-    ) {
-      throw new Error("Failed to generate topic or incomplete topic data");
+    if (!generatedTopic.topics) {
+      throw new Error("Failed to generate topic");
     }
 
-    let generatedArticle;
-    let evaluatedArticle;
     let attempts = 0;
-    const maxAttempts = 3;
+    let content: GeneratedContent | null = null;
 
-    while (attempts < maxAttempts) {
-      generatedArticle = await generateArticle({
-        type,
-        genre: generatedTopic.genre,
-        subgenre: generatedTopic.subgenre,
-        topic: generatedTopic.topics || "",
-        cefrLevel: level,
-      });
-
-      evaluatedArticle = await evaluateRating({
-        passage: generatedArticle.passage,
-        cefrLevel: level,
-      });
-
-      if (evaluatedArticle.rating >= 2) {
-        // const { raLevel, cefrLevel } = calculateLevel(
-        //   generatedArticle.passage,
-        //   level
-        // );
-
-        const mcq = await generateMCQuestion({
+    while (attempts < MAX_ATTEMPTS) {
+      try {
+        content = await generateContent(
           type,
-          cefrlevel: level,
-          passage: generatedArticle.passage,
-          title: generatedArticle.title,
-          summary: generatedArticle.summary,
-          imageDesc: generatedArticle.imageDesc,
-        });
-
-        const saq = await generateSAQuestion({
-          type,
-          cefrlevel: level,
-          passage: generatedArticle.passage,
-          title: generatedArticle.title,
-          summary: generatedArticle.summary,
-          imageDesc: generatedArticle.imageDesc,
-        });
-
-        const laq = await generateLAQuestion({
-          type,
-          cefrlevel: level,
-          passage: generatedArticle.passage,
-          title: generatedArticle.title,
-          summary: generatedArticle.summary,
-          imageDesc: generatedArticle.imageDesc,
-        });
-
-        const wordList = await generateWordList({
-          passage: generatedArticle.passage,
-        });
-
-        const article = await prisma.article.create({
-          data: {
-            title: generatedArticle.title,
-            passage: generatedArticle.passage,
-            summary: generatedArticle.summary,
-            imageDescription: generatedArticle.imageDesc,
-            genre: randomGenre.genre.replace(/\s*\(.*?\)\s*$/, ""),
-            subGenre: randomGenre.subgenre.replace(/\s*\(.*?\)\s*$/, ""),
-            type: type,
-            rating: evaluatedArticle.rating,
-            raLevel: 2,
-            cefrLevel: level,
-          },
-        });
-
-        await generateImage({
-          imageDesc: generatedArticle.imageDesc,
-          articleId: article.id,
-        });
-
-        await prisma.longAnswerQuestion.create({
-          data: {
-            question: laq.question,
-            articleId: article.id,
-          },
-        });
-
-        await Promise.all(
-          saq.questions.map((question) => {
-            return prisma.shortAnswerQuestion.create({
-              data: {
-                question: question.question,
-                answer: question.answer,
-                articleId: article.id,
-              },
-            });
-          })
+          level,
+          generatedTopic.topics,
+          randomGenre.genre,
+          randomGenre.subgenre,
         );
-
-        await Promise.all(
-          mcq.questions.map((mcq) =>
-            prisma.multipleChoiceQuestion.create({
-              data: {
-                question: mcq.question,
-                options: mcq.options,
-                answer: mcq.answer,
-                articleId: article.id,
-              },
-            })
-          )
-        );
-
-        await prisma.wordList.create({
-          data: {
-            wordlist: wordList.word_list,
-            articleId: article.id,
-          },
-        });
-
-        await generateAudio({
-          passage: generatedArticle.passage,
-          articleId: article.id,
-        });
-
-        await generateAudioForWord({
-          wordList: wordList.word_list,
-          articleId: article.id,
-        });
-
         break;
+      } catch (error) {
+        attempts++;
+        if (attempts === MAX_ATTEMPTS) {
+          throw new Error(
+            `Failed to generate content after ${MAX_ATTEMPTS} attempts`,
+          );
+        }
+        // Wait before retrying with exponential backoff
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * Math.pow(2, attempts - 1)),
+        );
       }
-
-      attempts++;
     }
-    return;
+
+    if (!content) {
+      throw new Error("Failed to generate content");
+    }
+
+    await saveArticleContent(
+      content,
+      randomGenre.genre,
+      randomGenre.subgenre,
+      type,
+    );
   } catch (error) {
     console.error("Error generating article:", error);
     throw error;
@@ -195,6 +307,9 @@ export const getArticlesWithParams = async (params: {
     where: whereClause,
     skip: offset,
     take: limit,
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   const totalArticles = await prisma.article.count({
@@ -207,84 +322,113 @@ export const getArticlesWithParams = async (params: {
   };
 };
 
-export const getArticleWithId = async (articleId: string) => {
-  const fullArticle = await prisma.article.findUnique({
+export const getArticleById = async (articleId: string) => {
+  const article = await prisma.article.findUnique({
     where: { id: articleId },
-    include: {
-      multipleChoiceQuestions: true,
-      shortAnswerQuestions: true,
-      longAnswerQuestions: true,
-      WordList: true,
-    },
   });
 
-  if (!fullArticle) {
+  if (!article) {
     throw new Error("Article not found"); // or return null / 404 response
   }
 
-  const {
-    multipleChoiceQuestions,
-    shortAnswerQuestions,
-    longAnswerQuestions,
-    WordList,
-    ...article
-  } = fullArticle;
-
-  return {
-    article,
-    questions: {
-      multipleChoiceQuestions,
-      shortAnswerQuestions,
-      longAnswerQuestions,
-      WordList,
-    },
-  };
+  return { article };
 };
 
-export const getQuestionsWithArticleId = async (
+export const getQuestionsByArticleId = async (
   articleId: string,
-  type: ActivityType
-) => {
-  let questions: MCQuestion[] | SAQuestion[] | LAQuestion[] = [];
-  let questionStatus;
-
-  if (type === ActivityType.MC_Question) {
-    questionStatus = await prisma.multipleChoiceQuestion_ActivityLog.findMany({
-      where: { articleId },
-    });
-
-    if (questionStatus) {
-      const question = await prisma.multipleChoiceQuestion.findMany({
-        where: { articleId },
-      });
-      const suffledQuestions = question.sort(() => Math.random() - 0.5);
-      questions = suffledQuestions.slice(0, 5);
-    }
-  } else if (type === ActivityType.SA_Question) {
-    questionStatus = await prisma.shortAnswerQuestion_ActivityLog.findMany({
-      where: { articleId },
-    });
-    if (questionStatus) {
-      const question = await prisma.shortAnswerQuestion.findMany({
-        where: { articleId },
-      });
-      const suffledQuestions = question.sort(() => Math.random() - 0.5);
-      questions = suffledQuestions.slice(0, 1);
-    }
-  } else if (type === ActivityType.LA_Question) {
-    questionStatus = await prisma.longAnswerQuestion_ActivityLog.findMany({
-      where: { articleId },
-    });
-    if (questionStatus) {
-      questions = await prisma.longAnswerQuestion.findMany({
-        where: { articleId },
-      });
-    }
+  type: ActivityType,
+): Promise<{
+  questions: MCQuestion[] | SAQuestion | LAQuestion;
+  result: QuestionResult;
+  questionStatus: QuestionState;
+}> => {
+  if (!articleId) {
+    throw new Error("Article ID is required");
   }
 
-  if (!questions) {
-    throw new Error("Questions not found");
-  }
+  let questionStatus: QuestionState = QuestionState.INCOMPLETE;
+  let questions: MCQuestion[] | SAQuestion | LAQuestion;
+  let result: QuestionResult = {
+    details: {
+      timer: 0,
+    },
+    completed: false,
+  };
 
-  return { questions, questionStatus };
+  try {
+    // Check if questions are already completed
+    const activities = await prisma.userActivity.findMany({
+      where: {
+        targetId: articleId,
+        activityType: type,
+        completed: true,
+      },
+    });
+
+    // Map activities to QuestionResult type
+    if (activities.length > 0) {
+      const activity = activities[0];
+      result = {
+        details: activity.details as {
+          responses?: string[];
+          progress?: number[];
+          timer: number;
+        },
+        completed: activity.completed,
+      };
+      questionStatus = QuestionState.COMPLETED;
+      return { questions: [] as MCQuestion[], result, questionStatus };
+    }
+
+    // Get questions based on type
+    switch (type) {
+      case ActivityType.MC_QUESTION:
+        const mcQuestions = await prisma.multipleChoiceQuestion.findMany({
+          where: { articleId },
+        });
+        questions = mcQuestions
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 5)
+          .map((q) => ({
+            ...q,
+            textualEvidence: q.textualEvidence || undefined,
+          }));
+        break;
+
+      case ActivityType.SA_QUESTION:
+        const saQuestions = await prisma.shortAnswerQuestion.findMany({
+          where: { articleId },
+        });
+        if (saQuestions.length === 0) {
+          throw new Error(`No SA questions found for article ${articleId}`);
+        }
+        questions = saQuestions[0];
+        break;
+
+      case ActivityType.LA_QUESTION:
+        const laQuestions = await prisma.longAnswerQuestion.findMany({
+          where: { articleId },
+        });
+        if (laQuestions.length === 0) {
+          throw new Error(`No LA questions found for article ${articleId}`);
+        }
+        questions = laQuestions[0];
+        break;
+
+      default:
+        throw new Error(`Unsupported activity type: ${type}`);
+    }
+
+    if (!questions || (Array.isArray(questions) && questions.length === 0)) {
+      questionStatus = QuestionState.ERROR;
+      throw new Error(
+        `No questions found for article ${articleId} and type ${type}`,
+      );
+    }
+
+    return { questions, result, questionStatus };
+  } catch (error) {
+    questionStatus = QuestionState.ERROR;
+    throw error;
+  }
 };

@@ -10,16 +10,20 @@ import {
 import React from "react";
 import genreDataJson from "@/data/genres.json";
 import Link from "next/link";
-import { getArticles } from "@/server/controllers/articleController";
-import { cleanGenre, cn } from "@/lib/utils";
+import { fetchArticles } from "@/server/controllers/articleController";
+import { cleanGenre, cn, sanitizeTranslationKey } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { GoToTop } from "@/components/go-to-top";
+import { translateAndStoreSentences } from "@/server/utils/genaretors/sentence-translator";
+import { getTranslations } from "next-intl/server";
+import { currentUser } from "@/lib/session";
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     type?: string;
     genre?: string;
     subgenre?: string;
-  };
+  }>;
 }
 
 export interface GenreItem {
@@ -35,64 +39,86 @@ const genreData = genreDataJson as GenreData;
 
 export default async function ReadPage({ searchParams }: PageProps) {
   const { type, genre, subgenre } = await searchParams;
+  const user = await currentUser();
+  const t = await getTranslations();
 
-  const initialData = await getArticles(
+  const initialData = await fetchArticles(
     new URLSearchParams({
       ...(type ? { type } : {}),
       ...(genre ? { genre } : {}),
       ...(subgenre ? { subgenre } : {}),
       limit: "10",
       offset: "0",
-    })
+    }),
   );
 
   return (
     <>
-      <Header heading="Article Selection" />
-      <Card className="my-2">
+      <Header heading={t("Article.selection.title")} />
+      <Card className="mt-4">
         <CardHeader>
-          <CardTitle>Article Selection</CardTitle>
+          <CardTitle>
+            {t("Article.selection.description", {
+              selection:
+                type && genre && subgenre
+                  ? t(`Article.subgenres.${sanitizeTranslationKey(subgenre)}`)
+                  : type && genre
+                    ? t("Article.subGenre")
+                    : type
+                      ? t("Article.genre")
+                      : t("Article.type"),
+            })}
+          </CardTitle>
           <CardDescription>
-            Select an article to read and practice your reading skills.
+            {t("Article.selection.description2", {
+              level: user?.level ?? 0,
+              selection:
+                type && genre && subgenre
+                  ? t(`Article.subgenres.${sanitizeTranslationKey(subgenre)}`)
+                  : type && genre
+                    ? t("Article.subGenre")
+                    : type
+                      ? t("Article.genre")
+                      : t("Article.type"),
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {/* Type selection */}
-          <div className="space-x-2 space-y-2">
-            {!type &&
-              Object.keys(genreData).map((t) => (
+          {!type && (
+            <div className="space-y-2 space-x-2">
+              {Object.keys(genreData).map((typeKey) => (
                 <Link
-                  key={t}
-                  href={`/student/read?type=${t}`}
+                  key={typeKey}
+                  href={`/student/read?type=${typeKey}`}
                   className={cn(
                     buttonVariants({ variant: "default" }),
-                    "capitalize"
+                    "capitalize",
                   )}
-                  scroll={false} // Optional: prevents page scroll
-                  replace={false} // Forces a re-navigation
+                  scroll={false}
+                  replace={false}
                 >
-                  {t}
+                  {t(`Article.types.${typeKey}`)}
                 </Link>
               ))}
-          </div>
+            </div>
+          )}
 
           {/* Genre selection */}
           {type && !genre && (
-            <div className="space-x-2 space-y-2">
+            <div className="space-y-2 space-x-2">
               {genreData[type].map((g) => (
                 <Link
                   key={g.name}
-                  href={`/student/read?type=${type}&genre=${cleanGenre(
-                    g.name
-                  )}`}
+                  href={`/student/read?type=${type}&genre=${encodeURIComponent(cleanGenre(g.name))}`}
                   className={cn(
                     buttonVariants({ variant: "default" }),
-                    "capitalize"
+                    "capitalize",
                   )}
-                  scroll={false} // Optional: prevents page scroll
-                  replace={false} // Forces a re-navigation
+                  scroll={false}
+                  replace={false}
                 >
-                  {cleanGenre(g.name)}
+                  {t(`Article.genres.${sanitizeTranslationKey(g.name)}`)}
                 </Link>
               ))}
             </div>
@@ -100,25 +126,37 @@ export default async function ReadPage({ searchParams }: PageProps) {
 
           {/* Subgenre selection */}
           {type && genre && !subgenre && (
-            <div className="space-x-2 space-y-2">
+            <div className="space-y-2 space-x-2">
               {genreData[type]
-                .find((g) => cleanGenre(g.name) === cleanGenre(genre))
+                .find((g) => cleanGenre(g.name) === genre)
                 ?.subgenres.map((sub) => (
                   <Link
                     key={sub}
-                    href={`/student/read?type=${type}&genre=${genre}&subgenre=${cleanGenre(
-                      sub
-                    )}`}
+                    href={`/student/read?type=${type}&genre=${encodeURIComponent(
+                      genre,
+                    )}&subgenre=${encodeURIComponent(cleanGenre(sub))}`}
                     className={cn(
                       buttonVariants({ variant: "default" }),
-                      "capitalize"
+                      "capitalize",
                     )}
-                    scroll={false} // Optional: prevents page scroll
-                    replace={false} // Forces a re-navigation
+                    scroll={false}
+                    replace={false}
                   >
-                    {cleanGenre(sub)}
+                    {t(`Article.subgenres.${sanitizeTranslationKey(sub)}`)}
                   </Link>
                 ))}
+            </div>
+          )}
+
+          {/* Reset button */}
+          {(type || genre || subgenre) && (
+            <div className="mt-2">
+              <Link
+                href="/student/read"
+                className={cn(buttonVariants({ variant: "outline" }))}
+              >
+                {t("Components.resetFilter")}
+              </Link>
             </div>
           )}
 
@@ -128,6 +166,7 @@ export default async function ReadPage({ searchParams }: PageProps) {
           />
         </CardContent>
       </Card>
+      <GoToTop />
     </>
   );
 }

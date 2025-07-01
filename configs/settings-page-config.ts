@@ -1,12 +1,12 @@
-import { StudentPageConfig } from "@/types";
+import { PageConfig } from "@/types";
 
-export const settingsPageConfig: StudentPageConfig = {
+export const settingsPageConfig: PageConfig = {
   mainNav: [],
   sidebarNav: [
     {
       title: "User Profile",
       href: "/settings/user-profile",
-      icon: "user",
+      // icon: "user",
     },
     // {
     //     title: "Localization",

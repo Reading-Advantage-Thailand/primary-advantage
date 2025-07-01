@@ -6,6 +6,6 @@ export const siteConfig: SiteConfig = {
   url: "",
   ogImage: "",
   link: {
-    github: "",
+    github: "https://github.com/Reading-Advantage-Thailand/primary-advantage",
   },
 };

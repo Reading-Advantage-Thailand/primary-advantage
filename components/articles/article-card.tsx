@@ -10,6 +10,7 @@ import { Badge } from "../ui/badge";
 import { Article } from "@/types";
 import { AlertCircle } from "lucide-react";
 import ArticleContent from "./article-content";
+import { getLocale, getTranslations } from "next-intl/server";
 // import RatingPopup from "./rating-popup";
 
 type Props = {
@@ -18,19 +19,33 @@ type Props = {
 };
 
 export default async function ArticleCard({ article, userId }: Props) {
+  const locale = await getLocale();
+  const t = await getTranslations();
+  const getLocalizedSummary = () => {
+    if (!locale || locale === "en") {
+      return article.summary;
+    }
+
+    return (
+      article.translatedSummary?.[locale as "th" | "cn" | "tw" | "vi"] ||
+      article.summary
+    );
+  };
   return (
     <div className="md:basis-3/5">
       <Card>
         <CardHeader>
-          <CardTitle className="font-article font-bold text-3xl md:text-5xl">
+          <CardTitle className="font-article text-3xl font-bold md:text-5xl">
             {article.title}
           </CardTitle>
           <div className="flex flex-wrap gap-3">
-            <Badge>RA Level : {article.raLevel}</Badge>
-            <Badge>Cefr Level : {article.cefrLevel}</Badge>
+            <Badge>{t("Article.raLevel", { level: article.raLevel })}</Badge>
+            <Badge>
+              {t("Article.cefrLevel", { level: article.cefrLevel })}
+            </Badge>
           </div>
           <CardDescription className="font-article text-lg md:text-xl">
-            {article.summary}
+            {getLocalizedSummary()}
           </CardDescription>
           <div className="flex justify-center">
             <Image

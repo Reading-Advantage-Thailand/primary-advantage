@@ -2,7 +2,7 @@ import { MainNav } from "@/components/nav/main-nav";
 import { UserAccountNav } from "@/components/nav/user-account-nav";
 import { SidebarNav } from "@/components/nav/sidebar-nav";
 import ProgressBar from "@/components/progress-bar-xp";
-import { NavItem, SidebarNavItem } from "@/types";
+import { MainNavItem, SidebarNavItem } from "@/types";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/switchers/theme-switcher-toggle";
 import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
@@ -11,7 +11,7 @@ import { redirect } from "next/navigation";
 
 interface AppLayoutProps {
   children?: React.ReactNode;
-  mainNavConfig: NavItem[];
+  mainNavConfig: MainNavItem[];
   sidebarNavConfig?: SidebarNavItem[];
   disableProgressBar?: boolean;
   disableSidebar?: boolean;
@@ -61,16 +61,16 @@ export default async function AppLayout({
       <header className="sticky top-0 z-40 border-b bg-background">
         <div className="container flex h-16 items-center justify-between py-4">
           <MainNav items={mainNavConfig} />
-          {!disableProgressBar && (
+          {/* {!disableProgressBar && (
             <ProgressBar
               progress={session.user.xp}
               level={session.user.level!}
             />
-          )}
-          <div className="flex space-x-2">
+          )} */}
+          <div className="flex justify-center items-center gap-2">
             <LocaleSwitcher />
             <ThemeToggle />
-            <UserAccountNav user={session.user} />
+            <UserAccountNav user={session?.user} />
           </div>
         </div>
       </header>

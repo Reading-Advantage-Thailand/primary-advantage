@@ -1,28 +1,29 @@
 "use client";
-import { useCallback, useState, useRef, useEffect } from "react";
+import { useCallback, useState, useRef, useEffect, useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-// import { createEmptyCard, Card } from "ts-fsrs";
-// import { filter, includes } from "lodash";
-// import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
-// import { AUDIO_WORDS_URL } from "@/server/constants";
+import { createEmptyCard, Card } from "ts-fsrs";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { Book } from "lucide-react";
-
-// interface Props {
-//   article: Article;
-//   articleId: string;
-//   userId: string;
-// }
+import { WordListTimestamp } from "@/types";
+import { useLocale, useTranslations } from "next-intl";
+import AudioButton from "../audio-button";
+import { toast } from "sonner";
+import { saveFlashcard } from "@/actions/flashcard";
 
 interface WordList {
   vocabulary: string;
@@ -33,280 +34,311 @@ interface WordList {
     tw: string;
     vi: string;
   };
-  index: number;
   startTime: number;
   endTime: number;
   audioUrl: string;
 }
 
-export default function WordList() {
-  //   const t = useScopedI18n("components.wordList");
-  //   const [loading, setLoading] = useState<boolean>(false);
-  //   const [wordList, setWordList] = useState<WordList[]>([]);
+export default function WordList({
+  articleId,
+  words,
+  audioUrl,
+}: {
+  articleId: string;
+  words: WordListTimestamp[];
+  audioUrl: string;
+}) {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [wordList, setWordList] = useState<WordList[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const locale = useLocale();
+  const t = useTranslations("WordList");
+  const tc = useTranslations("Components");
 
-  //   // Get the current locale
-  //   const currentLocale = useCurrentLocale() as "en" | "th" | "cn" | "tw" | "vi";
+  const FormSchema = z.object({
+    items: z.array(z.string()).refine((value) => value.some((item) => item), {
+      message: "You have to select at least one item.",
+    }),
+  });
 
-  //   const FormSchema = z.object({
-  //     items: z.array(z.string()).refine((value) => value.some((item) => item), {
-  //       message: "You have to select at least one item.",
-  //     }),
-  //   });
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+  });
 
-  //   const form = useForm<z.infer<typeof FormSchema>>({
-  //     resolver: zodResolver(FormSchema),
-  //   });
+  useEffect(() => {
+    if (words) {
+      let wordList = [];
 
-  //   const handleWordList = useCallback(async () => {
-  //     try {
-  //       setLoading(true); // Start loading
-  //       const resWordlist = await fetch(`/api/v1/assistant/wordlist`, {
-  //         method: "POST",
-  //         body: JSON.stringify({ article, articleId }),
-  //       });
+      wordList = words.map((word: WordListTimestamp, index: number) => {
+        const startTime = word?.timeSeconds as number;
+        const endTime =
+          index === words.length - 1
+            ? (word?.timeSeconds as number) + 10
+            : (words[index + 1].timeSeconds as number);
 
-  //       const data = await resWordlist.json();
+        return {
+          vocabulary: word?.vocabulary,
+          definition: word?.definition,
+          index,
+          startTime,
+          endTime,
+          audioUrl,
+        };
+      });
+      setWordList(wordList);
+    }
+  }, [words, articleId]);
 
-  //       let wordList = [];
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const foundWordsList = wordList.filter((vocab) =>
+      data?.items.includes(vocab?.vocabulary),
+    );
 
-  //       if (data?.timepoints) {
-  //         wordList = data?.timepoints.map(
-  //           (timepoint: { timeSeconds: number }, index: number) => {
-  //             const startTime = timepoint.timeSeconds;
-  //             const endTime =
-  //               index === data?.timepoints.length - 1
-  //                 ? timepoint.timeSeconds + 10
-  //                 : data?.timepoints[index + 1].timeSeconds;
-  //             return {
-  //               vocabulary: data?.word_list[index]?.vocabulary,
-  //               definition: data?.word_list[index]?.definition,
-  //               index,
-  //               startTime,
-  //               endTime,
-  //               audioUrl: `https://storage.googleapis.com/artifacts.reading-advantage.appspot.com/${AUDIO_WORDS_URL}/${articleId}.mp3`,
-  //             };
-  //           }
-  //         );
-  //       } else {
-  //         wordList = data?.word_list;
-  //       }
-  //       setWordList(wordList);
-  //       form.reset();
-  //     } catch (error: any) {
-  //       console.error("error: ", error);
-  //       toast({
-  //         title: "Something went wrong.",
-  //         description: `${error?.response?.data?.message || error?.message}`,
-  //         variant: "destructive",
-  //       });
-  //     } finally {
-  //       setLoading(false); // Stop loading
-  //     }
-  //   }, [article, articleId, form]);
+    startTransition(async () => {
+      try {
+        const res = await saveFlashcard(articleId, foundWordsList);
+        if (res.status === 200) {
+          toast.success("Success", {
+            description: `You have saved ${foundWordsList.length} words to flashcard`,
+            richColors: true,
+          });
+          form.reset();
+        } else if (res.status === 400) {
+          toast.info("Word already saved", {
+            description: `${res?.message}`,
+            richColors: true,
+          });
+        }
+      } catch (error: any) {
+        toast.error("Something went wrong.", {
+          description: "Your word was not saved. Please try again.",
+          richColors: true,
+        });
+      }
+    });
 
-  //   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-  //     try {
-  //       let card: Card = createEmptyCard();
-  //       const foundWordsList = filter(wordList, (vocab) =>
-  //         includes(data?.items, vocab?.vocabulary)
-  //       );
-  //       if (foundWordsList.length > 0) {
-  //         const param = {
-  //           ...card,
-  //           articleId: articleId,
-  //           saveToFlashcard: true,
-  //           foundWordsList: foundWordsList,
-  //         };
+    // if (foundWordsList.length > 0) {
+    //   const param = {
+    //     ...card,
+    //     articleId: articleId,
+    //     saveToFlashcard: true,
+    //     foundWordsList: foundWordsList,
+    //   };
 
-  //         const res = await fetch(`/api/v1/users/wordlist/${userId}`, {
-  //           method: "POST",
-  //           body: JSON.stringify(param),
-  //         });
+    //   const res = await fetch(`/api/v1/users/wordlist/${userId}`, {
+    //     method: "POST",
+    //     body: JSON.stringify(param),
+    //   });
 
-  //         const data = await res.json();
+    //   const data = await res.json();
 
-  //         if (data.status === 200) {
-  //           toast({
-  //             title: "Success",
-  //             description: `You have saved ${foundWordsList.length} words to flashcard`,
-  //           });
-  //         } else if (data.status === 400) {
-  //           toast({
-  //             title: "Word already saved",
-  //             description: `${data?.message}`,
-  //             variant: "destructive",
-  //           });
-  //         }
-  //       }
-  //     } catch (error: any) {
-  //       toast({
-  //         title: "Something went wrong.",
-  //         description: "Your word was not saved. Please try again.",
-  //         variant: "destructive",
-  //       });
-  //     }
-  //   };
-
-  //   // Calculate the height based on the number of items in the wordList
-  //   const calculateHeight = () => {
-  //     const baseHeight = 300; // Base height for content without wordList
-  //     const itemHeight = 50; // Height of each word list item
-  //     const maxDialogHeight = 490; // Maximum height of the dialog
-  //     const calculatedHeight = baseHeight + wordList.length * itemHeight;
-  //     return Math.min(calculatedHeight, maxDialogHeight); // Limit to max height
-  //   };
+    //   if (data.status === 200) {
+    //     toast.success("Success", {
+    //       description: `You have saved ${foundWordsList.length} words to flashcard`,
+    //     });
+    //   } else if (data.status === 400) {
+    //     toast.info("Word already saved", {
+    //       description: `${data?.message}`,
+    //     });
+    //   }
+    // }
+  };
 
   return (
     <div id="onborda-wordbutton" className="flex items-center">
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button>Word List</Button>
-        </DialogTrigger>
-        {/* <DialogContent
-          style={{ height: `${calculateHeight()}px` }}
-          className="sm:max-w-[550px]"
-        >
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button className="shadow-md transition-shadow duration-200 hover:shadow-lg">
+            <Book className="h-4 w-4" />
+            {t("title")}
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent className="max-h-[80vh] gap-0 p-0 sm:max-w-[600px]">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="overflow-auto h-96"
-            >
-              <DialogHeader>
-                <DialogTitle>
+            <div className="flex h-full max-h-[80vh] flex-col">
+              <AlertDialogHeader className="border-b px-6 py-4">
+                <AlertDialogTitle>
                   <div className="flex items-center">
-                    <Book />
-                    <div className="ml-2">{t("title")}</div>
+                    <div className="mr-3 rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
+                      <Book className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="text-lg font-semibold">{t("title")}</div>
                   </div>
-                </DialogTitle>
-              </DialogHeader>
-              {loading && wordList ? (
-                <div className="flex items-center space-x-4 mt-5">
-                  <div className="space-y-5">
-                    <Skeleton className="h-4 w-[300px]" />
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[200px]" />
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="mt-5">
-                    <span className="font-bold">{t("detail")}</span>
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="items"
-                    render={() => {
-                      return (
-                        <FormItem>
-                          <>
-                            {wordList?.map((word, index) => (
-                              <FormField
-                                key={index}
-                                control={form.control}
-                                name="items"
-                                render={({ field }) => {
-                                  return (
-                                    <>
-                                      <FormItem key={word?.vocabulary}>
-                                        <FormControl>
-                                          <div
-                                            key={index}
-                                            className="p-4 border-b-2 flex flex-row"
-                                          >
-                                            <div>
-                                              <Checkbox
-                                                checked={field?.value?.includes(
-                                                  word?.vocabulary
-                                                )}
-                                                onCheckedChange={(checked) => {
-                                                  if (
-                                                    Array.isArray(field.value)
-                                                  ) {
-                                                    return checked
-                                                      ? field.onChange([
-                                                          ...field.value,
-                                                          word.vocabulary,
-                                                        ])
-                                                      : field.onChange(
-                                                          field.value.filter(
-                                                            (value) =>
-                                                              value !==
-                                                              word.vocabulary
+                </AlertDialogTitle>
+              </AlertDialogHeader>
+
+              <div className="flex-1 overflow-hidden">
+                <form
+                  className="flex h-full flex-col"
+                  onSubmit={form.handleSubmit(onSubmit)}
+                >
+                  <div className="flex-1 overflow-y-auto px-6 py-4">
+                    {loading && words ? (
+                      <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center space-x-4 rounded-lg border bg-white p-4 shadow-sm dark:bg-slate-800"
+                          >
+                            <Skeleton className="h-5 w-5 rounded" />
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-4 w-[200px]" />
+                              <Skeleton className="h-3 w-[300px]" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mb-4">
+                          <AlertDialogDescription className="text-muted-foreground text-sm">
+                            {t("description")}
+                          </AlertDialogDescription>
+                        </div>
+                        <FormField
+                          control={form.control}
+                          name="items"
+                          render={() => {
+                            return (
+                              <FormItem>
+                                <div className="space-y-3">
+                                  {wordList.map((word, index) => (
+                                    <FormField
+                                      key={index}
+                                      name="items"
+                                      control={form.control}
+                                      render={({ field }) => {
+                                        return (
+                                          <FormItem key={word?.vocabulary}>
+                                            <FormControl>
+                                              <div className="group relative rounded-lg border p-4 transition-all duration-200 hover:border-slate-300 hover:shadow-md">
+                                                <div className="flex items-start space-x-4">
+                                                  {/* Checkbox */}
+                                                  <div className="mt-1 flex-shrink-0">
+                                                    <Checkbox
+                                                      checked={field?.value?.includes(
+                                                        word?.vocabulary,
+                                                      )}
+                                                      onCheckedChange={(
+                                                        checked,
+                                                      ) => {
+                                                        if (
+                                                          Array.isArray(
+                                                            field.value,
                                                           )
-                                                        );
-                                                  } else {
-                                                    return field.onChange(
-                                                      checked
-                                                        ? [word.vocabulary]
-                                                        : []
-                                                    );
-                                                  }
-                                                }}
-                                              />
-                                            </div>
+                                                        ) {
+                                                          return checked
+                                                            ? field.onChange([
+                                                                ...field.value,
+                                                                word.vocabulary,
+                                                              ])
+                                                            : field.onChange(
+                                                                field.value.filter(
+                                                                  (value) =>
+                                                                    value !==
+                                                                    word.vocabulary,
+                                                                ),
+                                                              );
+                                                        } else {
+                                                          return field.onChange(
+                                                            checked
+                                                              ? [
+                                                                  word.vocabulary,
+                                                                ]
+                                                              : [],
+                                                          );
+                                                        }
+                                                      }}
+                                                      className="h-5 w-5"
+                                                    />
+                                                  </div>
 
-                                            <span className="font-bold text-cyan-500 ml-2">
-                                              {word.vocabulary}:{" "}
-                                            </span>
+                                                  <div className="min-w-0 flex-1">
+                                                    {/* Vocabulary word */}
+                                                    <div className="mb-2 flex items-center space-x-3">
+                                                      <span className="text-primary text-lg font-bold capitalize">
+                                                        {word.vocabulary}
+                                                      </span>
 
-                                            <div className="mr-1">
-                                              {word?.startTime && (
-                                                <AudioImg
-                                                  key={word.vocabulary}
-                                                  audioUrl={
-                                                    word.audioUrl
-                                                      ? word.audioUrl
-                                                      : `https://storage.googleapis.com/artifacts.reading-advantage.appspot.com/${AUDIO_WORDS_URL}/${articleId}.mp3`
-                                                  }
-                                                  startTimestamp={
-                                                    word?.startTime
-                                                  }
-                                                  endTimestamp={word?.endTime}
-                                                />
-                                              )}
-                                            </div>
+                                                      {/* Audio button */}
+                                                      <div className="flex-shrink-0">
+                                                        <AudioButton
+                                                          audioUrl={
+                                                            word.audioUrl
+                                                          }
+                                                          startTimestamp={
+                                                            word.startTime
+                                                          }
+                                                          endTimestamp={
+                                                            word.endTime
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </div>
 
-                                            <span>
-                                              {word.definition[currentLocale]}
-                                            </span>
-                                          </div>
-                                        </FormControl>
-                                      </FormItem>
-                                    </>
-                                  );
-                                }}
-                              />
-                            ))}
-                          </>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                </>
-              )}
-              <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-[#020817] p-5">
-                <div className="flex justify-end">
-                  <DialogClose asChild>
-                    <Button type="button" variant="secondary">
-                      {t("closeButton")}
-                    </Button>
-                  </DialogClose>
-                  <Button
-                    className="ml-2"
-                    type="submit"
-                    disabled={
-                      form.watch("items")?.length === 0 ||
-                      form.watch("items") === undefined
-                    }
-                  >
-                    {t("saveButton")}
-                  </Button>
-                </div>
+                                                    {/* Definition */}
+                                                    <p className="text-muted-foreground text-sm leading-relaxed">
+                                                      {
+                                                        word.definition[
+                                                          locale as keyof typeof word.definition
+                                                        ]
+                                                      }
+                                                    </p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </FormControl>
+                                          </FormItem>
+                                        );
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      </>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="border-t px-6 py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-muted-foreground text-sm">
+                        {t("selectedWords", {
+                          count: form.watch("items")?.length || 0,
+                        })}
+                      </div>
+                      <div className="flex space-x-3">
+                        <AlertDialogCancel asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="px-6"
+                          >
+                            {tc("closeButton")}
+                          </Button>
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          type="submit"
+                          className="px-6"
+                          disabled={
+                            form.watch("items")?.length === 0 ||
+                            form.watch("items") === undefined
+                          }
+                        >
+                          {tc("saveToFlashcard")}
+                        </AlertDialogAction>
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </Form>
-        </DialogContent> */}
-      </Dialog>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

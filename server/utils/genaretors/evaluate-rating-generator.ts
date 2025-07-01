@@ -22,7 +22,7 @@ export interface EvaluateRatingParams {
 
 export interface EvaluateRatingResponse {
   rating: number;
-  cefr_level?: string;
+  cefrLevel?: string;
 }
 
 interface CefrLevelEvaluationPromptType {
@@ -36,7 +36,7 @@ export async function evaluateRating(
   const dataFilePath = path.join(
     process.cwd(),
     "data",
-    "cefr-level-evaluation-prompts.json"
+    "new-level-evaluation-prompts.json"
   );
 
   // read prompts from file
@@ -51,6 +51,7 @@ export async function evaluateRating(
     const { object: evaluated } = await generateObject({
       model: google(googleModel),
       schema: z.object({
+        cefrLevel: z.string(),
         rating: z.number(),
       }),
       system: systemPrompt,
@@ -63,6 +64,7 @@ export async function evaluateRating(
 
     return {
       rating: evaluated.rating,
+      cefrLevel: evaluated.cefrLevel,
     };
   } catch (error) {
     throw `failed to evaluate rating`;

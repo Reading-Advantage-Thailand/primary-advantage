@@ -1,9 +1,9 @@
-import { getArticles } from "@/server/controllers/articleController";
+import { fetchArticles } from "@/server/controllers/articleController";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const { articles, totalArticles } = await getArticles(
+    const { articles, totalArticles } = await fetchArticles(
       req.nextUrl.searchParams
     );
 
