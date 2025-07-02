@@ -21,15 +21,7 @@ steps:
   - name: "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
     id: "migrate-database"
     entrypoint: "npx"
-    args:
-      - "-c"
-      - |
-        if [ "${_SKIP_MIGRATIONS}" = "true" ]; then
-          echo "Skipping database migrations"
-          exit 0
-        fi
-        npx prisma migrate deploy
-    # args: ["prisma", "migrate", "deploy"]
+    args: ["prisma", "migrate", "deploy"]
     secretEnv: ["DATABASE_URL"]
 
   # Step 4: Deploy to Cloud Run
