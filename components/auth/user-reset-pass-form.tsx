@@ -24,13 +24,13 @@ export function UserResetPassForm({ className, ...props }: UserAuthFormProps) {
     };
     const email = target.email.value;
     try {
-      const response = await fetch("/api/send", {
-        method: "POST",
-        body: JSON.stringify({ email }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to send email");
-      }
+      // const response = await fetch("/api/send", {
+      //   method: "POST",
+      //   body: JSON.stringify({ email }),
+      // });
+      // if (!response.ok) {
+      //   throw new Error("Failed to send email");
+      // }
       setIsEmailSent(true);
       setIsLoading(false);
     } catch (error) {
