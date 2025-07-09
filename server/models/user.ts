@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ActivityType } from "@/types/enum";
 import bcrypt from "bcrypt";
-import { get } from "http";
 
 export const createUser = async (data: {
   name: string;

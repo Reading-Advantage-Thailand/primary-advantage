@@ -15,8 +15,9 @@ COPY . .
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
 
-
 RUN npm run prisma:generate && npm run build
+
+
 
 # Use a smaller image for production deployment
 FROM node:22-alpine AS runner

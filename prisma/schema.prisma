@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,22 +11,22 @@ model User {
   id               String             @id @default(cuid())
   name             String?
   email            String?            @unique
-  password         String?
   emailVerified    DateTime?          @map("email_verified")
   image            String?
-  role             Role               @default(USER)
-  xp               Int                @default(0)
-  level            Int                @default(1)
-  cefrLevel        String?            @default("A1-")
-  accounts         Account[]
-  sessions         Session[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  UserActiclity    UserActivity[]
+  password         String?
+  cefrLevel        String?            @default("A1-")
+  level            Int                @default(1)
+  xp               Int                @default(0)
+  role             Role               @default(USER)
+  accounts         Account[]
   studentClassroom ClassroomStudent[]
   teacherClassroom Classroom[]        @relation("TeacherClassrooms")
-  XpLogs           XPLogs[]
   FlashcardDeck    FlashcardDeck[]
+  sessions         Session[]
+  UserActiclity    UserActivity[]
+  XpLogs           XPLogs[]
 
   @@map("users")
 }
@@ -43,15 +37,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -84,18 +77,9 @@ model XPLogs {
   activityType ActivityType
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("xp_logs")
-}
-
-enum Role {
-  USER
-  STUDENT
-  TEACHER
-  ADMIN
-  SYSTEM
 }
 
 model UserActivity {
@@ -104,16 +88,168 @@ model UserActivity {
   activityType ActivityType
   targetId     String?
   timer        Int?
-
-  details   Json?
-  completed Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  details      Json?
+  completed    Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, activityType, targetId])
   @@map("user_activities")
+}
+
+model Article {
+  id                      String                   @id @default(cuid())
+  type                    String
+  genre                   String
+  subGenre                String                   @map("sub_genre")
+  title                   String
+  summary                 String
+  passage                 String
+  imageDescription        String                   @map("image_description")
+  cefrLevel               String                   @map("cefr_level")
+  raLevel                 Int                      @map("ra_level")
+  rating                  Float
+  audioUrl                String?                  @map("audio_url")
+  audioWordUrl            String?                  @map("audio_word_url")
+  sentences               Json?
+  words                   Json?
+  authorId                String?                  @map("author_id")
+  createdAt               DateTime                 @default(now()) @map("created_at")
+  updatedAt               DateTime                 @updatedAt @map("updated_at")
+  translatedPassage       Json?                    @map("translated_passage")
+  translatedSummary       Json?                    @map("translated_summary")
+  longAnswerQuestions     LongAnswerQuestion[]
+  multipleChoiceQuestions MultipleChoiceQuestion[]
+  shortAnswerQuestions    ShortAnswerQuestion[]
+
+  @@map("article")
+}
+
+model MultipleChoiceQuestion {
+  id              String   @id @default(cuid())
+  question        String
+  options         String[]
+  answer          String
+  textualEvidence String?
+  articleId       String   @map("article_id")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  article         Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("multiple_choice_questions")
+}
+
+model ShortAnswerQuestion {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  articleId String   @map("article_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("short_answer_questions")
+}
+
+model LongAnswerQuestion {
+  id        String   @id @default(cuid())
+  question  String
+  articleId String   @map("article_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("long_answer_questions")
+}
+
+model Classroom {
+  id            String             @id @default(cuid())
+  name          String
+  teacherId     String
+  classCode     String?            @unique
+  codeExpiresAt DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  students      ClassroomStudent[]
+  teacher       User               @relation("TeacherClassrooms", fields: [teacherId], references: [id])
+
+  @@map("classrooms")
+}
+
+model ClassroomStudent {
+  id          String    @id @default(cuid())
+  studentId   String
+  classroomId String
+  classroom   Classroom @relation(fields: [classroomId], references: [id])
+  student     User      @relation(fields: [studentId], references: [id])
+
+  @@unique([classroomId, studentId])
+  @@map("classroom_students")
+}
+
+model FlashcardDeck {
+  id          String          @id @default(cuid())
+  userId      String          @map("user_id")
+  name        String?
+  type        FlashcardType
+  description String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  cards       FlashcardCard[]
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("flashcard_decks")
+}
+
+model FlashcardCard {
+  id            String        @id @default(cuid())
+  deckId        String        @map("deck_id")
+  type          FlashcardType
+  articleId     String?       @map("article_id")
+  audioUrl      String?       @map("audio_url")
+  startTime     Float?        @map("start_time")
+  endTime       Float?        @map("end_time")
+  word          String?
+  definition    Json?
+  sentence      String?
+  translation   Json?
+  context       String?
+  due           DateTime      @default(now())
+  stability     Float         @default(0.0)
+  difficulty    Float         @default(0.0)
+  elapsedDays   Int           @default(0) @map("elapsed_days")
+  scheduledDays Int           @default(0) @map("scheduled_days")
+  learningSteps Int           @default(0) @map("learning_steps")
+  reps          Int           @default(0)
+  lapses        Int           @default(0)
+  state         CardState     @default(NEW)
+  lastReview    DateTime?     @map("last_review")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  reviews       CardReview[]
+  deck          FlashcardDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@map("flashcard_cards")
+}
+
+model CardReview {
+  id         String        @id @default(cuid())
+  cardId     String        @map("card_id")
+  rating     Int
+  timeSpent  Int?          @map("time_spent")
+  reviewedAt DateTime      @default(now())
+  card       FlashcardCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@map("card_reviews")
+}
+
+enum Role {
+  USER
+  STUDENT
+  TEACHER
+  ADMIN
+  SYSTEM
 }
 
 enum ActivityType {
@@ -134,166 +270,6 @@ enum ActivityType {
   SENTENCE_CLOZE_TEST
   VOCABULARY_FLASHCARDS
   VOCABULARY_MATCHING
-}
-
-model Article {
-  id                String   @id @default(cuid())
-  type              String
-  genre             String
-  subGenre          String   @map("sub_genre")
-  title             String
-  summary           String
-  passage           String
-  translatedSummary Json?    @map("translated_summary")
-  translatedPassage Json?    @map("translated_passage")
-  imageDescription  String   @map("image_description")
-  cefrLevel         String   @map("cefr_level")
-  raLevel           Int      @map("ra_level")
-  rating            Float
-  audioUrl          String?  @map("audio_url")
-  audioWordUrl      String?  @map("audio_word_url")
-  sentences         Json?
-  words             Json?
-  authorId          String?  @map("author_id")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-
-  multipleChoiceQuestions MultipleChoiceQuestion[]
-  shortAnswerQuestions    ShortAnswerQuestion[]
-  longAnswerQuestions     LongAnswerQuestion[]
-
-  @@map("article")
-}
-
-model MultipleChoiceQuestion {
-  id              String   @id @default(cuid())
-  question        String
-  options         String[]
-  answer          String
-  textualEvidence String?
-  articleId       String   @map("article_id")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
-  @@map("multiple_choice_questions")
-}
-
-model ShortAnswerQuestion {
-  id        String   @id @default(cuid())
-  question  String
-  answer    String
-  articleId String   @map("article_id")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
-  @@map("short_answer_questions")
-}
-
-model LongAnswerQuestion {
-  id        String   @id @default(cuid())
-  question  String
-  articleId String   @map("article_id")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
-  @@map("long_answer_questions")
-}
-
-model Classroom {
-  id            String    @id @default(cuid())
-  name          String
-  teacherId     String
-  classCode     String?   @unique
-  codeExpiresAt DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  teacher  User               @relation("TeacherClassrooms", fields: [teacherId], references: [id])
-  students ClassroomStudent[]
-
-  @@map("classrooms")
-}
-
-model ClassroomStudent {
-  id          String @id @default(cuid())
-  studentId   String
-  classroomId String
-
-  classroom Classroom @relation(fields: [classroomId], references: [id])
-  student   User      @relation(fields: [studentId], references: [id])
-
-  @@unique([classroomId, studentId])
-  @@map("classroom_students")
-}
-
-model FlashcardDeck {
-  id          String        @id @default(cuid())
-  userId      String        @map("user_id")
-  name        String?
-  type        FlashcardType
-  description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  cards FlashcardCard[]
-
-  @@map("flashcard_decks")
-}
-
-model FlashcardCard {
-  id     String        @id @default(cuid())
-  deckId String        @map("deck_id")
-  type   FlashcardType
-
-  articleId String? @map("article_id")
-  audioUrl  String? @map("audio_url")
-  startTime Float?  @map("start_time")
-  endTime   Float?  @map("end_time")
-
-  word       String?
-  definition Json?
-
-  sentence    String?
-  translation Json?
-  context     String?
-
-  due           DateTime  @default(now())
-  stability     Float     @default(0.0)
-  difficulty    Float     @default(0.0)
-  elapsedDays   Int       @default(0) @map("elapsed_days")
-  scheduledDays Int       @default(0) @map("scheduled_days")
-  learningSteps Int       @default(0) @map("learning_steps")
-  reps          Int       @default(0)
-  lapses        Int       @default(0)
-  state         CardState @default(NEW)
-  lastReview    DateTime? @map("last_review")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  deck    FlashcardDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  reviews CardReview[]
-
-  @@map("flashcard_cards")
-}
-
-model CardReview {
-  id         String   @id @default(cuid())
-  cardId     String   @map("card_id")
-  rating     Int
-  timeSpent  Int?     @map("time_spent")
-  reviewedAt DateTime @default(now())
-
-  card FlashcardCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
-
-  @@map("card_reviews")
 }
 
 enum FlashcardType {

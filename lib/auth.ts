@@ -22,9 +22,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           if (!credentials) return null;
 
-          const { email, password, type } = await signInSchema.parseAsync(
-            credentials
-          );
+          const { email, password, type } =
+            await signInSchema.parseAsync(credentials);
 
           const user = await getUserByEmail(email);
           if (!user) return null;
@@ -46,7 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (type === "teacher") {
             const isPasswordValid = await bcrypt.compare(
               password,
-              user.password ?? ""
+              user.password ?? "",
             );
             if (isPasswordValid) {
               return userData;
@@ -89,9 +88,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    // async redirect({ url, baseUrl }) {
-    //   return "/";
-    // },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id as string;
@@ -105,8 +101,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      // console.log("session", session);
-      // console.log("token", token);
       if (session.user) {
         session.user.id = token.id;
         session.user.email = token.email;

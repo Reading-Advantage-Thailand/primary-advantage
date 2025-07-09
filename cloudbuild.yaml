@@ -35,13 +35,32 @@ steps:
       - "--region=asia-southeast1"
       - "--platform=managed"
       - "--allow-unauthenticated"
-      - "--set-secrets=DATABASE_URL=${_DATABASE_URL}:latest,RESEND_API_KEY=${_RESEND_API_KEY}:latest"
+      - "--set-secrets=DATABASE_URL=${_DATABASE_URL}:latest"
+      - "--set-secrets=RESEND_API_KEY=${_RESEND_API_KEY}:latest"
+      - "--set-secrets=AUTH_SECRET=${_AUTH_SECRET}:latest"
+      - "--set-secrets=AUTH_URL=${_AUTH_URL}:latest"
+      - "--set-secrets=AUTH_GOOGLE_ID=${_AUTH_GOOGLE_ID}:latest"
+      - "--set-secrets=AUTH_GOOGLE_SECRET=${_AUTH_GOOGLE_SECRET}:latest"
+      - "--set-secrets=OPENAI_API_KEY=${_OPENAI_API_KEY}:latest"
+      - "--set-secrets=VERTEX_CLIENT_EMAIL=${_VERTEX_CLIENT_EMAIL}:latest"
+      - "--set-secrets=VERTEX_PRIVATE_KEY=${_VERTEX_PRIVATE_KEY}:latest"
+      - "--set-secrets=GOOGLE_API_KEY=${_GOOGLE_API_KEY}:latest"
+      - "--set-secrets=AUDIO_API_KEY=${_AUDIO_API_KEY}:latest"
 
 # Substitutions
 substitutions:
   _PROJECT_ID: "primary-advantage"
   _DATABASE_URL: "DATABASE_URL"
   _RESEND_API_KEY: "RESEND_API_KEY"
+  _AUTH_SECRET: "AUTH_SECRET"
+  _AUTH_URL: "AUTH_URL"
+  _AUTH_GOOGLE_ID: "AUTH_GOOGLE_ID"
+  _AUTH_GOOGLE_SECRET: "AUTH_GOOGLE_SECRET"
+  _OPENAI_API_KEY: "OPENAI_API_KEY"
+  _VERTEX_CLIENT_EMAIL: "VERTEX_CLIENT_EMAIL"
+  _VERTEX_PRIVATE_KEY: "VERTEX_PRIVATE_KEY"
+  _GOOGLE_API_KEY: "GOOGLE_API_KEY"
+  _AUDIO_API_KEY: "AUDIO_API_KEY"
 
 # Secrets
 availableSecrets:
