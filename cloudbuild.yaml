@@ -18,11 +18,11 @@ steps:
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
 
   # Step 3: Run database migrations
-  - name: "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
-    id: "migrate-database"
-    entrypoint: "npx"
-    args: ["prisma", "migrate", "deploy"]
-    secretEnv: ["DATABASE_URL"]
+  # - name: "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
+  #   id: "migrate-database"
+  #   entrypoint: "npx"
+  #   args: ["prisma", "migrate", "deploy"]
+  #   secretEnv: ["DATABASE_URL"]
 
   # Step 4: Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
