@@ -26,45 +26,10 @@ const roleDefaultRedirects = {
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
-  // First, handle i18n routing
-  const response = await intlMiddleware(request);
-
   // Get the pathname without locale
   const pathname = request.nextUrl.pathname;
   const locale = request.nextUrl.pathname.split("/")[1];
   const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
-
-  // Check if the route is protected
-  const isProtectedRoute = Object.keys(protectedRoutes).some((route) =>
-    pathWithoutLocale.startsWith(route),
-  );
-
-  if (isProtectedRoute) {
-    const token = await getToken({
-      req: request,
-      secret: process.env.AUTH_SECRET,
-    });
-
-    // If no token, redirect to login
-    if (!token) {
-      const loginUrl = new URL(`/${locale}/auth/signin`, request.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    // Check if user has required role for the route
-    const userRole = token.role as string;
-    const requiredRoles = Object.entries(protectedRoutes).find(([route]) =>
-      pathWithoutLocale.startsWith(route),
-    )?.[1];
-
-    if (requiredRoles && !requiredRoles.includes(userRole)) {
-      // Redirect to unauthorized page if user doesn't have required role
-      return NextResponse.redirect(
-        new URL(`/${locale}/unauthorized`, request.url),
-      );
-    }
-  }
 
   // Handle post-login redirects
   if (pathname.includes("/auth/signin")) {
@@ -99,6 +64,43 @@ export async function middleware(request: NextRequest) {
           new URL(`/${locale}${defaultRedirect}`, request.url),
         );
       }
+      // Fallback redirect to home page
+      return NextResponse.redirect(new URL(`/${locale}/`, request.url));
+    }
+  }
+
+  //handle i18n routing
+  const response = await intlMiddleware(request);
+
+  // Check if the route is protected
+  const isProtectedRoute = Object.keys(protectedRoutes).some((route) =>
+    pathWithoutLocale.startsWith(route),
+  );
+
+  if (isProtectedRoute) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.AUTH_SECRET,
+    });
+
+    // If no token, redirect to login
+    if (!token) {
+      const loginUrl = new URL(`/${locale}/auth/signin`, request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Check if user has required role for the route
+    const userRole = token.role as string;
+    const requiredRoles = Object.entries(protectedRoutes).find(([route]) =>
+      pathWithoutLocale.startsWith(route),
+    )?.[1];
+
+    if (requiredRoles && !requiredRoles.includes(userRole)) {
+      // Redirect to unauthorized page if user doesn't have required role
+      return NextResponse.redirect(
+        new URL(`/${locale}/unauthorized`, request.url),
+      );
     }
   }
 
