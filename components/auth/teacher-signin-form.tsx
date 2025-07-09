@@ -53,7 +53,7 @@ export function TeacherSignInForm({
           ...value,
           type: "teacher",
         },
-        callbackUrl || undefined,
+        // callbackUrl || undefined,
       ).then((data) => {
         setError(data?.error);
       });
@@ -138,7 +138,7 @@ export function TeacherSignInForm({
             className="w-full cursor-pointer"
             onClick={() => {
               signIn("google", {
-                callbackUrl: callbackUrl || undefined,
+                // callbackUrl: callbackUrl || undefined,
               });
             }}
           >
