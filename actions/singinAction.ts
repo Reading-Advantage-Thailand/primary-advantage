@@ -5,7 +5,10 @@ import { signInSchema } from "@/lib/zod";
 import { AuthError } from "next-auth";
 import { z } from "zod";
 
-export async function signInAction(value: z.infer<typeof signInSchema>) {
+export async function signInAction(
+  value: z.infer<typeof signInSchema>,
+  callbackUrl?: string,
+) {
   const validation = signInSchema.safeParse(value);
 
   if (!validation.success) {
@@ -21,6 +24,7 @@ export async function signInAction(value: z.infer<typeof signInSchema>) {
       type,
       email,
       password,
+      redirectTo: callbackUrl || undefined,
     });
   } catch (error) {
     if (error instanceof AuthError) {

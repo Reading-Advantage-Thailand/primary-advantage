@@ -27,6 +27,7 @@ export function TeacherSignInForm({
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Email already exists"
@@ -47,7 +48,13 @@ export function TeacherSignInForm({
     setError("");
 
     startTransition(() => {
-      signInAction({ ...value, type: "teacher" }).then((data) => {
+      signInAction(
+        {
+          ...value,
+          type: "teacher",
+        },
+        callbackUrl || undefined,
+      ).then((data) => {
         setError(data?.error);
       });
     });
@@ -130,7 +137,9 @@ export function TeacherSignInForm({
             type="button"
             className="w-full cursor-pointer"
             onClick={() => {
-              signIn("google");
+              signIn("google", {
+                callbackUrl: callbackUrl || undefined,
+              });
             }}
           >
             <Icons.google className="mr-2 h-4 w-4" />

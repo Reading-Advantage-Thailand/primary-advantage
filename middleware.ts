@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
 
   // Check if the route is protected
   const isProtectedRoute = Object.keys(protectedRoutes).some((route) =>
-    pathWithoutLocale.startsWith(route)
+    pathWithoutLocale.startsWith(route),
   );
 
   if (isProtectedRoute) {
@@ -55,13 +55,13 @@ export async function middleware(request: NextRequest) {
     // Check if user has required role for the route
     const userRole = token.role as string;
     const requiredRoles = Object.entries(protectedRoutes).find(([route]) =>
-      pathWithoutLocale.startsWith(route)
+      pathWithoutLocale.startsWith(route),
     )?.[1];
 
     if (requiredRoles && !requiredRoles.includes(userRole)) {
       // Redirect to unauthorized page if user doesn't have required role
       return NextResponse.redirect(
-        new URL(`/${locale}/unauthorized`, request.url)
+        new URL(`/${locale}/unauthorized`, request.url),
       );
     }
   }
@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
         const callbackPathWithoutLocale =
           callbackUrl.replace(`/${locale}`, "") || "/";
         const requiredRoles = Object.entries(protectedRoutes).find(([route]) =>
-          callbackPathWithoutLocale.startsWith(route)
+          callbackPathWithoutLocale.startsWith(route),
         )?.[1];
 
         if (requiredRoles && requiredRoles.includes(userRole)) {
@@ -96,7 +96,7 @@ export async function middleware(request: NextRequest) {
         roleDefaultRedirects[userRole as keyof typeof roleDefaultRedirects];
       if (defaultRedirect) {
         return NextResponse.redirect(
-          new URL(`/${locale}${defaultRedirect}`, request.url)
+          new URL(`/${locale}${defaultRedirect}`, request.url),
         );
       }
     }
