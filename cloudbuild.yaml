@@ -46,7 +46,8 @@ steps:
       - "--set-secrets=VERTEX_PRIVATE_KEY=${_VERTEX_PRIVATE_KEY}:latest"
       - "--set-secrets=GOOGLE_API_KEY=${_GOOGLE_API_KEY}:latest"
       - "--set-secrets=AUDIO_API_KEY=${_AUDIO_API_KEY}:latest"
-      - "--set-secrets=AUTH_TRUST_HOST=true"
+      - "--set-env-vars"
+      - "AUTH_TRUST_HOST=true"
 
 # Substitutions
 substitutions:
