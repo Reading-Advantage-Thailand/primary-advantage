@@ -35,6 +35,7 @@ steps:
       - "--region=asia-southeast1"
       - "--platform=managed"
       - "--allow-unauthenticated"
+      - "--set-secrets=PROJECT_ID=${_PROJECT_ID}"
       - "--set-secrets=DATABASE_URL=${_DATABASE_URL}:latest"
       - "--set-secrets=RESEND_API_KEY=${_RESEND_API_KEY}:latest"
       - "--set-secrets=AUTH_SECRET=${_AUTH_SECRET}:latest"
@@ -49,7 +50,7 @@ steps:
 
 # Substitutions
 substitutions:
-  _PROJECT_ID: "PROJECT_ID"
+  _PROJECT_ID: "primary-advantage"
   _DATABASE_URL: "DATABASE_URL"
   _RESEND_API_KEY: "RESEND_API_KEY"
   _AUTH_SECRET: "AUTH_SECRET"
@@ -67,8 +68,6 @@ availableSecrets:
   secretManager:
     - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/latest
       env: "DATABASE_URL"
-    - versionName: projects/${_PROJECT_ID}/secrets/${_PROJECT_ID}/versions/latest
-      env: "PROJECT_ID"
 
 options:
   logging: CLOUD_LOGGING_ONLY
