@@ -27,7 +27,7 @@ WORKDIR /app
 # Set environment variables for Next.js production
 ENV NODE_ENV=production
 # Set host to 0.0.0.0 for Cloud Run
-ENV HOST="0.0.0.0"
+ENV HOSTNAME="0.0.0.0"
 # Set port to 3000 for Cloud Run
 ENV PORT=3000
 
