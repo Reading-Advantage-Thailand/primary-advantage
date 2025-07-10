@@ -88,6 +88,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allows full URLs if they are on the same origin
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl; // Fallback to base URL
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id as string;

@@ -26,6 +26,10 @@ export async function signInAction(
       password,
       // redirectTo: callbackUrl || undefined,
     });
+
+    return {
+      success: true,
+    };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {

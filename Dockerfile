@@ -27,9 +27,9 @@ WORKDIR /app
 # Set environment variables for Next.js production
 ENV NODE_ENV=production
 # Set host to 0.0.0.0 for Cloud Run
-ENV HOSTNAME="0.0.0.0"
+# ENV HOSTNAME="0.0.0.0"
 # Set port to 3000 for Cloud Run
-ENV PORT=3000
+# ENV PORT=3000
 
 # Copy necessary files from the builder stage
 COPY --from=builder /app/public ./public
@@ -42,7 +42,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Expose the port
-EXPOSE 3000
+# EXPOSE 3000
 
 # Start the Next.js application
 CMD ["npm", "run", "start"]

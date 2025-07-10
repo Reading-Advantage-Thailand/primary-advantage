@@ -20,14 +20,14 @@ import { signIn } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { signInAction } from "@/actions/singinAction";
 import { FormError } from "../form-error";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormSuccess } from "../form-success";
 
 export function TeacherSignInForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl");
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Email already exists"
@@ -35,7 +35,7 @@ export function TeacherSignInForm({
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPanding, startTransition] = useTransition();
-
+  const router = useRouter();
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -55,6 +55,12 @@ export function TeacherSignInForm({
         },
         // callbackUrl || undefined,
       ).then((data) => {
+        // if (data?.success) {
+        //   setSuccess("Login successful");
+        //   setTimeout(() => {
+        //     router.push("/");
+        //   }, 1500);
+        // }
         setError(data?.error);
       });
     });
@@ -122,6 +128,7 @@ export function TeacherSignInForm({
           )}
         />
 
+        {/* <FormSuccess message={success} /> */}
         <FormError message={error || urlError} />
         <div className="grid gap-6">
           <Button type="submit" className="w-full">
