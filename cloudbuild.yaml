@@ -35,7 +35,6 @@ steps:
       - "--region=asia-southeast1"
       - "--platform=managed"
       - "--allow-unauthenticated"
-      - "--set-secrets=PROJECT_ID=${_PROJECT_ID}"
       - "--set-secrets=DATABASE_URL=${_DATABASE_URL}:latest"
       - "--set-secrets=RESEND_API_KEY=${_RESEND_API_KEY}:latest"
       - "--set-secrets=AUTH_SECRET=${_AUTH_SECRET}:latest"
@@ -47,6 +46,7 @@ steps:
       - "--set-secrets=VERTEX_PRIVATE_KEY=${_VERTEX_PRIVATE_KEY}:latest"
       - "--set-secrets=GOOGLE_API_KEY=${_GOOGLE_API_KEY}:latest"
       - "--set-secrets=AUDIO_API_KEY=${_AUDIO_API_KEY}:latest"
+      - "--set-env-vars=PROJECT_ID=${_PROJECT_ID}"
 
 # Substitutions
 substitutions:
