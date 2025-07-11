@@ -45,18 +45,43 @@ export function TeacherSignInForm({
   const onSubmit = async (value: z.infer<typeof signInSchema>) => {
     setError("");
 
-    startTransition(() => {
-      signInAction(
-        {
-          ...value,
-          type: "other",
-        },
-        callbackUrl || undefined,
-      ).then((data) => {
-        if (data?.error) {
-          setError(data?.error);
+    startTransition(async () => {
+      try {
+        const response = await fetch("/api/auth/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...value,
+            type: "other",
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Handle successful login - redirect manually
+          const redirectUrl = callbackUrl || "/auth/signin";
+          window.location.href = redirectUrl;
+        } else {
+          setError(data.error);
         }
-      });
+      } catch (error) {
+        setError("An unexpected error occurred");
+        console.error("Login error:", error);
+      }
+      // signInAction(
+      //   {
+      //     ...value,
+      //     type: "other",
+      //   },
+      //   callbackUrl || undefined,
+      // ).then((data) => {
+      //   if (data?.error) {
+      //     setError(data?.error);
+      //   }
+      // });
     });
   };
 
@@ -138,7 +163,7 @@ export function TeacherSignInForm({
             className="w-full cursor-pointer"
             onClick={() => {
               signIn("google", {
-                callbackUrl: callbackUrl || undefined,
+                callbackUrl: callbackUrl || "/auth/signin",
               });
             }}
           >

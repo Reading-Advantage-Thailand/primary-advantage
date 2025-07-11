@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { getToken } from "next-auth/jwt";
+import { auth } from "@/lib/auth";
 
 // Define protected routes and their required roles
 const protectedRoutes = {
