@@ -28,6 +28,7 @@ export function TeacherSignInForm({
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Email already exists"
@@ -53,14 +54,8 @@ export function TeacherSignInForm({
           ...value,
           type: "teacher",
         },
-        // callbackUrl || undefined,
+        callbackUrl || undefined,
       ).then((data) => {
-        // if (data?.success) {
-        //   setSuccess("Login successful");
-        //   setTimeout(() => {
-        //     router.push("/");
-        //   }, 1500);
-        // }
         setError(data?.error);
       });
     });
@@ -128,7 +123,7 @@ export function TeacherSignInForm({
           )}
         />
 
-        {/* <FormSuccess message={success} /> */}
+        <FormSuccess message={success} />
         <FormError message={error || urlError} />
         <div className="grid gap-6">
           <Button type="submit" className="w-full">
@@ -145,7 +140,7 @@ export function TeacherSignInForm({
             className="w-full cursor-pointer"
             onClick={() => {
               signIn("google", {
-                // callbackUrl: callbackUrl || undefined,
+                callbackUrl: callbackUrl || "/",
               });
             }}
           >

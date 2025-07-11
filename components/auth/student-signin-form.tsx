@@ -37,6 +37,7 @@ export function StudentSignInForm({
 }: React.ComponentPropsWithoutRef<"form">) {
   const params = useSearchParams();
   const classCode = params.get("classroom_code");
+  const callbackUrl = params.get("callbackUrl");
   const [step, setStep] = useState<"code" | "select">("code");
   const [code, setCode] = useState("");
   const [students, setStudents] = useState<
@@ -93,6 +94,7 @@ export function StudentSignInForm({
       type: "student",
       email: selectedStudentId,
       password: code,
+      callbackUrl: callbackUrl || undefined,
     });
   }
 
@@ -109,7 +111,7 @@ export function StudentSignInForm({
               <h1 className="text-2xl font-bold">
                 Welcome to Primary Advantage
               </h1>
-              <p className="text-balance text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm text-balance">
                 Enter your Classroom Code
               </p>
             </div>
@@ -147,7 +149,7 @@ export function StudentSignInForm({
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-2xl font-bold">Welcome to Primary Advantage</h1>
-            <p className="text-balance text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm text-balance">
               Select Your Name below to login to your account
             </p>
           </div>

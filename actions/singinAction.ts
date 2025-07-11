@@ -24,12 +24,8 @@ export async function signInAction(
       type,
       email,
       password,
-      // redirectTo: callbackUrl || undefined,
+      redirectTo: callbackUrl || (type === "teacher" ? "/" : "/"),
     });
-
-    return {
-      success: true,
-    };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
