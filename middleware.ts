@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
   const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
 
   // Handle post-login redirects
-  if (pathWithoutLocale === "/auth/signin") {
+  if (pathWithoutLocale.includes("/auth/signin")) {
     const token = await getToken({
       req: request,
       secret: process.env.AUTH_SECRET,

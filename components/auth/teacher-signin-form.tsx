@@ -49,6 +49,7 @@ export function TeacherSignInForm({
       signInAction(
         {
           ...value,
+          type: "other",
         },
         callbackUrl || undefined,
       ).then((data) => {

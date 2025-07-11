@@ -10,6 +10,7 @@ import { ZodError } from "zod";
 import { getUserByEmail } from "@/server/models/user";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
@@ -42,7 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return userData;
           }
 
-          if (type !== "student") {
+          if (type === "other") {
             const isPasswordValid = await bcrypt.compare(
               password,
               user.password ?? "",
