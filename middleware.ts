@@ -82,10 +82,12 @@ export default async function middleware(request: NextRequest) {
   );
 
   if (isProtectedRoute) {
-    const token = await getToken({
-      req: request,
-      secret: process.env.AUTH_SECRET,
-    });
+    const session = await currentUser();
+    const token = session;
+    // const token = await getToken({
+    //   req: request,
+    //   secret: process.env.AUTH_SECRET,
+    // });
 
     // If no token, redirect to login
     if (!token) {
