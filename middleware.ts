@@ -32,13 +32,17 @@ export async function middleware(request: NextRequest) {
   const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
 
   // Handle post-login redirects
-  if (pathWithoutLocale.includes("/auth/signin")) {
+  if (pathWithoutLocale === "/auth/signin") {
     const token = await getToken({
       req: request,
       secret: process.env.AUTH_SECRET,
     });
 
+    console.log("Middleware - Path:", pathWithoutLocale);
+    console.log("Middleware - Token exists:", !!token);
+
     if (token) {
+      console.log("Middleware - User role:", token.role);
       const userRole = token.role as string;
       const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
 
