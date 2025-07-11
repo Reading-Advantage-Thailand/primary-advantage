@@ -11,7 +11,7 @@ import { getUserByEmail } from "@/server/models/user";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  adapter: PrismaAdapter(prisma),
+  // adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
       credentials: {
@@ -89,7 +89,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id as string;
         token.email = user.email as string;
@@ -99,6 +99,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.level = user.level;
         token.cefrLevel = user.cefrLevel;
       }
+
+      // Handle Google OAuth users
+      if (account?.provider === "google" && user?.email) {
+        // Fetch user from database to get role
+        const dbUser = await getUserByEmail(user.email);
+        if (dbUser) {
+          token.role = dbUser.role;
+          token.xp = dbUser.xp;
+          token.level = dbUser.level;
+          token.cefrLevel = dbUser.cefrLevel as string;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
