@@ -42,7 +42,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return userData;
           }
 
-          if (type === "teacher") {
+          if (type !== "student") {
             const isPasswordValid = await bcrypt.compare(
               password,
               user.password ?? "",

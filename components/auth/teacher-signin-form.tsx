@@ -20,8 +20,7 @@ import { signIn } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { signInAction } from "@/actions/singinAction";
 import { FormError } from "../form-error";
-import { useRouter, useSearchParams } from "next/navigation";
-import { FormSuccess } from "../form-success";
+import { useSearchParams } from "next/navigation";
 
 export function TeacherSignInForm({
   className,
@@ -34,9 +33,7 @@ export function TeacherSignInForm({
       ? "Email already exists"
       : "";
   const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
   const [isPanding, startTransition] = useTransition();
-  const router = useRouter();
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -52,11 +49,12 @@ export function TeacherSignInForm({
       signInAction(
         {
           ...value,
-          type: "teacher",
         },
         callbackUrl || undefined,
       ).then((data) => {
-        setError(data?.error);
+        if (data?.error) {
+          setError(data?.error);
+        }
       });
     });
   };
@@ -123,7 +121,6 @@ export function TeacherSignInForm({
           )}
         />
 
-        <FormSuccess message={success} />
         <FormError message={error || urlError} />
         <div className="grid gap-6">
           <Button type="submit" className="w-full">
@@ -140,7 +137,7 @@ export function TeacherSignInForm({
             className="w-full cursor-pointer"
             onClick={() => {
               signIn("google", {
-                callbackUrl: callbackUrl || "/",
+                callbackUrl: callbackUrl || undefined,
               });
             }}
           >
