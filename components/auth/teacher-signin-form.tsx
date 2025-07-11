@@ -74,7 +74,7 @@ export function TeacherSignInForm({
           ...value,
           type: "other",
         },
-        callbackUrl || undefined,
+        // callbackUrl || undefined,
       ).then((data) => {
         if (data?.error) {
           setError(data?.error);

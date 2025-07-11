@@ -24,7 +24,7 @@ export async function signInAction(
       type,
       email,
       password,
-      redirectTo: callbackUrl || "/auth/signin",
+      // redirectTo: callbackUrl || "/auth/signin",
     });
   } catch (error) {
     if (error instanceof AuthError) {

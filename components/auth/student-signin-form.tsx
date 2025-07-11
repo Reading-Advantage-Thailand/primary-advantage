@@ -120,7 +120,7 @@ export function StudentSignInForm({
       type: "student",
       email: selectedStudentId,
       password: code,
-      callbackUrl: callbackUrl || undefined,
+      // callbackUrl: callbackUrl || undefined,
     });
   }
 
