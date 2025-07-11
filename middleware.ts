@@ -40,6 +40,7 @@ export async function middleware(request: NextRequest) {
     });
 
     console.log("Middleware - Path:", pathWithoutLocale);
+    console.log("Middleware - Token:", token);
     console.log("Middleware - Token exists:", !!token);
 
     if (token) {
