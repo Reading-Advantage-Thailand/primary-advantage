@@ -37,8 +37,8 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
       <DropdownMenuTrigger asChild>
         <UserAvatar
           user={{
-            name: user?.name || null,
-            image: user?.image || null,
+            name: user?.name || "",
+            image: user?.image || "",
           }}
           className="border-muted-foreground h-8 w-8 cursor-pointer border"
         />

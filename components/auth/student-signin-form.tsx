@@ -90,40 +90,38 @@ export function StudentSignInForm({
   };
 
   async function handleLogin() {
-    try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: "student",
-          email: selectedStudentId,
-          password: code,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Handle successful login - redirect manually
-        const redirectUrl = callbackUrl || "/student/read";
-        window.location.href = redirectUrl;
-      } else {
-        setError(data.error);
-        toast.error(data.error);
-      }
-    } catch (error) {
-      setError("An unexpected error occurred");
-      toast.error("An unexpected error occurred");
-      console.error("Login error:", error);
-    }
-    // signIn("credentials", {
-    //   type: "student",
-    //   email: selectedStudentId,
-    //   password: code,
-    //   callbackUrl: callbackUrl || undefined,
-    // });
+    // try {
+    //   const response = await fetch("/api/auth/signin", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       type: "student",
+    //       email: selectedStudentId,
+    //       password: code,
+    //     }),
+    //   });
+    //   const data = await response.json();
+    //   if (data.success) {
+    //     // Handle successful login - redirect manually
+    //     const redirectUrl = callbackUrl || "/student/read";
+    //     window.location.href = redirectUrl;
+    //   } else {
+    //     setError(data.error);
+    //     toast.error(data.error);
+    //   }
+    // } catch (error) {
+    //   setError("An unexpected error occurred");
+    //   toast.error("An unexpected error occurred");
+    //   console.error("Login error:", error);
+    // }
+    signIn("credentials", {
+      type: "student",
+      email: selectedStudentId,
+      password: code,
+      callbackUrl: callbackUrl || undefined,
+    });
   }
 
   return (

@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { getToken } from "next-auth/jwt";
-import { auth } from "@/lib/auth";
+import { currentUser } from "./lib/session";
 
 // Define protected routes and their required roles
 const protectedRoutes = {
@@ -26,7 +26,7 @@ const roleDefaultRedirects = {
 // Create the intl middleware
 const intlMiddleware = createIntlMiddleware(routing);
 
-export async function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   // Get the pathname without locale
   const pathname = request.nextUrl.pathname;
   const locale = request.nextUrl.pathname.split("/")[1];
@@ -34,17 +34,15 @@ export async function middleware(request: NextRequest) {
 
   // Handle post-login redirects
   if (pathWithoutLocale === "/auth/signin") {
-    const token = await getToken({
-      req: request,
-      secret: process.env.AUTH_SECRET,
-    });
+    const session = await currentUser();
+    const token = session;
 
-    console.log("Middleware - Path:", pathWithoutLocale);
-    console.log("Middleware - Token:", token);
-    console.log("Middleware - Token exists:", !!token);
+    // const token = await getToken({
+    //   req: request,
+    //   secret: process.env.AUTH_SECRET,
+    // });
 
     if (token) {
-      console.log("Middleware - User role:", token.role);
       const userRole = token.role as string;
       const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
 

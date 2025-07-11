@@ -3,7 +3,7 @@ import { User } from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { signInSchema } from "./zod";
 import { ZodError } from "zod";
