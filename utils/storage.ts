@@ -17,7 +17,8 @@ const storage = new Storage({
   timeout: 60000, // 60 seconds
 });
 
-export const bucket = storage.bucket(process.env.STORAGE_BUCKET_NAME as string);
+// export const bucket = storage.bucket(process.env.STORAGE_BUCKET_NAME as string);
+export const bucket = storage;
 
 // Utility functions for production
 export const uploadToBucket = async (
@@ -27,12 +28,17 @@ export const uploadToBucket = async (
   isDeleteLocal: boolean = true,
 ) => {
   try {
-    await bucket.upload(filePath, {
-      destination: destination,
-    });
+    await bucket
+      .bucket(process.env.STORAGE_BUCKET_NAME as string)
+      .upload(filePath, {
+        destination: destination,
+      });
 
     if (isPublic) {
-      await bucket.file(destination).makePublic();
+      await bucket
+        .bucket(process.env.STORAGE_BUCKET_NAME as string)
+        .file(destination)
+        .makePublic();
     }
 
     // delete the file from the local file system
@@ -60,7 +66,9 @@ export async function deleteFile(fileName: string): Promise<{
 
     const deletePromises = filePatterns.map(async (filePath) => {
       try {
-        const file = bucket.file(filePath);
+        const file = bucket
+          .bucket(process.env.STORAGE_BUCKET_NAME as string)
+          .file(filePath);
         const [exists] = await file.exists();
 
         if (exists) {
