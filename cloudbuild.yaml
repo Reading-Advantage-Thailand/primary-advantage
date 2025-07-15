@@ -46,11 +46,15 @@ steps:
       - "--set-secrets=VERTEX_PRIVATE_KEY=${_VERTEX_PRIVATE_KEY}:latest"
       - "--set-secrets=GOOGLE_API_KEY=${_GOOGLE_API_KEY}:latest"
       - "--set-secrets=AUDIO_API_KEY=${_AUDIO_API_KEY}:latest"
+      - "--set-secrets=STORAGE_CLIENT_EMAIL=${_STORAGE_CLIENT_EMAIL}:latest"
+      - "--set-secrets=STORAGE_PRIVATE_KEY=${_STORAGE_PRIVATE_KEY}:latest"
       - "--set-env-vars=PROJECT_ID=${_PROJECT_ID}"
+      - "--set-env-vars=NODE_ENV=${_NODE_ENV}"
       - "--set-env-vars=AUTH_TRUST_HOST=true"
 
 # Substitutions
 substitutions:
+  _NODE_ENV: "production"
   _PROJECT_ID: "primary-advantage"
   _DATABASE_URL: "DATABASE_URL"
   _RESEND_API_KEY: "RESEND_API_KEY"
@@ -63,6 +67,8 @@ substitutions:
   _VERTEX_PRIVATE_KEY: "VERTEX_PRIVATE_KEY"
   _GOOGLE_API_KEY: "GOOGLE_API_KEY"
   _AUDIO_API_KEY: "AUDIO_API_KEY"
+  _STORAGE_CLIENT_EMAIL: "STORAGE_CLIENT_EMAIL"
+  _STORAGE_PRIVATE_KEY: "STORAGE_PRIVATE_KEY"
 
 # Secrets
 availableSecrets:

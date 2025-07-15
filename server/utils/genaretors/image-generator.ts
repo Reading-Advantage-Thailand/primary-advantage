@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { openai, openaiImages } from "@/utils/openai";
 import { google, googleImages } from "@/utils/google";
+import { uploadToBucket } from "@/utils/storage";
 
 interface GenerateImageParams {
   imageDesc: string;
@@ -11,13 +12,11 @@ interface GenerateImageParams {
 
 export async function generateImage(
   params: GenerateImageParams,
-  maxRetries = 5
+  maxRetries = 5,
 ): Promise<void> {
   let attempts = 0;
   while (attempts < maxRetries) {
     try {
-      const tempImageName = `temp-${Date.now()}.png`;
-
       const { image } = await generateImages({
         model: openai.image(openaiImages),
         n: 1,
@@ -30,24 +29,24 @@ export async function generateImage(
 
       const localPath = path.join(
         process.cwd(),
-        "public/images",
-        `${params.articleId}.png`
+        "data/images",
+        `${params.articleId}.png`,
       );
       fs.writeFileSync(localPath, base64Image as Uint8Array);
 
-      //   await uploadToBucket(localPath, `${IMAGE_URL}/${params.articleId}.png`);
+      await uploadToBucket(localPath, `images/${params.articleId}.png`);
 
       return;
     } catch (error) {
       console.error(
         `Failed to generate image (Attempt ${attempts + 1}):`,
-        error
+        error,
       );
       attempts++;
 
       if (attempts >= maxRetries) {
         throw new Error(
-          `Failed to generate image after ${maxRetries} attempts: ${error}`
+          `Failed to generate image after ${maxRetries} attempts: ${error}`,
         );
       }
 

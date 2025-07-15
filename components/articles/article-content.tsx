@@ -43,6 +43,9 @@ const SUPPORTED_LANGUAGES = {
 
 export default function ArticleContent({ article }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentSentenceRef = useRef<HTMLSpanElement | null>(null);
+  const controlsRef = useRef<HTMLDivElement | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [togglePlayer, setTogglePlayer] = useState<boolean>(false);
@@ -56,6 +59,90 @@ export default function ArticleContent({ article }: Props) {
   const [isPanding, startTransition] = useTransition();
   const locale = useLocale();
   const t = useTranslations("Components");
+  const [isControlsVisible, setIsControlsVisible] = useState<boolean>(true);
+  const [isAutoScrollPaused, setIsAutoScrollPaused] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (
+      isPlaying &&
+      currentSentenceIndex !== -1 &&
+      currentSentenceRef.current &&
+      !isAutoScrollPaused
+    ) {
+      const timeoutId = setTimeout(() => {
+        currentSentenceRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "nearest",
+        });
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentSentenceIndex, currentWordIndex, isPlaying, isAutoScrollPaused]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsControlsVisible(entry.isIntersecting);
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "-10px 0px -10px 0px",
+      },
+    );
+
+    if (controlsRef.current) {
+      observer.observe(controlsRef.current);
+    }
+
+    return () => {
+      if (controlsRef.current) {
+        observer.unobserve(controlsRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let isScrolling = false;
+
+    const handleScroll = () => {
+      if (!isScrolling && isPlaying) {
+        isScrolling = true;
+        setIsAutoScrollPaused(true);
+
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+
+        scrollTimeoutRef.current = setTimeout(() => {
+          setIsAutoScrollPaused(false);
+          isScrolling = false;
+        }, 3000);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      setIsAutoScrollPaused(false);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    }
+  }, [isPlaying]);
+
+  const shouldShowFixedControls =
+    togglePlayer && isPlaying && !isControlsVisible;
 
   const handlePlayPause = async () => {
     if (audioRef.current) {
@@ -100,7 +187,6 @@ export default function ArticleContent({ article }: Props) {
     if (!audio || !article) return;
 
     const handleLoadedMetadata = () => {
-      // Apply speed setting when audio loads
       audio.playbackRate = Number(speed);
     };
 
@@ -209,7 +295,7 @@ export default function ArticleContent({ article }: Props) {
 
   useEffect(() => {
     handleTranslate(currentSentenceIndex);
-  }, [currentSentenceIndex]);
+  }, [currentSentenceIndex, selectedLanguage]);
 
   const handleWordClick = async (
     sentenceIndex: number,
@@ -289,13 +375,20 @@ export default function ArticleContent({ article }: Props) {
     }
   };
 
+  const paragraphs = article.passage
+    .split("\n\n")
+    .filter((p) => p.trim() !== "");
+
   return (
     <div>
-      <div className="my-2 flex items-center justify-center gap-4">
+      <div
+        ref={controlsRef}
+        className="my-2 flex items-center justify-center gap-4"
+      >
         <div id="onborda-audio" className="flex flex-grow items-center">
           <audio
             ref={audioRef}
-            src={article.audioUrl as string}
+            src={`https://storage.googleapis.com/primary-app-storage${article.audioUrl}`}
             className="w-full"
             onTimeUpdate={handleTimeUpdate}
             onEnded={() => {
@@ -314,21 +407,58 @@ export default function ArticleContent({ article }: Props) {
           </Button>
         </div>
         <div id="onborda-translate" className="flex items-center gap-2">
+          {/* <Select
+            value={selectedLanguage}
+            onValueChange={setSelectedLanguage}
+            disabled={loading}
+          >
+            <SelectTrigger className="h-10 w-16 min-w-16">
+              <div className="flex items-center justify-center">
+                <Languages className="h-4 w-4" />
+                <SelectValue>
+                  <span className="text-lg">
+                    {selectedLanguage === "th" && "🇹🇭"}
+                    {selectedLanguage === "vi" && "🇻🇳"}
+                    {selectedLanguage === "cn" && "🇨🇳"}
+                    {selectedLanguage === "tw" && "🇹🇼"}
+                  </span>
+                </SelectValue>
+              </div>
+            </SelectTrigger>
+            <SelectContent position="popper" className="max-h-60 w-48">
+              {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
+                <SelectItem key={code} value={code} className="w-full">
+                  <span className="truncate">{name}</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select> */}
+
           <Select
             value={selectedLanguage}
             onValueChange={setSelectedLanguage}
             disabled={loading}
           >
             <SelectTrigger className="h-10">
+              {" "}
+              {/* Even smaller width */}
               <div className="flex items-center gap-2">
                 <Languages className="h-4 w-4" />
-                <SelectValue />
+                <SelectValue>
+                  {/* Show only flag */}
+                  <span className="text-lg">
+                    {selectedLanguage === "th" && "🇹🇭"}
+                    {selectedLanguage === "vi" && "🇻🇳"}
+                    {selectedLanguage === "cn" && "🇨🇳"}
+                    {selectedLanguage === "tw" && "🇹🇼"}
+                  </span>
+                </SelectValue>
               </div>
             </SelectTrigger>
-            <SelectContent position="popper" className="max-h-60">
+            <SelectContent position="popper" className="max-h-60 w-48">
               {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
-                <SelectItem key={code} value={code}>
-                  {name}
+                <SelectItem key={code} value={code} className="w-full">
+                  <span className="truncate">{name}</span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -353,10 +483,138 @@ export default function ArticleContent({ article }: Props) {
         </div>
       </div>
 
-      {togglePlayer && (
+      {shouldShowFixedControls && (
+        <div className="bg-primary dark:bg-primary-foreground fixed right-0 bottom-0 left-0 z-50 border-t p-4 shadow-lg transition-all duration-300">
+          <div className="mx-auto max-w-4xl space-y-3">
+            {isTranslateOpen && (
+              <div className="flex flex-col items-center justify-center border-b pb-3">
+                <p className="text-center text-green-500">{translate}</p>
+              </div>
+            )}
+
+            {/* Main Controls */}
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex max-w-md flex-grow items-center">
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={handleTogglePlayer}
+                >
+                  {t("audioButton")}
+                </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <Select
+                  value={selectedLanguage}
+                  onValueChange={setSelectedLanguage}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="h-10">
+                    <div className="flex items-center gap-2">
+                      <Languages className="h-4 w-4" />
+                      <SelectValue>
+                        <span className="text-lg">
+                          {selectedLanguage === "th" && "🇹🇭"}
+                          {selectedLanguage === "vi" && "🇻🇳"}
+                          {selectedLanguage === "cn" && "🇨🇳"}
+                          {selectedLanguage === "tw" && "🇹🇼"}
+                        </span>
+                      </SelectValue>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent position="popper" className="max-h-60 w-48">
+                    {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
+                      <SelectItem key={code} value={code} className="w-full">
+                        <span className="truncate">{name}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  variant="default"
+                  disabled={loading || currentSentenceIndex === -1}
+                  onClick={() => {
+                    isTranslateOpen
+                      ? setIsTranslateOpen(false)
+                      : setIsTranslateOpen(true);
+                    handleTranslate(currentSentenceIndex);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <>
+                    <Languages className="h-4 w-4" />
+                    {isTranslateOpen ? t("closeButton") : t("translate")}
+                  </>
+                </Button>
+              </div>
+            </div>
+
+            {/* Audio Player Controls */}
+            {togglePlayer && (
+              <div className="bg-primary text-primary-foreground rounded p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <Button
+                    variant="secondary"
+                    className="h-10 w-10 rounded-full p-0"
+                  >
+                    <SkipBackIcon />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-10 w-10 rounded-full p-0"
+                    onClick={handlePlayPause}
+                  >
+                    {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-10 w-10 rounded-full p-0"
+                  >
+                    <SkipForwardIcon />
+                  </Button>
+                  <div>
+                    <Select defaultValue="1" onValueChange={handleSpeedTime}>
+                      <SelectTrigger className="border-muted-foreground w-20 border">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="0.5">0.5x</SelectItem>
+                        <SelectItem value="0.75">0.75x</SelectItem>
+                        <SelectItem value="1">1x</SelectItem>
+                        <SelectItem value="1.25">1.25x</SelectItem>
+                        <SelectItem value="1.5">1.5x</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Add padding when fixed controls are shown */}
+      {shouldShowFixedControls && (
+        <div
+          className={cn(
+            "pb-4",
+            togglePlayer && isTranslateOpen
+              ? "h-52"
+              : togglePlayer
+                ? "h-36"
+                : isTranslateOpen
+                  ? "h-32"
+                  : "h-20",
+          )}
+        ></div>
+      )}
+
+      {/* Keep normal audio player when not fixed */}
+      {togglePlayer && !shouldShowFixedControls && (
         <div
           id="audioPlayer"
-          className="bg-primary text-primary-foreground my-2 rounded p-4"
+          className="bg-primary text-primary-foreground my-2 rounded p-4 transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-2">
             <Button variant="secondary" className="h-10 w-10 rounded-full p-0">
@@ -391,22 +649,39 @@ export default function ArticleContent({ article }: Props) {
         </div>
       )}
 
-      {isTranslateOpen && (
-        <div className="flex h-32 flex-col items-center justify-between md:h-24">
+      {/* Keep normal translate when not fixed */}
+      {isTranslateOpen && !shouldShowFixedControls && (
+        <div className="flex h-32 flex-col items-center justify-between transition-all duration-300 md:h-24">
           <Separator />
           <p className="text-center text-green-500">{translate}</p>
           <Separator />
         </div>
       )}
 
-      {Array.isArray(article.sentences) &&
+      {/* {isTranslateOpen && (
+        <div
+          // className="flex h-32 flex-col items-center justify-between md:h-24"
+          className={cn(
+            "flex h-32 flex-col items-center justify-between transition-all duration-300 md:h-24",
+            shouldShowFixedControls
+              ? "dark:bg-primary-foreground bg-primary fixed right-4 bottom-0 left-4 z-30 border-t p-4 shadow-lg"
+              : "",
+          )}
+        >
+          <Separator />
+          <p className="text-center text-green-500">{translate}</p>
+          <Separator />
+        </div>
+      )} */}
+
+      {/* {Array.isArray(article.sentences) &&
         article.sentences.map(
           (sentence: SentenceTimepoint, sentenceIndex: number) => {
             return (
               <ContextMenu key={sentenceIndex}>
                 <ContextMenuTrigger>
                   <span
-                    className={`font-article rounded px-0.5 text-lg transition-all duration-200 md:text-xl ${
+                    className={`font-article mb-2 block rounded px-0.5 indent-4 text-lg hyphens-auto whitespace-pre-wrap transition-all duration-200 md:text-xl ${
                       sentenceIndex === currentSentenceIndex
                         ? "bg-blue-300 dark:bg-blue-900/70"
                         : ""
@@ -511,70 +786,70 @@ export default function ArticleContent({ article }: Props) {
                         );
                       });
                     })()}
-                    {/* {sentence.sentence.split(/\b/).map((part, partIndex) => {
-                    // const wordIndex = sentence.words.findIndex(
-                    //   (word) => word.word === part
-                    // );
+                    {sentence.sentence.split(/\b/).map((part, partIndex) => {
+                      // const wordIndex = sentence.words.findIndex(
+                      //   (word) => word.word === part
+                      // );
 
-                    // Instead of using findIndex, we need to map the split parts to actual word indices
-                    // We'll create a mapping of word positions to their indices in the words array
-                    let wordIndex = -1;
-                    let wordCount = 0;
+                      // Instead of using findIndex, we need to map the split parts to actual word indices
+                      // We'll create a mapping of word positions to their indices in the words array
+                      let wordIndex = -1;
+                      let wordCount = 0;
 
-                    // Count actual words (not spaces/punctuation) up to this part
-                    const splitParts = sentence.sentence.split(/\b/);
+                      // Count actual words (not spaces/punctuation) up to this part
+                      const splitParts = sentence.sentence.split(/\b/);
 
-                    for (let i = 0; i <= partIndex; i++) {
-                      const currentPart = splitParts[i];
-                      // Check if this part is an actual word (not whitespace/punctuation)
-                      if (currentPart && /\w/.test(currentPart)) {
-                        if (i === partIndex) {
-                          wordIndex = wordCount;
-                        }
-                        wordCount++;
-                      }
-                    }
-
-                    // Only highlight if this part is actually a word (contains letters/numbers)
-                    const isActualWord = part && /\w/.test(part);
-
-                    // Check if this word should be highlighted
-                    const isCurrentWord =
-                      sentenceIndex === currentSentenceIndex &&
-                      wordIndex !== -1 &&
-                      wordIndex === currentWordIndex &&
-                      isActualWord; // Only highlight actual words
-
-                    return (
-                      <span
-                        key={partIndex}
-                        className={cn(
-                          isActualWord
-                            ? "cursor-pointer rounded transition-colors duration-150"
-                            : "",
-                          isCurrentWord
-                            ? "bg-blue-500 text-white"
-                            : isActualWord
-                              ? "hover:bg-blue-200 dark:hover:bg-blue-900/50"
-                              : "",
-                        )}
-                        onClick={() => {
-                          if (wordIndex !== -1 && isActualWord) {
-                            setCurrentSentenceIndex(sentenceIndex);
-                            setCurrentWordIndex(wordIndex);
-
-                            // Jump audio to word start time
-                            if (audioRef.current) {
-                              audioRef.current.currentTime =
-                                sentence.words[wordIndex].start;
-                            }
+                      for (let i = 0; i <= partIndex; i++) {
+                        const currentPart = splitParts[i];
+                        // Check if this part is an actual word (not whitespace/punctuation)
+                        if (currentPart && /\w/.test(currentPart)) {
+                          if (i === partIndex) {
+                            wordIndex = wordCount;
                           }
-                        }}
-                      >
-                        {part}
-                      </span>
-                    );
-                  })} */}
+                          wordCount++;
+                        }
+                      }
+
+                      // Only highlight if this part is actually a word (contains letters/numbers)
+                      const isActualWord = part && /\w/.test(part);
+
+                      // Check if this word should be highlighted
+                      const isCurrentWord =
+                        sentenceIndex === currentSentenceIndex &&
+                        wordIndex !== -1 &&
+                        wordIndex === currentWordIndex &&
+                        isActualWord; // Only highlight actual words
+
+                      return (
+                        <span
+                          key={partIndex}
+                          className={cn(
+                            isActualWord
+                              ? "cursor-pointer rounded transition-colors duration-150"
+                              : "",
+                            isCurrentWord
+                              ? "bg-blue-500 text-white"
+                              : isActualWord
+                                ? "hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                                : "",
+                          )}
+                          onClick={() => {
+                            if (wordIndex !== -1 && isActualWord) {
+                              setCurrentSentenceIndex(sentenceIndex);
+                              setCurrentWordIndex(wordIndex);
+
+                              // Jump audio to word start time
+                              if (audioRef.current) {
+                                audioRef.current.currentTime =
+                                  sentence.words[wordIndex].start;
+                              }
+                            }
+                          }}
+                        >
+                          {part}
+                        </span>
+                      );
+                    })}
                   </span>
                 </ContextMenuTrigger>
                 <ContextMenuContent className="w-50">
@@ -604,7 +879,180 @@ export default function ArticleContent({ article }: Props) {
               </ContextMenu>
             );
           },
-        )}
+        )} */}
+
+      {(() => {
+        if (!Array.isArray(article.sentences)) {
+          // Fallback to original paragraphs if no sentences
+          return paragraphs.map((p, index) => (
+            <p
+              key={index}
+              className="mb-2 indent-4 hyphens-auto whitespace-pre-wrap"
+            >
+              {p}
+            </p>
+          ));
+        }
+
+        // Group sentences back into original paragraphs
+        const groupSentencesIntoParagraphs = () => {
+          const paragraphGroups: { paragraph: string; sentences: number[] }[] =
+            [];
+          let currentParagraphText = "";
+          let currentSentenceIndices: number[] = [];
+
+          // Reconstruct paragraph structure by checking which sentences belong to which paragraph
+          paragraphs.forEach((paragraph) => {
+            const paragraphSentences: number[] = [];
+
+            article.sentences?.forEach((sentence, sentenceIndex) => {
+              if (paragraph.includes(sentence.sentence.trim())) {
+                paragraphSentences.push(sentenceIndex);
+              }
+            });
+
+            if (paragraphSentences.length > 0) {
+              paragraphGroups.push({
+                paragraph,
+                sentences: paragraphSentences,
+              });
+            }
+          });
+
+          return paragraphGroups;
+        };
+
+        const paragraphGroups = groupSentencesIntoParagraphs();
+
+        return paragraphGroups.map((group, groupIndex) => (
+          <p key={groupIndex} className="mb-4 indent-8 whitespace-pre-wrap">
+            {group.sentences.map((sentenceIndex) => {
+              const sentence = article.sentences?.[sentenceIndex];
+              const isCurrentSentence = sentenceIndex === currentSentenceIndex;
+
+              return (
+                <ContextMenu key={sentenceIndex}>
+                  <ContextMenuTrigger>
+                    <span
+                      ref={isCurrentSentence ? currentSentenceRef : null}
+                      className={`font-article rounded px-0.5 text-lg transition-all duration-200 md:text-xl ${
+                        sentenceIndex === currentSentenceIndex
+                          ? "bg-blue-300 dark:bg-blue-900/70"
+                          : ""
+                      }`}
+                    >
+                      {(() => {
+                        // ... existing word rendering logic ...
+                        const parts = sentence?.sentence.split(
+                          /(\s+|[.!?;:,"""''`()[\]{}—–\u2013\u2014\u2026]+)/,
+                        );
+                        let wordIndex = 0;
+
+                        const mergedParts = [];
+                        for (let i = 0; i < (parts?.length ?? 0); i++) {
+                          const current = parts?.[i];
+                          const next = parts?.[i + 1];
+                          const after = parts?.[i + 2];
+
+                          if (
+                            current &&
+                            /^\w+$/.test(current) &&
+                            (next === "'" || next === "'") &&
+                            after &&
+                            /^[a-z]+$/i.test(after) &&
+                            (after.toLowerCase() === "t" ||
+                              after.toLowerCase() === "s" ||
+                              after.toLowerCase() === "re" ||
+                              after.toLowerCase() === "ll" ||
+                              after.toLowerCase() === "ve" ||
+                              after.toLowerCase() === "d" ||
+                              after.toLowerCase() === "m")
+                          ) {
+                            mergedParts.push(current + next + after);
+                            i += 2;
+                          } else {
+                            mergedParts.push(current);
+                          }
+                        }
+
+                        return mergedParts.map((part, partIndex) => {
+                          const isActualWord =
+                            /[\w]/.test(part ?? "") &&
+                            /^[\w'-]+$/.test(part ?? "") &&
+                            part?.trim() !== "";
+
+                          const currentPartWordIndex = isActualWord
+                            ? wordIndex
+                            : -1;
+
+                          if (isActualWord) {
+                            wordIndex++;
+                          }
+
+                          const isCurrentWord =
+                            sentenceIndex === currentSentenceIndex &&
+                            currentPartWordIndex !== -1 &&
+                            currentPartWordIndex === currentWordIndex &&
+                            isActualWord;
+
+                          return (
+                            <span
+                              key={partIndex}
+                              className={cn(
+                                isActualWord
+                                  ? "cursor-pointer rounded transition-colors duration-150"
+                                  : "",
+                                isCurrentWord && isPlaying
+                                  ? "bg-blue-500 text-white"
+                                  : isActualWord
+                                    ? "hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                                    : "",
+                              )}
+                              onClick={() =>
+                                handleWordClick(
+                                  sentenceIndex,
+                                  currentPartWordIndex,
+                                  sentence as SentenceTimepoint,
+                                )
+                              }
+                            >
+                              {part}
+                            </span>
+                          );
+                        });
+                      })()}
+                    </span>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-50">
+                    {loading ? (
+                      <ContextMenuItem inset disabled>
+                        Loading
+                      </ContextMenuItem>
+                    ) : (
+                      <>
+                        <ContextMenuItem
+                          inset
+                          disabled={loading}
+                          onClick={handleSaveToFlashcard}
+                        >
+                          {t("saveToFlashcard")}
+                        </ContextMenuItem>
+                        <ContextMenuItem
+                          inset
+                          disabled={loading || currentSentenceIndex === -1}
+                          onClick={() => handleTranslateClick(sentenceIndex)}
+                        >
+                          {t("translate")}
+                        </ContextMenuItem>
+                      </>
+                    )}
+                  </ContextMenuContent>
+                </ContextMenu>
+              );
+            })}
+          </p>
+        ));
+      })()}
     </div>
   );
 }

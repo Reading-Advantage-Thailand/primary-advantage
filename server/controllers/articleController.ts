@@ -12,11 +12,11 @@ export const generateAllArticle = async (amountPerGenre: number) => {
   const types: ArticleType[] = [ArticleType.FICTION, ArticleType.NONFICTION];
   const levels: ArticleBaseCefrLevel[] = [
     ArticleBaseCefrLevel.A1,
-    // ArticleBaseCefrLevel.A2,
-    // ArticleBaseCefrLevel.B1,
-    // ArticleBaseCefrLevel.B2,
-    // ArticleBaseCefrLevel.C1,
-    // ArticleBaseCefrLevel.C2,
+    ArticleBaseCefrLevel.A2,
+    ArticleBaseCefrLevel.B1,
+    ArticleBaseCefrLevel.B2,
+    ArticleBaseCefrLevel.C1,
+    ArticleBaseCefrLevel.C2,
   ];
 
   const totalArticles = types.length * levels.length * amountPerGenre;

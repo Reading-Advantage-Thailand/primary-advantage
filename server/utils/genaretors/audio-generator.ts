@@ -21,6 +21,7 @@ import { createLogFile } from "../logging";
 import { SENTENCE_SPLITTER_SYSTEM_PROMPT } from "@/data/prompts-ai";
 import winkNLP from "wink-nlp";
 import model from "wink-eng-lite-web-model";
+import { uploadToBucket } from "@/utils/storage";
 
 interface GenerateAudioParams {
   passage: string;
@@ -419,37 +420,38 @@ export async function generateAudio({
   articleId,
 }: GenerateAudioParams): Promise<void> {
   try {
-    log("start generating audio");
-    // const voice = VOICES_AI[Math.floor(Math.random() * VOICES_AI.length)];
+    const voice = VOICES_AI[Math.floor(Math.random() * VOICES_AI.length)];
 
-    // const response = await fetch("https://api.lemonfox.ai/v1/audio/speech", {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Bearer ${process.env.AUDIO_API_KEY}`,
-    //   },
-    //   body: JSON.stringify({
-    //     input: passage,
-    //     voice: voice,
-    //     response_format: "mp3",
-    //     speed: 0.7,
-    //     word_timestamps: true,
-    //   }),
-    // });
+    const response = await fetch("https://api.lemonfox.ai/v1/audio/speech", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.AUDIO_API_KEY}`,
+      },
+      body: JSON.stringify({
+        input: passage,
+        voice: voice,
+        response_format: "mp3",
+        speed: 0.7,
+        word_timestamps: true,
+      }),
+    });
 
-    // if (!response.ok) {
-    //   throw new Error(`HTTP error! status: ${response.status}`);
-    // }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-    // if (!response.body) {
-    //   throw new Error("Response body is null");
-    // }
+    if (!response.body) {
+      throw new Error("Response body is null");
+    }
 
-    // const json = await response.json();
+    const json = await response.json();
 
-    // const MP3 = base64.toByteArray(json.audio);
+    const MP3 = base64.toByteArray(json.audio);
 
-    // const localPath = `${process.cwd()}/public/audios/${articleId}.mp3`;
-    // fs.writeFileSync(localPath, MP3);
+    const localPath = `${process.cwd()}/data/audios/${articleId}.mp3`;
+    fs.writeFileSync(localPath, MP3);
+
+    await uploadToBucket(localPath, `audios/sentences/${articleId}.mp3`);
 
     // const sentences = await splitIntoSentences(passage);
     // const sentence: string[] = sentencize(passage);
@@ -457,38 +459,33 @@ export async function generateAudio({
     const doc = nlp.readDoc(passage);
     const its = nlp.its;
     const sentences: string[] = doc.sentences().out(its.value);
-    console.log(sentences);
-
-    // console.log(sentence);
 
     // Process word timestamps into sentence timepoints
-    // const sentenceTimepoints = processWordTimestampsIntoSentences(
-    //   json.word_timestamps,
-    //   sentences,
-    //   articleId,
-    // );
+    const sentenceTimepoints = processWordTimestampsIntoSentences(
+      json.word_timestamps,
+      sentences,
+      articleId,
+    );
 
     // // Update the database with sentence timepoints
-    // await prisma.article.update({
-    //   where: { id: articleId },
-    //   data: {
-    //     sentences: JSON.parse(JSON.stringify(sentenceTimepoints)),
-    //     audioUrl: `/audios/${articleId}.mp3`,
-    //   },
-    // });
+    await prisma.article.update({
+      where: { id: articleId },
+      data: {
+        sentences: JSON.parse(JSON.stringify(sentenceTimepoints)),
+        audioUrl: `/audios/sentences/${articleId}.mp3`,
+      },
+    });
 
     // Automatically translate sentences after audio generation
-    // try {
-    //   await translateAndStoreSentences({ articleId });
-    // } catch (translationError) {
-    //   console.error(
-    //     `Failed to translate sentences for article ${articleId}:`,
-    //     translationError,
-    //   );
-    //   // Don't throw here - audio generation was successful
-    // }
-
-    log("audio generated successfully");
+    try {
+      await translateAndStoreSentences({ articleId });
+    } catch (translationError) {
+      console.error(
+        `Failed to translate sentences for article ${articleId}:`,
+        translationError,
+      );
+      // Don't throw here - audio generation was successful
+    }
 
     return;
   } catch (error: any) {

@@ -11,6 +11,7 @@ import { Article } from "@/types";
 import { AlertCircle } from "lucide-react";
 import ArticleContent from "./article-content";
 import { getLocale, getTranslations } from "next-intl/server";
+
 // import RatingPopup from "./rating-popup";
 
 type Props = {
@@ -31,6 +32,7 @@ export default async function ArticleCard({ article, userId }: Props) {
       article.summary
     );
   };
+
   return (
     <div className="md:basis-3/5">
       <Card>
@@ -49,8 +51,7 @@ export default async function ArticleCard({ article, userId }: Props) {
           </CardDescription>
           <div className="flex justify-center">
             <Image
-              src={`/images/${article.id}.png`}
-              // src={`https://storage.googleapis.com/artifacts.reading-advantage.appspot.com/images/${articleId}.png`}
+              src={`https://storage.googleapis.com/primary-app-storage/images/${article.id}.png`}
               alt="Malcolm X"
               width={640}
               height={640}

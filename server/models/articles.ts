@@ -28,6 +28,7 @@ import {
   Article,
 } from "@/types";
 import { cleanGenre, convertCefrLevel } from "@/lib/utils";
+import { deleteFile } from "@/utils/storage";
 
 interface GenerateArticleParams {
   type: ArticleType;
@@ -198,27 +199,17 @@ async function saveArticleContent(
       }),
     ),
 
-    // Save word list
-    // prisma.wordList.create({
-    //   data: {
-    //     wordlist: wordList.word_list,
-    //     article: {
-    //       connect: {
-    //         id: articleId,
-    //       },
-    //     },
-    //   },
+    // Generate audio
+    // generateAudio({
+    //   passage: article.passage,
+    //   articleId,
     // }),
 
-    // Generate audio
-    generateAudio({
-      passage: article.passage,
-      articleId,
-    }),
-
-    // Generate word audio
-    generateWordLists(articleId),
+    // // Generate word audio
+    // generateWordLists(articleId),
   ]);
+
+  return;
 }
 
 export const generateArticles = async ({
@@ -429,6 +420,22 @@ export const getQuestionsByArticleId = async (
     return { questions, result, questionStatus };
   } catch (error) {
     questionStatus = QuestionState.ERROR;
+    throw error;
+  }
+};
+
+export const deleteArticleById = async (articleId: string) => {
+  try {
+    const article = await prisma.article.delete({
+      where: { id: articleId },
+    });
+
+    const result = await deleteFile(articleId);
+    console.log("result", result);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting article:", error);
     throw error;
   }
 };

@@ -58,7 +58,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
           ref={ref}
           className="flex h-[20rem] flex-col gap-1 rounded-md bg-black bg-cover bg-center p-3 transition-all duration-300 hover:scale-105"
           style={{
-            backgroundImage: `url(/images/${article.id}.png)`,
+            backgroundImage: `url('https://storage.googleapis.com/primary-app-storage/images/${article.id}.png')`,
             boxShadow: "inset 80px 10px 90px 10px rgba(0, 0, 0, 0.9)",
             opacity:
               article.is_read ||
