@@ -33,6 +33,8 @@ export default async function ArticleCard({ article, userId }: Props) {
     );
   };
 
+  const imageUrl = `https://storage.googleapis.com/primary-app-storage/images/${article.id}.png`;
+
   return (
     <div className="md:basis-3/5">
       <Card>
@@ -50,12 +52,7 @@ export default async function ArticleCard({ article, userId }: Props) {
             {getLocalizedSummary()}
           </CardDescription>
           <div className="flex justify-center">
-            <Image
-              src={`https://storage.googleapis.com/primary-app-storage/images/${article.id}.png`}
-              alt="Malcolm X"
-              width={640}
-              height={640}
-            />
+            <Image src={imageUrl} alt="Malcolm X" width={640} height={640} />
           </div>
           <ArticleContent article={article} />
         </CardHeader>
