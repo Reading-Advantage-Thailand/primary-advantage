@@ -52,7 +52,13 @@ export default async function ArticleCard({ article, userId }: Props) {
             {getLocalizedSummary()}
           </CardDescription>
           <div className="flex justify-center">
-            <Image src={imageUrl} alt="Malcolm X" width={640} height={640} />
+            <Image
+              src={imageUrl}
+              alt="Malcolm X"
+              width={640}
+              height={640}
+              unoptimized
+            />
           </div>
           <ArticleContent article={article} />
         </CardHeader>
