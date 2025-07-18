@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LAQuestion } from "@/types";
+import { LAQuestion, LAQFeedback } from "@/types";
 import { Button } from "@/components/ui/button";
 import TextareaAutosize from "react-textarea-autosize";
 import {
@@ -41,23 +41,20 @@ import { finishQuiz, getFeedback } from "@/actions/question";
 import { useLocale, useTranslations } from "next-intl";
 
 interface FeedbackData {
-  feedback: {
-    detailedFeedback: {
-      [key: string]: {
-        areasForImprovement: string;
-        examples: string;
-        strengths: string;
-        suggestions: string;
-      };
+  detailedFeedback: {
+    [key: string]: {
+      areasForImprovement: string;
+      examples: string;
+      strengths: string;
+      suggestions: string;
     };
-    score: {
-      [key: string]: number;
-    };
-    overallImpression: string;
-    exampleRevisions: string;
-    nextSteps?: string[];
   };
-
+  score: {
+    [key: string]: number;
+  };
+  overallImpression: string;
+  exampleRevisions: string;
+  nextSteps?: string[];
   answer?: string;
 }
 
@@ -116,7 +113,7 @@ export default function LAQuestionContent({
         },
         activityType: ActivityType.LA_QUESTION,
       }).then((res) => {
-        setFeedback({ ...(res as FeedbackData), answer: value.answer });
+        setFeedback(res as unknown as FeedbackData);
         setOpenModal(true);
       });
     });
@@ -124,12 +121,12 @@ export default function LAQuestionContent({
 
   const handleFinishQuiz = async () => {
     setPaused(true);
-    const score = Object.values(feedback?.feedback?.score ?? {}).reduce(
+    const score = Object.values(feedback?.score ?? {}).reduce(
       (acc, curr) => acc + curr,
       0,
     );
     const data = {
-      feedback: JSON.stringify(feedback?.feedback),
+      feedback: JSON.stringify(feedback),
       score,
       question: questions.question,
       yourAnswer: form.getValues("answer"),
@@ -282,7 +279,7 @@ export default function LAQuestionContent({
                   {/* {t("feedbackModal.contentanddevelopment")} */}
                 </Button>
               </div>
-              {selectedCategory && feedback?.feedback?.detailedFeedback && (
+              {selectedCategory && feedback?.detailedFeedback && (
                 <>
                   <AlertDialogDescription className="flex flex-col gap-2">
                     <div>
@@ -292,7 +289,7 @@ export default function LAQuestionContent({
                       </p>
                       <p>
                         {
-                          feedback.feedback.detailedFeedback[selectedCategory]
+                          feedback?.detailedFeedback[selectedCategory]
                             ?.areasForImprovement
                         }
                       </p>
@@ -303,10 +300,7 @@ export default function LAQuestionContent({
                         {/* {t("feedbackModal.examples")} */}
                       </p>
                       <p>
-                        {
-                          feedback.feedback.detailedFeedback[selectedCategory]
-                            ?.examples
-                        }
+                        {feedback?.detailedFeedback[selectedCategory]?.examples}
                       </p>
                     </div>
                     <div>
@@ -316,7 +310,7 @@ export default function LAQuestionContent({
                       </p>
                       <p>
                         {
-                          feedback.feedback.detailedFeedback[selectedCategory]
+                          feedback?.detailedFeedback[selectedCategory]
                             ?.strengths
                         }
                       </p>
@@ -328,7 +322,7 @@ export default function LAQuestionContent({
                       </p>
                       <p>
                         {
-                          feedback.feedback.detailedFeedback[selectedCategory]
+                          feedback?.detailedFeedback[selectedCategory]
                             ?.suggestions
                         }
                       </p>
@@ -337,7 +331,7 @@ export default function LAQuestionContent({
                   <div>
                     <p className="inline font-bold text-green-500 dark:text-green-400">
                       {/* {t("feedbackModal.score")}{" "} */}
-                      Score :{feedback.feedback.score[selectedCategory]}
+                      Score :{feedback?.score[selectedCategory]}
                     </p>
                   </div>
                 </>
@@ -348,9 +342,7 @@ export default function LAQuestionContent({
                     overallImpression
                     {/* {t("feedbackModal.feedbackoverall")} */}
                   </p>
-                  <p className="text-sm">
-                    {feedback?.feedback.overallImpression}
-                  </p>
+                  <p className="text-sm">{feedback?.overallImpression}</p>
 
                   {form.getValues("method") === "feedback" ? (
                     <>
@@ -358,9 +350,7 @@ export default function LAQuestionContent({
                         exampleRevisions
                         {/* {t("feedbackModal.examplerevisions")} */}
                       </p>
-                      <p className="text-sm">
-                        {feedback?.feedback.exampleRevisions}
-                      </p>
+                      <p className="text-sm">{feedback?.exampleRevisions}</p>
                     </>
                   ) : (
                     <>
@@ -369,7 +359,7 @@ export default function LAQuestionContent({
                         {/* {t("feedbackModal.nextStep")} */}
                       </p>
                       <div className="text-sm">
-                        {feedback?.feedback.nextSteps?.map((item, index) => (
+                        {feedback?.nextSteps?.map((item, index) => (
                           <p key={index}>
                             {index + 1}.{item}
                           </p>
