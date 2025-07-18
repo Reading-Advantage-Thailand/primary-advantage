@@ -23,7 +23,7 @@ export async function getQuestionFeedback(req: {
     preferredLanguage: string;
   };
   activityType: ActivityType;
-}): Promise<SAQFeedbackResponse | LAQFeedback> {
+}): Promise<SAQFeedbackResponse | { feedback: LAQFeedback }> {
   try {
     let outputSchema: z.ZodSchema | undefined;
     let systemPrompt: string | undefined;
@@ -93,12 +93,14 @@ export async function getQuestionFeedback(req: {
 
     const { object } = await generateObject({
       model: google(googleModel),
-      schema: outputSchema as z.ZodSchema,
+      schema: outputSchema as z.ZodSchema<
+        SAQFeedbackResponse | { feedback: LAQFeedback }
+      >,
       system: systemPrompt,
       prompt,
     });
 
-    return object;
+    return object as SAQFeedbackResponse | { feedback: LAQFeedback };
   } catch (error) {
     console.log(error);
     throw error;
