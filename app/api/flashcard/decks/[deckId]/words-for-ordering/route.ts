@@ -228,7 +228,7 @@ export async function GET(
             // For individual words, we don't have word-level translations
             // Could be enhanced with a dictionary API later
           },
-          audioUrl: article.audioUrl,
+          audioUrl: `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`,
           startTime,
           endTime,
           partOfSpeech: getPartOfSpeech(word, index, words.length),

@@ -116,7 +116,7 @@ export async function GET(
             tw: (article.translatedPassage as any)?.tw?.[globalIndex],
             vi: (article.translatedPassage as any)?.vi?.[globalIndex],
           },
-          audioUrl: article.audioUrl,
+          audioUrl: `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`,
           startTime: sentence.startTime,
           endTime: sentence.endTime,
           isFromFlashcard,

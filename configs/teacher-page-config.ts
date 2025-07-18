@@ -25,7 +25,7 @@ export const teacherPageConfig: PageConfig = {
   ],
   sidebarNav: [
     {
-      title: "dashboard",
+      title: "teacherdashboard",
       href: "/teacher/dashboard",
       // icon: "class",
     },
@@ -39,11 +39,11 @@ export const teacherPageConfig: PageConfig = {
     //   href: "/teacher/my-students",
     //   icon: "student",
     // },
-    {
-      title: "classRoster",
-      href: "/teacher/class-roster",
-      // icon: "roster",
-    },
+    // {
+    //   title: "classRoster",
+    //   href: "/teacher/class-roster",
+    //   // icon: "roster",
+    // },
     // {
     //   title: "reports",
     //   href: "/teacher/reports",

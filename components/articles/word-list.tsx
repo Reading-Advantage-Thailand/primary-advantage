@@ -116,32 +116,6 @@ export default function WordList({
         });
       }
     });
-
-    // if (foundWordsList.length > 0) {
-    //   const param = {
-    //     ...card,
-    //     articleId: articleId,
-    //     saveToFlashcard: true,
-    //     foundWordsList: foundWordsList,
-    //   };
-
-    //   const res = await fetch(`/api/v1/users/wordlist/${userId}`, {
-    //     method: "POST",
-    //     body: JSON.stringify(param),
-    //   });
-
-    //   const data = await res.json();
-
-    //   if (data.status === 200) {
-    //     toast.success("Success", {
-    //       description: `You have saved ${foundWordsList.length} words to flashcard`,
-    //     });
-    //   } else if (data.status === 400) {
-    //     toast.info("Word already saved", {
-    //       description: `${data?.message}`,
-    //     });
-    //   }
-    // }
   };
 
   return (

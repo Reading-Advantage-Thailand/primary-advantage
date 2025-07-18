@@ -14,7 +14,8 @@
     "sentences": "Câu",
     "vocabulary": "Từ vựng",
     "testing": "Kiểm tra",
-    "systemdashboard": "Bảng điều khiển hệ thống"
+    "systemdashboard": "Bảng điều khiển hệ thống",
+    "teacherdashboard": "Bảng điều khiển giáo viên"
   },
   "Question": {
     "SAQuestion": {

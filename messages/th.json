@@ -14,7 +14,8 @@
     "sentences": "ประโยค",
     "vocabulary": "คำศัพท์",
     "testing": "ทดสอบ",
-    "systemdashboard": "กระบวนการของระบบ"
+    "systemdashboard": "กระบวนการของระบบ",
+    "teacherdashboard": "กระบวนการของครู"
   },
   "Question": {
     "SAQuestion": {

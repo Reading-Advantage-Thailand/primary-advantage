@@ -6,8 +6,7 @@ import {
   saqFeedbackInputSchema,
   saqFeedbackOutputSchema,
 } from "@/lib/zod";
-import { SAQFeedbackResponse } from "@/types";
-import { LAQFeedbackResponse } from "@/types";
+import { LAQFeedback, SAQFeedbackResponse } from "@/types";
 import { ActivityType } from "@/types/enum";
 import { google, googleModel } from "@/utils/google";
 import { generateObject } from "ai";
@@ -24,11 +23,11 @@ export async function getQuestionFeedback(req: {
     preferredLanguage: string;
   };
   activityType: ActivityType;
-}): Promise<SAQFeedbackResponse | LAQFeedbackResponse> {
+}): Promise<SAQFeedbackResponse | LAQFeedback> {
   try {
-    let outputSchema;
-    let systemPrompt;
-    let prompt;
+    let outputSchema: z.ZodSchema | undefined;
+    let systemPrompt: string | undefined;
+    let prompt: string | undefined;
 
     const article = await prisma.article.findUnique({
       where: {
@@ -43,7 +42,7 @@ export async function getQuestionFeedback(req: {
     if (req.activityType === ActivityType.SA_QUESTION) {
       const rawPrompt = fs.readFileSync(
         path.join(process.cwd(), "data", "prompts-feedback-user-SA.json"),
-        "utf-8"
+        "utf-8",
       );
       outputSchema = saqFeedbackOutputSchema;
       systemPrompt = saqeution_system;
@@ -69,7 +68,7 @@ export async function getQuestionFeedback(req: {
     } else if (req.activityType === ActivityType.LA_QUESTION) {
       const rawPrompt = fs.readFileSync(
         path.join(process.cwd(), "data", "prompts-feedback-user-LA.json"),
-        "utf-8"
+        "utf-8",
       );
       outputSchema = laqFeedbackOutputSchema;
       systemPrompt = laquestion_system;

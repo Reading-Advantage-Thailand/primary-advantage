@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { Header } from "../header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,7 +96,7 @@ export function OrderSentenceGame({
     null,
   );
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   // Add flag to track if user has made any moves
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [isPlayingHintAudio, setIsPlayingHintAudio] = useState(false);
@@ -383,13 +389,21 @@ export function OrderSentenceGame({
     });
   }, []);
 
+  // Replace your playHintAudio function with this simpler version
   const playHintAudio = useCallback(async () => {
-    if (!currentSentenceGroup?.sentences || isPlayingHintAudio) return;
+    if (
+      !currentSentenceGroup?.sentences ||
+      isPlayingHintAudio ||
+      !audioRef.current
+    )
+      return;
 
     setIsPlayingHintAudio(true);
     toast.success("Playing correct order audio sequence 🔊");
 
     try {
+      const audio = audioRef.current;
+
       // Get sentences in correct order
       const correctOrderSentences = currentSentenceGroup.correctOrder
         .map((sentenceText) =>
@@ -397,93 +411,83 @@ export function OrderSentenceGame({
         )
         .filter(Boolean);
 
-      // Play audio for each sentence in correct order with delay
+      // Play each sentence sequentially
       for (let i = 0; i < correctOrderSentences.length; i++) {
         const sentence = correctOrderSentences[i];
+
+        console.log(`📊 Debug - Playing sentence ${i + 1}:`, {
+          hasAudioUrl: !!sentence?.audioUrl,
+          startTime: sentence?.startTime,
+          endTime: sentence?.endTime,
+          url: sentence?.audioUrl,
+        });
+
         if (
           sentence?.audioUrl &&
           sentence.startTime !== undefined &&
           sentence.endTime !== undefined
         ) {
           try {
-            await new Promise((resolve, reject) => {
-              const audio = new Audio();
-              let timeoutId: NodeJS.Timeout;
+            await new Promise<void>((resolve) => {
+              let intervalRef: NodeJS.Timeout | null = null;
 
               const cleanup = () => {
-                audio.pause();
-                if (timeoutId) clearTimeout(timeoutId);
-                audio.removeEventListener("loadeddata", handleLoadedData);
-                audio.removeEventListener("seeked", handleSeeked);
-                audio.removeEventListener("timeupdate", handleTimeUpdate);
-                audio.removeEventListener("ended", handleEnded);
+                if (intervalRef) {
+                  clearInterval(intervalRef);
+                  intervalRef = null;
+                }
+                audio.removeEventListener("canplaythrough", handleCanPlay);
                 audio.removeEventListener("error", handleError);
               };
 
-              const handleLoadedData = () => {
-                audio.removeEventListener("loadeddata", handleLoadedData);
-                // Set the start time after audio is loaded
-                audio.currentTime = sentence.startTime!;
-              };
+              const handleCanPlay = () => {
+                audio.removeEventListener("canplaythrough", handleCanPlay);
 
-              const handleSeeked = () => {
-                audio.removeEventListener("seeked", handleSeeked);
-                // Start playing after seek is complete
+                audio.currentTime = sentence.startTime!;
+
                 audio
                   .play()
                   .then(() => {
-                    // Start monitoring time immediately after play starts
-                    audio.addEventListener("timeupdate", handleTimeUpdate);
+                    const tolerance = 0.1;
+                    intervalRef = setInterval(() => {
+                      if (audio.currentTime + tolerance >= sentence.endTime!) {
+                        audio.pause();
+                        cleanup();
+                        resolve();
+                      }
+                    }, 50);
                   })
-                  .catch(handleError);
+                  .catch(() => {
+                    cleanup();
+                    resolve();
+                  });
               };
 
-              const handleTimeUpdate = () => {
-                // Stop when we reach the end time
-                if (audio.currentTime >= sentence.endTime!) {
-                  cleanup();
-                  resolve(void 0);
-                }
-              };
-
-              const handleEnded = () => {
+              const handleError = () => {
                 cleanup();
-                resolve(void 0);
+                resolve();
               };
 
-              const handleError = (error: any) => {
-                cleanup();
-                reject(error);
-              };
-
-              // Set up event listeners
-              audio.addEventListener("loadeddata", handleLoadedData);
-              audio.addEventListener("seeked", handleSeeked);
-              audio.addEventListener("ended", handleEnded);
+              audio.addEventListener("canplaythrough", handleCanPlay);
               audio.addEventListener("error", handleError);
 
-              // Set a timeout as fallback to prevent hanging
-              timeoutId = setTimeout(() => {
-                cleanup();
-                resolve(void 0);
-              }, 10000); // 10 second fallback
-
-              // Load the audio
-              audio.preload = "auto";
               audio.src = sentence.audioUrl!;
               audio.load();
+
+              // Fallback timeout
+              setTimeout(() => {
+                cleanup();
+                resolve();
+              }, 10000);
             });
 
-            // Add a smooth delay between sentences
+            // Delay between sentences
             if (i < correctOrderSentences.length - 1) {
               await new Promise((resolve) => setTimeout(resolve, 500));
             }
           } catch (error) {
             console.warn(`Failed to play audio for sentence ${i + 1}:`, error);
-            // Continue to next sentence even if one fails
           }
-        } else {
-          console.warn(`Sentence ${i + 1} missing audio URL or timestamps`);
         }
       }
 
@@ -694,6 +698,9 @@ export function OrderSentenceGame({
         heading="Order Sentences Game"
         text="Arrange the sentences in chronological order"
       />
+
+      {/* Hidden audio element for playback */}
+      <audio ref={audioRef} style={{ display: "none" }} />
 
       {/* Minimal Progress Bar */}
       <div className="space-y-2">

@@ -11,7 +11,7 @@ import { getUserByEmail } from "@/server/models/user";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  // adapter: PrismaAdapter(prisma),
+  // adapter: PrismaAdapter(prisma) as any,
   providers: [
     Credentials({
       credentials: {
@@ -105,6 +105,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Fetch user from database to get role
         const dbUser = await getUserByEmail(user.email);
         if (dbUser) {
+          token.id = dbUser.id;
           token.role = dbUser.role;
           token.xp = dbUser.xp;
           token.level = dbUser.level;

@@ -4,6 +4,7 @@ import AudioTestWord from "./audio-test-word";
 import { testConnection } from "@/lib/test";
 import ArticleTestGenerate from "./article-test-genarate";
 import UploadTest from "./upload-test";
+import { deleteAllArticles } from "@/actions/test";
 // import FlashcardGame from "@/components/flashcards/flashcard-game";
 // import { FlashcardType } from "@/types/enum";
 
@@ -24,6 +25,14 @@ export default async function TestFunctionality() {
         </Button>
       </div>
       <ArticleTestGenerate />
+      <Button
+        onClick={async () => {
+          "use server";
+          const result = await deleteAllArticles();
+        }}
+      >
+        Delete All Articles
+      </Button>
       <UploadTest />
     </div>
   );

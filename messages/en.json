@@ -14,7 +14,8 @@
     "sentences": "Sentences",
     "vocabulary": "Vocabulary",
     "testing": "Testing",
-    "systemdashboard": "System Dashboard"
+    "systemdashboard": "System Dashboard",
+    "teacherdashboard": "Teacher Dashboard"
   },
   "Question": {
     "SAQuestion": {

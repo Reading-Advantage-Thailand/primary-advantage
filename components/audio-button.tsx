@@ -70,7 +70,9 @@ export default function AudioButton({
   return (
     <div className="select-none">
       <audio ref={audioRef} onEnded={stopPlayback}>
-        <source src={audioUrl} />
+        <source
+          src={`https://storage.googleapis.com/primary-app-storage${audioUrl}`}
+        />
       </audio>
       <Volume2Icon
         className={`mx-3 mt-1 h-5 w-5 cursor-pointer ${

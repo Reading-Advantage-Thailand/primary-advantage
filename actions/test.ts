@@ -1,5 +1,6 @@
 "use server";
 
+import { prisma } from "@/lib/prisma";
 import { getArticleById } from "@/server/models/articles";
 import { generateAudio } from "@/server/utils/genaretors/audio-generator";
 import { generateWordLists } from "@/server/utils/genaretors/audio-word-generator";
@@ -44,4 +45,56 @@ export async function uploadArticleImages(articleId: string) {
 export async function deleteArticleFile(articleId: string) {
   const result = await deleteFile(articleId);
   return result;
+}
+
+export async function deleteAllArticles() {
+  try {
+    // Get all article IDs first (we need them to delete associated files)
+    const articles = await prisma.article.findMany({
+      select: { id: true },
+    });
+
+    if (articles.length === 0) {
+      return { success: true, message: "No articles to delete" };
+    }
+
+    console.log(
+      `Deleting ${articles.length} articles and their associated files...`,
+    );
+
+    // Delete all associated files in parallel
+    const fileDeletePromises = articles.map((article) =>
+      deleteFile(article.id),
+    );
+    const fileResults = await Promise.allSettled(fileDeletePromises);
+
+    // Log file deletion results
+    const successfulFileDeletions = fileResults.filter(
+      (result) => result.status === "fulfilled",
+    ).length;
+    const failedFileDeletions = fileResults.filter(
+      (result) => result.status === "rejected",
+    ).length;
+
+    console.log(
+      `File deletions - Success: ${successfulFileDeletions}, Failed: ${failedFileDeletions}`,
+    );
+
+    // Delete all article records in a single operation (much more efficient)
+    const deleteResult = await prisma.article.deleteMany({});
+
+    console.log(`Successfully deleted ${deleteResult.count} article records`);
+
+    return {
+      success: true,
+      deletedCount: deleteResult.count,
+      fileDeleteResults: {
+        successful: successfulFileDeletions,
+        failed: failedFileDeletions,
+      },
+    };
+  } catch (error) {
+    console.log("error", error);
+    return { error: true };
+  }
 }

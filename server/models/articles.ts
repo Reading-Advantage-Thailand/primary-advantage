@@ -200,13 +200,13 @@ async function saveArticleContent(
     ),
 
     // Generate audio
-    // generateAudio({
-    //   passage: article.passage,
-    //   articleId,
-    // }),
+    generateAudio({
+      passage: article.passage,
+      articleId,
+    }),
 
-    // // Generate word audio
-    // generateWordLists(articleId),
+    // Generate word audio
+    generateWordLists(articleId),
   ]);
 
   return;

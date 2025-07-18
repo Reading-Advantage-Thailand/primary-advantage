@@ -117,7 +117,7 @@ export async function GET(
         words: matchingSentence.words,
         blanks: [],
         translation: translation,
-        audioUrl: article.audioUrl,
+        audioUrl: `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`,
         startTime: matchingSentence.startTime,
         endTime: matchingSentence.endTime,
         difficulty: difficulty,

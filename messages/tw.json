@@ -14,7 +14,8 @@
     "sentences": "句子",
     "vocabulary": "單字",
     "testing": "測試",
-    "systemdashboard": "系統儀表板"
+    "systemdashboard": "系統儀表板",
+    "teacherdashboard": "教師儀表板"
   },
   "Question": {
     "SAQuestion": {

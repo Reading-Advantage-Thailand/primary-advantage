@@ -8,6 +8,7 @@ import base64 from "base64-js";
 import fs from "fs";
 import path from "path";
 import { generateWordList } from "./wordlist-generator";
+import { uploadToBucket } from "@/utils/storage";
 
 export type WordListResponse = {
   vocabulary: string;
@@ -134,12 +135,7 @@ export async function generateAudioForWord({
       );
       fs.writeFileSync(localPath, MP3);
 
-      //   await uploadToBucket(localPath, `${AUDIO_WORDS_URL}/${articleId}.mp3`);
-
-      //   await db.collection("word-list").doc(articleId).update({
-      //     timepoints: allTimePoints,
-      //     id: articleId,
-      //   });
+      await uploadToBucket(localPath, `audios/words/${articleId}.mp3`);
 
       await prisma.article.update({
         where: {

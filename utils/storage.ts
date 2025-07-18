@@ -45,6 +45,7 @@ export const uploadToBucket = async (
     if (isDeleteLocal) {
       fs.unlinkSync(filePath);
     }
+    console.log(`✅ Uploaded to bucket: ${destination}`);
   } catch (error) {
     console.error("ERROR UPLOADING TO BUCKET: ", error);
     throw error;
