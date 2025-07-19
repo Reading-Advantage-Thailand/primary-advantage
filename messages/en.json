@@ -24,7 +24,26 @@
     },
     "LAQuestion": {
       "title": "Long Answer Question",
-      "description": "Answer the question in a few paragraphs"
+      "description": "Answer the question in a few paragraphs",
+      "feedbackModal": {
+        "feedbackwritting": "Writing Feedback",
+        "finalfeedback": "Final Feedback",
+        "vocabulary": "Vocabulary Use",
+        "grammar": "Grammar Accuracy",
+        "clarityandcoherence": "Clarity and Coherence",
+        "complexityandstructure": "Complexity and Structure",
+        "contentanddevelopment": "Content and Development",
+        "areaforimpovement": "Area for improvement",
+        "examples": "Examples",
+        "strength": "Strength",
+        "suggestions": "Suggestions",
+        "feedbackoverall": "Overall Feedback",
+        "examplerevisions": "Example Revisions",
+        "nextStep": "Next Step",
+        "reviseResponse": "Revise Your Response",
+        "getXP": "Get your XP!",
+        "score": "Score is"
+      }
     },
     "MCQuestion": {
       "title": "Multiple Choice Question",

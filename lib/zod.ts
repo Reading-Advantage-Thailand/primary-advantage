@@ -111,48 +111,50 @@ export const laqFeedbackInputSchema = z.object({
 });
 
 export const laqFeedbackOutputSchema = z.object({
-  score: z.object({
-    vocabularyUse: z.number().int().min(1).max(5),
-    grammarAccuracy: z.number().int().min(1).max(5),
-    clarityAndCoherence: z.number().int().min(1).max(5),
-    complexityAndStructure: z.number().int().min(1).max(5),
-    contentAndDevelopment: z.number().int().min(1).max(5),
+  feedback: z.object({
+    scores: z.object({
+      vocabularyUse: z.number().int().min(1).max(5),
+      grammarAccuracy: z.number().int().min(1).max(5),
+      clarityAndCoherence: z.number().int().min(1).max(5),
+      complexityAndStructure: z.number().int().min(1).max(5),
+      contentAndDevelopment: z.number().int().min(1).max(5),
+    }),
+    overallImpression: z.string(),
+    detailedFeedback: z.object({
+      vocabularyUse: z.object({
+        strengths: z.string(),
+        areasForImprovement: z.string(),
+        examples: z.string(),
+        suggestions: z.string(),
+      }),
+      grammarAccuracy: z.object({
+        strengths: z.string(),
+        areasForImprovement: z.string(),
+        examples: z.string(),
+        suggestions: z.string(),
+      }),
+      clarityAndCoherence: z.object({
+        strengths: z.string(),
+        areasForImprovement: z.string(),
+        examples: z.string(),
+        suggestions: z.string(),
+      }),
+      complexityAndStructure: z.object({
+        strengths: z.string(),
+        areasForImprovement: z.string(),
+        examples: z.string(),
+        suggestions: z.string(),
+      }),
+      contentAndDevelopment: z.object({
+        strengths: z.string(),
+        areasForImprovement: z.string(),
+        examples: z.string(),
+        suggestions: z.string(),
+      }),
+    }),
+    exampleRevisions: z.array(z.string()).min(2).max(3),
+    nextSteps: z.array(z.string()).min(2).max(3),
   }),
-  overallImpression: z.string(),
-  detailedFeedback: z.object({
-    vocabularyUse: z.object({
-      strengths: z.string(),
-      areasForImprovement: z.string(),
-      examples: z.string(),
-      suggestions: z.string(),
-    }),
-    grammarAccuracy: z.object({
-      strengths: z.string(),
-      areasForImprovement: z.string(),
-      examples: z.string(),
-      suggestions: z.string(),
-    }),
-    clarityAndCoherence: z.object({
-      strengths: z.string(),
-      areasForImprovement: z.string(),
-      examples: z.string(),
-      suggestions: z.string(),
-    }),
-    complexityAndStructure: z.object({
-      strengths: z.string(),
-      areasForImprovement: z.string(),
-      examples: z.string(),
-      suggestions: z.string(),
-    }),
-    contentAndDevelopment: z.object({
-      strengths: z.string(),
-      areasForImprovement: z.string(),
-      examples: z.string(),
-      suggestions: z.string(),
-    }),
-  }),
-  exampleRevisions: z.array(z.string()).min(2).max(3),
-  nextSteps: z.array(z.string()).min(2).max(3),
 });
 
 export const saqFeedbackInputSchema = z.object({

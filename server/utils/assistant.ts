@@ -6,15 +6,14 @@ import {
   saqFeedbackInputSchema,
   saqFeedbackOutputSchema,
 } from "@/lib/zod";
-import { LAQFeedback, SAQFeedbackResponse } from "@/types";
+import { LAQFeedback, LAQFeedbackResponse, SAQFeedbackResponse } from "@/types";
 import { ActivityType } from "@/types/enum";
-import { google, googleModel } from "@/utils/google";
+import { google, googleModel, googleModelLite } from "@/utils/google";
 import { generateObject } from "ai";
-import { z } from "zod";
 import fs from "fs";
 import path from "path";
 
-export async function getQuestionFeedback(req: {
+export async function getSaqFeedback(req: {
   data: {
     articleId: string;
     question: string;
@@ -23,10 +22,8 @@ export async function getQuestionFeedback(req: {
     preferredLanguage: string;
   };
   activityType: ActivityType;
-}): Promise<SAQFeedbackResponse | { feedback: LAQFeedback }> {
+}): Promise<SAQFeedbackResponse> {
   try {
-    let outputSchema: z.ZodSchema | undefined;
-    let systemPrompt: string | undefined;
     let prompt: string | undefined;
 
     const article = await prisma.article.findUnique({
@@ -39,68 +36,108 @@ export async function getQuestionFeedback(req: {
       },
     });
 
-    if (req.activityType === ActivityType.SA_QUESTION) {
-      const rawPrompt = fs.readFileSync(
-        path.join(process.cwd(), "data", "prompts-feedback-user-SA.json"),
-        "utf-8",
-      );
-      outputSchema = saqFeedbackOutputSchema;
-      systemPrompt = saqeution_system;
-
-      const data = {
-        preferredLanguage: req.data.preferredLanguage,
-        targetCEFRLevel: article?.cefrLevel.replace(/[+-]/g, ""),
-        article: article?.passage,
-        question: req.data.question,
-        suggestedResponse: req.data.suggestedResponse,
-        studentResponse: req.data.answer,
-      };
-
-      const validatedInput = saqFeedbackInputSchema.parse(data);
-
-      prompt = rawPrompt
-        .replace("{preferredLanguage}", validatedInput.preferredLanguage)
-        .replace("{targetCEFRLevel}", validatedInput.targetCEFRLevel)
-        .replace("{article}", validatedInput.article)
-        .replace("{question}", validatedInput.question)
-        .replace("{suggestedResponse}", validatedInput.suggestedResponse)
-        .replace("{studentResponse}", validatedInput.studentResponse);
-    } else if (req.activityType === ActivityType.LA_QUESTION) {
-      const rawPrompt = fs.readFileSync(
-        path.join(process.cwd(), "data", "prompts-feedback-user-LA.json"),
-        "utf-8",
-      );
-      outputSchema = laqFeedbackOutputSchema;
-      systemPrompt = laquestion_system;
-
-      const data = {
-        preferredLanguage: req.data.preferredLanguage,
-        targetCEFRLevel: article?.cefrLevel.replace(/[+-]/g, ""),
-        readingPassage: article?.passage,
-        writingPrompt: req.data.question,
-        studentResponse: req.data.answer,
-      };
-
-      const validatedInput = laqFeedbackInputSchema.parse(data);
-
-      prompt = rawPrompt
-        .replace("{preferredLanguage}", validatedInput.preferredLanguage)
-        .replace("{targetCEFRLevel}", validatedInput.targetCEFRLevel)
-        .replace("{readingPassage}", validatedInput.readingPassage)
-        .replace("{writingPrompt}", validatedInput.writingPrompt)
-        .replace("{studentResponse}", validatedInput.studentResponse);
+    if (!article) {
+      throw new Error("Article not found");
     }
+
+    const rawPrompt = fs.readFileSync(
+      path.join(process.cwd(), "data", "prompts-feedback-user-SA.json"),
+      "utf-8",
+    );
+
+    const data = {
+      preferredLanguage: req.data.preferredLanguage,
+      targetCEFRLevel: article?.cefrLevel.replace(/[+-]/g, ""),
+      article: article?.passage,
+      question: req.data.question,
+      suggestedResponse: req.data.suggestedResponse,
+      studentResponse: req.data.answer,
+    };
+
+    const validatedInput = saqFeedbackInputSchema.parse(data);
+
+    prompt = rawPrompt
+      .replace("{preferredLanguage}", validatedInput.preferredLanguage)
+      .replace("{targetCEFRLevel}", validatedInput.targetCEFRLevel)
+      .replace("{article}", validatedInput.article)
+      .replace("{question}", validatedInput.question)
+      .replace("{suggestedResponse}", validatedInput.suggestedResponse)
+      .replace("{studentResponse}", validatedInput.studentResponse);
 
     const { object } = await generateObject({
       model: google(googleModel),
-      schema: outputSchema as z.ZodSchema<
-        SAQFeedbackResponse | { feedback: LAQFeedback }
-      >,
-      system: systemPrompt,
+      schema: saqFeedbackOutputSchema,
+      system: saqeution_system,
       prompt,
     });
 
-    return object as SAQFeedbackResponse | { feedback: LAQFeedback };
+    return object as SAQFeedbackResponse;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getLaqFeedback(req: {
+  data: {
+    articleId: string;
+    question: string;
+    answer: string;
+    suggestedResponse?: string;
+    preferredLanguage: string;
+  };
+}) {
+  try {
+    let prompt: string | undefined;
+
+    const article = await prisma.article.findUnique({
+      where: {
+        id: req.data.articleId,
+      },
+      select: {
+        passage: true,
+        cefrLevel: true,
+      },
+    });
+
+    if (!article) {
+      throw new Error("Article not found");
+    }
+
+    const rawPrompt = fs.readFileSync(
+      path.join(process.cwd(), "data", "prompts-feedback-user-LA.json"),
+      "utf-8",
+    );
+
+    const data = {
+      preferredLanguage: req.data.preferredLanguage,
+      targetCEFRLevel: article?.cefrLevel.replace(/[+-]/g, ""),
+      readingPassage: article?.passage,
+      writingPrompt: req.data.question,
+      studentResponse: req.data.answer,
+    };
+
+    const validatedInput = laqFeedbackInputSchema.parse(data);
+
+    prompt = rawPrompt
+      .replace("{preferredLanguage}", validatedInput.preferredLanguage)
+      .replace("{targetCEFRLevel}", validatedInput.targetCEFRLevel)
+      .replace("{readingPassage}", validatedInput.readingPassage)
+      .replace("{writingPrompt}", validatedInput.writingPrompt)
+      .replace("{studentResponse}", validatedInput.studentResponse);
+
+    const { object } = await generateObject({
+      model: google(googleModelLite),
+      schema: laqFeedbackOutputSchema,
+      system: laquestion_system,
+      prompt,
+    });
+
+    if (!object.feedback) {
+      return { error: "An error occurred" };
+    } else {
+      return object.feedback;
+    }
   } catch (error) {
     console.log(error);
     throw error;

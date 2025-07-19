@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
 import { calculateLevelAndCefrLevel } from "@/lib/utils";
-import { getQuestionFeedback } from "@/server/utils/assistant";
+import { getLaqFeedback, getSaqFeedback } from "@/server/utils/assistant";
 import { ActivityType, UserXpEarned } from "@/types/enum";
 
 export async function retakeQuiz(articleId: string, type: ActivityType) {
@@ -135,7 +135,13 @@ export async function getFeedback(value: {
     return { error: "User not found" };
   }
 
-  const feedback = await getQuestionFeedback(value);
+  if (value.activityType === ActivityType.LA_QUESTION) {
+    const feedback = await getLaqFeedback(value);
+    return feedback;
+  }
 
-  return feedback;
+  if (value.activityType === ActivityType.SA_QUESTION) {
+    const feedback = await getSaqFeedback(value);
+    return feedback;
+  }
 }

@@ -24,7 +24,26 @@
     },
     "LAQuestion": {
       "title": "คำถามตอบยาว",
-      "description": "ตอบคำถามในรูปแบบยาว"
+      "description": "ตอบคำถามในรูปแบบยาว",
+      "feedbackModal": {
+        "feedbackwritting": "รับคำแนะนำ",
+        "finalfeedback": "รับคำแนะนำ",
+        "vocabulary": "คำศัพท์",
+        "grammar": "กระบวนการของระบบ",
+        "clarityandcoherence": "ความชัดเจนและความสอดคล้อง",
+        "complexityandstructure": "ความซับซ้อนและโครงสร้าง",
+        "contentanddevelopment": "เนื้อหาและการพัฒนา",
+        "areaforimpovement": "พื้นที่ที่ควรปรับปรุง",
+        "examples": "ตัวอย่าง",
+        "strength": "จุดเด่น",
+        "suggestions": "แนะนำ",
+        "feedbackoverall": "ความคิดเห็นรวม",
+        "examplerevisions": "ตัวอย่างการแก้ไข",
+        "nextStep": "ขั้นตอนต่อไป",
+        "reviseResponse": "แก้ไขคำตอบ",
+        "getXP": "รับคะแนน",
+        "score": "คะแนน"
+      }
     },
     "MCQuestion": {
       "title": "คำถามตอบหลายตัวเลือก",

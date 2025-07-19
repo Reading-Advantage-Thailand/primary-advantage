@@ -24,7 +24,26 @@
     },
     "LAQuestion": {
       "title": "长答题",
-      "description": "用几段话回答问题"
+      "description": "用几段话回答问题",
+      "feedbackModal": {
+        "feedbackwritting": "写作反馈",
+        "finalfeedback": "最终反馈",
+        "vocabulary": "词汇使用",
+        "grammar": "语法准确性",
+        "clarityandcoherence": "清晰度和连贯性",
+        "complexityandstructure": "复杂性和结构",
+        "contentanddevelopment": "内容和开发",
+        "areaforimpovement": "改进领域",
+        "examples": "例子",
+        "strength": "优点",
+        "suggestions": "建议",
+        "feedbackoverall": "总体反馈",
+        "examplerevisions": "示例修订",
+        "nextStep": "下一步",
+        "reviseResponse": "修订响应",
+        "getXP": "获取XP",
+        "score": "分数"
+      }
     },
     "MCQuestion": {
       "title": "多选题",

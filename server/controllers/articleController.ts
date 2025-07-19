@@ -6,7 +6,6 @@ import {
   getQuestionsByArticleId,
 } from "../models/articles";
 import { NextRequest } from "next/server";
-import { getQuestionFeedback } from "../utils/assistant";
 
 export const generateAllArticle = async (amountPerGenre: number) => {
   const types: ArticleType[] = [ArticleType.FICTION, ArticleType.NONFICTION];
@@ -84,18 +83,18 @@ export const fetchArticleById = async (req: URLSearchParams) => {
   return getArticleById(articleId);
 };
 
-export const fetchQuestionFeedback = async (req: {
-  data: {
-    articleId: string;
-    question: string;
-    answer: string;
-    suggestedResponse?: string;
-    preferredLanguage: string;
-  };
-  activityType: ActivityType;
-}) => {
-  return getQuestionFeedback(req);
-};
+// export const fetchQuestionFeedback = async (req: {
+//   data: {
+//     articleId: string;
+//     question: string;
+//     answer: string;
+//     suggestedResponse?: string;
+//     preferredLanguage: string;
+//   };
+//   activityType: ActivityType;
+// }) => {
+//   return getQuestionFeedback(req);
+// };
 
 // export const fetchQuestionsByArticleId = async (req: URLSearchParams) => {
 //   const articleId = req.get("articleId") ?? undefined;

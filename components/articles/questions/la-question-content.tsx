@@ -39,6 +39,7 @@ import {
 import { Icons } from "@/components/icons";
 import { finishQuiz, getFeedback } from "@/actions/question";
 import { useLocale, useTranslations } from "next-intl";
+import { convertLocaleFull } from "@/lib/utils";
 
 interface FeedbackData {
   detailedFeedback: {
@@ -49,7 +50,7 @@ interface FeedbackData {
       suggestions: string;
     };
   };
-  score: {
+  scores: {
     [key: string]: number;
   };
   overallImpression: string;
@@ -76,6 +77,7 @@ export default function LAQuestionContent({
   const locale = useLocale();
   const t = useTranslations("Question");
   const tc = useTranslations("Components");
+  const tfq = useTranslations("Question.LAQuestion.feedbackModal");
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(selectedCategory === category ? "" : category);
@@ -109,7 +111,7 @@ export default function LAQuestionContent({
           articleId: questions.articleId,
           question: questions.question,
           answer: value.answer,
-          preferredLanguage: locale,
+          preferredLanguage: convertLocaleFull(locale),
         },
         activityType: ActivityType.LA_QUESTION,
       }).then((res) => {
@@ -121,7 +123,7 @@ export default function LAQuestionContent({
 
   const handleFinishQuiz = async () => {
     setPaused(true);
-    const score = Object.values(feedback?.score ?? {}).reduce(
+    const score = Object.values(feedback?.scores ?? {}).reduce(
       (acc, curr) => acc + curr,
       0,
     );
@@ -223,8 +225,7 @@ export default function LAQuestionContent({
                     selectedCategory === "vocabularyUse" ? "default" : "outline"
                   }
                 >
-                  vocabulary
-                  {/* {t("feedbackModal.vocabulary")} */}
+                  {tfq("vocabulary")}
                 </Button>
                 <Button
                   className="rounded-full"
@@ -236,8 +237,7 @@ export default function LAQuestionContent({
                       : "outline"
                   }
                 >
-                  grammar
-                  {/* {t("feedbackModal.grammar")} */}
+                  {tfq("grammar")}
                 </Button>
                 <Button
                   className="rounded-full"
@@ -249,8 +249,7 @@ export default function LAQuestionContent({
                       : "outline"
                   }
                 >
-                  clarityandcoherence
-                  {/* {t("feedbackModal.clarityandcoherence")} */}
+                  {tfq("clarityandcoherence")}
                 </Button>
                 <Button
                   className="rounded-full"
@@ -262,8 +261,7 @@ export default function LAQuestionContent({
                       : "outline"
                   }
                 >
-                  complexityandstructure
-                  {/* {t("feedbackModal.complexityandstructure")} */}
+                  {tfq("complexityandstructure")}
                 </Button>
                 <Button
                   className="rounded-full"
@@ -275,89 +273,60 @@ export default function LAQuestionContent({
                       : "outline"
                   }
                 >
-                  contentanddevelopment
-                  {/* {t("feedbackModal.contentanddevelopment")} */}
+                  {tfq("contentanddevelopment")}
                 </Button>
               </div>
               {selectedCategory && feedback?.detailedFeedback && (
                 <>
-                  <AlertDialogDescription className="flex flex-col gap-2">
+                  <div className="text-muted-foreground flex flex-col gap-2 text-sm">
                     <div>
-                      <p className="text-lg">
-                        areaforimpovement
-                        {/* {t("feedbackModal.areaforimpovement")} */}
-                      </p>
-                      <p>
-                        {
-                          feedback?.detailedFeedback[selectedCategory]
-                            ?.areasForImprovement
-                        }
-                      </p>
+                      <h1 className="text-lg">{tfq("areaforimpovement")}</h1>
+
+                      {
+                        feedback?.detailedFeedback[selectedCategory]
+                          ?.areasForImprovement
+                      }
                     </div>
                     <div>
-                      <p className="text-lg">
-                        examples
-                        {/* {t("feedbackModal.examples")} */}
-                      </p>
-                      <p>
-                        {feedback?.detailedFeedback[selectedCategory]?.examples}
-                      </p>
+                      <h1 className="text-lg">{tfq("examples")}</h1>
+                      {feedback?.detailedFeedback[selectedCategory]?.examples}
                     </div>
                     <div>
-                      <p className="text-lg">
-                        strength
-                        {/* {t("feedbackModal.strength")} */}
-                      </p>
-                      <p>
-                        {
-                          feedback?.detailedFeedback[selectedCategory]
-                            ?.strengths
-                        }
-                      </p>
+                      <h1 className="text-lg">{tfq("strength")}</h1>
+
+                      {feedback?.detailedFeedback[selectedCategory]?.strengths}
                     </div>
                     <div>
-                      <p className="text-lg">
-                        suggestions
-                        {/* {t("feedbackModal.suggestions")} */}
-                      </p>
-                      <p>
-                        {
-                          feedback?.detailedFeedback[selectedCategory]
-                            ?.suggestions
-                        }
+                      <h1 className="text-lg">{tfq("suggestions")}</h1>
+
+                      {
+                        feedback?.detailedFeedback[selectedCategory]
+                          ?.suggestions
+                      }
+                    </div>
+                    <div>
+                      <p className="inline font-bold text-green-500 dark:text-green-400">
+                        {tfq("score")} : {feedback?.scores[selectedCategory]}
                       </p>
                     </div>
-                  </AlertDialogDescription>
-                  <div>
-                    <p className="inline font-bold text-green-500 dark:text-green-400">
-                      {/* {t("feedbackModal.score")}{" "} */}
-                      Score :{feedback?.score[selectedCategory]}
-                    </p>
                   </div>
                 </>
               )}
               {!selectedCategory && (
                 <div className="flex flex-grow flex-col gap-2 overflow-y-auto pr-4">
-                  <p className="text-bold text-xl">
-                    overallImpression
-                    {/* {t("feedbackModal.feedbackoverall")} */}
-                  </p>
+                  <p className="text-bold text-xl">{tfq("feedbackoverall")}</p>
                   <p className="text-sm">{feedback?.overallImpression}</p>
 
                   {form.getValues("method") === "feedback" ? (
                     <>
                       <p className="text-bold text-xl">
-                        exampleRevisions
-                        {/* {t("feedbackModal.examplerevisions")} */}
+                        {tfq("examplerevisions")}
                       </p>
                       <p className="text-sm">{feedback?.exampleRevisions}</p>
                     </>
                   ) : (
                     <>
-                      <p className="text-bold text-xl">
-                        nextStep
-                        {/* {t("feedbackModal.nextStep")} */}
-                      </p>
+                      <p className="text-bold text-xl">{tfq("nextStep")}</p>
                       <div className="text-sm">
                         {feedback?.nextSteps?.map((item, index) => (
                           <p key={index}>
@@ -379,16 +348,14 @@ export default function LAQuestionContent({
                       setSelectedCategory("");
                     }}
                   >
-                    {/* {t("feedbackModal.reviseResponse")} */}
-                    reviseResponse
+                    {tfq("reviseResponse")}
                   </Button>
                 ) : (
                   <Button
                     disabled={isPanding}
                     onClick={() => handleFinishQuiz()}
                   >
-                    {/* {t("feedbackModal.getXP")} */}
-                    Get XP
+                    {tfq("getXP")}
                   </Button>
                 )}
               </AlertDialogFooter>

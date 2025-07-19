@@ -24,7 +24,26 @@
     },
     "LAQuestion": {
       "title": "長答題",
-      "description": "用幾段話回答問題"
+      "description": "用幾段話回答問題",
+      "feedbackModal": {
+        "feedbackwritting": "寫作反饋",
+        "finalfeedback": "最終反饋",
+        "vocabulary": "詞彙使用",
+        "grammar": "語法準確性",
+        "clarityandcoherence": "清晰度和連貫性",
+        "complexityandstructure": "複雜性和結構",
+        "contentanddevelopment": "內容和開發",
+        "areaforimpovement": "改進領域",
+        "examples": "例子",
+        "strength": "優點",
+        "suggestions": "建議",
+        "feedbackoverall": "總體反饋",
+        "examplerevisions": "示例修訂",
+        "nextStep": "下一步",
+        "reviseResponse": "修訂響應",
+        "getXP": "獲取XP",
+        "score": "分數"
+      }
     },
     "MCQuestion": {
       "title": "多選題",

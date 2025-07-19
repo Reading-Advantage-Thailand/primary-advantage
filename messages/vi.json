@@ -24,7 +24,26 @@
     },
     "LAQuestion": {
       "title": "Câu hỏi dài",
-      "description": "Trả lời câu hỏi bằng một vài đoạn"
+      "description": "Trả lời câu hỏi bằng một vài đoạn",
+      "feedbackModal": {
+        "feedbackwritting": "Phản hồi viết",
+        "finalfeedback": "Phản hồi cuối cùng",
+        "vocabulary": "Từ vựng",
+        "grammar": "Ngữ pháp",
+        "clarityandcoherence": "Sự rõ ràng và tương thích",
+        "complexityandstructure": "Độ phức tạp và cấu trúc",
+        "contentanddevelopment": "Nội dung và phát triển",
+        "areaforimpovement": "Lĩnh vực cần cải thiện",
+        "examples": "Ví dụ",
+        "strength": "Điểm mạnh",
+        "suggestions": "Gợi ý",
+        "feedbackoverall": "Phản hồi tổng thể",
+        "examplerevisions": "Ví dụ sửa đổi",
+        "nextStep": "Bước tiếp theo",
+        "reviseResponse": "Sửa đổi phản hồi",
+        "getXP": "Nhận XP",
+        "score": "Điểm"
+      }
     },
     "MCQuestion": {
       "title": "Câu hỏi đa lựa chọn",

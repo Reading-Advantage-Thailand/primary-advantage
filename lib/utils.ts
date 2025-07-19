@@ -83,3 +83,14 @@ export function convertCefrLevel(cefrLevel: string) {
   const level = levels.find((level) => level.cefrLevel === cefrLevel);
   return level?.raLevel || 1;
 }
+
+export function convertLocaleFull(locale: string) {
+  const localeMap: Record<string, string> = {
+    en: "English",
+    th: "Thai",
+    cn: "Chinese",
+    tw: "Taiwan",
+    vi: "Vietnamese",
+  };
+  return localeMap[locale as keyof typeof localeMap] || locale;
+}
