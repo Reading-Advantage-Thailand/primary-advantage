@@ -7,23 +7,37 @@ import { getLaqFeedback, getSaqFeedback } from "@/server/utils/assistant";
 import { ActivityType, UserXpEarned } from "@/types/enum";
 
 export async function retakeQuiz(articleId: string, type: ActivityType) {
-  const userActivity = await prisma.userActivity.findFirst({
-    where: { targetId: articleId, activityType: type },
-  });
+  try {
+    const user = await currentUser();
 
-  if (!userActivity) {
-    return { error: "User activity not found" };
+    if (!user) {
+      return { error: "User not found" };
+    }
+
+    const userActivity = await prisma.userActivity.findFirst({
+      where: { targetId: articleId, activityType: type, userId: user.id },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!userActivity) {
+      return { error: "User activity not found" };
+    }
+
+    const deleted = await prisma.userActivity.delete({
+      where: { id: userActivity.id },
+    });
+
+    if (!deleted) {
+      return { error: "Failed to delete user activity" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to retake quiz" };
   }
-
-  const deleted = await prisma.userActivity.delete({
-    where: { id: userActivity.id },
-  });
-
-  if (!deleted) {
-    return { error: "Failed to delete user activity" };
-  }
-
-  return { success: true };
 }
 
 export async function finishQuiz(

@@ -29,6 +29,7 @@ import {
 } from "@/types";
 import { cleanGenre, convertCefrLevel } from "@/lib/utils";
 import { deleteFile } from "@/utils/storage";
+import { currentUser } from "@/lib/session";
 
 interface GenerateArticleParams {
   type: ArticleType;
@@ -333,6 +334,12 @@ export const getQuestionsByArticleId = async (
   result: QuestionResult;
   questionStatus: QuestionState;
 }> => {
+  const userId = await currentUser();
+
+  if (!userId) {
+    throw new Error("User not found");
+  }
+
   if (!articleId) {
     throw new Error("Article ID is required");
   }
@@ -350,6 +357,7 @@ export const getQuestionsByArticleId = async (
     // Check if questions are already completed
     const activities = await prisma.userActivity.findMany({
       where: {
+        userId: userId.id,
         targetId: articleId,
         activityType: type,
         completed: true,
