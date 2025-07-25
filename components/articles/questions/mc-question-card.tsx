@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { QuizContextProvider } from "@/contexts/question-context";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getQuestionsByArticleId } from "@/server/models/articles";
+import { getQuestionsByArticleId } from "@/server/models/articleModel";
 import { ActivityType } from "@/types/enum";
 import MCQuestionContent from "./mc-question-content";
 import QuestionHeader from "./question-header";

@@ -1,7 +1,7 @@
 "use server";
 
 import { generateAllArticle } from "@/server/controllers/articleController";
-import { deleteArticleById } from "@/server/models/articles";
+import { deleteArticleById } from "@/server/models/articleModel";
 
 export async function generateArticle(amountPerGenre: number) {
   const result = await generateAllArticle(amountPerGenre);

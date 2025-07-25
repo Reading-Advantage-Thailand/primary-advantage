@@ -3,8 +3,36 @@ import FlashcardDashboard from "@/components/flashcards/flashcard-dashboard";
 import SentencesOrderingPage from "@/components/pratice/order-sentences-page";
 import ClozeTestPage from "@/components/pratice/cloze-test-page";
 import OrderWordPage from "@/components/pratice/order-words-page";
+import ManageTab from "@/components/manage-tab";
+import { fetchAllFlashcards } from "@/server/controllers/articleController";
+import MatchingGamePage from "@/components/pratice/matching-page";
+
+type Payment = {
+  id: string;
+  amount: number;
+  status: "pending" | "processing" | "success" | "failed";
+  email: string;
+};
 
 export default async function SentencesPage() {
+  const payments: Payment[] = [
+    {
+      id: "728ed52f",
+      amount: 100,
+      status: "pending",
+      email: "m@example.com",
+    },
+    {
+      id: "489e1d42",
+      amount: 125,
+      status: "processing",
+      email: "example@gmail.com",
+    },
+    // ...
+  ];
+
+  const flashcards = await fetchAllFlashcards(new URLSearchParams());
+
   return (
     <>
       <Tabs defaultValue="flashcard">
@@ -41,10 +69,10 @@ export default async function SentencesPage() {
           <OrderWordPage />
         </TabsContent>
         <TabsContent className="mt-4" value="matching">
-          <h1>Matching</h1>
+          <MatchingGamePage />
         </TabsContent>
         <TabsContent className="mt-4" value="manage">
-          <h1>Manage</h1>
+          <ManageTab data={flashcards?.cards || []} />
         </TabsContent>
       </Tabs>
     </>

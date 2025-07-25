@@ -3,7 +3,7 @@ import LAQuestionCard from "@/components/articles/questions/la-question-card";
 import MCQuestionCard from "@/components/articles/questions/mc-question-card";
 import SAQuestionCard from "@/components/articles/questions/sa-question-card";
 import WordList from "@/components/articles/word-list";
-import { getArticleById } from "@/server/models/articles";
+import { getArticleById } from "@/server/models/articleModel";
 import React from "react";
 import { Article, WordListTimestamp } from "@/types";
 

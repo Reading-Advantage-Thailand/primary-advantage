@@ -5,7 +5,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getQuestionsByArticleId } from "@/server/models/articles";
+import { getQuestionsByArticleId } from "@/server/models/articleModel";
 import { ActivityType, QuestionState } from "@/types/enum";
 import QuestionHeader from "./question-header";
 import { QuizContextProvider } from "@/contexts/question-context";

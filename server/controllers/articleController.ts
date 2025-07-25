@@ -1,11 +1,21 @@
-import { ActivityType, ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
+"use server";
+
+import {
+  ActivityType,
+  ArticleBaseCefrLevel,
+  ArticleType,
+  FlashcardType,
+} from "@/types/enum";
 import {
   generateArticles,
   getArticlesWithParams,
   getArticleById,
   getQuestionsByArticleId,
-} from "../models/articles";
-import { NextRequest } from "next/server";
+  getAllFlashcards,
+  deleteFlashcardById,
+} from "../models/articleModel";
+import { NextRequest, NextResponse } from "next/server";
+import { currentUser } from "@/lib/session";
 
 export const generateAllArticle = async (amountPerGenre: number) => {
   const types: ArticleType[] = [ArticleType.FICTION, ArticleType.NONFICTION];
@@ -105,3 +115,32 @@ export const fetchArticleById = async (req: URLSearchParams) => {
 
 //   return getQuestionsByArticleId(articleId);
 // };
+
+export const fetchAllFlashcards = async (req: URLSearchParams) => {
+  try {
+    const userId = await currentUser();
+
+    if (!userId) {
+      throw new Error("User not found");
+    }
+
+    return getAllFlashcards(userId.id);
+  } catch (error) {
+    console.error("Error in fetchAllFlashcards:", error);
+    throw new Error("Failed to fetch all flashcards");
+  }
+};
+
+export const deleteFlashcardByIdAction = async (flashcardId: string) => {
+  try {
+    if (!flashcardId) {
+      return { success: false, error: "Flashcard ID is required" };
+    }
+
+    await deleteFlashcardById(flashcardId);
+    return { success: true, message: "Flashcard deleted successfully" };
+  } catch (error) {
+    console.error("Error in deleteFlashcardByIdAction:", error);
+    return { success: false, error: "Failed to delete flashcard" };
+  }
+};

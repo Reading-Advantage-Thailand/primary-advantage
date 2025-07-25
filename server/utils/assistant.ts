@@ -127,7 +127,7 @@ export async function getLaqFeedback(req: {
       .replace("{studentResponse}", validatedInput.studentResponse);
 
     const { object } = await generateObject({
-      model: google(googleModelLite),
+      model: google(googleModel),
       schema: laqFeedbackOutputSchema,
       system: laquestion_system,
       prompt,

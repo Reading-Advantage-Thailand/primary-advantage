@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { signUpSchema } from "@/lib/zod";
-import { createUser } from "@/server/models/user";
+import { createUser } from "@/server/models/userModel";
 
 export async function signUpAction(value: z.infer<typeof signUpSchema>) {
   const validation = signUpSchema.safeParse(value);

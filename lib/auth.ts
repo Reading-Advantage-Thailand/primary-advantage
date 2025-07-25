@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { signInSchema } from "./zod";
 import { ZodError } from "zod";
-import { getUserByEmail } from "@/server/models/user";
+import { getUserByEmail } from "@/server/models/userModel";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,

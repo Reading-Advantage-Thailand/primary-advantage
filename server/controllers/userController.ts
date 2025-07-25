@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { updateUserActivity } from "../models/user";
+import { updateUserActivity } from "../models/userModel";
 import { ActivityType, UserXpEarned } from "@/types/enum";
 import { error } from "console";
 
@@ -12,7 +12,7 @@ export const handleUpdateUserActivity = async (
     };
     activityType: ActivityType;
   },
-  targetId?: string
+  targetId?: string,
 ) => {
   const { data, activityType } = body;
 

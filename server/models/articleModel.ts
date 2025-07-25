@@ -30,6 +30,7 @@ import {
 import { cleanGenre, convertCefrLevel } from "@/lib/utils";
 import { deleteFile } from "@/utils/storage";
 import { currentUser } from "@/lib/session";
+import { FlashcardType } from "@/types/enum";
 
 interface GenerateArticleParams {
   type: ArticleType;
@@ -446,4 +447,24 @@ export const deleteArticleById = async (articleId: string) => {
     console.error("Error deleting article:", error);
     throw error;
   }
+};
+
+export const getAllFlashcards = async (userId: string) => {
+  return await prisma.flashcardDeck.findFirst({
+    where: {
+      userId: userId,
+      type: FlashcardType.SENTENCE,
+    },
+    include: {
+      cards: true,
+    },
+  });
+};
+
+export const deleteFlashcardById = async (flashcardId: string) => {
+  return await prisma.flashcardCard.delete({
+    where: {
+      id: flashcardId,
+    },
+  });
 };
