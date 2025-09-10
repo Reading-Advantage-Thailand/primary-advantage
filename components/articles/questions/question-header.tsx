@@ -43,7 +43,7 @@ export default function QuestionHeader({
     //   const activityType = activityTypes[buttonLabel as keyof ActivityType];
 
     // if (activityType) {
-    //   fetch(`/api/v1/users/${userId}/activitylog`, {
+    //   fetch(`/api/users/${userId}/activitylog`, {
     //     method: "POST",
     //     body: JSON.stringify({
     //       activityType,
@@ -56,7 +56,7 @@ export default function QuestionHeader({
   ) : (
     <>
       <CardHeader>
-        <CardTitle className="font-bold text-3xl md:text-3xl">
+        <CardTitle className="text-3xl font-bold md:text-3xl">
           {heading}
         </CardTitle>
         <CardDescription>{description}</CardDescription>

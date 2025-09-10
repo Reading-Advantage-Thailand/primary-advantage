@@ -23,10 +23,10 @@ export function MainNav({ children, items }: MainNavProps) {
   const t = useTranslations("MainNav");
 
   return (
-    <div className="flex md:gap-10 gap-6">
+    <div className="flex gap-6 md:gap-10">
       <Link href="/" className="hidden items-center space-x-2 md:flex">
         <Icons.logo />
-        <span className="hidden text-[#22d3ee] font-heading font-bold sm:inline-block">
+        <span className="font-logo hidden font-bold text-[#22d3ee] sm:inline-block">
           {siteConfig.name}
         </span>
       </Link>
@@ -44,11 +44,11 @@ export function MainNav({ children, items }: MainNavProps) {
                 key={index}
                 href={item.disabled ? "#" : item.href}
                 className={cn(
-                  "font-menu capitalize flex items-center text-lg font-medium transition-colors hover:text-foreground/80",
+                  "font-menu hover:text-foreground/80 flex items-center text-lg font-medium capitalize transition-colors",
                   item.href.startsWith(`/${segment}`)
                     ? "text-foreground"
                     : "text-foreground/60",
-                  item.disabled && "cursor-not-allowed opacity-80"
+                  item.disabled && "cursor-not-allowed opacity-80",
                 )}
               >
                 {Icon && <Icon className="mr-2 h-4 w-4" />}

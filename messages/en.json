@@ -3,6 +3,12 @@
     "label": "Change language",
     "locale": "{locale, select, th {🇹🇭 ไทย} en {🇺🇸 English} tw {🇹🇼 中文} cn {🇨🇳 台灣} vi {🇻🇳 Tiếng Việt} other {Unknown}}"
   },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "Sorry, we couldn't find the page you're looking for.",
+    "goBack": "Go Back",
+    "returnToWebsite": "Return to website"
+  },
   "MainNav": {
     "home": "Home",
     "about": "About",
@@ -15,7 +21,38 @@
     "vocabulary": "Vocabulary",
     "testing": "Testing",
     "systemdashboard": "System Dashboard",
-    "teacherdashboard": "Teacher Dashboard"
+    "licenses": "Licenses Dashboard",
+    "schools": "Schools Dashboard",
+    "teacherdashboard": "Teacher Dashboard",
+    "reports": "Reports",
+    "history": "History",
+    "myClasses": "My Classes",
+    "myStudents": "My Students",
+    "classRoster": "Class Roster",
+    "adminDashboard": "Admin Dashboard",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "teachers": "Teachers",
+    "importdata": "Import Data",
+    "userProfile": "User Profile",
+    "schoolProfile": "School Profile",
+    "studentsandclasses": "Students and Classes",
+    "articlecreation": "Article Creation",
+    "subItem": {
+      "admin": "Admin",
+      "teachers": "Teachers",
+      "students": "Students",
+      "allTeachers": "All Teachers",
+      "addTeacher": "Add Teacher",
+      "allStudents": "All Students",
+      "addStudent": "Add Student",
+      "classrooms": "Classrooms",
+      "classRoster": "Class Roster",
+      "studentProgress": "Student Progress",
+      "overviewReports": "Overview Reports",
+      "performanceAnalytics": "Performance Analytics",
+      "progressTracking": "Progress Tracking"
+    }
   },
   "Question": {
     "SAQuestion": {
@@ -54,6 +91,107 @@
     "descriptionSuccess2": "You have completed the quiz {score} questions correct out of {total} questions",
     "descriptionError": "There was an error getting the question",
     "descriptionLoading": "Getting questions for this article. Please wait a moment."
+  },
+  "Admin": {
+    "Classrooms": {
+      "classrooms": "Classrooms",
+      "classroomsDescription": "Manage classrooms in your school",
+      "searchPlaceholder": "Search classrooms...",
+      "createClassroom": "Create Classroom",
+      "createClassroomDescription": "Create a new classroom for students",
+      "editClassroom": "Edit Classroom",
+      "editClassroomDescription": "Update classroom information",
+      "deleteClassroom": "Delete Classroom",
+      "deleteClassroomDescription": "Are you sure you want to delete this classroom?",
+      "deleteClassroomWarning": "This action cannot be undone. All students and teachers will be removed from this classroom.",
+      "name": "Name",
+      "namePlaceholder": "Enter classroom name",
+      "grade": "Grade",
+      "gradePlaceholder": "Enter grade level",
+      "classCode": "Class Code",
+      "studentPassword": "Student Password",
+      "studentPasswordPlaceholder": "Enter password for students",
+      "students": "Students",
+      "teachers": "Teachers",
+      "createdAt": "Created",
+      "expires": "Expires",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update",
+      "creating": "Creating...",
+      "updating": "Updating...",
+      "deleting": "Deleting...",
+      "noClassrooms": "No classrooms found",
+      "loading": "Loading classrooms..."
+    }
+  },
+  "AdminDashboard": {
+    "title": "Admin Dashboard",
+    "subtitle": "Manage your school's educational platform",
+    "actions": {
+      "importData": "Import Data",
+      "addTeacher": "Add Teacher"
+    },
+    "stats": {
+      "teachers": "Teachers",
+      "teachersDesc": "Active teachers in your school",
+      "students": "Students",
+      "studentsDesc": "Enrolled students",
+      "articles": "Articles",
+      "articlesDesc": "Available reading materials",
+      "growth": "Monthly Growth",
+      "growthDesc": "Student enrollment growth"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "addTeacher": "Add Teacher",
+      "addTeacherDesc": "Register a new teacher account",
+      "addStudent": "Add Student",
+      "addStudentDesc": "Create a new student profile",
+      "createArticle": "Create Article",
+      "createArticleDesc": "Generate new reading content",
+      "importData": "Import Data",
+      "importDataDesc": "Bulk import users and content",
+      "viewReports": "View Reports",
+      "viewReportsDesc": "Access analytics and insights",
+      "manageClassrooms": "Manage Classrooms",
+      "manageClassroomsDesc": "Organize classes and assignments"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "empty": "No recent activity to display",
+      "viewAll": "View all activity"
+    },
+    "systemStatus": {
+      "title": "System Status",
+      "serverHealth": "Server Health",
+      "database": "Database",
+      "aiServices": "AI Services",
+      "healthy": "Healthy",
+      "connected": "Connected",
+      "operational": "Operational"
+    },
+    "alerts": {
+      "title": "System Alerts",
+      "lowStorage": {
+        "title": "Storage Space Low",
+        "description": "Consider upgrading your storage plan"
+      },
+      "newRegistrations": {
+        "title": "New Teacher Registrations",
+        "description": "5 teachers pending approval"
+      }
+    },
+    "charts": {
+      "title": "Analytics Overview",
+      "userGrowth": "User Growth",
+      "topArticles": "Most Popular Articles",
+      "activityByLevel": "Activity by CEFR Level",
+      "performance": "Performance Metrics"
+    }
   },
   "Components": {
     "submitButton": "Submit",
@@ -205,6 +343,48 @@
       "elements_of_art": "Elements of Art",
       "music_around_the_world": "Music Around the World",
       "craft_techniques_explained": "Craft Techniques Explained"
+    }
+  },
+  "Reports": {
+    "title": "Reports",
+    "description": "View student progress and classroom analytics",
+    "activityprogress": "Activity Progress",
+    "recentactivity": "Recent Activity",
+    "activityheatmap": "Activity Heatmap",
+    "xpoverall": "XP Overall",
+    "readingstatschart": "Reading Stats Chart",
+    "xpearned": "XP Earned",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "dateRange": "Date Range",
+    "activityType": {
+      "MC_QUESTION": "Multiple Choice Question",
+      "SA_QUESTION": "Short Answer Question",
+      "LA_QUESTION": "Long Answer Question",
+      "ARTICLE_READ": "Article Read"
+    },
+    "level": {
+      "title": "CEFR Level",
+      "yourlevel": "Your Level",
+      "description": {
+        "A0": "You can recognize words and names you've seen before, especially when there are pictures to help. You can understand the really simple signs around you and basic information like where and when something is happening.",
+        "A1-": "You're beginning to recognize more words and simple phrases beyond the very basics. You can follow short, simple directions and understand basic phrases and sentences about things you need.",
+        "A1": "You can understand really short and simple texts. You recognize enough words to spot them in notices and simple guides. You can talk about simple, everyday things using the words you know.",
+        "A1+": "You're starting to understand sentences and expressions that are important to you. Reading is not just about recognizing familiar words anymore; you're beginning to understand whole messages in simple texts.",
+        "A2-": "You're getting better at understanding simple texts and can find specific information in everyday materials like ads or schedules, though you might still struggle with unfamiliar topics.",
+        "A2": "You can understand short, simple texts, find what you need in everyday materials like ads or menus, and follow basic instructions. You know enough words to communicate in daily situations.",
+        "A2+": "You can understand regular writing and the main points in short news stories or descriptions. Your vocabulary is growing so you can talk about things that matter to you and handle everyday situations.",
+        "B1-": "You can grasp the main ideas of straightforward texts on familiar topics. You're developing the ability to deal with texts that introduce new topics or slightly more complex language, although you may still need some help.",
+        "B1": "You can read texts on topics you like and understand the main points. Stories and personal messages are easy for you to follow. You know enough words for everyday topics and can talk about what you read without too much trouble.",
+        "B1+": "You can understand clear writing about familiar subjects and are getting better at handling slightly more complicated language. You're comfortable finding information you need and can enjoy a book if it's not too difficult.",
+        "B2-": "You can understand detailed texts about familiar topics. You're starting to recognize the subtle parts of language and can discuss topics you're interested in pretty easily, although very complex ideas might still be challenging.",
+        "B2": "You can read independently and tell whether a text is formal or casual. You can adjust your reading speed depending on what you're reading. You enjoy good books and articles about current events. You know many words, and even if you get confused sometimes, you can usually figure it out.",
+        "B2+": "You can understand the main ideas of more challenging texts, like science articles or more complex stories. You're starting to read more on your own and can handle topics that are a bit abstract or technical, especially subjects you know well.",
+        "C1-": "You can understand complex texts with some effort. Your vocabulary lets you read about many different topics, and you can figure out less obvious details, although sometimes you might need to reread certain parts.",
+        "C1": "You can read long and challenging texts and understand most of what's happening. You enjoy stories and articles that make you think, and you can talk about them using good vocabulary without having to search too hard for the right words.",
+        "C1+": "You're a super reader who can handle challenging texts and understand different writing styles. You're really good at figuring out the less obvious parts of stories and articles, and you usually know what words mean without having to look them up.",
+        "C2": "You can read and understand almost anything. You can understand the main ideas of complex texts and enjoy reading more challenging books and articles. You can talk about almost anything and use the language with confidence."
+      }
     }
   }
 }

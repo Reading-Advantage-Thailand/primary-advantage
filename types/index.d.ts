@@ -1,4 +1,5 @@
 import { Card as FSRSCard, State, Rating } from "ts-fsrs";
+import { Prisma } from "@prisma/client";
 
 export type SiteConfig = {
   name: string;
@@ -8,6 +9,11 @@ export type SiteConfig = {
   link: {
     github: string;
   };
+  navItems?: {
+    href: string;
+    label: string;
+    icon?: string;
+  }[];
 };
 
 export type MainNavItem = {
@@ -17,23 +23,32 @@ export type MainNavItem = {
   icon?: string;
 };
 
+export type NavLink = {
+  title: string;
+  href: string;
+  icon?: string;
+  disabled?: boolean;
+  // Permission requirements for this navigation link
+  requiredPermissions?: import("@/lib/permissions").Permission[];
+  // Whether to hide completely when no permission (default: false, shows as locked)
+  hideWhenNoPermission?: boolean;
+};
+
 export type PageConfig = {
   mainNav: MainNavItem[];
-  sidebarNav?: sidebarNav[];
+  sidebarNav?: SidebarNavItem[];
 };
 
 export type SidebarNavItem = {
   id?: string;
-  title:
-    | "read"
-    | "stories"
-    | "sentences"
-    | "vocabulary"
-    | "reports"
-    | "history";
+  title: string;
   disabled?: boolean;
   external?: boolean;
   icon?: string;
+  // Permission requirements for this navigation item
+  requiredPermissions?: import("@/lib/permissions").Permission[];
+  // Whether to hide completely when no permission (default: false, shows as locked)
+  hideWhenNoPermission?: boolean;
 } & (
   | {
       href: string;
@@ -257,6 +272,171 @@ export interface CardReview {
   rating: Rating; // ts-fsrs Rating enum (1-4)
   timeSpent?: number;
   reviewedAt: Date;
+}
+
+export interface UserActivityLog {
+  id: string;
+  userId: string;
+  activityType: string;
+  targetId?: string | null;
+  details: any;
+  completed: boolean;
+  createdAt: Date;
+}
+
+export interface UserXpLog {
+  id: string;
+  userId: string;
+  xpEarned: number;
+  createdAt: Date;
+}
+
+// Teacher API Types
+export interface TeacherData {
+  id: string;
+  name: string | null;
+  email: string | null;
+  role: string;
+  createdAt: string;
+  image?: string | null;
+  schoolId?: string | null;
+  cefrLevel?: string | null;
+  totalStudents: number;
+  totalClasses: number;
+}
+
+export interface TeachersResponse {
+  teachers: TeacherData[];
+  statistics: {
+    totalTeachers: number;
+    totalStudents: number;
+    totalClasses: number;
+    averageStudentsPerTeacher: number;
+    activeTeachers: number;
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateTeacherRequest {
+  name: string;
+  email: string;
+  role: "Teacher" | "Admin";
+  cefrLevel?: string;
+}
+
+export interface UpdateTeacherRequest {
+  name?: string;
+  email?: string;
+  role?: "Teacher" | "Admin";
+  cefrLevel?: string;
+}
+
+export interface TeacherApiResponse {
+  success: boolean;
+  teacher?: TeacherData;
+  error?: string;
+}
+
+// Additional types for MVC architecture
+export interface UserWithRoles {
+  id: string;
+  email: string | null;
+  schoolId: string | null;
+  roles: Array<{
+    role: {
+      id: string;
+      name: string;
+    };
+  }>;
+  SchoolAdmins: Array<{
+    id: string;
+    schoolId: string;
+  }>;
+}
+
+// Student API Types
+export interface StudentData {
+  id: string;
+  name: string | null;
+  email: string | null;
+  cefrLevel: string | null;
+  xp: number;
+  role: string;
+  createdAt: string;
+  className: string | null;
+  classroomId: string | null;
+}
+
+export interface StudentsResponse {
+  students: StudentData[];
+  statistics: {
+    totalStudents: number;
+    averageXp: number;
+    mostCommonLevel: string;
+    activeThisWeek: number;
+    activePercentage: number;
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+// Input types for creating/updating
+export interface CreateTeacherInput {
+  name: string;
+  email: string;
+  role: string;
+  cefrLevel?: string;
+  password?: string;
+}
+
+export interface UpdateTeacherInput {
+  name?: string;
+  email?: string;
+  role?: string;
+  cefrLevel?: string;
+  password?: string;
+}
+
+export interface CreateStudentInput {
+  name: string;
+  email: string;
+  cefrLevel?: string;
+  classroomId?: string;
+  password?: string;
+}
+
+export interface UpdateStudentInput {
+  name?: string;
+  email?: string;
+  cefrLevel?: string;
+  classroomId?: string;
+  password?: string;
+}
+
+// API Response types
+export interface ApiResponse<T = unknown> {
+  data?: T;
+  error?: string;
+  message?: string;
+  status: number;
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 // Re-export ts-fsrs types for convenience

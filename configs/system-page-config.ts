@@ -27,12 +27,22 @@ export const systemPageConfig: PageConfig = {
     {
       title: "systemdashboard",
       href: "/system/dashboard",
-      // icon: "class",
+      icon: "LayoutDashboardIcon",
+    },
+    {
+      title: "schools",
+      href: "/system/schools",
+      icon: "SchoolIcon",
+    },
+    {
+      title: "licenses",
+      href: "/system/licenses",
+      icon: "KeyIcon",
     },
     {
       title: "testing",
       href: "/system/test",
-      // icon: "class",
+      icon: "LayoutDashboardIcon",
     },
   ],
 };

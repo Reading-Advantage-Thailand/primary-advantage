@@ -11,7 +11,7 @@ import { getUserByEmail } from "@/server/models/userModel";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  // adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
       credentials: {
@@ -27,13 +27,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             await signInSchema.parseAsync(credentials);
 
           const user = await getUserByEmail(email);
+
           if (!user) return null;
 
           const userData = {
             id: user.id,
             name: user.name,
             email: user.email,
-            role: user.role,
+            role: user.roles.map((role) => role.role.name).join(", "),
             xp: user.xp,
             level: user.level,
             cefrLevel: user.cefrLevel,
@@ -70,13 +71,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         params: {
           prompt: "consent",
           access_type: "offline",
-          // scope: [
-          //   "https://www.googleapis.com/auth/classroom.courses.readonly",
-          //   "https://www.googleapis.com/auth/classroom.coursework.me",
-          //   "https://www.googleapis.com/auth/classroom.coursework.students",
-          //   "https://www.googleapis.com/auth/classroom.rosters.readonly",
-          //   "https://www.googleapis.com/auth/classroom.profile.emails",
-          // ].join(" "),
+          scope: "openid profile email",
         },
       },
     }),
@@ -106,7 +101,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const dbUser = await getUserByEmail(user.email);
         if (dbUser) {
           token.id = dbUser.id;
-          token.role = dbUser.role;
+          token.role = dbUser.roles.map((role) => role.role.name).join(", ");
           token.xp = dbUser.xp;
           token.level = dbUser.level;
           token.cefrLevel = dbUser.cefrLevel as string;

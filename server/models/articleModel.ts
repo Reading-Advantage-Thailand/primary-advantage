@@ -42,15 +42,25 @@ interface GeneratedContent {
     title: string;
     passage: string;
     summary: string;
+    brainstorming?: string | null;
+    planning?: string | null;
     translatedSummary: {
       th: string;
       cn: string;
       tw: string;
       vi: string;
     };
-    imageDesc: string;
+    imageDesc?: string;
     rating: number;
     cefrLevel: string;
+    topic?: string;
+    isDraft?: boolean;
+    isPublished?: boolean;
+    isApproved?: boolean;
+    type?: string | ArticleType;
+    genre?: string;
+    subGenre?: string;
+    authorId?: string;
   };
   mcq: {
     questions: Array<{
@@ -97,6 +107,8 @@ async function generateContent(
     throw new Error("Article rating too low");
   }
 
+  // const questions = await generateQuestions(generatedArticle, type, level);
+
   const [mcq, saq, laq] = await Promise.all([
     generateMCQuestion({
       type,
@@ -136,28 +148,34 @@ async function generateContent(
   };
 }
 
-async function saveArticleContent(
+export async function saveArticleContent(
   content: GeneratedContent,
-  genre: string,
-  subgenre: string,
-  type: ArticleType,
 ): Promise<void> {
   const { article, mcq, saq, laq } = content;
 
   // First create the article to get its ID
+  // Exclude fields that need transformation or don't exist in Prisma schema
+  const {
+    imageDesc,
+    isDraft,
+    isPublished,
+    isApproved,
+    authorId,
+    ...articleData
+  } = article;
+
   const createdArticle = await prisma.article.create({
     data: {
-      title: article.title,
-      passage: article.passage,
-      summary: article.summary,
-      translatedSummary: article.translatedSummary,
-      imageDescription: article.imageDesc,
-      genre: cleanGenre(genre),
-      subGenre: cleanGenre(subgenre),
-      type,
-      rating: article.rating,
+      ...articleData,
+      imageDescription: imageDesc || "",
+      genre: cleanGenre(article?.genre || ""),
+      subGenre: cleanGenre(article?.subGenre || ""),
+      type: article.type || "",
       raLevel: convertCefrLevel(article.cefrLevel),
-      cefrLevel: article.cefrLevel,
+      isDraft: isDraft || false,
+      isPublished: isPublished || false,
+      isApproved: isApproved || false,
+      authorId: authorId || "",
     },
   });
 
@@ -166,7 +184,7 @@ async function saveArticleContent(
   await Promise.all([
     // Generate and save image
     generateImage({
-      imageDesc: article.imageDesc,
+      imageDesc: article.imageDesc || "",
       articleId,
     }),
 
@@ -213,6 +231,43 @@ async function saveArticleContent(
 
   return;
 }
+
+export const generateQuestions = async (
+  type: ArticleType,
+  cefrLevel: ArticleBaseCefrLevel,
+  passage: string,
+  title: string,
+  summary: string,
+  imageDesc: string,
+) => {
+  const [mcq, saq, laq] = await Promise.all([
+    generateMCQuestion({
+      type,
+      cefrlevel: cefrLevel,
+      passage,
+      title,
+      summary,
+      imageDesc,
+    }),
+    generateSAQuestion({
+      type,
+      cefrlevel: cefrLevel,
+      passage,
+      title,
+      summary,
+      imageDesc,
+    }),
+    generateLAQuestion({
+      type,
+      cefrlevel: cefrLevel,
+      passage,
+      title,
+      summary,
+      imageDesc,
+    }),
+  ]);
+  return { mcq, saq, laq };
+};
 
 export const generateArticles = async ({
   type,
@@ -267,9 +322,9 @@ export const generateArticles = async ({
 
     await saveArticleContent(
       content,
-      randomGenre.genre,
-      randomGenre.subgenre,
-      type,
+      // randomGenre.genre,
+      // randomGenre.subgenre,
+      // type,
     );
   } catch (error) {
     console.error("Error generating article:", error);
@@ -294,6 +349,7 @@ export const getArticlesWithParams = async (params: {
     ...(genre && { genre: { contains: genre, mode: "insensitive" } }),
     ...(subgenre && { subGenre: { contains: subgenre, mode: "insensitive" } }),
     ...(cefrLevel && { cefrLevel }),
+    ...{ isDraft: false },
   };
 
   const articles = await prisma.article.findMany({
@@ -433,19 +489,24 @@ export const getQuestionsByArticleId = async (
   }
 };
 
-export const deleteArticleById = async (articleId: string) => {
+export const deleteArticleByIdModel = async (articleId: string) => {
   try {
-    const article = await prisma.article.delete({
-      where: { id: articleId },
-    });
+    await prisma.$transaction(async (tx) => {
+      await tx.article.delete({
+        where: { id: articleId },
+      });
 
-    const result = await deleteFile(articleId);
-    console.log("result", result);
+      const result = await deleteFile(articleId);
+
+      if (!result) {
+        throw new Error("Failed to delete associated file");
+      }
+    });
 
     return { success: true };
   } catch (error) {
     console.error("Error deleting article:", error);
-    throw error;
+    return { success: false };
   }
 };
 
@@ -467,4 +528,255 @@ export const deleteFlashcardById = async (flashcardId: string) => {
       id: flashcardId,
     },
   });
+};
+
+export const getArticleActivity = async (articleId: string) => {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if already exists
+    const existingActivity = await prisma.userActivity.findFirst({
+      where: {
+        userId: user.id as string,
+        targetId: articleId,
+        activityType: ActivityType.ARTICLE_READ,
+      },
+    });
+
+    const article = await prisma.article.findUnique({
+      where: {
+        id: articleId,
+      },
+      select: {
+        type: true,
+        genre: true,
+        subGenre: true,
+      },
+    });
+
+    if (!existingActivity) {
+      // Create new article read activity
+      await prisma.userActivity.create({
+        data: {
+          userId: user.id as string,
+          activityType: ActivityType.ARTICLE_READ,
+          targetId: articleId,
+          timer: 0,
+          details: {
+            accessedAt: new Date(),
+            type: article?.type,
+            genre: article?.genre,
+            subGenre: article?.subGenre,
+          },
+          completed: false,
+        },
+      });
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error tracking article access:", error);
+    return { error: "Failed to track article access" };
+  }
+};
+
+export const saveArticleAsDraftModel = async (
+  article: GeneratedContent["article"],
+  type: ArticleType,
+  genre: string,
+  subgenre: string,
+) => {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await prisma.article.create({
+      data: {
+        title: article.title,
+        passage: article.passage,
+        summary: article.summary,
+        translatedSummary: article.translatedSummary,
+        imageDescription: article.imageDesc || "",
+        brainstorming: article.brainstorming,
+        planning: article.planning,
+        genre: cleanGenre(genre as string),
+        subGenre: cleanGenre(subgenre as string),
+        topic: article.topic,
+        type,
+        rating: article.rating,
+        raLevel: convertCefrLevel(article.cefrLevel),
+        cefrLevel: article.cefrLevel,
+        isDraft: true,
+        authorId: user.id as string,
+      },
+    });
+
+    return;
+  } catch (error) {
+    console.error("Error saving article as draft:", error);
+    throw error;
+  }
+};
+
+export const getCustomArticle = async (userId: string) => {
+  try {
+    return await prisma.article.findMany({
+      where: {
+        authorId: userId,
+      },
+    });
+  } catch (error) {
+    console.error("Error getting custom article:", error);
+    throw error;
+  }
+};
+
+export const createdArticleCustom = async (
+  article: GeneratedContent["article"],
+) => {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const {
+      title,
+      passage,
+      summary,
+      imageDesc,
+      type,
+      cefrLevel,
+      genre,
+      subGenre,
+    } = article;
+
+    const { mcq, saq, laq } = await generateQuestions(
+      type as ArticleType,
+      cefrLevel as ArticleBaseCefrLevel,
+      passage,
+      title,
+      summary,
+      imageDesc || "",
+    );
+
+    const content = {
+      article: {
+        ...article,
+        authorId: user.id as string,
+        isPublished: true,
+        isApproved: true,
+      },
+      mcq,
+      saq,
+      laq,
+    };
+
+    await saveArticleContent(content);
+
+    return;
+  } catch (error) {
+    console.error("Error creating custom article:", error);
+    throw error;
+  }
+};
+
+export const updateAprovedCustomArticle = async (articleId: string) => {
+  try {
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+    });
+
+    if (!article) {
+      throw new Error("Article not found");
+    }
+
+    const { mcq, saq, laq } = await generateQuestions(
+      article.type as ArticleType,
+      article.cefrLevel as ArticleBaseCefrLevel,
+      article.passage,
+      article.title,
+      article.summary,
+      article.imageDescription,
+    );
+
+    await Promise.all([
+      // Generate and save image
+      generateImage({
+        imageDesc: article.imageDescription,
+        articleId,
+      }),
+
+      // Save questions
+      prisma.longAnswerQuestion.create({
+        data: {
+          question: laq.question,
+          articleId,
+        },
+      }),
+
+      // Save short answer questions
+      ...saq.questions.map((question) =>
+        prisma.shortAnswerQuestion.create({
+          data: {
+            question: question.question,
+            answer: question.answer,
+            articleId,
+          },
+        }),
+      ),
+
+      // Save multiple choice questions
+      ...mcq.questions.map((mcq) =>
+        prisma.multipleChoiceQuestion.create({
+          data: {
+            question: mcq.question,
+            options: mcq.options,
+            answer: mcq.answer,
+            articleId,
+          },
+        }),
+      ),
+
+      // Generate audio
+      generateAudio({
+        passage: article.passage,
+        articleId,
+      }),
+
+      // Generate word audio
+      generateWordLists(articleId),
+    ]);
+
+    await prisma.article.update({
+      where: { id: articleId },
+      data: {
+        isDraft: false,
+        isPublished: true,
+        isApproved: true,
+      },
+    });
+
+    return;
+  } catch (error) {
+    console.error("Error updating custom article:", error);
+    throw error;
+  }
+};
+
+export const checkExistingArticle = async (articleId: string) => {
+  try {
+    return await prisma.article.findUnique({ where: { id: articleId } });
+  } catch (error) {
+    console.error("Error updating custom article:", error);
+    throw error;
+  }
 };

@@ -10,6 +10,7 @@ import { Inter as FontSans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/lib/auth";
+import { LayoutProvider } from "@/hooks/use-layout";
 
 const cabinSketch = Cabin_Sketch({
   variable: "--font-cabin-sketch",
@@ -74,7 +75,11 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <SessionProvider session={session}>
+    <SessionProvider
+      session={session}
+      refetchInterval={5 * 60}
+      refetchOnWindowFocus={true}
+    >
       <html lang={locale} suppressHydrationWarning>
         <body
           className={`${cabinSketch.variable} ${cabinSketchBold.variable} ${fontSans.variable} bg-background min-h-screen font-sans antialiased`}
@@ -86,8 +91,10 @@ export default async function RootLayout({
             disableTransitionOnChange
             enableColorScheme
           >
-            <NextIntlClientProvider>{children}</NextIntlClientProvider>
-            <Toaster />
+            <LayoutProvider>
+              <NextIntlClientProvider>{children}</NextIntlClientProvider>
+              <Toaster />
+            </LayoutProvider>
           </ThemeProvider>
         </body>
       </html>

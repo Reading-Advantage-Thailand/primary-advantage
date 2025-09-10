@@ -36,7 +36,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
       <Link
         href={`/student/read/${article.id}`}
         // onClick={() =>
-        //   fetch(`/api/v1/users/${userId}/activitylog`, {
+        //   fetch(`/api/users/${userId}/activitylog`, {
         //     method: "POST",
         //     body: JSON.stringify({
         //       articleId: article.id,

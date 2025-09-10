@@ -17,4 +17,4 @@ async function checkDbConnection() {
   }
 }
 
-checkDbConnection();
+// checkDbConnection();

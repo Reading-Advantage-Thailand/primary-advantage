@@ -31,12 +31,12 @@ interface CefrLevelEvaluationPromptType {
 }
 
 export async function evaluateRating(
-  params: EvaluateRatingParams
+  params: EvaluateRatingParams,
 ): Promise<EvaluateRatingResponse> {
   const dataFilePath = path.join(
     process.cwd(),
     "data",
-    "new-level-evaluation-prompts.json"
+    "new-level-evaluation-prompts.json",
   );
 
   // read prompts from file
@@ -44,7 +44,7 @@ export async function evaluateRating(
   const prompt: CefrLevelEvaluationPromptType[] = JSON.parse(rawData);
 
   const systemPrompt = prompt.find(
-    (p) => p.level === params.cefrLevel
+    (p) => p.level === params.cefrLevel,
   )?.systemPrompt;
 
   try {

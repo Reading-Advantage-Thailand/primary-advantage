@@ -29,6 +29,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { saveFlashcard } from "@/actions/flashcard";
 import { toast } from "sonner";
+import { fetchArticleActivity } from "@/actions/article";
 
 type Props = {
   article: Article;
@@ -61,6 +62,12 @@ export default function ArticleContent({ article }: Props) {
   const t = useTranslations("Components");
   const [isControlsVisible, setIsControlsVisible] = useState<boolean>(true);
   const [isAutoScrollPaused, setIsAutoScrollPaused] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (article.id) {
+      fetchArticleActivity(article.id).catch(console.error);
+    }
+  }, [article.id]);
 
   useEffect(() => {
     if (

@@ -1,4 +1,5 @@
-import { PageConfig, SidebarNavItem } from "@/types";
+import { PageConfig } from "@/types";
+import type { Permission } from "@/lib/permissions";
 
 export const studentPageConfig: PageConfig = {
   mainNav: [
@@ -28,35 +29,41 @@ export const studentPageConfig: PageConfig = {
       title: "read",
       href: "/student/read",
       icon: "BookIcon",
+      requiredPermissions: ["STUDENT_ACCESS"],
     },
     // {
     //   title: "stories",
     //   href: "/student/stories",
     //   icon: "storyBook",
+    //   requiredPermissions: ["STUDENT_ACCESS"],
     // },
     {
       id: "onborda-sentences",
       title: "sentences",
       href: "/student/sentences",
       icon: "AlbumIcon",
+      requiredPermissions: ["STUDENT_ACCESS"],
     },
     {
       id: "onborda-vocabulary",
       title: "vocabulary",
       href: "/student/vocabulary",
       icon: "BookIcon",
+      requiredPermissions: ["STUDENT_ACCESS"],
     },
-    // {
-    //   id: "onborda-reports",
-    //   title: "reports",
-    //   href: "/student/reports",
-    //   icon: "dashboard",
-    // },
-    // {
-    //   id: "onborda-history",
-    //   title: "history",
-    //   href: "/student/history",
-    //   icon: "record",
-    // },
+    {
+      id: "onborda-reports",
+      title: "reports",
+      href: "/student/reports",
+      icon: "LayoutDashboard",
+      requiredPermissions: ["STUDENT_ACCESS"],
+    },
+    {
+      id: "onborda-history",
+      title: "history",
+      href: "/student/history",
+      icon: "HistoryIcon",
+      requiredPermissions: ["STUDENT_ACCESS"],
+    },
   ],
 };

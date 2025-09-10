@@ -38,6 +38,7 @@ import { ArrowUpDown, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { deleteFlashcardByIdAction } from "@/server/controllers/articleController";
+import { formatDate } from "@/lib/utils";
 
 type Sentence = {
   id: string;
@@ -109,26 +110,6 @@ function getDueColor(dueDate: Date): "destructive" | "secondary" | "default" {
   return "default"; // Future - blue/gray
 }
 
-// Add this helper function to your component:
-function getCreatedAtText(createdAt: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - createdAt.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
-
-  if (diffMinutes < 1) return "Just now";
-  if (diffMinutes < 60) return `${diffMinutes}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-  if (diffDays < 365) return `${Math.ceil(diffDays / 30)} months ago`;
-
-  // For old items, show the actual date
-  return createdAt.toLocaleDateString();
-}
-
 export default function ManageTab({ data }: ManageTabProps) {
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "due", desc: false },
@@ -167,7 +148,7 @@ export default function ManageTab({ data }: ManageTabProps) {
             className="text-muted-foreground text-center text-sm"
             title={`Created: ${createdAt.toLocaleString()}`}
           >
-            {getCreatedAtText(createdAt)}
+            {formatDate(createdAt)}
           </div>
         );
       },
