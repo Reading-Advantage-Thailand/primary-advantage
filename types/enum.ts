@@ -1,9 +1,9 @@
 export enum Role {
-  USER = "USER",
-  STUDENT = "STUDENT",
-  TEACHER = "TEACHER",
-  ADMIN = "ADMIN",
-  SYSTEM = "SYSTEM",
+  User = "User",
+  Student = "Student",
+  Teacher = "Teacher",
+  Admin = "Admin",
+  System = "System",
 }
 
 export enum ArticleType {

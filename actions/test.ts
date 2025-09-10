@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getArticleById } from "@/server/models/articles";
+import { getArticleById } from "@/server/models/articleModel";
 import { generateAudio } from "@/server/utils/genaretors/audio-generator";
 import { generateWordLists } from "@/server/utils/genaretors/audio-word-generator";
 import { deleteFile, uploadToBucket } from "@/utils/storage";

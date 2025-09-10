@@ -4,9 +4,13 @@ export const settingsPageConfig: PageConfig = {
   mainNav: [],
   sidebarNav: [
     {
-      title: "User Profile",
+      title: "userProfile",
       href: "/settings/user-profile",
       // icon: "user",
+    },
+    {
+      title: "schoolProfile",
+      href: "/settings/school-profile",
     },
     // {
     //     title: "Localization",

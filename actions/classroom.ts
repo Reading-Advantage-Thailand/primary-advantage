@@ -4,7 +4,7 @@ import { generateSecureCode } from "@/lib/utils";
 import {
   createClassCode,
   getClassroomStudentForLogin,
-} from "@/server/models/classrooms";
+} from "@/server/models/classroomModel";
 
 export async function fetchStudentsByClassCode(code: string) {
   if (!code || typeof code !== "string") {

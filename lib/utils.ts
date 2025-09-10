@@ -26,6 +26,10 @@ export function generateSecureCode(length = 8): string {
   return Array.from(array, (x) => charset[x % charset.length]).join("");
 }
 
+export function generateRandomClassCode() {
+  return Math.random().toString(36).substring(2, 8);
+}
+
 export function calculateLevelAndCefrLevel(xpEarned: number, userXp: number) {
   const levels = [
     { min: 0, max: 4999, cefrLevel: "A1-", raLevel: 1 },
@@ -93,4 +97,23 @@ export function convertLocaleFull(locale: string) {
     vi: "Vietnamese",
   };
   return localeMap[locale as keyof typeof localeMap] || locale;
+}
+
+export function formatDate(createdAt: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - createdAt.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+  if (diffMinutes < 1) return "Just now";
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+  if (diffDays < 365) return `${Math.ceil(diffDays / 30)} months ago`;
+
+  // For old items, show the actual date
+  return createdAt.toLocaleDateString();
 }

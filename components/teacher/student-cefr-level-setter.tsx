@@ -1,0 +1,250 @@
+"use client";
+
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { convertCefrLevel } from "@/lib/utils";
+import { Settings } from "lucide-react";
+
+interface StudentCefrLevelSetterProps {
+  studentId: string;
+  studentName: string;
+  currentCefrLevel: string;
+  onUpdate?: () => void;
+}
+
+const CEFR_LEVELS = [
+  { value: "A1-", label: "A1- (Beginner)", description: "Pre-A1, very basic" },
+  {
+    value: "A1",
+    label: "A1 (Beginner)",
+    description: "Basic user, elementary",
+  },
+  {
+    value: "A1+",
+    label: "A1+ (High Beginner)",
+    description: "Upper elementary",
+  },
+  {
+    value: "A2-",
+    label: "A2- (Pre-Intermediate)",
+    description: "Lower intermediate",
+  },
+  {
+    value: "A2",
+    label: "A2 (Pre-Intermediate)",
+    description: "Pre-intermediate",
+  },
+  {
+    value: "A2+",
+    label: "A2+ (High Pre-Intermediate)",
+    description: "Upper pre-intermediate",
+  },
+  {
+    value: "B1-",
+    label: "B1- (Low Intermediate)",
+    description: "Lower intermediate",
+  },
+  {
+    value: "B1",
+    label: "B1 (Intermediate)",
+    description: "Independent user, intermediate",
+  },
+  {
+    value: "B1+",
+    label: "B1+ (High Intermediate)",
+    description: "Upper intermediate",
+  },
+  {
+    value: "B2-",
+    label: "B2- (Low Upper-Intermediate)",
+    description: "Lower upper-intermediate",
+  },
+  {
+    value: "B2",
+    label: "B2 (Upper-Intermediate)",
+    description: "Upper-intermediate",
+  },
+  {
+    value: "B2+",
+    label: "B2+ (High Upper-Intermediate)",
+    description: "Advanced lower",
+  },
+  { value: "C1-", label: "C1- (Low Advanced)", description: "Lower advanced" },
+  {
+    value: "C1",
+    label: "C1 (Advanced)",
+    description: "Proficient user, advanced",
+  },
+  { value: "C1+", label: "C1+ (High Advanced)", description: "Upper advanced" },
+  {
+    value: "C2-",
+    label: "C2- (Low Proficiency)",
+    description: "Lower proficiency",
+  },
+  {
+    value: "C2",
+    label: "C2 (Proficiency)",
+    description: "Mastery, proficient",
+  },
+  {
+    value: "C2+",
+    label: "C2+ (High Proficiency)",
+    description: "Native-like proficiency",
+  },
+];
+
+export default function StudentCefrLevelSetter({
+  studentId,
+  studentName,
+  currentCefrLevel,
+  onUpdate,
+}: StudentCefrLevelSetterProps) {
+  const [selectedLevel, setSelectedLevel] = useState(currentCefrLevel);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleUpdateLevel = async () => {
+    if (selectedLevel === currentCefrLevel) {
+      toast.info("No changes to save");
+      setIsOpen(false);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const raLevel = convertCefrLevel(selectedLevel);
+
+      const response = await fetch(`/api/users/${studentId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cefrLevel: selectedLevel,
+          level: raLevel,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update CEFR level");
+      }
+
+      toast.success(`${studentName}'s CEFR level updated to ${selectedLevel}`);
+      setIsOpen(false);
+      onUpdate?.();
+    } catch (error) {
+      console.error("Error updating CEFR level:", error);
+      toast.error("Failed to update CEFR level");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const currentLevelInfo = CEFR_LEVELS.find(
+    (level) => level.value === currentCefrLevel,
+  );
+  const selectedLevelInfo = CEFR_LEVELS.find(
+    (level) => level.value === selectedLevel,
+  );
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm" className="w-full justify-start">
+          <Settings className="text-muted-foreground mr-1 size-4" />
+          Set Level
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Set CEFR Level for {studentName}</DialogTitle>
+          <DialogDescription>
+            Choose the appropriate CEFR level for this student. This will also
+            update their reading level (RA level).
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="current-level">Current Level</Label>
+            <div className="bg-muted rounded p-2 text-sm">
+              <strong>{currentLevelInfo?.label}</strong>
+              {currentLevelInfo?.description && (
+                <div className="text-muted-foreground">
+                  {currentLevelInfo.description}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="new-level">New Level</Label>
+            <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select CEFR Level" />
+              </SelectTrigger>
+              <SelectContent>
+                {CEFR_LEVELS.map((level) => (
+                  <SelectItem key={level.value} value={level.value}>
+                    <div className="flex flex-col">
+                      <span>{level.label}</span>
+                      <span className="text-muted-foreground text-xs">
+                        {level.description}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {selectedLevel && selectedLevel !== currentCefrLevel && (
+            <div className="rounded border border-blue-200 bg-blue-50 p-2 text-sm">
+              <div className="font-medium text-blue-900">Preview:</div>
+              <div className="text-blue-700">
+                <strong>CEFR Level:</strong> {selectedLevelInfo?.label}
+              </div>
+              <div className="text-blue-700">
+                <strong>RA Level:</strong> {convertCefrLevel(selectedLevel)}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setIsOpen(false)}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUpdateLevel}
+            disabled={isLoading || selectedLevel === currentCefrLevel}
+          >
+            {isLoading ? "Updating..." : "Update Level"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

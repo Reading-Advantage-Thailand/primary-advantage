@@ -162,18 +162,26 @@ export default function SAQuestionContent({
                 <AlertDialogTitle className="text-2xl font-bold">
                   Feedback and your score
                 </AlertDialogTitle>
-                <AlertDialogDescription>
-                  <p className="mt-4 text-lg font-bold">Question</p>
-                  <p>{questions.question}</p>
-                  <p className="mt-4 text-lg font-bold">Suggested Answer</p>
-                  <p>{questions.answer}</p>
-                  <p className="mt-4 text-lg font-bold">Feedback</p>
-                  <p>{feedback?.feedback}</p>
-                  <p className="mt-4 text-lg font-bold">Your Answer</p>
+                <div className="flex flex-col gap-2">
+                  <p className="text-muted-foreground mt-4 text-lg font-bold">
+                    Question
+                  </p>
+                  <p className="text-muted-foreground">{questions.question}</p>
+                  <p className="text-muted-foreground mt-4 text-lg font-bold">
+                    Suggested Answer
+                  </p>
+                  <p className="text-muted-foreground">{questions.answer}</p>
+                  <p className="text-muted-foreground mt-4 text-lg font-bold">
+                    Feedback
+                  </p>
+                  <p className="text-muted-foreground">{feedback?.feedback}</p>
+                  <p className="text-muted-foreground mt-4 text-lg font-bold">
+                    Your Answer
+                  </p>
                   <p className="mt-2 inline font-bold text-green-500 dark:text-green-400">
                     {form.getValues("answer")}
                   </p>
-                </AlertDialogDescription>
+                </div>
               </AlertDialogHeader>
               <div className="flex items-center">
                 <p className="mt-4 text-lg font-bold">

@@ -8,25 +8,29 @@ datasource db {
 }
 
 model User {
-  id               String             @id @default(cuid())
-  name             String?
-  email            String?            @unique
-  emailVerified    DateTime?          @map("email_verified")
-  image            String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  password         String?
-  cefrLevel        String?            @default("A1-")
-  level            Int                @default(1)
-  xp               Int                @default(0)
-  role             Role               @default(USER)
-  accounts         Account[]
-  studentClassroom ClassroomStudent[]
-  teacherClassroom Classroom[]        @relation("TeacherClassrooms")
-  FlashcardDeck    FlashcardDeck[]
-  sessions         Session[]
-  UserActiclity    UserActivity[]
-  XpLogs           XPLogs[]
+  id                String              @id @default(cuid())
+  name              String?
+  email             String?             @unique
+  emailVerified     DateTime?           @map("email_verified")
+  image             String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  password          String?
+  cefrLevel         String?             @default("A1-")
+  level             Int                 @default(1)
+  xp                Int                 @default(0)
+  roles             UserRole[]
+  accounts          Account[]
+  studentClassroom  ClassroomStudent[]
+  FlashcardDeck     FlashcardDeck[]
+  sessions          Session[]
+  UserActiclity     UserActivity[]
+  XpLogs            XPLogs[]
+  SchoolAdmins      SchoolAdmins[]
+  ClassroomTeachers ClassroomTeachers[]
+
+  schoolId String? @map("school_id")
+  School   School? @relation(fields: [schoolId], references: [id])
 
   @@map("users")
 }
@@ -69,15 +73,37 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model Role {
+  id   String @id @default(cuid())
+  name String
+
+  users UserRole[]
+
+  @@map("roles")
+}
+
 model XPLogs {
-  id           String       @id @default(cuid())
-  userId       String       @map("user_id")
+  id           String         @id @default(cuid())
+  userId       String         @map("user_id")
   xpEarned     Int
   activityId   String?
   activityType ActivityType
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  UserActivity UserActivity[] @relation("UserActivityToXPLogs")
 
   @@map("xp_logs")
 }
@@ -93,6 +119,7 @@ model UserActivity {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  xpLogs       XPLogs[]     @relation("UserActivityToXPLogs")
 
   @@index([userId, activityType, targetId])
   @@map("user_activities")
@@ -103,10 +130,13 @@ model Article {
   type                    String
   genre                   String
   subGenre                String                   @map("sub_genre")
+  topic                   String?                  
   title                   String
   summary                 String
   passage                 String
   imageDescription        String                   @map("image_description")
+  brainstorming           String?                  @map("brainstorming")
+  planning                String?                  @map("planning")
   cefrLevel               String                   @map("cefr_level")
   raLevel                 Int                      @map("ra_level")
   rating                  Float
@@ -119,6 +149,9 @@ model Article {
   updatedAt               DateTime                 @updatedAt @map("updated_at")
   translatedPassage       Json?                    @map("translated_passage")
   translatedSummary       Json?                    @map("translated_summary")
+  isDraft                 Boolean                  @default(false) @map("is_draft")
+  isPublished             Boolean                  @default(false) @map("is_published")
+  isApproved              Boolean                  @default(false) @map("is_approved")
   longAnswerQuestions     LongAnswerQuestion[]
   multipleChoiceQuestions MultipleChoiceQuestion[]
   shortAnswerQuestions    ShortAnswerQuestion[]
@@ -161,31 +194,6 @@ model LongAnswerQuestion {
   article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   @@map("long_answer_questions")
-}
-
-model Classroom {
-  id            String             @id @default(cuid())
-  name          String
-  teacherId     String
-  classCode     String?            @unique
-  codeExpiresAt DateTime?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  students      ClassroomStudent[]
-  teacher       User               @relation("TeacherClassrooms", fields: [teacherId], references: [id])
-
-  @@map("classrooms")
-}
-
-model ClassroomStudent {
-  id          String    @id @default(cuid())
-  studentId   String
-  classroomId String
-  classroom   Classroom @relation(fields: [classroomId], references: [id])
-  student     User      @relation(fields: [studentId], references: [id])
-
-  @@unique([classroomId, studentId])
-  @@map("classroom_students")
 }
 
 model FlashcardDeck {
@@ -244,13 +252,13 @@ model CardReview {
   @@map("card_reviews")
 }
 
-enum Role {
-  USER
-  STUDENT
-  TEACHER
-  ADMIN
-  SYSTEM
-}
+// enum Role {
+//   USER
+//   STUDENT
+//   TEACHER
+//   ADMIN
+//   SYSTEM
+// }
 
 enum ActivityType {
   ARTICLE_RATING
@@ -282,4 +290,99 @@ enum CardState {
   LEARNING
   REVIEW
   RELEARNING
+}
+
+model Classroom {
+  id               String    @id @default(cuid())
+  name             String
+  grade            String?
+  classCode        String?   @unique
+  passwordStudents String?   @map("password_students")
+  codeExpiresAt    DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  schoolId String? @map("school_id")
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  students ClassroomStudent[]
+  teachers ClassroomTeachers[]
+
+  @@map("classrooms")
+}
+
+model ClassroomStudent {
+  id          String @id @default(cuid())
+  studentId   String
+  classroomId String
+
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  student   User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([classroomId, studentId])
+  @@map("classroom_students")
+}
+
+model School {
+  id String @id @default(cuid())
+
+  name         String
+  contactName  String?  @map("contact_name")
+  contactEmail String?  @map("contact_email")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ownerId      String?  @map("owner_id")
+
+  users      User[]
+  admins     SchoolAdmins[]
+  classrooms Classroom[]
+
+  licenseId String?  @unique @map("license_id")
+  license   License? @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@map("schools")
+}
+
+model License {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  name        String
+  description String?
+  maxUsers    Int       @map("max_users")
+  startDate   DateTime  @map("start_date")
+  expiryDate  DateTime?
+  expiryDays  Int?      @map("expiry_days")
+  status      String    @default("active")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  School School?
+
+  @@map("licenses")
+}
+
+model SchoolAdmins {
+  id        String   @id @default(cuid())
+  schoolId  String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("school_admins")
+}
+
+model ClassroomTeachers {
+  id          String   @id @default(cuid())
+  classroomId String
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("classroom_teachers")
 }

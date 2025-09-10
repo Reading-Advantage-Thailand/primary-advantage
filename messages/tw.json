@@ -3,6 +3,12 @@
     "label": "改變語言",
     "locale": "{locale, select, th {🇹🇭 ไทย} en {🇺🇸 English} tw {🇹🇼 中文} cn {🇨🇳 台灣} vi {🇻🇳 Tiếng Việt} other {Unknown}}"
   },
+  "NotFound": {
+    "title": "頁面未找到",
+    "description": "抱歉，我們找不到您要查找的頁面。",
+    "goBack": "返回",
+    "returnToWebsite": "返回網站"
+  },
   "MainNav": {
     "home": "主頁",
     "about": "關於",
@@ -15,7 +21,28 @@
     "vocabulary": "單字",
     "testing": "測試",
     "systemdashboard": "系統儀表板",
-    "teacherdashboard": "教師儀表板"
+    "teacherdashboard": "教師儀表板",
+    "reports": "報告",
+    "myClasses": "我的班級",
+    "myStudents": "我的學生",
+    "classRoster": "班級名冊",
+    "adminDashboard": "管理員儀表板",
+    "importdata": "匯入資料",
+    "subItem": {
+      "admin": "管理員",
+      "teachers": "教師",
+      "students": "學生",
+      "allTeachers": "所有教師",
+      "addTeacher": "新增教師",
+      "allStudents": "所有學生",
+      "addStudent": "新增學生",
+      "classrooms": "教室",
+      "classRoster": "班級名冊",
+      "studentProgress": "學生進度",
+      "overviewReports": "概覽報告",
+      "performanceAnalytics": "效能分析",
+      "progressTracking": "進度追蹤"
+    }
   },
   "Question": {
     "SAQuestion": {
@@ -54,6 +81,42 @@
     "descriptionSuccess2": "您已完成測試 {score} 題正確，共 {total} 題",
     "descriptionError": "取得問題時發生錯誤",
     "descriptionLoading": "正在取得問題，請稍候"
+  },
+  "Admin": {
+    "Classrooms": {
+      "classrooms": "教室",
+      "classroomsDescription": "管理您學校的教室",
+      "searchPlaceholder": "搜尋教室...",
+      "createClassroom": "建立教室",
+      "createClassroomDescription": "為學生建立新教室",
+      "editClassroom": "編輯教室",
+      "editClassroomDescription": "更新教室資訊",
+      "deleteClassroom": "刪除教室",
+      "deleteClassroomDescription": "您確定要刪除這個教室嗎？",
+      "deleteClassroomWarning": "此操作無法復原。所有學生和教師都將從此教室中移除。",
+      "name": "名稱",
+      "namePlaceholder": "輸入教室名稱",
+      "grade": "年級",
+      "gradePlaceholder": "輸入年級",
+      "classCode": "班級代碼",
+      "studentPassword": "學生密碼",
+      "studentPasswordPlaceholder": "輸入學生密碼",
+      "students": "學生",
+      "teachers": "教師",
+      "createdAt": "建立時間",
+      "expires": "過期時間",
+      "actions": "操作",
+      "edit": "編輯",
+      "delete": "刪除",
+      "cancel": "取消",
+      "create": "建立",
+      "update": "更新",
+      "creating": "建立中...",
+      "updating": "更新中...",
+      "deleting": "刪除中...",
+      "noClassrooms": "未找到教室",
+      "loading": "正在載入教室..."
+    }
   },
   "Components": {
     "submitButton": "送出",
@@ -206,5 +269,9 @@
       "music_around_the_world": "世界各地的音樂",
       "craft_techniques_explained": "工藝技術解說"
     }
+  },
+  "Reports": {
+    "title": "報告",
+    "description": "查看學生進度和教室分析"
   }
 }

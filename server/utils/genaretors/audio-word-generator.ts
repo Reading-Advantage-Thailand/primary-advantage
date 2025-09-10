@@ -130,7 +130,7 @@ export async function generateAudioForWord({
 
       const localPath = path.join(
         process.cwd(),
-        "public/audios/words",
+        "data/audios/words",
         `${articleId}.mp3`,
       );
       fs.writeFileSync(localPath, MP3);
@@ -148,9 +148,8 @@ export async function generateAudioForWord({
       });
       return;
     } catch (error: any) {
-      throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(
-        error.response.data,
-      )}`;
+      const errorDetails = error.response?.data || error.message || error;
+      throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(errorDetails)}`;
     }
   }
 }

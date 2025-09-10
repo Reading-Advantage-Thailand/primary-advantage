@@ -5,7 +5,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getQuestionsByArticleId } from "@/server/models/articles";
+import { getQuestionsByArticleId } from "@/server/models/articleModel";
 import { ActivityType, QuestionState } from "@/types/enum";
 import SAQuestionContent from "./sa-question-content";
 import QuestionHeader from "./question-header";

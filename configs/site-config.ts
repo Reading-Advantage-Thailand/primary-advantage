@@ -8,4 +8,27 @@ export const siteConfig: SiteConfig = {
   link: {
     github: "https://github.com/Reading-Advantage-Thailand/primary-advantage",
   },
+  navItems: [
+    {
+      href: "/",
+      label: "Home",
+      icon: "HomeIcon",
+    },
+    {
+      href: "/contact",
+      label: "contact",
+      icon: "MailIcon",
+    },
+
+    {
+      href: "/about",
+      label: "about",
+      icon: "InfoIcon",
+    },
+    {
+      href: "/authors",
+      label: "authors",
+      icon: "UsersIcon",
+    },
+  ],
 };

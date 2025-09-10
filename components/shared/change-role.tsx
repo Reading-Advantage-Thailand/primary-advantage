@@ -30,7 +30,7 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
       description:
         "The Student role is designed for users who are enrolled in courses and participating in learning activities.",
       icon: <UserCircle size={32} />,
-      value: Role.STUDENT,
+      value: Role.Student,
       color: "blue",
     },
     {
@@ -38,7 +38,7 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
       description:
         "The Teacher role is intended for users who are responsible for delivering course content and evaluating student performance.",
       icon: <GraduationCap size={32} />,
-      value: Role.TEACHER,
+      value: Role.Teacher,
       color: "blue",
     },
   ];
@@ -49,16 +49,16 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
         title: "Admin",
         description: "Display only in development mode. (School Admin)",
         icon: <School size={32} />,
-        value: Role.ADMIN,
+        value: Role.Admin,
         color: "red",
       },
       {
         title: "System",
         description: "Display only in development mode. (System Admin)",
         icon: <Ghost size={32} />,
-        value: Role.SYSTEM,
+        value: Role.System,
         color: "red",
-      }
+      },
     );
   }
   const [isLoading, setIsLoading] = useState(false);
@@ -118,7 +118,7 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
           <RoleSelectionItem
             onClick={() =>
               setSelectedRole((prevRole) =>
-                prevRole === role.value ? userRole : role.value
+                prevRole === role.value ? userRole : role.value,
               )
             }
             key={index}
@@ -128,7 +128,7 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
         ))}
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-3">
-        <p className="text-muted-foreground text-[0.8rem] mt-3">
+        <p className="text-muted-foreground mt-3 text-[0.8rem]">
           Changing your role will affect the permissions and access you have on
           the platform.
         </p>
@@ -169,15 +169,15 @@ const RoleSelectionItem = ({
     <div
       onClick={onClick}
       className={cn(
-        `relative overflow-hidden rounded-lg border shadow-2x hover:shadow-3x cursor-pointer hover:dark:bg-${color}-900`,
-        isSelected && `dark:bg-${color}-900 hover:dark:bg-${color}-800`
+        `shadow-2x hover:shadow-3x relative cursor-pointer overflow-hidden rounded-lg border hover:dark:bg-${color}-900`,
+        isSelected && `dark:bg-${color}-900 hover:dark:bg-${color}-800`,
       )}
     >
       <div className="flex flex-col justify-between rounded-md p-3">
         {icon}
-        <div className="space-y-1 mt-3">
+        <div className="mt-3 space-y-1">
           <h3 className="text-sm font-medium">{title}</h3>
-          <p className="text-[0.8rem] text-muted-foreground">{description}</p>
+          <p className="text-muted-foreground text-[0.8rem]">{description}</p>
         </div>
       </div>
     </div>

@@ -3,6 +3,12 @@
     "label": "Đổi ngôn ngữ",
     "locale": "{locale, select, th {🇹🇭 ไทย} en {🇺🇸 English} tw {🇹🇼 中文} cn {🇨🇳 台灣} vi {🇻🇳 Tiếng Việt} other {Unknown}}"
   },
+  "NotFound": {
+    "title": "Không tìm thấy trang",
+    "description": "Xin lỗi, chúng tôi không thể tìm thấy trang bạn đang tìm kiếm.",
+    "goBack": "Quay lại",
+    "returnToWebsite": "Quay lại trang web"
+  },
   "MainNav": {
     "home": "Trang chủ",
     "about": "Về chúng tôi",
@@ -15,7 +21,28 @@
     "vocabulary": "Từ vựng",
     "testing": "Kiểm tra",
     "systemdashboard": "Bảng điều khiển hệ thống",
-    "teacherdashboard": "Bảng điều khiển giáo viên"
+    "teacherdashboard": "Bảng điều khiển giáo viên",
+    "reports": "Báo cáo",
+    "myClasses": "Lớp học của tôi",
+    "myStudents": "Học sinh của tôi",
+    "classRoster": "Danh sách lớp học",
+    "adminDashboard": "Bảng điều khiển quản trị",
+    "importdata": "Nhập dữ liệu",
+    "subItem": {
+      "admin": "Quản trị viên",
+      "teachers": "Giáo viên",
+      "students": "Học sinh",
+      "allTeachers": "Tất cả giáo viên",
+      "addTeacher": "Thêm giáo viên",
+      "allStudents": "Tất cả học sinh",
+      "addStudent": "Thêm học sinh",
+      "classrooms": "Lớp học",
+      "classRoster": "Danh sách lớp học",
+      "studentProgress": "Tiến độ học sinh",
+      "overviewReports": "Báo cáo tổng quan",
+      "performanceAnalytics": "Phân tích hiệu suất",
+      "progressTracking": "Theo dõi tiến độ"
+    }
   },
   "Question": {
     "SAQuestion": {
@@ -54,6 +81,42 @@
     "descriptionSuccess2": "Bạn đã hoàn thành bài kiểm tra {score} câu đúng trên {total} câu",
     "descriptionError": "Có lỗi xảy ra khi lấy câu hỏi",
     "descriptionLoading": "Đang lấy câu hỏi cho bài viết này. Vui lòng đợi trong giây lát"
+  },
+  "Admin": {
+    "Classrooms": {
+      "classrooms": "Lớp học",
+      "classroomsDescription": "Quản lý lớp học trong trường của bạn",
+      "searchPlaceholder": "Tìm kiếm lớp học...",
+      "createClassroom": "Tạo lớp học",
+      "createClassroomDescription": "Tạo lớp học mới cho học sinh",
+      "editClassroom": "Chỉnh sửa lớp học",
+      "editClassroomDescription": "Cập nhật thông tin lớp học",
+      "deleteClassroom": "Xóa lớp học",
+      "deleteClassroomDescription": "Bạn có chắc chắn muốn xóa lớp học này?",
+      "deleteClassroomWarning": "Hành động này không thể hoàn tác. Tất cả học sinh và giáo viên sẽ bị xóa khỏi lớp học này.",
+      "name": "Tên",
+      "namePlaceholder": "Nhập tên lớp học",
+      "grade": "Lớp",
+      "gradePlaceholder": "Nhập cấp lớp",
+      "classCode": "Mã lớp học",
+      "studentPassword": "Mật khẩu học sinh",
+      "studentPasswordPlaceholder": "Nhập mật khẩu cho học sinh",
+      "students": "Học sinh",
+      "teachers": "Giáo viên",
+      "createdAt": "Tạo lúc",
+      "expires": "Hết hạn",
+      "actions": "Hành động",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "cancel": "Hủy",
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "creating": "Đang tạo...",
+      "updating": "Đang cập nhật...",
+      "deleting": "Đang xóa...",
+      "noClassrooms": "Không tìm thấy lớp học",
+      "loading": "Đang tải lớp học..."
+    }
   },
   "Components": {
     "submitButton": "Gửi",
@@ -206,5 +269,9 @@
       "music_around_the_world": "Âm nhạc khắp thế giới",
       "craft_techniques_explained": "Giải thích kỹ thuật thủ công"
     }
+  },
+  "Reports": {
+    "title": "Báo cáo",
+    "description": "Xem tiến độ học sinh và phân tích lớp học"
   }
 }

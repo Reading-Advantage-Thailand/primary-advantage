@@ -3,6 +3,12 @@
     "label": "改变语言",
     "locale": "{locale, select, th {🇹🇭 ไทย} en {🇺🇸 English} tw {🇹🇼 中文} cn {🇨🇳 台灣} vi {🇻🇳 Tiếng Việt} other {Unknown}}"
   },
+  "NotFound": {
+    "title": "页面未找到",
+    "description": "抱歉，我们找不到您要查找的页面。",
+    "goBack": "返回",
+    "returnToWebsite": "返回网站"
+  },
   "MainNav": {
     "home": "主页",
     "about": "关于",
@@ -15,7 +21,28 @@
     "vocabulary": "单词",
     "testing": "测试",
     "systemdashboard": "系统仪表板",
-    "teacherdashboard": "教师仪表板"
+    "teacherdashboard": "教师仪表板",
+    "reports": "报告",
+    "myClasses": "我的班级",
+    "myStudents": "我的学生",
+    "classRoster": "班级名册",
+    "adminDashboard": "管理员仪表板",
+    "importdata": "导入数据",
+    "subItem": {
+      "admin": "管理员",
+      "teachers": "教师",
+      "students": "学生",
+      "allTeachers": "所有教师",
+      "addTeacher": "添加教师",
+      "allStudents": "所有学生",
+      "addStudent": "添加学生",
+      "classrooms": "教室",
+      "classRoster": "班级名册",
+      "studentProgress": "学生进度",
+      "overviewReports": "概览报告",
+      "performanceAnalytics": "性能分析",
+      "progressTracking": "进度跟踪"
+    }
   },
   "Question": {
     "SAQuestion": {
@@ -54,6 +81,42 @@
     "descriptionSuccess2": "您已完成测试 {score} 题正确，共 {total} 题",
     "descriptionError": "获取问题时发生错误",
     "descriptionLoading": "正在获取问题，请稍候"
+  },
+  "Admin": {
+    "Classrooms": {
+      "classrooms": "教室",
+      "classroomsDescription": "管理您学校的教室",
+      "searchPlaceholder": "搜索教室...",
+      "createClassroom": "创建教室",
+      "createClassroomDescription": "为学生创建新教室",
+      "editClassroom": "编辑教室",
+      "editClassroomDescription": "更新教室信息",
+      "deleteClassroom": "删除教室",
+      "deleteClassroomDescription": "您确定要删除这个教室吗？",
+      "deleteClassroomWarning": "此操作无法撤销。所有学生和教师都将从此教室中移除。",
+      "name": "名称",
+      "namePlaceholder": "输入教室名称",
+      "grade": "年级",
+      "gradePlaceholder": "输入年级",
+      "classCode": "班级代码",
+      "studentPassword": "学生密码",
+      "studentPasswordPlaceholder": "输入学生密码",
+      "students": "学生",
+      "teachers": "教师",
+      "createdAt": "创建时间",
+      "expires": "过期时间",
+      "actions": "操作",
+      "edit": "编辑",
+      "delete": "删除",
+      "cancel": "取消",
+      "create": "创建",
+      "update": "更新",
+      "creating": "创建中...",
+      "updating": "更新中...",
+      "deleting": "删除中...",
+      "noClassrooms": "未找到教室",
+      "loading": "正在加载教室..."
+    }
   },
   "Components": {
     "submitButton": "提交",
@@ -206,5 +269,9 @@
       "music_around_the_world": "世界各地的音乐",
       "craft_techniques_explained": "工艺技术解说"
     }
+  },
+  "Reports": {
+    "title": "报告",
+    "description": "查看学生进度和课堂分析"
   }
 }
