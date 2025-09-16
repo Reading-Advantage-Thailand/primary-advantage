@@ -117,3 +117,8 @@ export function formatDate(createdAt: Date): string {
   // For old items, show the actual date
   return createdAt.toLocaleDateString();
 }
+
+// Generate a random license key
+export function generateLicenseKey() {
+  return `${generateSecureCode(6)}-${generateSecureCode(6)}-${generateSecureCode(6)}`;
+}

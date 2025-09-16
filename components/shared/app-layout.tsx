@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/switchers/theme-switcher-toggle";
 import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -58,7 +59,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-screen flex-col space-y-6">
-      <header className="sticky top-0 z-40 border-b bg-background">
+      <header className="bg-background sticky top-0 z-40 border-b">
         <div className="container flex h-16 items-center justify-between py-4">
           <MainNav items={mainNavConfig} />
           {/* {!disableProgressBar && (
@@ -67,7 +68,7 @@ export default async function AppLayout({
               level={session.user.level!}
             />
           )} */}
-          <div className="flex justify-center items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <LocaleSwitcher />
             <ThemeToggle />
             <UserAccountNav user={session?.user} />
@@ -79,11 +80,11 @@ export default async function AppLayout({
           "container",
           disableSidebar
             ? "grid flex-1 gap-12"
-            : "mx-auto px-4 lg:grid lg:flex-1 gap-12 lg:grid-cols-[200px_1fr]"
+            : "mx-auto gap-12 px-4 lg:grid lg:flex-1 lg:grid-cols-[200px_1fr]",
         )}
       >
         {!disableSidebar && (
-          <aside className="lg:w-[230px] lg:flex-col lg:flex">
+          <aside className="lg:flex lg:w-[230px] lg:flex-col">
             <SidebarNav items={sidebarNavConfig || []} />
             {/* {user.license_id && !disableLeaderboard ? (
               <Leaderboard data={leaderboard} />

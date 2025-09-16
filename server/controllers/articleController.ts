@@ -1,11 +1,4 @@
-"use server";
-
-import {
-  ActivityType,
-  ArticleBaseCefrLevel,
-  ArticleType,
-  FlashcardType,
-} from "@/types/enum";
+import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
 import {
   generateArticles,
   getArticlesWithParams,

@@ -37,7 +37,7 @@ import { Button } from "./ui/button";
 import { ArrowUpDown, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { deleteFlashcardByIdAction } from "@/server/controllers/articleController";
+import { deleteFlashcardCard } from "@/actions/flashcard";
 import { formatDate } from "@/lib/utils";
 
 type Sentence = {
@@ -239,7 +239,7 @@ export default function ManageTab({ data }: ManageTabProps) {
 
   const handleDelete = async (id: string) => {
     startTransition(async () => {
-      const result = await deleteFlashcardByIdAction(id);
+      const result = await deleteFlashcardCard(id);
       if (result.success) {
         toast.success(result.message);
         setSentences(sentences.filter((sentence) => sentence.id !== id));

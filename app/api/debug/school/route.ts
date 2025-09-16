@@ -16,7 +16,7 @@ export async function GET() {
       include: {
         School: {
           include: {
-            license: true, // Direct relation
+            licenses: true, // Direct relation
           },
         },
       },
@@ -45,15 +45,13 @@ export async function GET() {
         ? {
             id: user.School.id,
             name: user.School.name,
-            licenseId: user.School.licenseId,
-            license: user.School.license,
+            licenses: user.School.licenses,
           }
         : null,
       allLicenses,
       debug: {
         hasSchool: !!user.School,
-        hasLicenseId: !!user.School?.licenseId,
-        hasLicense: !!user.School?.license,
+        hasLicenses: !!user.School?.licenses,
       },
     });
   } catch (error) {

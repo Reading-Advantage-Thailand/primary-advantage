@@ -40,6 +40,18 @@ export async function GET() {
                 },
               },
             },
+            licenses: {
+              select: {
+                id: true,
+                key: true,
+                name: true,
+                description: true,
+                maxUsers: true,
+                startDate: true,
+                expiryDate: true,
+                status: true,
+              },
+            },
           },
         },
       },
@@ -59,22 +71,10 @@ export async function GET() {
                 select: { id: true, name: true, email: true },
               })
             : null,
-          license: user.School.licenseId
-            ? await prisma.license.findUnique({
-                where: { id: user.School.licenseId },
-                select: {
-                  id: true,
-                  key: true,
-                  name: true,
-                  description: true,
-                  maxUsers: true,
-                  startDate: true,
-                  expiryDate: true,
-                  expiryDays: true,
-                  status: true,
-                },
-              })
-            : null,
+          license:
+            user.School.licenses && user.School.licenses.length > 0
+              ? user.School.licenses[0]
+              : null,
         }
       : null;
 
@@ -147,19 +147,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    console.log(
+      "Current user roles:",
+      currentUser.roles.map((r) => r.role.name),
+    );
+
     // Check if user has Admin role
     const hasAdminRole = currentUser.roles.some(
       (userRole) => userRole.role.name === "Admin",
     );
 
+    console.log("Has admin role:", hasAdminRole);
+
+    // Check what roles exist in the database
+    const allRoles = await prisma.role.findMany();
+    console.log(
+      "All roles in database:",
+      allRoles.map((r) => r.name),
+    );
+
     // If user doesn't have Admin role and is currently User or Teacher, upgrade them
     if (!hasAdminRole) {
       const currentRoles = currentUser.roles.map((ur) => ur.role.name);
+      console.log("Current roles:", currentRoles);
+      console.log(
+        "Checking for User or Teacher:",
+        currentRoles.includes("User") || currentRoles.includes("Teacher"),
+      );
+
       if (currentRoles.includes("User") || currentRoles.includes("Teacher")) {
         // Find or create Admin role
         let adminRole = await prisma.role.findFirst({
           where: { name: "Admin" },
         });
+
+        console.log("Found Admin role:", adminRole);
 
         if (!adminRole) {
           adminRole = await prisma.role.create({
@@ -216,6 +238,18 @@ export async function POST(request: NextRequest) {
             },
           },
         },
+        licenses: {
+          select: {
+            id: true,
+            key: true,
+            name: true,
+            description: true,
+            maxUsers: true,
+            startDate: true,
+            expiryDate: true,
+            status: true,
+          },
+        },
       },
     });
 
@@ -226,32 +260,24 @@ export async function POST(request: NextRequest) {
         where: { id: session.user.id },
         select: { id: true, name: true, email: true },
       }),
-      license: school.licenseId
-        ? await prisma.license.findUnique({
-            where: { id: school.licenseId },
-            select: {
-              id: true,
-              key: true,
-              name: true,
-              description: true,
-              maxUsers: true,
-              startDate: true,
-              expiryDate: true,
-              expiryDays: true,
-              status: true,
-            },
-          })
-        : null,
+      license:
+        school.licenses && school.licenses.length > 0
+          ? school.licenses[0]
+          : null,
     };
 
     // Return success with role upgrade information
+    const roleUpgraded =
+      !hasAdminRole &&
+      currentUser.roles.some(
+        (ur) => ur.role.name === "User" || ur.role.name === "Teacher",
+      );
+
+    console.log("Role upgraded calculation:", { hasAdminRole, roleUpgraded });
+
     const responseData = {
       ...schoolWithOwner,
-      roleUpgraded:
-        !hasAdminRole &&
-        currentUser.roles.some(
-          (ur) => ur.role.name === "User" || ur.role.name === "Teacher",
-        ),
+      roleUpgraded,
     };
 
     return NextResponse.json(responseData, { status: 201 });
@@ -342,6 +368,18 @@ export async function PATCH(request: NextRequest) {
             },
           },
         },
+        licenses: {
+          select: {
+            id: true,
+            key: true,
+            name: true,
+            description: true,
+            maxUsers: true,
+            startDate: true,
+            expiryDate: true,
+            status: true,
+          },
+        },
       },
     });
 
@@ -354,22 +392,10 @@ export async function PATCH(request: NextRequest) {
             select: { id: true, name: true, email: true },
           })
         : null,
-      license: updatedSchool.licenseId
-        ? await prisma.license.findUnique({
-            where: { id: updatedSchool.licenseId },
-            select: {
-              id: true,
-              key: true,
-              name: true,
-              description: true,
-              maxUsers: true,
-              startDate: true,
-              expiryDate: true,
-              expiryDays: true,
-              status: true,
-            },
-          })
-        : null,
+      license:
+        updatedSchool.licenses && updatedSchool.licenses.length > 0
+          ? updatedSchool.licenses[0]
+          : null,
     };
 
     return NextResponse.json(schoolWithOwner);
@@ -424,10 +450,60 @@ export async function DELETE() {
       );
     }
 
+    // Get owner's current roles before deleting school
+    const ownerWithRoles = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+
     // Delete the school (this will cascade delete related records)
     await prisma.school.delete({
       where: { id: user.School.id },
     });
+
+    // Downgrade owner's role from Admin to User if they have Admin role
+    if (ownerWithRoles) {
+      const hasAdminRole = ownerWithRoles.roles.some(
+        (ur) => ur.role.name === "Admin",
+      );
+
+      if (hasAdminRole) {
+        // Find or create User role
+        let userRole = await prisma.role.findFirst({
+          where: { name: "User" },
+        });
+
+        if (!userRole) {
+          userRole = await prisma.role.create({
+            data: { name: "User" },
+          });
+        }
+
+        // Remove all existing roles and set User role
+        await prisma.userRole.deleteMany({
+          where: { userId: session.user.id },
+        });
+
+        await prisma.userRole.create({
+          data: {
+            userId: session.user.id,
+            roleId: userRole.id,
+          },
+        });
+
+        // Remove school association
+        await prisma.user.update({
+          where: { id: session.user.id },
+          data: { schoolId: null },
+        });
+      }
+    }
 
     return NextResponse.json({ message: "School deleted successfully" });
   } catch (error) {

@@ -25,6 +25,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const schoolFormSchema = z.object({
   name: z
@@ -62,7 +64,8 @@ export function SchoolProfileForm({
   onCancel,
 }: SchoolProfileFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-
+  const { data: session, update } = useSession();
+  const router = useRouter();
   const form = useForm<SchoolFormData>({
     resolver: zodResolver(schoolFormSchema),
     defaultValues: {
@@ -98,6 +101,15 @@ export function SchoolProfileForm({
 
       const school = await response.json();
 
+      console.log("school", school);
+
+      if (school.roleUpgraded) {
+        await update({
+          ...session,
+          user: { ...session?.user, role: "Admin" },
+        });
+      }
+
       toast.success("School created successfully!", {
         description: school.roleUpgraded
           ? `${school.name} has been created and you've been upgraded to Admin to access admin features.`
@@ -115,6 +127,7 @@ export function SchoolProfileForm({
       });
     } finally {
       setIsLoading(false);
+      router.refresh();
     }
   };
 

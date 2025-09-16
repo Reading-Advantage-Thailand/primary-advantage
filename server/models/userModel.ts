@@ -19,17 +19,44 @@ export const createUser = async (data: {
 
     const hashedPassword = bcrypt.hashSync(data.password, 10);
 
-    await prisma.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        password: hashedPassword,
-      },
+    // Find the User role
+    const userRole = await prisma.role.findFirst({
+      where: { name: "User" },
     });
+
+    if (!userRole) {
+      return {
+        error: "Default user role not found",
+      };
+    }
+
+    // Create user with transaction to ensure role assignment
+    const newUser = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: hashedPassword,
+        },
+      });
+
+      // Assign the User role to the new user
+      await tx.userRole.create({
+        data: {
+          userId: user.id,
+          roleId: userRole.id,
+        },
+      });
+
+      return user;
+    });
+
     return {
       success: "User created successfully",
+      user: newUser,
     };
   } catch (error) {
+    console.error("Error creating user:", error);
     return {
       error: "Error creating user",
     };

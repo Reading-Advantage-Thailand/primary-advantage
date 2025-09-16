@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Plus,
   Pencil,
@@ -41,6 +43,7 @@ import {
   GraduationCap,
   Search,
   Loader2,
+  School,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
@@ -54,10 +57,22 @@ import {
 // Updated Teacher interface to match API response
 interface Teacher extends Omit<TeacherData, "createdAt"> {
   createdAt: Date;
+  assignedClassrooms?: Array<{
+    id: string;
+    name: string;
+  }>;
+}
+
+interface Classroom {
+  id: string;
+  name: string;
+  grade: string | null;
+  studentCount: number;
 }
 
 export function TeachersTable() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [statistics, setStatistics] = useState({
     totalTeachers: 0,
     totalStudents: 0,
@@ -66,6 +81,7 @@ export function TeachersTable() {
     activeTeachers: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isClassroomsLoading, setIsClassroomsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -76,7 +92,10 @@ export function TeachersTable() {
     email: "",
     role: "Teacher" as "Teacher" | "Admin",
     cefrLevel: "A1",
+    assignedClassroomIds: [] as string[],
+    password: "",
   });
+  const [showPasswordField, setShowPasswordField] = useState(false);
 
   // Fetch teachers data from API
   const fetchTeachers = async () => {
@@ -106,9 +125,46 @@ export function TeachersTable() {
     }
   };
 
+  // Fetch available classrooms for assignment
+  const fetchClassrooms = async () => {
+    try {
+      setIsClassroomsLoading(true);
+      console.log("🔍 Fetching classrooms...");
+      const response = await fetch("/api/classrooms");
+
+      console.log("🔍 Classrooms response status:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("🔍 Classrooms fetch error:", errorText);
+        throw new Error(
+          `Failed to fetch classrooms: ${response.status} ${errorText}`,
+        );
+      }
+
+      const data = await response.json();
+      console.log("🔍 Classrooms data received:", data);
+
+      // Handle both possible response formats
+      const classroomsArray = Array.isArray(data)
+        ? data
+        : data.classrooms || [];
+      console.log("🔍 Setting classrooms:", classroomsArray);
+      setClassrooms(classroomsArray);
+    } catch (error) {
+      console.error("🔍 Error fetching classrooms:", error);
+      toast.error(
+        `Failed to load classrooms: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    } finally {
+      setIsClassroomsLoading(false);
+    }
+  };
+
   // Load data on component mount
   useEffect(() => {
     fetchTeachers();
+    fetchClassrooms();
   }, []);
 
   // Filter teachers based on search term
@@ -120,12 +176,19 @@ export function TeachersTable() {
 
   const handleAddTeacher = async () => {
     try {
-      const requestData: CreateTeacherRequest = {
+      const requestData: CreateTeacherRequest & {
+        classroomIds?: string[];
+        password?: string;
+      } = {
         name: formData.name,
         email: formData.email,
         role: formData.role,
         cefrLevel: formData.cefrLevel,
+        classroomIds: formData.assignedClassroomIds,
+        ...(formData.password && { password: formData.password }),
       };
+
+      console.log("🔍 Creating teacher with data:", requestData);
 
       const response = await fetch("/api/teachers", {
         method: "POST",
@@ -135,10 +198,16 @@ export function TeachersTable() {
         body: JSON.stringify(requestData),
       });
 
+      console.log("🔍 Create teacher response status:", response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("🔍 Create teacher error:", errorData);
         throw new Error(errorData.error || "Failed to create teacher");
       }
+
+      const result = await response.json();
+      console.log("🔍 Teacher created successfully:", result);
 
       toast.success("Teacher created successfully");
 
@@ -146,7 +215,7 @@ export function TeachersTable() {
       resetForm();
       fetchTeachers(); // Refresh the list
     } catch (error: any) {
-      console.error("Error creating teacher:", error);
+      console.error("🔍 Error creating teacher:", error);
       toast.error(error.message || "Failed to create teacher");
     }
   };
@@ -155,12 +224,20 @@ export function TeachersTable() {
     if (!selectedTeacher) return;
 
     try {
-      const requestData: UpdateTeacherRequest = {
+      const requestData: UpdateTeacherRequest & {
+        classroomIds?: string[];
+        password?: string;
+      } = {
         name: formData.name,
         email: formData.email,
         role: formData.role,
         cefrLevel: formData.cefrLevel,
+        classroomIds: formData.assignedClassroomIds,
+        ...(formData.password && { password: formData.password }),
       };
+
+      console.log("🔍 Updating teacher with data:", requestData);
+      console.log("🔍 Selected teacher ID:", selectedTeacher.id);
 
       const response = await fetch(`/api/teachers/${selectedTeacher.id}`, {
         method: "PUT",
@@ -170,10 +247,16 @@ export function TeachersTable() {
         body: JSON.stringify(requestData),
       });
 
+      console.log("🔍 Update teacher response status:", response.status);
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("🔍 Update teacher error:", errorData);
         throw new Error(errorData.error || "Failed to update teacher");
       }
+
+      const result = await response.json();
+      console.log("🔍 Teacher updated successfully:", result);
 
       toast.success("Teacher updated successfully");
 
@@ -182,7 +265,7 @@ export function TeachersTable() {
       setSelectedTeacher(null);
       fetchTeachers(); // Refresh the list
     } catch (error: any) {
-      console.error("Error updating teacher:", error);
+      console.error("🔍 Error updating teacher:", error);
       toast.error(error.message || "Failed to update teacher");
     }
   };
@@ -218,7 +301,10 @@ export function TeachersTable() {
       email: teacher.email || "",
       role: teacher.role as "Teacher" | "Admin",
       cefrLevel: teacher.cefrLevel || "A1",
+      assignedClassroomIds: teacher.assignedClassrooms?.map((c) => c.id) || [],
+      password: "",
     });
+    setShowPasswordField(false);
     setIsEditDialogOpen(true);
   };
 
@@ -233,7 +319,10 @@ export function TeachersTable() {
       email: "",
       role: "Teacher",
       cefrLevel: "A1",
+      assignedClassroomIds: [],
+      password: "",
     });
+    setShowPasswordField(false);
   };
 
   const getInitials = (name: string | null) => {
@@ -398,6 +487,87 @@ export function TeachersTable() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="add-password">Password (Optional)</Label>
+                  <Input
+                    id="add-password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    placeholder="Leave empty for auto-generated password"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Assign Classrooms</Label>
+                  <div className="rounded-lg border p-3">
+                    {isClassroomsLoading ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <span className="text-muted-foreground text-sm">
+                          Loading classrooms...
+                        </span>
+                      </div>
+                    ) : classrooms.length === 0 ? (
+                      <p className="text-muted-foreground py-4 text-center text-sm">
+                        No classrooms available
+                      </p>
+                    ) : (
+                      <ScrollArea className="h-32">
+                        <div className="space-y-2">
+                          {classrooms.map((classroom) => (
+                            <div
+                              key={classroom.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`add-classroom-${classroom.id}`}
+                                checked={formData.assignedClassroomIds.includes(
+                                  classroom.id,
+                                )}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setFormData({
+                                      ...formData,
+                                      assignedClassroomIds: [
+                                        ...formData.assignedClassroomIds,
+                                        classroom.id,
+                                      ],
+                                    });
+                                  } else {
+                                    setFormData({
+                                      ...formData,
+                                      assignedClassroomIds:
+                                        formData.assignedClassroomIds.filter(
+                                          (id) => id !== classroom.id,
+                                        ),
+                                    });
+                                  }
+                                }}
+                              />
+                              <Label
+                                htmlFor={`add-classroom-${classroom.id}`}
+                                className="flex cursor-pointer items-center gap-2 text-sm font-normal"
+                              >
+                                <School className="h-3 w-3" />
+                                {classroom.name}
+                                {classroom.grade && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {classroom.grade}
+                                  </Badge>
+                                )}
+                                <span className="text-muted-foreground">
+                                  ({classroom.studentCount} students)
+                                </span>
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    )}
+                  </div>
+                </div>
               </div>
               <DialogFooter>
                 <Button
@@ -424,6 +594,7 @@ export function TeachersTable() {
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>CEFR Level</TableHead>
+                <TableHead>Assigned Classrooms</TableHead>
                 <TableHead>Students</TableHead>
                 <TableHead>Classes</TableHead>
                 <TableHead>Joined</TableHead>
@@ -433,7 +604,7 @@ export function TeachersTable() {
             <TableBody>
               {filteredTeachers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-8 text-center">
+                  <TableCell colSpan={9} className="py-8 text-center">
                     <div className="flex flex-col items-center gap-2">
                       {isLoading ? (
                         <>
@@ -489,6 +660,27 @@ export function TeachersTable() {
                       <Badge variant="outline">
                         {teacher.cefrLevel || "N/A"}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {teacher.assignedClassrooms &&
+                        teacher.assignedClassrooms.length > 0 ? (
+                          teacher.assignedClassrooms.map((classroom) => (
+                            <Badge
+                              key={classroom.id}
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              <School className="mr-1 h-3 w-3" />
+                              {classroom.name}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-muted-foreground text-sm">
+                            No classrooms assigned
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>{teacher.totalStudents}</TableCell>
                     <TableCell>{teacher.totalClasses}</TableCell>
@@ -591,6 +783,99 @@ export function TeachersTable() {
                   <SelectItem value="C2">C2 - Proficient</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <Label>Reset Password</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPasswordField(!showPasswordField)}
+                >
+                  {showPasswordField ? "Cancel" : "Set New Password"}
+                </Button>
+              </div>
+              {showPasswordField && (
+                <Input
+                  id="edit-password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder="Enter new password"
+                />
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label>Assign Classrooms</Label>
+              <div className="rounded-lg border p-3">
+                {isClassroomsLoading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <span className="text-muted-foreground text-sm">
+                      Loading classrooms...
+                    </span>
+                  </div>
+                ) : classrooms.length === 0 ? (
+                  <p className="text-muted-foreground py-4 text-center text-sm">
+                    No classrooms available
+                  </p>
+                ) : (
+                  <ScrollArea className="h-32">
+                    <div className="space-y-2">
+                      {classrooms.map((classroom) => (
+                        <div
+                          key={classroom.id}
+                          className="flex items-center space-x-2"
+                        >
+                          <Checkbox
+                            id={`edit-classroom-${classroom.id}`}
+                            checked={formData.assignedClassroomIds.includes(
+                              classroom.id,
+                            )}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setFormData({
+                                  ...formData,
+                                  assignedClassroomIds: [
+                                    ...formData.assignedClassroomIds,
+                                    classroom.id,
+                                  ],
+                                });
+                              } else {
+                                setFormData({
+                                  ...formData,
+                                  assignedClassroomIds:
+                                    formData.assignedClassroomIds.filter(
+                                      (id) => id !== classroom.id,
+                                    ),
+                                });
+                              }
+                            }}
+                          />
+                          <Label
+                            htmlFor={`edit-classroom-${classroom.id}`}
+                            className="flex cursor-pointer items-center gap-2 text-sm font-normal"
+                          >
+                            <School className="h-3 w-3" />
+                            {classroom.name}
+                            {classroom.grade && (
+                              <Badge variant="outline" className="text-xs">
+                                {classroom.grade}
+                              </Badge>
+                            )}
+                            <span className="text-muted-foreground">
+                              ({classroom.studentCount} students)
+                            </span>
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </div>
             </div>
           </div>
           <DialogFooter>

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Cabin_Sketch } from "next/font/google";
 import "@/styles/globals.css";
 import { NextIntlClientProvider, hasLocale, Locale } from "next-intl";
 import { notFound } from "next/navigation";
@@ -11,17 +10,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/lib/auth";
 import { LayoutProvider } from "@/hooks/use-layout";
-
-const cabinSketch = Cabin_Sketch({
-  variable: "--font-cabin-sketch",
-  subsets: ["latin"],
-  weight: "400",
-});
-const cabinSketchBold = Cabin_Sketch({
-  variable: "--font-cabin-sketch-bold",
-  subsets: ["latin"],
-  weight: "700",
-});
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -75,14 +63,10 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <SessionProvider
-      session={session}
-      refetchInterval={5 * 60}
-      refetchOnWindowFocus={true}
-    >
+    <SessionProvider session={session}>
       <html lang={locale} suppressHydrationWarning>
         <body
-          className={`${cabinSketch.variable} ${cabinSketchBold.variable} ${fontSans.variable} bg-background min-h-screen font-sans antialiased`}
+          className={` ${fontSans.variable} bg-background min-h-screen font-sans antialiased`}
         >
           <ThemeProvider
             attribute="class"

@@ -123,7 +123,7 @@ export const createTeacherController = async (
     }
 
     const body = await request.json();
-    const { name, email, role, cefrLevel, password } =
+    const { name, email, role, cefrLevel, password, classroomIds } =
       body as CreateTeacherInput;
 
     // Validate required fields
@@ -150,6 +150,7 @@ export const createTeacherController = async (
       role,
       cefrLevel: cefrLevel || "A1",
       password,
+      classroomIds,
       userWithRoles,
     });
 

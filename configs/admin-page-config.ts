@@ -29,8 +29,8 @@ export const adminPageConfig: PageConfig = {
       title: "dashboard",
       href: "/admin/dashboard",
       icon: "LayoutDashboardIcon",
-      requiredPermissions: ["SYSTEM_ACCESS"],
-      hideWhenNoPermission: true,
+      requiredPermissions: ["ADMIN_ACCESS"],
+      // hideWhenNoPermission: true,
       items: [
         {
           title: "admin",
@@ -42,13 +42,15 @@ export const adminPageConfig: PageConfig = {
           title: "teachers",
           href: "/admin/dashboard/teachers",
           icon: "ChevronRightIcon",
-          requiredPermissions: ["ADMIN_ACCESS"],
+          requiredPermissions: ["SYSTEM_ACCESS"],
+          hideWhenNoPermission: true,
         },
         {
           title: "students",
           href: "/admin/dashboard/students",
           icon: "ChevronRightIcon",
-          requiredPermissions: ["ADMIN_ACCESS"],
+          requiredPermissions: ["SYSTEM_ACCESS"],
+          hideWhenNoPermission: true,
         },
       ],
     },

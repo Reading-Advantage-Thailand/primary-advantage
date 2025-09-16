@@ -53,8 +53,11 @@ const csvFileSchema = z.object({
   name: z
     .string()
     .refine(
-      (name) => ["classes.csv", "users.csv"].includes(name.toLowerCase()),
-      "Only classes.csv or users.csv files are allowed",
+      (name) =>
+        ["classes.csv", "students.csv", "teachers.csv"].includes(
+          name.toLowerCase(),
+        ),
+      "Only classes.csv or students.csv or teachers.csv files are allowed",
     ),
   size: z.number().max(5 * 1024 * 1024, "File size must be less than 5MB"),
   type: z
@@ -297,6 +300,7 @@ export async function POST(request: NextRequest) {
       }
       parseTimer.end("CSV validation completed");
     } catch (parseError) {
+      console.error("CSV parsing failed", parseError);
       return NextResponse.json(
         {
           error: "CSV parsing failed",
@@ -320,7 +324,7 @@ export async function POST(request: NextRequest) {
       let expectedHeaders: string[] = [];
       let headerSchema: z.ZodSchema;
 
-      if (filename === "users.csv") {
+      if (filename === "students.csv" || filename === "teachers.csv") {
         expectedHeaders = expectedHeadersUsers;
       } else if (filename === "classes.csv") {
         expectedHeaders = expectedHeadersClasses;
@@ -350,7 +354,7 @@ export async function POST(request: NextRequest) {
     const processedUsers: any[] = [];
     const errors: string[] = [];
 
-    if (filename === "users.csv") {
+    if (filename === "students.csv" || filename === "teachers.csv") {
       console.log("📊 Starting users CSV validation and processing...");
 
       // Pre-process and validate all rows first
@@ -705,7 +709,7 @@ export async function POST(request: NextRequest) {
     let studentAssignments = 0;
     let teacherAssignments = 0;
 
-    if (filename === "users.csv") {
+    if (filename === "students.csv" || filename === "teachers.csv") {
       console.log("👥 Starting user creation and assignment processes...");
       // Get all roles from database
       const roles = await prisma.role.findMany();
@@ -958,7 +962,7 @@ export async function POST(request: NextRequest) {
         `Students: ${studentAssignments}, Teachers: ${teacherAssignments}, Users assigned: ${classroomsAssigned}`,
       );
 
-      // Update createdClassrooms for response (empty for users.csv)
+      // Update createdClassrooms for response (empty for students.csv or teachers.csv)
       createdClassrooms = [];
     }
 
@@ -994,7 +998,7 @@ export async function POST(request: NextRequest) {
       errors: errors.length,
     };
 
-    if (filename === "users.csv") {
+    if (filename === "students.csv" || filename === "teachers.csv") {
       message = "Users uploaded and created successfully";
       note =
         "Users created with default values: password=null, cefrLevel=A1-, level=1, xp=0. Users need to set passwords before they can log in.";
@@ -1040,7 +1044,7 @@ export async function POST(request: NextRequest) {
             id: currentUser.School.id,
             name: currentUser.School.name,
             note:
-              filename === "users.csv"
+              filename === "students.csv" || filename === "teachers.csv"
                 ? "All imported users have been assigned to this school"
                 : "All imported classes have been assigned to this school",
           }
