@@ -127,25 +127,25 @@ const benefits = [
 export default function Home() {
   return (
     <div>
-      <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-3">
-        <div className="container flex max-w-[64rem] py-36 flex-col items-center gap-4 text-center ">
+      <section className="space-y-6 pt-6 pb-8 md:pt-10 md:pb-12 lg:py-3">
+        <div className="container flex max-w-[64rem] flex-col items-center gap-4 py-36 text-center">
           <h1
             id="onborda-step1"
-            className="font-heading animate-glow text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white"
+            className="font-logo animate-glow text-3xl text-white sm:text-5xl md:text-6xl lg:text-7xl"
           >
             {siteConfig.name}
           </h1>
-          <h2 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl ">
+          <h2 className="font-logo text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
             <span>Help Young Students Become</span>
             <span className="text-green-500"> Amazing Readers </span>
             <span>with AI-Powered Fun!</span>
           </h2>
-          <p className="max-w-[42rem] font-heading leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+          <p className="font-logo text-muted-foreground max-w-[42rem] leading-normal sm:text-xl sm:leading-8">
             Reading adventures tailored for ages 8-12 (Grades 3-6).
           </p>
           <div className="relative">
             <div className="absolute -inset-2 rounded-lg bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-gray-600 via-purple-600 to-zinc-600 opacity-50 blur-2xl"></div>
-            <div className="relative flex w-60 h-14 items-center justify-center border border-zinc-700 rounded-lg text-white bg-[#172554] font-heading text-xl cursor-pointer hover:scale-105 transition-transform duration-300 ease-in-out dark:bg-white dark:text-black">
+            <div className="font-logo relative flex h-14 w-60 cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-[#172554] text-xl text-white transition-transform duration-300 ease-in-out hover:scale-105 dark:bg-white dark:text-black">
               <Link href={"/auth/signin"}>Get Started Now!</Link>
             </div>
           </div>
@@ -162,10 +162,10 @@ export default function Home() {
       <div className="bg-[#172554]">
         <section
           id="features"
-          className="container space-y-6 py-8 md:py-12 lg:py-24 my-[-2px]" // Keep styling
+          className="container my-[-2px] space-y-6 py-8 md:py-12 lg:py-24" // Keep styling
         >
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-            <h2 className="font-heading text-white animate-glow text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
+            <h2 className="font-logo animate-glow text-3xl leading-[1.1] text-white sm:text-3xl md:text-6xl">
               Cool Features
             </h2>
             <p className="max-w-[85%] leading-normal text-gray-400 sm:text-lg sm:leading-7">
@@ -181,10 +181,10 @@ export default function Home() {
         </section>
         <section
           id="benefits"
-          className="container space-y-6 py-8 md:py-12 lg:py-24 bg-[#172554] my-[-2px]"
+          className="container my-[-2px] space-y-6 bg-[#172554] py-8 md:py-12 lg:py-24"
         >
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-            <h2 className="font-heading text-white animate-glow text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
+            <h2 className="font-logo animate-glow text-3xl leading-[1.1] text-white sm:text-3xl md:text-6xl">
               Why Schools Love Primary Advantage
             </h2>
             <p className="max-w-[85%] leading-normal text-gray-400 sm:text-lg sm:leading-7">
@@ -209,16 +209,16 @@ export default function Home() {
       </svg>
       <section id="contact-us" className="container py-8 md:py-12 lg:py-24">
         <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
-          <h2 className="font-heading text-white animate-glow text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
+          <h2 className="font-logo animate-glow text-3xl leading-[1.1] text-white sm:text-3xl md:text-6xl">
             Let&apos;s Get in Touch
           </h2>
-          <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
+          <p className="text-muted-foreground max-w-[85%] leading-normal sm:text-lg sm:leading-7">
             Have a question or need more information? Contact us today to learn
             more about our platform.
           </p>
-          <Card className="mt-10 text-start w-full">
+          <Card className="mt-10 w-full text-start">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl dark:text-white text-black">
+              <CardTitle className="text-2xl text-black dark:text-white">
                 Contact Us
               </CardTitle>
               <CardDescription>
@@ -268,13 +268,13 @@ export default function Home() {
       </section>
       <section
         id="start-free-trial"
-        className="container py-8 md:py-12 lg:py-24 mb-20"
+        className="container mb-20 py-8 md:py-12 lg:py-24"
       >
         <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
-          <h2 className="font-heading text-white animate-glow text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
+          <h2 className="font-logo animate-glow text-3xl leading-[1.1] text-white sm:text-3xl md:text-6xl">
             Ready for a Primary Adventure?
           </h2>
-          <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
+          <p className="text-muted-foreground max-w-[85%] leading-normal sm:text-lg sm:leading-7">
             Start your free trial and see how fun reading can be with Primary
             Advantage!{" "}
             <Link

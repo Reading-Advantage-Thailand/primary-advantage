@@ -1,5 +1,3 @@
-// // ... existing imports ...
-
 // interface BatchGenerateParams {
 //   type: ArticleType;
 //   level: ArticleBaseCefrLevel;

@@ -41,6 +41,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { AddAdminDialog } from "./add-admin-dialog";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface SchoolAdmin {
   id: string;
@@ -100,8 +102,9 @@ export function SchoolDetail({
   const currentUser = useCurrentUser();
   const [isDeleting, setIsDeleting] = useState(false);
   const [removingAdminId, setRemovingAdminId] = useState<string | null>(null);
+  const { data: session, update } = useSession();
+  const router = useRouter();
 
-  console.log(school);
   const isOwner = currentUser?.id === school.ownerId;
 
   const handleDelete = async () => {
@@ -116,6 +119,13 @@ export function SchoolDetail({
         throw new Error(errorData.message || "Failed to delete school");
       }
 
+      if (response.ok) {
+        await update({
+          ...session,
+          user: { ...session?.user, role: "User" },
+        });
+      }
+
       toast.success("School deleted successfully!");
       onDelete();
     } catch (error) {
@@ -127,6 +137,7 @@ export function SchoolDetail({
       });
     } finally {
       setIsDeleting(false);
+      router.refresh();
     }
   };
 

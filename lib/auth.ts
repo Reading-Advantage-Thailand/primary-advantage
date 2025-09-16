@@ -84,7 +84,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user) {
         token.id = user.id as string;
         token.email = user.email as string;
@@ -95,10 +95,46 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.cefrLevel = user.cefrLevel;
       }
 
+      if (trigger === "update" && token.email) {
+        const dbUser = await getUserByEmail(token.email as string);
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.email = dbUser.email as string;
+          token.name = dbUser.name as string;
+          token.xp = dbUser.xp;
+          token.level = dbUser.level;
+          token.cefrLevel = dbUser.cefrLevel as string;
+          token.role = dbUser.roles.map((role) => role.role.name).join(", ");
+        }
+      }
+
       // Handle Google OAuth users
       if (account?.provider === "google" && user?.email) {
         // Fetch user from database to get role
         const dbUser = await getUserByEmail(user.email);
+
+        const role = await prisma.role.findFirst({
+          where: { name: "USER" },
+        });
+
+        if (!dbUser) {
+          const newUser = await prisma.user.create({
+            data: {
+              name: user.name || "",
+              email: user.email!,
+              image: user.image,
+              emailVerified: new Date(),
+            },
+          });
+
+          await prisma.userRole.create({
+            data: {
+              userId: newUser.id,
+              roleId: role?.id as string,
+            },
+          });
+        }
+
         if (dbUser) {
           token.id = dbUser.id;
           token.role = dbUser.roles.map((role) => role.role.name).join(", ");

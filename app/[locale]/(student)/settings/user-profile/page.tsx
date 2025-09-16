@@ -29,12 +29,12 @@ export default async function UserProfileSettingsPage() {
       />
       <Link
         href="/student/read"
-        className="inline-block mb-4 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+        className="mb-4 inline-block text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
       >
         &larr; Back to Reading Page
       </Link>
       <Separator className="my-4" />
-      <div className="mx-2 flex gap-4 flex-col md:flex-row">
+      <div className="mx-2 flex flex-col gap-4 md:flex-row">
         <div className="w-full">
           <ChangeUsernameForm
             username={session.user.name as string}
@@ -177,7 +177,7 @@ const DisplaySettingInfo: React.FC<DisplaySettingInfoProps> = ({
   showVerified = false,
 }) => (
   <>
-    <div className="text-sm font-medium mt-3">
+    <div className="mt-3 text-sm font-medium">
       {title}
       {badge && (
         <Badge className="ml-2" variant="secondary">
@@ -185,19 +185,19 @@ const DisplaySettingInfo: React.FC<DisplaySettingInfoProps> = ({
         </Badge>
       )}
     </div>
-    {desc && <p className="text-[0.8rem] text-muted-foreground mt-2">{desc}</p>}
+    {desc && <p className="text-muted-foreground mt-2 text-[0.8rem]">{desc}</p>}
     {data && (
-      <div className="flex justify-between items-center text-[0.8rem] text-muted-foreground rounded-lg border bg-card shadow px-3 py-2 my-2">
+      <div className="text-muted-foreground bg-card my-2 flex items-center justify-between rounded-lg border px-3 py-2 text-[0.8rem] shadow">
         <p>{data}</p>
         {showVerified && (
           <div className="flex items-center gap-1">
             {verified ? (
-              <span className="text-green-800 dark:text-green-300 flex items-center gap-1">
+              <span className="flex items-center gap-1 text-green-800 dark:text-green-300">
                 <BadgeCheck size={16} />
                 Verified
               </span>
             ) : (
-              <span className="text-red-800 dark:text-red-300 flex items-center gap-1">
+              <span className="flex items-center gap-1 text-red-800 dark:text-red-300">
                 {/* <Icons.unVerified size={16} /> */}
                 Not verified
               </span>

@@ -142,6 +142,11 @@ export const getTeachers = async (
         cefrLevel: teacher.cefrLevel,
         totalStudents,
         totalClasses,
+        assignedClassrooms: teacher.ClassroomTeachers.map((ct) => ({
+          id: ct.classroom.id,
+          name: ct.classroom.name,
+          grade: ct.classroom.grade,
+        })),
       };
     });
 
@@ -232,6 +237,11 @@ export const getTeacherById = async (
       cefrLevel: teacher.cefrLevel,
       totalStudents,
       totalClasses,
+      assignedClassrooms: teacher.ClassroomTeachers.map((ct) => ({
+        id: ct.classroom.id,
+        name: ct.classroom.name,
+        grade: ct.classroom.grade,
+      })),
     };
 
     console.log("Teacher Model: Successfully fetched teacher:", teacherData.id);
@@ -249,9 +259,18 @@ export const createTeacher = async (params: {
   role: string;
   cefrLevel: string;
   password?: string;
+  classroomIds?: string[];
   userWithRoles: UserWithRoles;
 }): Promise<{ success: boolean; teacher?: TeacherData; error?: string }> => {
-  const { name, email, role, cefrLevel, password, userWithRoles } = params;
+  const {
+    name,
+    email,
+    role,
+    cefrLevel,
+    password,
+    classroomIds,
+    userWithRoles,
+  } = params;
 
   try {
     console.log("Teacher Model: Creating teacher with email:", email);
@@ -287,37 +306,92 @@ export const createTeacher = async (params: {
       ? bcrypt.hashSync(password, 10)
       : bcrypt.hashSync(Math.random().toString(36).slice(-8), 10);
 
-    // Create the new teacher
-    const newTeacher = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        cefrLevel,
-        schoolId,
-        roles: {
-          create: {
-            roleId: roleRecord.id,
+    // Validate classroom IDs if provided
+    if (classroomIds && classroomIds.length > 0) {
+      const validClassrooms = await prisma.classroom.findMany({
+        where: {
+          id: { in: classroomIds },
+          schoolId: schoolId, // Ensure classrooms belong to the same school
+        },
+      });
+
+      if (validClassrooms.length !== classroomIds.length) {
+        return {
+          success: false,
+          error: "Some classroom IDs are invalid or not accessible",
+        };
+      }
+    }
+
+    // Create the new teacher and assign classrooms in a transaction
+    const newTeacher = await prisma.$transaction(async (tx) => {
+      // Create the user
+      const user = await tx.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          cefrLevel,
+          schoolId,
+          roles: {
+            create: {
+              roleId: roleRecord.id,
+            },
           },
         },
-      },
-      include: {
-        roles: {
-          include: {
-            role: true,
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
           },
         },
-        ClassroomTeachers: {
-          include: {
-            classroom: {
-              include: {
-                students: true,
+      });
+
+      // Assign to classrooms if provided
+      if (classroomIds && classroomIds.length > 0) {
+        await tx.classroomTeachers.createMany({
+          data: classroomIds.map((classroomId) => ({
+            classroomId,
+            userId: user.id,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      // Fetch the complete teacher data with classroom relationships
+      const completeTeacher = await tx.user.findUnique({
+        where: { id: user.id },
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+          ClassroomTeachers: {
+            include: {
+              classroom: {
+                include: {
+                  students: true,
+                },
               },
             },
           },
         },
-      },
+      });
+
+      if (!completeTeacher) {
+        throw new Error("Failed to fetch created teacher");
+      }
+
+      return completeTeacher;
     });
+
+    // Calculate totals
+    const totalStudents = newTeacher.ClassroomTeachers.reduce((sum, ct) => {
+      return sum + ct.classroom.students.length;
+    }, 0);
+    const totalClasses = newTeacher.ClassroomTeachers.length;
 
     // Format response
     const teacherData: TeacherData = {
@@ -329,8 +403,13 @@ export const createTeacher = async (params: {
       image: newTeacher.image,
       schoolId: newTeacher.schoolId,
       cefrLevel: newTeacher.cefrLevel,
-      totalStudents: 0,
-      totalClasses: 0,
+      totalStudents,
+      totalClasses,
+      assignedClassrooms: newTeacher.ClassroomTeachers.map((ct) => ({
+        id: ct.classroom.id,
+        name: ct.classroom.name,
+        grade: ct.classroom.grade,
+      })),
     };
 
     console.log("Teacher Model: Successfully created teacher:", teacherData.id);
@@ -390,6 +469,23 @@ export const updateTeacher = async (
       }
     }
 
+    // Validate classroom IDs if provided
+    if (updateData.classroomIds) {
+      const validClassrooms = await prisma.classroom.findMany({
+        where: {
+          id: { in: updateData.classroomIds },
+          schoolId: existingTeacher.schoolId, // Ensure classrooms belong to the same school
+        },
+      });
+
+      if (validClassrooms.length !== updateData.classroomIds.length) {
+        return {
+          success: false,
+          error: "Some classroom IDs are invalid or not accessible",
+        };
+      }
+    }
+
     // Prepare update data
     const updatePayload: any = {};
     if (updateData.name) updatePayload.name = updateData.name;
@@ -399,48 +495,88 @@ export const updateTeacher = async (
       updatePayload.password = bcrypt.hashSync(updateData.password, 10);
     }
 
-    // Update the teacher
-    const updatedTeacher = await prisma.user.update({
-      where: { id },
-      data: updatePayload,
-      include: {
-        roles: {
-          include: {
-            role: true,
+    // Update the teacher and handle classroom assignments in a transaction
+    const updatedTeacher = await prisma.$transaction(async (tx) => {
+      // Update user data
+      const user = await tx.user.update({
+        where: { id },
+        data: updatePayload,
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
           },
         },
-        ClassroomTeachers: {
-          include: {
-            classroom: {
-              include: {
-                students: true,
+      });
+
+      // Handle role update if specified
+      if (updateData.role) {
+        const roleRecord = await tx.role.findFirst({
+          where: { name: updateData.role },
+        });
+
+        if (roleRecord) {
+          // Remove existing roles and add new one
+          await tx.userRole.deleteMany({
+            where: { userId: id },
+          });
+
+          await tx.userRole.create({
+            data: {
+              userId: id,
+              roleId: roleRecord.id,
+            },
+          });
+        }
+      }
+
+      // Handle classroom assignments if specified
+      if (updateData.classroomIds !== undefined) {
+        // Remove existing classroom assignments
+        await tx.classroomTeachers.deleteMany({
+          where: { userId: id },
+        });
+
+        // Add new classroom assignments
+        if (updateData.classroomIds.length > 0) {
+          await tx.classroomTeachers.createMany({
+            data: updateData.classroomIds.map((classroomId) => ({
+              classroomId,
+              userId: id,
+            })),
+            skipDuplicates: true,
+          });
+        }
+      }
+
+      // Fetch the complete updated teacher data
+      const completeTeacher = await tx.user.findUnique({
+        where: { id },
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+          ClassroomTeachers: {
+            include: {
+              classroom: {
+                include: {
+                  students: true,
+                },
               },
             },
           },
         },
-      },
-    });
-
-    // Handle role update if specified
-    if (updateData.role) {
-      const roleRecord = await prisma.role.findFirst({
-        where: { name: updateData.role },
       });
 
-      if (roleRecord) {
-        // Remove existing roles and add new one
-        await prisma.userRole.deleteMany({
-          where: { userId: id },
-        });
-
-        await prisma.userRole.create({
-          data: {
-            userId: id,
-            roleId: roleRecord.id,
-          },
-        });
+      if (!completeTeacher) {
+        throw new Error("Failed to fetch updated teacher");
       }
-    }
+
+      return completeTeacher;
+    });
 
     // Format response
     const primaryRole =
@@ -465,6 +601,11 @@ export const updateTeacher = async (
       cefrLevel: updatedTeacher.cefrLevel,
       totalStudents,
       totalClasses,
+      assignedClassrooms: updatedTeacher.ClassroomTeachers.map((ct) => ({
+        id: ct.classroom.id,
+        name: ct.classroom.name,
+        grade: ct.classroom.grade,
+      })),
     };
 
     console.log("Teacher Model: Successfully updated teacher:", teacherData.id);

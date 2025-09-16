@@ -14,12 +14,14 @@ import { Loader2, LogOutIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Role } from "@/types/enum";
 import { User } from "next-auth";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 interface UserAccountNavProps {
   user: User;
 }
 
 export function UserAccountNav({ user }: UserAccountNavProps) {
+  const currentUser = useCurrentUser();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const roles = {
@@ -120,11 +122,6 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
             <DropdownMenuItem asChild>
               <Link href="/system/dashboard" className="flex items-center">
                 <span>System Dashboard</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/system/test" className="flex items-center">
-                <span>Test functionality</span>
               </Link>
             </DropdownMenuItem>
           </>

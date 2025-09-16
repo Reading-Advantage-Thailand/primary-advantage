@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user has SYSTEM role
-    if (session.user.role !== "SYSTEM") {
+    if (session.user.role !== "System") {
       return NextResponse.json(
         {
           error: "Forbidden. Only system administrators can view schools.",
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
             admins: true,
           },
         },
-        license: {
+        licenses: {
           select: {
             name: true,
             status: true,

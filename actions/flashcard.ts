@@ -403,6 +403,94 @@ export async function getDeckCards(deckId: string) {
   }
 }
 
+export async function getAllSentenceCards() {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: "Unauthorized",
+        cards: [],
+      };
+    }
+
+    const deck = await prisma.flashcardDeck.findFirst({
+      where: {
+        userId: user.id,
+        type: FlashcardType.SENTENCE,
+      },
+      include: {
+        cards: true,
+      },
+    });
+
+    return {
+      success: true,
+      cards: deck?.cards || [],
+    };
+  } catch (error) {
+    console.error("Error in getAllSentenceCards:", error);
+    return {
+      success: false,
+      error: "Failed to fetch sentence cards",
+      cards: [],
+    };
+  }
+}
+
+export async function deleteFlashcardCard(cardId: string) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
+    if (!cardId) {
+      return {
+        success: false,
+        error: "Card ID is required",
+      };
+    }
+
+    // Verify the card belongs to the user before deleting
+    const card = await prisma.flashcardCard.findFirst({
+      where: {
+        id: cardId,
+        deck: {
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!card) {
+      return {
+        success: false,
+        error: "Card not found or unauthorized",
+      };
+    }
+
+    await prisma.flashcardCard.delete({
+      where: { id: cardId },
+    });
+
+    revalidatePath("/student/sentences");
+
+    return {
+      success: true,
+      message: "Card deleted successfully",
+    };
+  } catch (error) {
+    console.error("Error in deleteFlashcardCard:", error);
+    return {
+      success: false,
+      error: "Failed to delete card",
+    };
+  }
+}
+
 export async function reviewCard(
   cardId: string,
   rating: Rating,

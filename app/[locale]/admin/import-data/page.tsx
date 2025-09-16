@@ -128,9 +128,10 @@ export default function ImportDataPage() {
       setUploadProgress(100);
 
       const result = await response.json();
+      console.log("Upload result", result);
 
       if (!response.ok) {
-        throw new Error(result.error || "Upload failed");
+        throw new Error(result.details || "Upload failed");
       }
 
       setUploadResult(result);
@@ -199,6 +200,7 @@ export default function ImportDataPage() {
         ["Bob Johnson", "bob.johnson@email.com", "Classroom 3", "STUDENT"],
       ],
       requirements: [
+        "File name must be students.csv",
         "Email must be unique and valid format",
         "Role should be Student",
       ],
@@ -213,6 +215,7 @@ export default function ImportDataPage() {
         ["Sarah Davis", "sarah.davis@school.edu", "", "Admin"],
       ],
       requirements: [
+        "File name must be teachers.csv",
         "Email must be unique and valid format",
         "Role should be Teacher or Admin",
       ],
@@ -220,9 +223,12 @@ export default function ImportDataPage() {
     classes: {
       title: "Classes Data Format",
       description: "Import class schedules and room assignments",
-      headers: ["name"],
+      headers: ["classroom_name"],
       example: [["M1"], ["M2"], ["M3"]],
-      requirements: [],
+      requirements: [
+        "File name must be classes.csv",
+        "Classroom name must be unique",
+      ],
     },
   };
 

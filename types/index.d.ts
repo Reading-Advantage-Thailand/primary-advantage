@@ -303,6 +303,11 @@ export interface TeacherData {
   cefrLevel?: string | null;
   totalStudents: number;
   totalClasses: number;
+  assignedClassrooms?: Array<{
+    id: string;
+    name: string;
+    grade?: string | null;
+  }>;
 }
 
 export interface TeachersResponse {
@@ -327,6 +332,8 @@ export interface CreateTeacherRequest {
   email: string;
   role: "Teacher" | "Admin";
   cefrLevel?: string;
+  classroomIds?: string[];
+  password?: string;
 }
 
 export interface UpdateTeacherRequest {
@@ -334,6 +341,8 @@ export interface UpdateTeacherRequest {
   email?: string;
   role?: "Teacher" | "Admin";
   cefrLevel?: string;
+  classroomIds?: string[];
+  password?: string;
 }
 
 export interface TeacherApiResponse {
@@ -396,6 +405,7 @@ export interface CreateTeacherInput {
   role: string;
   cefrLevel?: string;
   password?: string;
+  classroomIds?: string[];
 }
 
 export interface UpdateTeacherInput {
@@ -404,6 +414,7 @@ export interface UpdateTeacherInput {
   role?: string;
   cefrLevel?: string;
   password?: string;
+  classroomIds?: string[];
 }
 
 export interface CreateStudentInput {
@@ -437,6 +448,17 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     total: number;
     totalPages: number;
   };
+}
+
+export interface License {
+  id: string;
+  school_name: string;
+  subscription_level: "basic" | "premium" | "enterprise";
+  amount: number;
+  status: "active" | "inactive" | "expired";
+  active_users: number;
+  expiry_date: string;
+  email: string;
 }
 
 // Re-export ts-fsrs types for convenience
