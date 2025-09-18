@@ -1,0 +1,104 @@
+---
+globs: app/**/*,*.ts,*.tsx
+description: Next.js App Router patterns and API route conventions
+---
+
+# Next.js App Router & API Patterns
+
+## App Router Structure
+
+### Route Organization
+
+- Use route groups `()` for logical organization without affecting URL structure
+- Implement parallel routes for role-based layouts
+- Follow the established locale-first routing: `app/[locale]/(group)/feature/`
+
+### Page and Layout Patterns
+
+```typescript
+// Layout pattern with authentication check
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  if (!session) redirect("/auth/signin");
+  return <div>{children}</div>;
+}
+
+// Page with proper typing
+export default async function Page({
+  params,
+  searchParams
+}: {
+  params: Promise<{ locale: string; id?: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { locale, id } = await params;
+  // Implementation
+}
+```
+
+## API Route Conventions
+
+### Standard CRUD Pattern
+
+```typescript
+// GET /api/resource - List resources
+export async function GET(request: NextRequest) {
+  try {
+    const data = await fetchResources(request.nextUrl.searchParams);
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    return new Response("Error", { status: 500 });
+  }
+}
+
+// POST /api/resource - Create resource
+export async function POST(request: NextRequest) {
+  return await createResourceController(request);
+}
+
+// Dynamic routes: /api/resource/[id]
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  return await getResourceController(req, { params });
+}
+```
+
+### Authentication & Authorization
+
+- Use `currentUser()` from `@/lib/session` for user context
+- Implement role-based access control in API routes:
+
+```typescript
+const user = await currentUser();
+if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+// Role-based access
+if (user.role !== "TEACHER" && user.role !== "SYSTEM") {
+  return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+}
+```
+
+### Error Handling
+
+- Use consistent error responses with proper HTTP status codes
+- Log errors appropriately for debugging
+- Return user-friendly error messages
+
+## Server Components vs Client Components
+
+- Default to Server Components for data fetching and static content
+- Use Client Components (`"use client"`) only when needed for:
+  - Event handlers and interactivity
+  - Browser-only APIs
+  - State management
+  - Third-party libraries requiring client-side execution
+
+## Data Fetching Patterns
+
+- Use server actions for form submissions and mutations
+- Implement proper loading and error states
+- Use Suspense boundaries for streaming content
+- Cache data appropriately with Next.js caching strategies

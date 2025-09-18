@@ -1,0 +1,560 @@
+---
+globs: app/api/**/*,server/**/*
+description: MVC architecture patterns for API development and server-side logic
+---
+
+# MVC Architecture Patterns for API Development
+
+This rule defines the Model-View-Controller (MVC) architecture patterns used in the Primary Advantage platform for building scalable and maintainable APIs.
+
+## MVC Architecture Overview
+
+The platform implements a clean separation of concerns using:
+
+- **Models** ([server/models/](mdc:server/models/)): Data access layer and business logic
+- **Controllers** ([server/controllers/](mdc:server/controllers/)): Request processing and HTTP response handling
+- **Views** ([app/api/](mdc:app/api/)): API route layer that delegates to controllers
+- **Utils** ([server/utils/](mdc:server/utils/)): Shared utilities and authentication logic
+
+## API Route Structure (View Layer)
+
+### Route File Pattern
+
+API routes should act as thin routing layers that delegate to controllers:
+
+```typescript
+// app/api/resource/route.ts
+import {
+  getResourceController,
+  createResourceController,
+} from "@/server/controllers/resourceController";
+import { NextRequest } from "next/server";
+
+export async function GET(request: NextRequest) {
+  return await getResourceController(request);
+}
+
+export async function POST(request: NextRequest) {
+  return await createResourceController(request);
+}
+```
+
+### Dynamic Route Pattern
+
+```typescript
+// app/api/resource/[id]/route.ts
+import {
+  getResourceByIdController,
+  updateResourceController,
+  deleteResourceController,
+} from "@/server/controllers/resourceController";
+import { NextRequest } from "next/server";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  return await getResourceByIdController(req, { params });
+}
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  return await updateResourceController(req, { params });
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  return await deleteResourceController(req, { params });
+}
+```
+
+## Controller Layer Patterns
+
+### Standard Controller Structure
+
+Controllers handle HTTP request processing, validation, and response formatting:
+
+```typescript
+// server/controllers/resourceController.ts
+import { NextRequest, NextResponse } from "next/server";
+import { currentUser } from "@/lib/session";
+import {
+  createResource,
+  getResources,
+  getResourceById,
+  updateResource,
+  deleteResource,
+} from "@/server/models/resourceModel";
+import { validateUser, checkAdminPermissions } from "@/server/utils/auth";
+import { ResourceData, CreateResourceInput } from "@/types/index";
+
+export const getResourcesController = async (
+  request: NextRequest,
+): Promise<NextResponse<ResourcesResponse | { error: string }>> => {
+  try {
+    // 1. Authentication check
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // 2. User validation and permission check
+    const userWithRoles = await validateUser(user.id);
+    if (!userWithRoles) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const hasPermission = await checkAdminPermissions(userWithRoles);
+    if (!hasPermission) {
+      return NextResponse.json(
+        { error: "Forbidden - Insufficient permissions" },
+        { status: 403 },
+      );
+    }
+
+    // 3. Parse and validate query parameters
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const search = searchParams.get("search") || "";
+
+    // 4. Call model layer for data
+    const { resources, totalCount } = await getResources({
+      page,
+      limit,
+      search,
+      userWithRoles,
+    });
+
+    // 5. Format response
+    const totalPages = Math.ceil(totalCount / limit);
+    const response = {
+      resources,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        totalPages,
+      },
+    };
+
+    return NextResponse.json(response, { status: 200 });
+  } catch (error) {
+    console.error("Controller Error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+};
+```
+
+### Create Resource Controller Pattern
+
+```typescript
+export const createResourceController = async (
+  request: NextRequest,
+): Promise<
+  NextResponse<{ success: boolean; resource?: ResourceData; error?: string }>
+> => {
+  try {
+    // 1. Authentication & authorization
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userWithRoles = await validateUser(user.id);
+    if (!userWithRoles || !(await checkAdminPermissions(userWithRoles))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // 2. Parse and validate request body
+    const body = await request.json();
+    const validatedData = createResourceSchema.parse(body);
+
+    // 3. Call model to create resource
+    const result = await createResource({
+      ...validatedData,
+      userWithRoles,
+    });
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: result.error === "Resource already exists" ? 409 : 400 },
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, resource: result.resource },
+      { status: 201 },
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
+      );
+    }
+
+    console.error("Create Resource Error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+};
+```
+
+## Model Layer Patterns
+
+### Data Access and Business Logic
+
+Models handle database operations and business logic:
+
+```typescript
+// server/models/resourceModel.ts
+import { prisma } from "@/lib/prisma";
+import { UserWithRoles } from "@/server/utils/auth";
+import { ResourceData, CreateResourceInput } from "@/types/index";
+import bcrypt from "bcryptjs";
+
+interface ResourceQueryParams {
+  page: number;
+  limit: number;
+  search: string;
+  userWithRoles: UserWithRoles;
+}
+
+export const getResources = async (
+  params: ResourceQueryParams,
+): Promise<{
+  resources: ResourceData[];
+  totalCount: number;
+}> => {
+  const { page, limit, search, userWithRoles } = params;
+
+  try {
+    // Calculate pagination offset
+    const offset = (page - 1) * limit;
+
+    // Build where clause based on user permissions
+    let whereClause: any = {};
+
+    // Apply school-based filtering for non-system users
+    if (
+      userWithRoles.SchoolAdmins.length > 0 &&
+      !userWithRoles.roles.some((r) => r.role.name === "SYSTEM")
+    ) {
+      whereClause.schoolId = userWithRoles.schoolId;
+    }
+
+    // Add search filtering
+    if (search) {
+      whereClause.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Execute queries in parallel
+    const [resources, totalCount] = await Promise.all([
+      prisma.resource.findMany({
+        where: whereClause,
+        skip: offset,
+        take: limit,
+        include: {
+          // Include related data as needed
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.resource.count({ where: whereClause }),
+    ]);
+
+    // Transform data for response
+    const transformedResources: ResourceData[] = resources.map((resource) => ({
+      id: resource.id,
+      name: resource.name,
+      email: resource.email,
+      createdAt: resource.createdAt.toISOString().split("T")[0],
+      // Transform other fields as needed
+    }));
+
+    return {
+      resources: transformedResources,
+      totalCount,
+    };
+  } catch (error) {
+    console.error("Model Error - getResources:", error);
+    throw error;
+  }
+};
+
+export const createResource = async (
+  params: CreateResourceInput & { userWithRoles: UserWithRoles },
+): Promise<{ success: boolean; resource?: ResourceData; error?: string }> => {
+  const { name, email, userWithRoles, ...otherParams } = params;
+
+  try {
+    // Check for existing resource
+    const existingResource = await prisma.resource.findUnique({
+      where: { email },
+    });
+
+    if (existingResource) {
+      return { success: false, error: "Resource already exists" };
+    }
+
+    // Business logic validations
+    // Determine school assignment based on user permissions
+    let schoolId = null;
+    if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
+      schoolId = userWithRoles.schoolId;
+    }
+
+    // Create the resource
+    const newResource = await prisma.resource.create({
+      data: {
+        name,
+        email,
+        schoolId,
+        ...otherParams,
+      },
+      include: {
+        // Include related data for response
+      },
+    });
+
+    // Transform for response
+    const resourceData: ResourceData = {
+      id: newResource.id,
+      name: newResource.name,
+      email: newResource.email,
+      createdAt: newResource.createdAt.toISOString().split("T")[0],
+      // Transform other fields
+    };
+
+    return { success: true, resource: resourceData };
+  } catch (error) {
+    console.error("Model Error - createResource:", error);
+    throw error;
+  }
+};
+```
+
+## Authentication & Authorization Utils
+
+### User Validation Pattern
+
+```typescript
+// server/utils/auth.ts
+import { prisma } from "@/lib/prisma";
+
+export interface UserWithRoles {
+  id: string;
+  email: string;
+  name: string;
+  schoolId: string | null;
+  roles: Array<{
+    role: { name: string };
+  }>;
+  SchoolAdmins: Array<{
+    id: string;
+    schoolId: string;
+  }>;
+}
+
+export const validateUser = async (
+  userId: string,
+): Promise<UserWithRoles | null> => {
+  try {
+    const userWithRoles = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        roles: { include: { role: true } },
+        SchoolAdmins: true,
+      },
+    });
+
+    if (!userWithRoles) return null;
+    return userWithRoles;
+  } catch (error) {
+    console.error("Auth Utils: Error validating user:", error);
+    return null;
+  }
+};
+
+export const checkAdminPermissions = async (
+  userWithRoles: UserWithRoles,
+): Promise<boolean> => {
+  try {
+    const isSystemAdmin = userWithRoles.roles.some(
+      (userRole) => userRole.role.name === "SYSTEM",
+    );
+
+    const isAdmin = userWithRoles.roles.some(
+      (userRole) => userRole.role.name === "ADMIN",
+    );
+
+    const isSchoolAdmin = userWithRoles.SchoolAdmins.length > 0;
+
+    return isSystemAdmin || isAdmin || isSchoolAdmin;
+  } catch (error) {
+    console.error("Auth Utils: Error checking admin permissions:", error);
+    return false;
+  }
+};
+```
+
+## Error Handling Standards
+
+### HTTP Status Codes
+
+- **200**: Success (GET)
+- **201**: Created (POST)
+- **400**: Bad Request (validation errors)
+- **401**: Unauthorized (not authenticated)
+- **403**: Forbidden (insufficient permissions)
+- **404**: Not Found
+- **409**: Conflict (duplicate resource)
+- **500**: Internal Server Error
+
+### Error Response Format
+
+```typescript
+// Consistent error response structure
+{
+  "error": "Descriptive error message",
+  "details"?: ["Additional error details"],  // For validation errors
+}
+
+// Success response structure
+{
+  "success": true,
+  "data": ResourceData,
+  "pagination"?: PaginationData,  // For list endpoints
+}
+```
+
+## Type Safety Integration
+
+### Controller and Model Types
+
+```typescript
+// types/index.d.ts - API Response Types
+interface ApiResponse<T = unknown> {
+  data?: T;
+  error?: string;
+  message?: string;
+  status: number;
+}
+
+interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+interface ResourceData {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  // Resource-specific fields
+}
+
+interface CreateResourceInput {
+  name: string;
+  email: string;
+  // Other required fields
+}
+```
+
+## File Organization Standards
+
+```
+server/
+├── controllers/ # HTTP request/response handling
+│   ├── resourceController.ts
+│   ├── userController.ts
+│   └── classroomController.ts
+├── models/ # Data access and business logic
+│   ├── resourceModel.ts
+│   ├── userModel.ts
+│   └── classroomModel.ts
+└── utils/ # Shared utilities
+├── auth.ts # Authentication & authorization
+├── validation.ts # Data validation helpers
+└── helpers.ts # General utilities
+app/api/ # API routes (thin routing layer)
+├── resource/
+│   ├── route.ts # GET, POST /api/resource
+│   └── [id]/
+│       └── route.ts # GET, PUT, DELETE /api/resource/[id]
+
+```
+
+## Testing Patterns
+
+### Controller Testing
+
+Test controllers by mocking the model layer and testing HTTP concerns:
+
+```typescript
+// __tests__/controllers/resourceController.test.ts
+describe("ResourceController", () => {
+  it("should return 401 for unauthenticated requests", async () => {
+    // Mock currentUser to return null
+    // Test the controller response
+  });
+
+  it("should validate query parameters", async () => {
+    // Test parameter validation logic
+  });
+});
+```
+
+### Model Testing
+
+Test models by testing business logic and database operations:
+
+```typescript
+// __tests__/models/resourceModel.test.ts
+describe("ResourceModel", () => {
+  it("should create resource with valid data", async () => {
+    // Test successful creation
+  });
+
+  it("should handle duplicate email conflicts", async () => {
+    // Test conflict handling
+  });
+});
+```
+
+## Performance Considerations
+
+- Use database transactions for multi-step operations
+- Implement proper indexing on searchable/filterable fields
+- Use `Promise.all()` for parallel database operations
+- Implement pagination for large datasets
+- Cache frequently accessed data when appropriate
+- Use database connection pooling through Prisma
+
+## Security Best Practices
+
+- Always validate user authentication in controllers
+- Implement role-based access control consistently
+- Sanitize and validate all input data
+- Use parameterized queries (Prisma handles this)
+- Log security-relevant events
+- Implement rate limiting for sensitive endpoints
+- Use HTTPS in production environments

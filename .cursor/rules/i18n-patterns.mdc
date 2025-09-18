@@ -1,0 +1,308 @@
+---
+globs: i18n/**/*,messages/**/*,app/[locale]/**/*,**/locale-switcher.*
+description: Internationalization patterns using next-intl
+---
+
+# Internationalization (i18n) Patterns
+
+## Supported Locales
+
+The application supports 5 locales with full internationalization:
+
+- **en** (English) - Default locale
+- **th** (Thai) - ไทย
+- **vi** (Vietnamese) - Tiếng Việt
+- **cn** (Simplified Chinese) - 中文
+- **tw** (Traditional Chinese) - 台灣
+
+## i18n Configuration
+
+### Routing Setup
+
+Reference: [i18n/routing.ts](mdc:i18n/routing.ts)
+
+```typescript
+import { defineRouting } from "next-intl/routing";
+
+export const routing = defineRouting({
+  locales: ["en", "th", "vi", "cn", "tw"],
+  defaultLocale: "en",
+});
+```
+
+### Request Configuration
+
+Reference: [i18n/request.ts](mdc:i18n/request.ts)
+
+```typescript
+export default getRequestConfig(async ({ requestLocale }) => {
+  const requested = await requestLocale;
+  const locale = hasLocale(routing.locales, requested)
+    ? requested
+    : routing.defaultLocale;
+
+  return {
+    locale,
+    messages: (await import(`../messages/${locale}.json`)).default,
+  };
+});
+```
+
+## Translation Message Structure
+
+### Message Organization
+
+Organize translations by feature/component namespace:
+
+```json
+{
+  "MainNav": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "Sidebar": {
+    "read": "Read",
+    "vocabulary": "Vocabulary",
+    "subItem": {
+      "admin": "Admin",
+      "teachers": "Teachers"
+    }
+  },
+  "LocaleSwitcher": {
+    "label": "Change language",
+    "locale": "{locale, select, th {🇹🇭 ไทย} en {🇺🇸 English} other {Unknown}}"
+  }
+}
+```
+
+### Complex Message Patterns
+
+```json
+{
+  "Question": {
+    "feedback": {
+      "correct": "Correct! Well done.",
+      "incorrect": "Incorrect. The correct answer is: {correctAnswer}",
+      "score": "You scored {score} out of {total} points."
+    },
+    "timer": {
+      "remaining": "{time, plural, =0 {Time's up!} =1 {1 second left} other {# seconds left}}"
+    }
+  }
+}
+```
+
+## Component Translation Patterns
+
+### Server Components
+
+```typescript
+import { getTranslations } from "next-intl/server";
+
+export default async function ServerComponent({
+  params
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params;
+  const t = await getTranslations("Namespace");
+
+  return (
+    <div>
+      <h1>{t("title")}</h1>
+      <p>{t("description")}</p>
+    </div>
+  );
+}
+```
+
+### Client Components
+
+```typescript
+"use client";
+import { useTranslations } from "next-intl";
+
+export function ClientComponent() {
+  const t = useTranslations("Namespace");
+
+  return (
+    <div>
+      <button>{t("button.submit")}</button>
+      <span>{t("status.loading")}</span>
+    </div>
+  );
+}
+```
+
+### Dynamic Translation Values
+
+```typescript
+const t = useTranslations("Messages");
+
+// Simple interpolation
+const message = t("welcome", { name: user.name });
+
+// Pluralization
+const itemCount = t("items", { count: items.length });
+
+// Rich text with formatting
+const richMessage = t.rich("announcement", {
+  strong: (chunks) => <strong>{chunks}</strong>,
+  link: (chunks) => <Link href="/info">{chunks}</Link>
+});
+```
+
+## Locale-Aware Routing
+
+### App Router Structure
+
+```
+app/
+├── [locale]/
+│   ├── layout.tsx          # Locale-specific layout
+│   ├── page.tsx           # Home page
+│   ├── about/
+│   │   └── page.tsx       # /en/about, /th/about, etc.
+│   └── student/
+│       └── dashboard/
+│           └── page.tsx   # /en/student/dashboard
+```
+
+### Link Navigation
+
+```typescript
+import { Link } from "@/i18n/navigation";
+
+export function Navigation() {
+  return (
+    <nav>
+      <Link href="/">{t("nav.home")}</Link>
+      <Link href="/about">{t("nav.about")}</Link>
+      <Link href="/student/dashboard">{t("nav.dashboard")}</Link>
+    </nav>
+  );
+}
+```
+
+### Programmatic Navigation
+
+```typescript
+import { useRouter } from "@/i18n/navigation";
+
+export function Component() {
+  const router = useRouter();
+
+  const handleNavigation = () => {
+    // Maintains current locale
+    router.push("/student/dashboard");
+  };
+}
+```
+
+## Locale Switching
+
+### Locale Switcher Component
+
+Reference: [components/switchers/locale-switcher.tsx](mdc:components/switchers/locale-switcher.tsx)
+
+```typescript
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter, usePathname } from "@/i18n/navigation";
+
+export function LocaleSwitcher() {
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+  const t = useTranslations("LocaleSwitcher");
+
+  const handleLocaleChange = (newLocale: string) => {
+    router.replace(pathname, { locale: newLocale });
+  };
+
+  return (
+    <Select value={locale} onValueChange={handleLocaleChange}>
+      {routing.locales.map((loc) => (
+        <SelectItem key={loc} value={loc}>
+          {t("locale", { locale: loc })}
+        </SelectItem>
+      ))}
+    </Select>
+  );
+}
+```
+
+## Database Content Localization
+
+### Multi-language Content Storage
+
+```typescript
+// Database schema for translated content
+interface Article {
+  title: string;
+  summary: string;
+  passage: string;
+  translatedSummary: {
+    th: string;
+    cn: string;
+    tw: string;
+    vi: string;
+  } | null;
+  translatedPassage: {
+    th: string[];
+    cn: string[];
+    tw: string[];
+    vi: string[];
+  } | null;
+}
+```
+
+### Content Retrieval Patterns
+
+```typescript
+function getLocalizedContent(article: Article, locale: string) {
+  const fallbackContent = {
+    summary: article.summary,
+    passage: article.passage,
+  };
+
+  if (locale === "en" || !article.translatedSummary) {
+    return fallbackContent;
+  }
+
+  return {
+    summary: article.translatedSummary[locale] || article.summary,
+    passage: article.translatedPassage?.[locale] || article.passage,
+  };
+}
+```
+
+## Best Practices
+
+### Translation Keys
+
+- Use descriptive, hierarchical keys: `"dashboard.student.progress.title"`
+- Keep keys consistent across locales
+- Use namespaces to organize related translations
+- Avoid deeply nested keys (max 3-4 levels)
+
+### Content Guidelines
+
+- Provide context for translators in comments
+- Use ICU message format for complex pluralization
+- Handle missing translations gracefully with fallbacks
+- Test all locales for UI layout issues
+
+### Performance Considerations
+
+- Only load necessary translation messages
+- Use tree-shaking to eliminate unused translations
+- Consider lazy loading for large translation files
+- Cache translated content appropriately
+
+### RTL Support Preparation
+
+- Design layouts that work with RTL languages
+- Use logical CSS properties (margin-inline-start vs margin-left)
+- Test UI components with longer text in different languages
+- Prepare for future Arabic support if needed
