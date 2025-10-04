@@ -455,6 +455,8 @@ export async function generateAudio({
 
     await uploadToBucket(localPath, `audios/articles/${articleId}.mp3`);
 
+    fs.unlinkSync(localPath);
+
     // const sentences = await splitIntoSentences(passage);
     // const sentence: string[] = sentencize(passage);
     // const nlp = winkNLP(model);

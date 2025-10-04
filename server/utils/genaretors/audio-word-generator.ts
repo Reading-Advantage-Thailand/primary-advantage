@@ -137,6 +137,8 @@ export async function generateAudioForWord({
 
       await uploadToBucket(localPath, `audios/words/${articleId}.mp3`);
 
+      fs.unlinkSync(localPath);
+
       await prisma.article.update({
         where: {
           id: articleId,
