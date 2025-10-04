@@ -11,6 +11,7 @@ import { Article } from "@/types";
 import { AlertCircle, BookCheck } from "lucide-react";
 import ArticleContent from "./article-content";
 import { getLocale, getTranslations } from "next-intl/server";
+import { getArticleImageUrl } from "@/lib/storage-config";
 
 // import RatingPopup from "./rating-popup";
 
@@ -33,7 +34,7 @@ export default async function ArticleCard({ article }: Props) {
     );
   };
 
-  const imageUrl = `https://storage.googleapis.com/primary-app-storage/images/${article.id}.png`;
+  const imageUrl = getArticleImageUrl(article.id, 1);
   // const imageUrl = `/nopic.png`;
 
   const isSaved = article.articleActivityLog.some(

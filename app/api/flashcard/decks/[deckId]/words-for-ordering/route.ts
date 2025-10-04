@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
 import { ActivityType } from "@/types/enum";
+import { getAudioUrl } from "@/lib/storage-config";
 
 // Helper function to tokenize a sentence into words
 function tokenizeSentence(sentence: string) {
@@ -229,7 +230,7 @@ export async function GET(
             // For individual words, we don't have word-level translations
             // Could be enhanced with a dictionary API later
           },
-          audioUrl: `https://storage.googleapis.com/primary-app-storage${flashcardCard.audioUrl}`,
+          audioUrl: getAudioUrl(flashcardCard.audioUrl || ""),
           startTime: flashcardCard.startTime,
           endTime: flashcardCard.endTime,
           partOfSpeech: getPartOfSpeech(word, index, words.length),

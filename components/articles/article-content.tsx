@@ -31,6 +31,7 @@ import { saveFlashcard } from "@/actions/flashcard";
 import { toast } from "sonner";
 import { fetchArticleActivity } from "@/actions/article";
 import Image from "next/image";
+import { getArticleImageUrl, getAudioUrl } from "@/lib/storage-config";
 
 type Props = {
   article: Article;
@@ -396,7 +397,7 @@ export default function ArticleContent({ article }: Props) {
         <div id="onborda-audio" className="flex flex-grow items-center">
           <audio
             ref={audioRef}
-            src={`https://storage.googleapis.com/primary-app-storage${article.audioUrl}`}
+            src={getAudioUrl(article.audioUrl || "")}
             className="w-full"
             onTimeUpdate={handleTimeUpdate}
             onEnded={() => {
@@ -937,7 +938,7 @@ export default function ArticleContent({ article }: Props) {
             <div key={groupIndex} className="flex flex-col gap-4">
               <Image
                 className="rounded-lg shadow-xl"
-                src={`https://storage.googleapis.com/primary-app-storage/images/${article.id}_${groupIndex + 1}.png`}
+                src={getArticleImageUrl(article.id, groupIndex + 1)}
                 alt="Article Image"
                 width={640}
                 height={640}

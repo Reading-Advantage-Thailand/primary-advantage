@@ -7,6 +7,7 @@ import { ActivityStatus, ActivityType } from "@/types/enum";
 import StarRating from "../ui/rating";
 import { useLocale, useTranslations } from "next-intl";
 import { sanitizeTranslationKey } from "@/lib/utils";
+import { getArticleImageUrl } from "@/lib/storage-config";
 
 type Props = {
   article: ArticleShowcase;
@@ -58,7 +59,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
           ref={ref}
           className="flex h-[20rem] flex-col gap-1 rounded-md bg-black bg-cover bg-center p-3 transition-all duration-300 hover:scale-105"
           style={{
-            backgroundImage: `url('https://storage.googleapis.com/primary-app-storage/images/${article.id}_1.png')`,
+            backgroundImage: `url('${getArticleImageUrl(article.id, 1)}')`,
             boxShadow: "inset 80px 10px 90px 10px rgba(0, 0, 0, 0.9)",
             opacity:
               article.is_read ||
