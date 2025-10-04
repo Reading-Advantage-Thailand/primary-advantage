@@ -13,7 +13,6 @@ import { openai, openaiImages } from "@/utils/openai";
 import { google, googleImage, googleModelLite } from "@/utils/google";
 import { uploadToBucket } from "@/utils/storage";
 import { z } from "zod";
-import { openaiClient } from "@/utils/openai";
 import { Uploadable } from "openai/uploads";
 import { createLogFile } from "../logging";
 

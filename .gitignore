@@ -46,8 +46,6 @@ next-env.d.ts
 docker-compose.yml*
 
 #file local
-/public/images/
-/public/audios/
 cloud-sql-proxy
 service-account.json
 /docs
