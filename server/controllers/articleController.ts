@@ -24,6 +24,34 @@ import {
   generateQuestions,
   saveArticleAsDraftModel,
 } from "../models/articleModel";
+import { generateArticleNew } from "../utils/genaretors/new-generator";
+
+export const generateAllArticleNew = async (amountPerGenre: number) => {
+  const types: ArticleType[] = [ArticleType.FICTION];
+  const levels: ArticleBaseCefrLevel[] = [
+    ArticleBaseCefrLevel.A0,
+    ArticleBaseCefrLevel.A1,
+    ArticleBaseCefrLevel.A2,
+    ArticleBaseCefrLevel.B1,
+    ArticleBaseCefrLevel.B2,
+  ];
+
+  const totalArticles = types.length * levels.length * amountPerGenre;
+  const articles: any[] = [];
+  let completedArticles = 0;
+
+  try {
+    console.log(`Starting generation of ${amountPerGenre} articles...`);
+    for (let i = 0; i < amountPerGenre; i++) {
+      console.log(`Generating article number ${i + 1}`);
+      await generateArticleNew(ArticleBaseCefrLevel.A2);
+    }
+    console.log(`Successfully generated ${amountPerGenre} articles`);
+  } catch (error) {
+    console.error("Error in generateAllArticleNew:", error);
+    throw new Error(`Failed to generate all articles: ${error}`);
+  }
+};
 
 export const generateAllArticle = async (amountPerGenre: number) => {
   const types: ArticleType[] = [ArticleType.FICTION, ArticleType.NONFICTION];
@@ -32,8 +60,6 @@ export const generateAllArticle = async (amountPerGenre: number) => {
     ArticleBaseCefrLevel.A2,
     ArticleBaseCefrLevel.B1,
     ArticleBaseCefrLevel.B2,
-    // ArticleBaseCefrLevel.C1,
-    // ArticleBaseCefrLevel.C2,
   ];
 
   const totalArticles = types.length * levels.length * amountPerGenre;

@@ -186,6 +186,7 @@ export async function saveArticleContent(
     generateImage({
       imageDesc: article.imageDesc || "",
       articleId,
+      passage: article.passage,
     }),
 
     // Save questions
@@ -220,10 +221,11 @@ export async function saveArticleContent(
     ),
 
     // Generate audio
-    generateAudio({
-      passage: article.passage,
-      articleId,
-    }),
+    // generateAudio({
+    //   passage: article.passage,
+    //   sentences: article.sentences || [],
+    //   articleId,
+    // }),
 
     // Generate word audio
     generateWordLists(articleId),
@@ -374,6 +376,10 @@ export const getArticlesWithParams = async (params: {
 export const getArticleById = async (articleId: string) => {
   const article = await prisma.article.findUnique({
     where: { id: articleId },
+    include: {
+      sentencsAndWordsForFlashcard: true,
+      articleActivityLog: true,
+    },
   });
 
   if (!article) {
@@ -713,6 +719,7 @@ export const updateAprovedCustomArticle = async (articleId: string) => {
       generateImage({
         imageDesc: article.imageDescription,
         articleId,
+        passage: article.passage,
       }),
 
       // Save questions
@@ -747,10 +754,11 @@ export const updateAprovedCustomArticle = async (articleId: string) => {
       ),
 
       // Generate audio
-      generateAudio({
-        passage: article.passage,
-        articleId,
-      }),
+      // generateAudio({
+      //   passage: article.passage,
+      //   sentences: article.sentences || [],
+      //   articleId,
+      // }),
 
       // Generate word audio
       generateWordLists(articleId),

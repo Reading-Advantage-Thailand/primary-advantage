@@ -71,6 +71,7 @@ export async function finishQuiz(
   }
 
   let xpEarned = 0;
+  let isCompleted = {};
 
   // Create user activity first
   const userActivity = await prisma.userActivity.create({
@@ -95,12 +96,15 @@ export async function finishQuiz(
   switch (type) {
     case ActivityType.SA_QUESTION:
       xpEarned = data.score ?? 0;
+      isCompleted = { isShortAnswerQuestionCompleted: true };
       break;
     case ActivityType.LA_QUESTION:
       xpEarned = data.score ?? 0;
+      isCompleted = { isLongAnswerQuestionCompleted: true };
       break;
     case ActivityType.MC_QUESTION:
       xpEarned = data.score ?? 0 * UserXpEarned.MCQuestion;
+      isCompleted = { isMultipleChoiceQuestionCompleted: true };
       break;
     default:
       xpEarned = 0;
@@ -110,6 +114,30 @@ export async function finishQuiz(
     xpEarned,
     userData.xp as number,
   );
+
+  const activityLog = await prisma.articleActivityLog.findFirst({
+    where: { articleId: articleId as string, userId: user.id as string },
+    select: {
+      id: true,
+    },
+  });
+
+  if (activityLog) {
+    await prisma.articleActivityLog.update({
+      where: { id: activityLog.id },
+      data: {
+        ...isCompleted,
+      },
+    });
+  } else {
+    await prisma.articleActivityLog.create({
+      data: {
+        articleId: articleId as string,
+        userId: user.id as string,
+        ...isCompleted,
+      },
+    });
+  }
 
   await prisma.$transaction([
     prisma.xPLogs.create({

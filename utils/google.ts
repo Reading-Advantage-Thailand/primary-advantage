@@ -19,8 +19,9 @@ const google = createVertex({
 const googleModelLite = "gemini-2.5-flash-lite";
 const googleModel = "gemini-2.5-flash";
 const googleFlashThinking = "gemini-2.0-flash-thinking-exp-01-21";
-const googleImages = "imagen-3.0-generate-001";
+const googleImages = "imagen-3.0-fast-generate-001";
 const googleProPrewiew = "gemini-2.5-pro-preview-03-25";
+const googleImage = "gemini-2.5-flash-image";
 
 export {
   google,
@@ -29,4 +30,5 @@ export {
   googleFlashThinking,
   googleModelLite,
   googleProPrewiew,
+  googleImage,
 };

@@ -649,7 +649,7 @@ export const getClassroomWithStudents = async (
                 createdAt: true,
                 updatedAt: true,
                 // Get the latest activity from UserActivity
-                UserActiclity: {
+                userActivity: {
                   orderBy: { createdAt: "desc" },
                   take: 1,
                   select: { createdAt: true },
@@ -671,7 +671,7 @@ export const getClassroomWithStudents = async (
       display_name: cs.student.name,
       email: cs.student.email,
       last_activity:
-        cs.student.UserActiclity[0]?.createdAt?.toISOString() || null,
+        cs.student.userActivity[0]?.createdAt?.toISOString() || null,
       level: cs.student.level,
       xp: cs.student.xp,
       cefrLevel: cs.student.cefrLevel,

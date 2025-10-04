@@ -41,11 +41,6 @@ interface ClozeTestData {
   articleId: string;
   articleTitle: string;
   sentence: string;
-  words: Array<{
-    word: string;
-    start: number;
-    end: number;
-  }>;
   blanks: Array<{
     id: string;
     position: number; // Character position in sentence
@@ -53,12 +48,7 @@ interface ClozeTestData {
     options: string[]; // Multiple choice options
     hint?: string;
   }>;
-  translation?: {
-    th?: string;
-    cn?: string;
-    tw?: string;
-    vi?: string;
-  };
+  translation?: string; // JSON string of translations
   audioUrl?: string;
   startTime?: number;
   endTime?: number;
@@ -138,79 +128,110 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
       const blankCount =
         difficulty === "easy" ? 1 : difficulty === "medium" ? 2 : 3;
 
-      // Filter candidate words for blanking
-      const candidateWords = sentenceData.words.filter((wordObj) => {
-        const word = wordObj.word.toLowerCase();
-        const commonWords = [
-          "the",
-          "and",
-          "for",
-          "are",
-          "but",
-          "not",
-          "you",
-          "all",
-          "can",
-          "had",
-          "her",
-          "was",
-          "one",
-          "our",
-          "out",
-          "day",
-          "get",
-          "has",
-          "him",
-          "his",
-          "how",
-          "its",
-          "may",
-          "new",
-          "now",
-          "old",
-          "see",
-          "two",
-          "way",
-          "who",
-          "boy",
-          "did",
-          "man",
-          "end",
-          "few",
-          "run",
-          "own",
-          "say",
-          "she",
-          "too",
-          "use",
-          "many",
-          "some",
-          "time",
-          "very",
-          "when",
-          "much",
-          "know",
-          "take",
-          "than",
-          "only",
-          "think",
-          "also",
-          "back",
-          "after",
-          "first",
-          "well",
-          "year",
-          "work",
-          "such",
-          "make",
-          "even",
-          "most",
-          "give",
-        ];
+      // Parse the sentence into words
+      const words = sentenceData.sentence
+        .split(/\s+/)
+        .map((word) => word.replace(/[^\w]/g, "")) // Remove punctuation
+        .filter((word) => word.length > 0);
 
+      // Common words to avoid blanking
+      const commonWords = [
+        "the",
+        "and",
+        "for",
+        "are",
+        "but",
+        "not",
+        "you",
+        "all",
+        "can",
+        "had",
+        "her",
+        "was",
+        "one",
+        "our",
+        "out",
+        "day",
+        "get",
+        "has",
+        "him",
+        "his",
+        "how",
+        "its",
+        "may",
+        "new",
+        "now",
+        "old",
+        "see",
+        "two",
+        "way",
+        "who",
+        "boy",
+        "did",
+        "man",
+        "end",
+        "few",
+        "run",
+        "own",
+        "say",
+        "she",
+        "too",
+        "use",
+        "many",
+        "some",
+        "time",
+        "very",
+        "when",
+        "much",
+        "know",
+        "take",
+        "than",
+        "only",
+        "think",
+        "also",
+        "back",
+        "after",
+        "first",
+        "well",
+        "year",
+        "work",
+        "such",
+        "make",
+        "even",
+        "most",
+        "give",
+        "a",
+        "an",
+        "is",
+        "be",
+        "to",
+        "of",
+        "in",
+        "it",
+        "on",
+        "as",
+        "at",
+        "by",
+        "or",
+        "up",
+        "so",
+        "no",
+        "if",
+        "my",
+        "me",
+        "we",
+        "he",
+        "do",
+        "go",
+        "us",
+      ];
+
+      // Filter candidate words for blanking
+      const candidateWords = words.filter((word) => {
+        const lowerWord = word.toLowerCase();
         return (
           word.length > 2 &&
-          !commonWords.includes(word) &&
+          !commonWords.includes(lowerWord) &&
           /^[a-zA-Z]+$/.test(word)
         );
       });
@@ -221,21 +242,37 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
         .slice(0, Math.min(blankCount, candidateWords.length));
 
       // Generate blanks
-      const blanks = selectedWords.map((wordObj, index) => {
-        const wordPosition = sentenceData.sentence.indexOf(wordObj.word);
+      const blanks = selectedWords.map((word, index) => {
+        // Find the position of the word in the original sentence
+        const regex = new RegExp(`\\b${word}\\b`, "i");
+        const match = sentenceData.sentence.match(regex);
+        const wordPosition = match
+          ? sentenceData.sentence.indexOf(match[0])
+          : -1;
 
-        // Generate options (simplified - you can enhance this)
-        const options = [wordObj.word];
-        const allWords = sentenceData.words.map((w) => w.word);
-        const distractors = allWords
+        // Generate distractor options
+        const options = [word];
+
+        // Create simple distractors based on word characteristics
+        const distractors = words
           .filter(
             (w) =>
-              w !== wordObj.word &&
-              w.length >= wordObj.word.length - 2 &&
-              w.length <= wordObj.word.length + 2,
+              w !== word &&
+              w.length >= word.length - 2 &&
+              w.length <= word.length + 2 &&
+              !commonWords.includes(w.toLowerCase()),
           )
           .sort(() => Math.random() - 0.5)
           .slice(0, 3);
+
+        // If we don't have enough distractors from the sentence, generate some
+        if (distractors.length < 3) {
+          const additionalDistractors = generateDistractors(
+            word,
+            3 - distractors.length,
+          );
+          distractors.push(...additionalDistractors);
+        }
 
         options.push(...distractors);
 
@@ -245,9 +282,9 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
         return {
           id: `blank-${index}`,
           position: wordPosition,
-          correctAnswer: wordObj.word,
-          options: shuffledOptions,
-          hint: `Word that starts at ${wordObj.start.toFixed(1)}s`,
+          correctAnswer: word,
+          options: shuffledOptions.slice(0, 4), // Ensure max 4 options
+          hint: `A word that fits in this context`,
         };
       });
 
@@ -259,6 +296,63 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
     },
     [],
   );
+
+  // Helper function to generate distractor words
+  const generateDistractors = (targetWord: string, count: number): string[] => {
+    const distractors: string[] = [];
+    const wordLength = targetWord.length;
+
+    // Simple distractor generation based on common patterns
+    const commonEndings = ["ing", "ed", "er", "ly", "tion", "ness", "ment"];
+    const commonPrefixes = ["un", "re", "pre", "dis", "over", "under"];
+
+    // Generate variations
+    for (let i = 0; i < count && distractors.length < count; i++) {
+      let distractor = "";
+
+      if (wordLength > 4) {
+        // Try adding/removing common endings
+        if (Math.random() > 0.5 && !targetWord.endsWith("ing")) {
+          distractor = targetWord.slice(0, -1) + "ing";
+        } else if (!targetWord.endsWith("ed")) {
+          distractor = targetWord + "ed";
+        } else {
+          distractor = targetWord.slice(0, -2) + "er";
+        }
+      } else {
+        // For shorter words, create simple variations
+        const chars = "abcdefghijklmnopqrstuvwxyz";
+        distractor =
+          targetWord.slice(0, -1) +
+          chars[Math.floor(Math.random() * chars.length)];
+      }
+
+      if (distractor !== targetWord && !distractors.includes(distractor)) {
+        distractors.push(distractor);
+      }
+    }
+
+    // Fill remaining slots with generic words if needed
+    const fallbackWords = [
+      "word",
+      "text",
+      "item",
+      "part",
+      "thing",
+      "place",
+      "time",
+      "way",
+    ];
+    while (distractors.length < count) {
+      const fallback =
+        fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
+      if (!distractors.includes(fallback) && fallback !== targetWord) {
+        distractors.push(fallback);
+      }
+    }
+
+    return distractors;
+  };
 
   // Generate active sentences based on difficulty
   const activeSentencesWithBlanks = useMemo(() => {
@@ -357,7 +451,7 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
 
       if (isAllCorrect) {
         setScore((prev) => prev + 1);
-        toast.success("Perfect! All blanks filled correctly! 🎉");
+        // toast.success("Perfect! All blanks filled correctly! 🎉");
       } else {
         toast.error(
           `${correctCount}/${currentSentence.blanks.length} correct. Try again! 💪`,
@@ -404,11 +498,19 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
     setIsPlaying(true);
   }, []);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (currentIndex < activeSentences.length - 1) {
       setCurrentIndex((prev) => prev + 1);
+      toggleAudioHints();
     } else {
       setGameComplete(true);
+      await fetch(`/api/flashcard/decks/${deckId}/sentences-for-cloze`, {
+        method: "POST",
+        body: JSON.stringify({
+          score: score,
+          timer: timer,
+        }),
+      });
       setIsPlaying(false);
     }
   }, [currentIndex, activeSentences.length]);
@@ -436,7 +538,7 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
 
     if (isAllCorrect) {
       setScore((prev) => prev + 1);
-      toast.success("Perfect! All blanks filled correctly! 🎉");
+      // toast.success("Perfect! All blanks filled correctly! 🎉");
     } else {
       toast.error(
         `${correctCount}/${currentSentence.blanks.length} correct. Try again! 💪`,
@@ -478,7 +580,7 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
     if (!currentSentence?.audioUrl || isPlayingAudio) return;
 
     setIsPlayingAudio(true);
-    toast.success("Playing sentence audio 🔊");
+    // toast.success("Playing sentence audio 🔊");
 
     try {
       await new Promise((resolve, reject) => {
@@ -517,9 +619,10 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
         };
 
         const handleTimeUpdate = () => {
+          const tolerance = 0.5;
           if (
             currentSentence.endTime !== undefined &&
-            audio.currentTime >= currentSentence.endTime
+            audio.currentTime + tolerance >= currentSentence.endTime
           ) {
             cleanup();
             resolve(void 0);
@@ -553,7 +656,7 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
         audio.load();
       });
 
-      toast.success("Audio completed! 🎵");
+      // toast.success("Audio completed! 🎵");
     } catch (error) {
       console.error("Error playing audio:", error);
       toast.error("Failed to play audio");

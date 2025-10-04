@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
+import { ActivityType } from "@/types/enum";
 
 export async function GET(
   request: NextRequest,
@@ -31,8 +32,7 @@ export async function GET(
         cards: {
           where: {
             type: "SENTENCE",
-            due: { lte: new Date() },
-            articleId: { not: null },
+            // due: { lte: new Date() },
           },
           include: {
             reviews: {
@@ -65,24 +65,21 @@ export async function GET(
         select: {
           id: true,
           title: true,
-          sentences: true,
-          audioUrl: true,
-          translatedPassage: true,
           cefrLevel: true,
         },
       });
 
       if (!article || !flashcardCard.sentence) continue;
 
-      const sentence = flashcardCard.sentence;
-      const articleSentences = article.sentences as any[];
+      // const sentence = flashcardCard.sentence;
+      // const articleSentences = article.sentences as any[];
 
       // Find the matching sentence in the article to get word timing data
-      const matchingSentence = articleSentences.find(
-        (s) => s.sentence === sentence,
-      );
+      // const matchingSentence = articleSentences.find(
+      //   (s) => s.sentence === sentence,
+      // );
 
-      if (!matchingSentence || !matchingSentence.words) continue;
+      // if (!matchingSentence || !matchingSentence.words) continue;
 
       // Create blanks from the sentence using the words array
       // const blanks = createBlanksFromSentence(
@@ -95,31 +92,31 @@ export async function GET(
       // if (blanks.length === 0) continue; // Skip if no suitable words for blanking
 
       // Get translation for the sentence
-      const sentenceIndex = articleSentences.findIndex(
-        (s) => s.sentence === sentence,
-      );
+      // const sentenceIndex = articleSentences.findIndex(
+      //   (s) => s.sentence === sentence,
+      // );
 
-      const translation =
-        sentenceIndex >= 0
-          ? {
-              th: (article.translatedPassage as any)?.th?.[sentenceIndex],
-              cn: (article.translatedPassage as any)?.cn?.[sentenceIndex],
-              tw: (article.translatedPassage as any)?.tw?.[sentenceIndex],
-              vi: (article.translatedPassage as any)?.vi?.[sentenceIndex],
-            }
-          : undefined;
+      // const translation =
+      //   sentenceIndex >= 0
+      //     ? {
+      //         th: (article.translatedPassage as any)?.th?.[sentenceIndex],
+      //         cn: (article.translatedPassage as any)?.cn?.[sentenceIndex],
+      //         tw: (article.translatedPassage as any)?.tw?.[sentenceIndex],
+      //         vi: (article.translatedPassage as any)?.vi?.[sentenceIndex],
+      //       }
+      //     : undefined;
 
       clozeTests.push({
         id: `${article.id}-${flashcardCard.id}-${Date.now()}-${Math.random()}`,
         articleId: article.id,
         articleTitle: article.title,
-        sentence: sentence,
-        words: matchingSentence.words,
+        sentence: flashcardCard.sentence,
+        // words: matchingSentence.words,
         blanks: [],
-        translation: translation,
-        audioUrl: `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`,
-        startTime: matchingSentence.startTime,
-        endTime: matchingSentence.endTime,
+        translation: flashcardCard.translation,
+        audioUrl: `https://storage.googleapis.com/primary-app-storage${flashcardCard.audioUrl}`,
+        startTime: flashcardCard.startTime,
+        endTime: flashcardCard.endTime,
         difficulty: difficulty,
       });
     }
@@ -139,6 +136,53 @@ export async function GET(
       { status: 500 },
     );
   }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ deckId: string }> },
+) {
+  const user = await currentUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { deckId } = await params;
+  const { score, timer } = await request.json();
+
+  const xpEarned = Math.floor(score * 2);
+
+  const userActivity = await prisma.userActivity.create({
+    data: {
+      userId: user.id as string,
+      activityType: ActivityType.SENTENCE_CLOZE_TEST,
+      targetId: deckId,
+      timer: timer,
+      details: {
+        timer: timer,
+        score: score,
+        xp: xpEarned,
+      },
+      completed: true,
+    },
+  });
+
+  await prisma.xPLogs.create({
+    data: {
+      userId: user.id as string,
+      xpEarned: xpEarned,
+      activityId: userActivity.id,
+      activityType: ActivityType.SENTENCE_CLOZE_TEST,
+    },
+  });
+
+  await prisma.user.update({
+    where: { id: user.id as string },
+    data: { xp: { increment: xpEarned } },
+  });
+
+  return NextResponse.json({ success: true });
 }
 
 // Helper function to create blanks from a sentence using the words array

@@ -8,8 +8,8 @@ interface Article {
   id: string;
   title: string;
   type: string;
-  genre: string;
-  subGenre: string;
+  genre: string | null;
+  subGenre?: string | null;
 }
 
 export default function ArticleSelect({

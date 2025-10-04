@@ -51,3 +51,4 @@ docker-compose.yml*
 cloud-sql-proxy
 service-account.json
 /docs
+/logs

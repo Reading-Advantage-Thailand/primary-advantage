@@ -1,3 +1,19 @@
+import { generateObject } from "ai";
+import { google, googleModel } from "@/utils/google";
+import { openai, newModel, openaiModel4o } from "@/utils/openai";
+import { articleGeneratorSchema } from "@/lib/zod";
+import path from "path";
+import fs from "fs";
+import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
+import { evaluateRating } from "./evaluate-rating-generator";
+import { prisma } from "@/lib/prisma";
+import { convertCefrLevel } from "@/lib/utils";
+import { generateImage } from "./image-generator";
+import { generateAudio } from "./audio-generator";
+import { generateAudioForWord } from "./audio-word-generator";
+import { generateAudioForFlashcard } from "./audio-flashcard-generator";
+import { se } from "date-fns/locale";
+
 // interface BatchGenerateParams {
 //   type: ArticleType;
 //   level: ArticleBaseCefrLevel;
@@ -13,6 +29,166 @@
 //   topic: string;
 //   status: "pending" | "processing" | "completed" | "failed";
 // }
+
+export const generateArticleNew = async (
+  levels: ArticleBaseCefrLevel,
+): Promise<void> => {
+  console.log("Generating article for level:", levels);
+
+  const rawData = fs.readFileSync(
+    path.join(process.cwd(), "data", "new-article-prompts.json"),
+    "utf-8",
+  );
+
+  const titleData = fs.readFileSync(
+    path.join(process.cwd(), "data", "title-a2.json"),
+    "utf-8",
+  );
+
+  const prompts = JSON.parse(rawData);
+
+  const data =
+    JSON.parse(titleData).storyCollection.stories[
+      Math.floor(
+        Math.random() * JSON.parse(titleData).storyCollection.stories.length,
+      )
+    ];
+
+  const filteredPrompts = prompts.levels.find(
+    (level: any) => level.level === levels,
+  );
+
+  // console.log("Filtered prompts:", filteredPrompts);
+
+  const userPrompt = filteredPrompts.userPromptTemplate
+    .replace("{genre}", data.genre)
+    .replace("{topic}", data.description);
+
+  try {
+    const MAX_ATTEMPTS = 3;
+    let attempts = 0;
+    let article: any = null;
+    while (attempts < MAX_ATTEMPTS) {
+      try {
+        const { object: article } = await generateObject({
+          // model: openai(newModel),
+          model: google(googleModel),
+          schema: articleGeneratorSchema,
+          system: filteredPrompts.systemPrompt,
+          prompt: userPrompt,
+          temperature: 1, //openai model does not support temperature 0
+        });
+
+        const { rating, cefrLevel } = await evaluateRating({
+          passage: article.passage,
+          cefrLevel: levels,
+        });
+
+        if (rating >= 2) {
+          prisma.$transaction(async (tx) => {
+            const createdArticle = await tx.article.create({
+              data: {
+                title: article.title,
+                passage: article.passage,
+                summary: article.summary,
+                translatedSummary: article.translatedSummary,
+                imageDescription: article.imageDesc || "",
+                genre: data.genre,
+                type: ArticleType.FICTION,
+                raLevel: convertCefrLevel(cefrLevel || ""),
+                rating,
+                cefrLevel: cefrLevel || "",
+                brainstorming: article.brainstorming,
+                planning: article.planning,
+                topic: data.description,
+              },
+            });
+
+            await tx.longAnswerQuestion.createMany({
+              data: article.longAnswerQuestions.map((question) => ({
+                question: question.question,
+                articleId: createdArticle.id,
+              })),
+            });
+
+            await tx.shortAnswerQuestion.createMany({
+              data: article.shortAnswerQuestions.map((question) => ({
+                question: question.question,
+                answer: question.answer,
+                articleId: createdArticle.id,
+              })),
+            });
+
+            await tx.multipleChoiceQuestion.createMany({
+              data: article.multipleChoiceQuestions.map((question) => ({
+                question: question.question,
+                options: question.options,
+                answer: question.answer,
+                articleId: createdArticle.id,
+              })),
+            });
+
+            Promise.all([
+              generateImage({
+                imageDesc: article.imageDesc,
+                articleId: createdArticle.id,
+                passage: article.passage,
+              }).then((result) => {
+                if (!result.success) {
+                  console.error(
+                    `Failed to generate images for article ${createdArticle.id}:`,
+                    result.error,
+                  );
+                } else {
+                  console.log(
+                    `Successfully generated ${result.imageUrls?.length || 0} images for article ${createdArticle.id}`,
+                  );
+                }
+              }),
+
+              generateAudio({
+                passage: article.passage,
+                sentences: article.sentences,
+                articleId: createdArticle.id,
+              }),
+
+              // generateAudioForWord({
+              //   wordList: article.wordlist.map((word) => ({
+              //     vocabulary: word.vocabulary,
+              //     definition: word.definitions,
+              //   })),
+              //   articleId: createdArticle.id,
+              // }),
+
+              generateAudioForFlashcard({
+                sentences: article.flashcard.map((sentence) => ({
+                  sentence: sentence.sentence,
+                  translation: sentence.translation,
+                })),
+                words: article.wordlist.map((word) => ({
+                  vocabulary: word.vocabulary,
+                  definition: word.definitions,
+                })),
+                articleId: createdArticle.id,
+              }),
+            ]);
+          });
+          console.log("Article generated successfully");
+          return;
+        }
+      } catch (error) {
+        attempts++;
+        if (attempts === MAX_ATTEMPTS) {
+          throw new Error("Failed to generate article");
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+  } catch (error) {
+    console.error("Error in generateArticleNew:", error);
+    throw new Error(`Failed to generate article: ${error}`);
+  }
+};
 
 // // Generate multiple topics at once to reduce AI calls
 // async function generateBatchTopics(

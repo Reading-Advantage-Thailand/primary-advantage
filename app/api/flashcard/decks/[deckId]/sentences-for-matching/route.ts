@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
+import { ActivityType } from "@/types/enum";
 
 export async function GET(
   request: NextRequest,
@@ -14,11 +15,10 @@ export async function GET(
 
     const { deckId } = await params;
 
-    // Get difficulty from query parameters
+    // Get translation language from query parameters
     const { searchParams } = new URL(request.url);
-    const difficulty =
-      (searchParams.get("difficulty") as "easy" | "medium" | "hard") ||
-      "medium";
+    const translationLanguage =
+      (searchParams.get("language") as "th" | "vi" | "cn" | "tw") || "th";
 
     // Get both sentence and vocabulary flashcards that are due
     const deck = await prisma.flashcardDeck.findFirst({
@@ -61,29 +61,34 @@ export async function GET(
 
     const matchingGames = [];
 
-    // Process vocabulary cards for direct word-definition matching
-    if (vocabularyCards.length > 0) {
-      const vocabularyPairs = await createVocabularyPairs(vocabularyCards);
-      if (vocabularyPairs.length > 0) {
+    // Process sentence cards for sentence-to-translation matching
+    if (sentenceCards.length > 0) {
+      const translationPairs = await createTranslationPairs(
+        sentenceCards,
+        translationLanguage,
+      );
+
+      console.log("translationPairs", translationPairs);
+      if (translationPairs.length > 0) {
         matchingGames.push({
-          id: `vocab-${Date.now()}-${Math.random()}`,
-          pairs: vocabularyPairs,
-          difficulty: difficulty,
+          id: `translation-${Date.now()}-${Math.random()}`,
+          pairs: translationPairs,
+          language: translationLanguage,
         });
       }
     }
 
-    // Process sentence cards to extract words for matching
-    if (sentenceCards.length > 0) {
-      const sentencePairs = await createSentencePairs(
-        sentenceCards,
-        difficulty,
+    // Process vocabulary cards for word-definition matching (fallback)
+    if (vocabularyCards.length > 0 && matchingGames.length === 0) {
+      const vocabularyPairs = await createVocabularyPairs(
+        vocabularyCards,
+        translationLanguage,
       );
-      if (sentencePairs.length > 0) {
+      if (vocabularyPairs.length > 0) {
         matchingGames.push({
-          id: `sentence-${Date.now()}-${Math.random()}`,
-          pairs: sentencePairs,
-          difficulty: difficulty,
+          id: `vocab-${Date.now()}-${Math.random()}`,
+          pairs: vocabularyPairs,
+          language: translationLanguage,
         });
       }
     }
@@ -104,8 +109,58 @@ export async function GET(
   }
 }
 
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ deckId: string }> },
+) {
+  const user = await currentUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { deckId } = await params;
+  const { score, timer } = await request.json();
+
+  const xpEarned = Math.floor(score * 2);
+
+  const userActivity = await prisma.userActivity.create({
+    data: {
+      userId: user.id as string,
+      activityType: ActivityType.SENTENCE_MATCHING,
+      targetId: deckId,
+      timer: timer,
+      details: {
+        timer: timer,
+        score: score,
+        xp: xpEarned,
+      },
+      completed: true,
+    },
+  });
+
+  await prisma.xPLogs.create({
+    data: {
+      userId: user.id as string,
+      xpEarned: xpEarned,
+      activityId: userActivity.id,
+      activityType: ActivityType.SENTENCE_MATCHING,
+    },
+  });
+
+  await prisma.user.update({
+    where: { id: user.id as string },
+    data: { xp: { increment: xpEarned } },
+  });
+
+  return NextResponse.json({ success: true });
+}
+
 // Helper function to create vocabulary matching pairs
-async function createVocabularyPairs(vocabularyCards: any[]) {
+async function createVocabularyPairs(
+  vocabularyCards: any[],
+  targetLanguage: string = "th",
+) {
   const pairs = [];
 
   for (const card of vocabularyCards) {
@@ -130,11 +185,12 @@ async function createVocabularyPairs(vocabularyCards: any[]) {
       (w) => w.vocabulary?.toLowerCase() === card.word?.toLowerCase(),
     );
 
-    // Extract definition text (handle multiple languages)
+    // Extract definition text in target language
     let definitionText = "";
     if (typeof card.definition === "object" && card.definition !== null) {
-      // Try to get English definition first, then fallback to other languages
+      // Try to get definition in target language first, then fallback to English
       definitionText =
+        (card.definition as any)[targetLanguage] ||
         (card.definition as any).en ||
         (card.definition as any).th ||
         (card.definition as any).vi ||
@@ -155,7 +211,7 @@ async function createVocabularyPairs(vocabularyCards: any[]) {
       right: {
         id: `right-${card.id}`,
         content: definitionText,
-        type: "definition",
+        type: "translation",
       },
       articleId: article.id,
       articleTitle: article.title,
@@ -170,165 +226,6 @@ async function createVocabularyPairs(vocabularyCards: any[]) {
   return pairs;
 }
 
-// Helper function to create sentence-based matching pairs
-async function createSentencePairs(sentenceCards: any[], difficulty: string) {
-  const pairs = [];
-
-  for (const card of sentenceCards) {
-    if (!card.sentence) continue;
-
-    // Get the article for word and translation data
-    const article = await prisma.article.findUnique({
-      where: { id: card.articleId },
-      select: {
-        id: true,
-        title: true,
-        sentences: true,
-        words: true,
-        audioUrl: true,
-        translatedPassage: true,
-      },
-    });
-
-    if (!article) continue;
-
-    const articleSentences = article.sentences as any[];
-    const articleWords = article.words as any[];
-
-    // Find the matching sentence in the article
-    const sentenceIndex = articleSentences.findIndex(
-      (s) => s.sentence === card.sentence,
-    );
-
-    if (sentenceIndex === -1) continue;
-
-    const matchingSentence = articleSentences[sentenceIndex];
-
-    // Extract vocabulary words from the sentence
-    const sentenceWords = matchingSentence.words || [];
-
-    // Filter words suitable for matching
-    const candidateWords = sentenceWords.filter((wordObj: any) => {
-      const word = wordObj.word?.toLowerCase();
-      if (!word) return false;
-
-      const commonWords = [
-        "the",
-        "and",
-        "for",
-        "are",
-        "but",
-        "not",
-        "you",
-        "all",
-        "can",
-        "had",
-        "her",
-        "was",
-        "one",
-        "our",
-        "out",
-        "day",
-        "get",
-        "has",
-        "him",
-        "his",
-        "how",
-        "its",
-        "may",
-        "new",
-        "now",
-        "old",
-        "see",
-        "two",
-        "way",
-        "who",
-        "a",
-        "an",
-        "in",
-        "on",
-        "at",
-        "to",
-        "of",
-        "is",
-        "it",
-        "be",
-        "do",
-      ];
-
-      return (
-        word.length > 3 &&
-        !commonWords.includes(word) &&
-        /^[a-zA-Z]+$/.test(word)
-      );
-    });
-
-    // Determine number of pairs based on difficulty
-    const pairCount =
-      difficulty === "easy" ? 2 : difficulty === "medium" ? 3 : 4;
-
-    // Select words for matching
-    const selectedWords = candidateWords
-      .sort(() => Math.random() - 0.5)
-      .slice(0, Math.min(pairCount, candidateWords.length));
-
-    // Create pairs for each selected word
-    for (const wordObj of selectedWords) {
-      // Find definition from article words data
-      const wordDefinition = articleWords?.find(
-        (w) => w.vocabulary?.toLowerCase() === wordObj.word?.toLowerCase(),
-      );
-
-      let definitionText = "";
-      if (wordDefinition?.definition) {
-        if (typeof wordDefinition.definition === "object") {
-          // Try to get English definition first, then fallback
-          definitionText =
-            wordDefinition.definition.en ||
-            wordDefinition.definition.th ||
-            wordDefinition.definition.vi ||
-            wordDefinition.definition.cn ||
-            wordDefinition.definition.tw ||
-            "Definition not available";
-        } else {
-          definitionText = wordDefinition.definition;
-        }
-      } else {
-        // Fallback to sentence translation if no word definition
-        const sentenceTranslation =
-          (article.translatedPassage as any)?.en?.[sentenceIndex] ||
-          (article.translatedPassage as any)?.th?.[sentenceIndex] ||
-          (article.translatedPassage as any)?.vi?.[sentenceIndex] ||
-          "Context: " + card.sentence;
-        definitionText = `From context: ${sentenceTranslation}`;
-      }
-
-      pairs.push({
-        id: `sentence-pair-${card.id}-${wordObj.word}`,
-        left: {
-          id: `left-${card.id}-${wordObj.word}`,
-          content: wordObj.word,
-          type: "word",
-        },
-        right: {
-          id: `right-${card.id}-${wordObj.word}`,
-          content: definitionText,
-          type: "meaning",
-        },
-        articleId: article.id,
-        articleTitle: article.title,
-        audioUrl: article.audioUrl
-          ? `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`
-          : undefined,
-        startTime: wordObj.startTime,
-        endTime: wordObj.endTime,
-      });
-    }
-  }
-
-  return pairs;
-}
-
 // Helper function to generate translation-based pairs
 async function createTranslationPairs(
   sentenceCards: any[],
@@ -337,10 +234,51 @@ async function createTranslationPairs(
   const pairs = [];
 
   for (const card of sentenceCards) {
-    if (!card.sentence || !card.translation) continue;
+    if (!card.sentence) continue;
 
-    const translation = (card.translation as any)?.[targetLanguage];
-    if (!translation) continue;
+    // Get the article for translation data
+    const article = await prisma.article.findUnique({
+      where: { id: card.articleId },
+      select: {
+        id: true,
+        title: true,
+        sentences: true,
+        translatedPassage: true,
+        audioUrl: true,
+      },
+    });
+
+    if (!article) continue;
+
+    const articleSentences = article.sentences as any[];
+    const translatedPassage = article.translatedPassage as any;
+
+    // Find the matching sentence in the article
+    const sentenceIndex = articleSentences.findIndex(
+      (s) => s.sentence === card.sentence,
+    );
+
+    if (sentenceIndex === -1) continue;
+
+    // Get translation for the sentence in target language
+    let translationText = "";
+    if (translatedPassage && translatedPassage[targetLanguage]) {
+      const translations = translatedPassage[targetLanguage];
+      if (Array.isArray(translations) && translations[sentenceIndex]) {
+        translationText = translations[sentenceIndex];
+      }
+    }
+
+    // If no translation found, try to get from card translation
+    if (!translationText && card.translation) {
+      const cardTranslation = (card.translation as any)?.[targetLanguage];
+      if (cardTranslation) {
+        translationText = cardTranslation;
+      }
+    }
+
+    // Skip if no translation available
+    if (!translationText) continue;
 
     pairs.push({
       id: `translation-pair-${card.id}`,
@@ -351,12 +289,14 @@ async function createTranslationPairs(
       },
       right: {
         id: `right-${card.id}`,
-        content: translation,
+        content: translationText,
         type: "translation",
       },
-      articleId: card.articleId,
-      articleTitle: "Translation Practice",
-      audioUrl: card.audioUrl,
+      articleId: article.id,
+      articleTitle: article.title,
+      audioUrl: article.audioUrl
+        ? `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`
+        : undefined,
       startTime: card.startTime,
       endTime: card.endTime,
     });

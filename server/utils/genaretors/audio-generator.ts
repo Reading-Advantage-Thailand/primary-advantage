@@ -25,6 +25,7 @@ import { uploadToBucket } from "@/utils/storage";
 
 interface GenerateAudioParams {
   passage: string;
+  sentences: string[];
   articleId: string;
 }
 
@@ -417,6 +418,7 @@ function processWordTimestampsIntoSentences(
 
 export async function generateAudio({
   passage,
+  sentences,
   articleId,
 }: GenerateAudioParams): Promise<void> {
   try {
@@ -451,14 +453,14 @@ export async function generateAudio({
     const localPath = `${process.cwd()}/data/audios/${articleId}.mp3`;
     fs.writeFileSync(localPath, MP3);
 
-    await uploadToBucket(localPath, `audios/sentences/${articleId}.mp3`);
+    await uploadToBucket(localPath, `audios/articles/${articleId}.mp3`);
 
     // const sentences = await splitIntoSentences(passage);
     // const sentence: string[] = sentencize(passage);
-    const nlp = winkNLP(model);
-    const doc = nlp.readDoc(passage);
-    const its = nlp.its;
-    const sentences: string[] = doc.sentences().out(its.value);
+    // const nlp = winkNLP(model);
+    // const doc = nlp.readDoc(passage);
+    // const its = nlp.its;
+    // const sentences: string[] = doc.sentences().out(its.value);
 
     // Process word timestamps into sentence timepoints
     const sentenceTimepoints = processWordTimestampsIntoSentences(
@@ -472,7 +474,7 @@ export async function generateAudio({
       where: { id: articleId },
       data: {
         sentences: JSON.parse(JSON.stringify(sentenceTimepoints)),
-        audioUrl: `/audios/sentences/${articleId}.mp3`,
+        audioUrl: `/audios/articles/${articleId}.mp3`,
       },
     });
 

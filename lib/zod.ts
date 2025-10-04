@@ -190,7 +190,7 @@ export const articleGeneratorSchema = z.object({
   passage: z
     .string()
     .describe(
-      "The reading passage written to the supplied specifications for both CEFR and type.",
+      "The reading passage written to the supplied specifications for both CEFR and type.Important: The passage should be returned in UTF-8 encoding format. and add some line breaks to make it more readable.and max 3 paragraphs ",
     ),
   summary: z
     .string()
@@ -202,6 +202,21 @@ export const articleGeneratorSchema = z.object({
     .describe(
       "A detailed description of an image to go along with the passage",
     ),
+
+  // imageDesc: z
+  //   .array(z.string())
+  //   .describe(
+  //     "A detailed description of an image to go along with the passage. A maximum of 3 images.",
+  //   ),
+  // imageDesc: z.array(z.string()).describe(
+  //   `Generate an array of 1 to 3 detailed image prompts that visually represent the key moments of the article, ensuring absolute consistency for main characters.
+
+  //   - **Image 1 (Beginning):** Describe an image that captures the initial scene or character setup. Crucially,
+  //   - **Image 2 (Middle):** Describe an image that shows the central conflict or a key action. Again,
+  //   - **Image 3 (End):** Describe an image that represents the resolution or final outcome. Once more,
+
+  //   Each description should be a single, detailed prompt for a high-quality image generator, using cinematic, photorealistic, or painterly styles as appropriate. Focus on visual details like specific clothing, unique markings, consistent age, and consistent general appearance.`,
+  // ),
   translatedSummary: z.object({
     th: z.string().describe("The Thai translation of the vocabulary."),
     cn: z
@@ -212,4 +227,76 @@ export const articleGeneratorSchema = z.object({
       .describe("The Traditional Chinese translation of the vocabulary."),
     vi: z.string().describe("The Vietnamese translation of the vocabulary."),
   }),
+  sentences: z.array(z.string()).describe("The sentences of the article"),
+  wordlist: z
+    .array(
+      z.object({
+        vocabulary: z.string().describe("The words of the article"),
+        definitions: z.object({
+          en: z.string().describe("The English definition of the vocabulary"),
+          th: z.string().describe("The Thai definition of the vocabulary"),
+          cn: z
+            .string()
+            .describe("The Simplified Chinese definition of the vocabulary"),
+          tw: z
+            .string()
+            .describe("The Traditional Chinese definition of the vocabulary"),
+          vi: z
+            .string()
+            .describe("The Vietnamese definition of the vocabulary"),
+        }),
+      }),
+    )
+    .describe(
+      "Extract the 3 to 5 most difficult vocabulary words, phrases, or idioms from the article",
+    ),
+  flashcard: z
+    .array(
+      z.object({
+        sentence: z.string().describe("The sentence of the article"),
+        translation: z.object({
+          th: z.string().describe("The Thai translation of the sentence"),
+          cn: z
+            .string()
+            .describe("The Simplified Chinese translation of the sentence"),
+          tw: z
+            .string()
+            .describe("The Traditional Chinese translation of the sentence"),
+          vi: z.string().describe("The Vietnamese translation of the sentence"),
+        }),
+      }),
+    )
+    .describe(
+      "Extract the 3 to 5 most difficult sentence, phrases, or idioms from the article",
+    ),
+  multipleChoiceQuestions: z
+    .array(
+      z.object({
+        question: z.string().describe("The question of the article"),
+        options: z.array(z.string()).describe("The options of the question"),
+        answer: z.string().describe("The answer of the question"),
+      }),
+    )
+    .describe(
+      "Create a series of 10 multiple-choice questions based on the article",
+    ),
+  shortAnswerQuestions: z
+    .array(
+      z.object({
+        question: z.string().describe("The question of the article"),
+        answer: z.string().describe("The answer of the question"),
+      }),
+    )
+    .describe(
+      "Create a series of 5 short answer questions based on the article",
+    ),
+  longAnswerQuestions: z
+    .array(
+      z.object({
+        question: z.string().describe("The question of the article"),
+      }),
+    )
+    .describe(
+      "Create a series of 5 long answer questions based on the article",
+    ),
 });

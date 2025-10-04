@@ -26,7 +26,7 @@ export default async function SentencesPage() {
           <TabsTrigger value="orderWord" className="text-xs sm:text-sm">
             Order Word
           </TabsTrigger>
-          <TabsTrigger disabled value="matching" className="text-xs sm:text-sm">
+          <TabsTrigger value="matching" className="text-xs sm:text-sm">
             Matching
           </TabsTrigger>
           <TabsTrigger value="manage" className="text-xs sm:text-sm">
