@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
 import { ActivityType } from "@/types/enum";
+import { getAudioUrl } from "@/lib/storage-config";
 
 export async function GET(
   request: NextRequest,
@@ -114,7 +115,7 @@ export async function GET(
         // words: matchingSentence.words,
         blanks: [],
         translation: flashcardCard.translation,
-        audioUrl: `https://storage.googleapis.com/primary-app-storage${flashcardCard.audioUrl}`,
+        audioUrl: getAudioUrl(flashcardCard.audioUrl || ""),
         startTime: flashcardCard.startTime,
         endTime: flashcardCard.endTime,
         difficulty: difficulty,

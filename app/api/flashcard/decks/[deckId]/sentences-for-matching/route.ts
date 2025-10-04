@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
 import { ActivityType } from "@/types/enum";
+import { getAudioUrl } from "@/lib/storage-config";
 
 export async function GET(
   request: NextRequest,
@@ -215,9 +216,7 @@ async function createVocabularyPairs(
       },
       articleId: article.id,
       articleTitle: article.title,
-      audioUrl: article.audioUrl
-        ? `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`
-        : undefined,
+      audioUrl: article.audioUrl ? getAudioUrl(article.audioUrl) : undefined,
       startTime: matchingWord?.startTime,
       endTime: matchingWord?.endTime,
     });
@@ -294,9 +293,7 @@ async function createTranslationPairs(
       },
       articleId: article.id,
       articleTitle: article.title,
-      audioUrl: article.audioUrl
-        ? `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`
-        : undefined,
+      audioUrl: article.audioUrl ? getAudioUrl(article.audioUrl) : undefined,
       startTime: card.startTime,
       endTime: card.endTime,
     });

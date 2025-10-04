@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback } from "react";
 import { Volume2Icon } from "lucide-react";
+import { getAudioUrl } from "@/lib/storage-config";
 
 type Props = {
   audioUrl: string;
@@ -70,9 +71,7 @@ export default function AudioButton({
   return (
     <div className="select-none">
       <audio ref={audioRef} onEnded={stopPlayback}>
-        <source
-          src={`https://storage.googleapis.com/primary-app-storage${audioUrl}`}
-        />
+        <source src={getAudioUrl(audioUrl)} />
       </audio>
       <Volume2Icon
         className={`mx-3 mt-1 h-5 w-5 cursor-pointer ${
