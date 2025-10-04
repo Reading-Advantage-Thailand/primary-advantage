@@ -39,7 +39,7 @@ export function SidebarNav({ items }: SidebarNavProps) {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const currentUser = useCurrentUser();
 
-  console.log("SidebarNav Debug - Current User:", currentUser);
+  // console.log("SidebarNav Debug - Current User:", currentUser);
 
   const toggleSection = (sectionKey: string) => {
     setOpenSections((prev) => ({

@@ -278,11 +278,18 @@ export function OrderSentenceGame({
     setIsPlaying(true);
   }, []);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (currentIndex < activeSentences.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
       setGameComplete(true);
+      await fetch(`/api/flashcard/decks/${deckId}/sentences-for-ordering`, {
+        method: "POST",
+        body: JSON.stringify({
+          score: score,
+          timer: timer,
+        }),
+      });
       setIsPlaying(false);
     }
   }, [currentIndex, activeSentences.length]);
@@ -389,7 +396,7 @@ export function OrderSentenceGame({
     });
   }, []);
 
-  // Replace your playHintAudio function with this simpler version
+  // Play continuous audio from first to last correct sentence
   const playHintAudio = useCallback(async () => {
     if (
       !currentSentenceGroup?.sentences ||
@@ -411,85 +418,97 @@ export function OrderSentenceGame({
         )
         .filter(Boolean);
 
-      // Play each sentence sequentially
-      for (let i = 0; i < correctOrderSentences.length; i++) {
-        const sentence = correctOrderSentences[i];
+      console.log("correctOrderSentences", correctOrderSentences);
 
-        console.log(`📊 Debug - Playing sentence ${i + 1}:`, {
-          hasAudioUrl: !!sentence?.audioUrl,
-          startTime: sentence?.startTime,
-          endTime: sentence?.endTime,
-          url: sentence?.audioUrl,
-        });
-
-        if (
-          sentence?.audioUrl &&
-          sentence.startTime !== undefined &&
-          sentence.endTime !== undefined
-        ) {
-          try {
-            await new Promise<void>((resolve) => {
-              let intervalRef: NodeJS.Timeout | null = null;
-
-              const cleanup = () => {
-                if (intervalRef) {
-                  clearInterval(intervalRef);
-                  intervalRef = null;
-                }
-                audio.removeEventListener("canplaythrough", handleCanPlay);
-                audio.removeEventListener("error", handleError);
-              };
-
-              const handleCanPlay = () => {
-                audio.removeEventListener("canplaythrough", handleCanPlay);
-
-                audio.currentTime = sentence.startTime!;
-
-                audio
-                  .play()
-                  .then(() => {
-                    const tolerance = 0.1;
-                    intervalRef = setInterval(() => {
-                      if (audio.currentTime + tolerance >= sentence.endTime!) {
-                        audio.pause();
-                        cleanup();
-                        resolve();
-                      }
-                    }, 50);
-                  })
-                  .catch(() => {
-                    cleanup();
-                    resolve();
-                  });
-              };
-
-              const handleError = () => {
-                cleanup();
-                resolve();
-              };
-
-              audio.addEventListener("canplaythrough", handleCanPlay);
-              audio.addEventListener("error", handleError);
-
-              audio.src = sentence.audioUrl!;
-              audio.load();
-
-              // Fallback timeout
-              setTimeout(() => {
-                cleanup();
-                resolve();
-              }, 10000);
-            });
-
-            // Delay between sentences
-            if (i < correctOrderSentences.length - 1) {
-              await new Promise((resolve) => setTimeout(resolve, 500));
-            }
-          } catch (error) {
-            console.warn(`Failed to play audio for sentence ${i + 1}:`, error);
-          }
-        }
+      if (correctOrderSentences.length === 0) {
+        toast.error("No sentences found for audio playback");
+        return;
       }
+
+      // Get the first sentence's start time and last sentence's end time
+      const firstSentence = correctOrderSentences[0];
+      const lastSentence =
+        correctOrderSentences[correctOrderSentences.length - 1];
+
+      console.log(`📊 Debug - Playing continuous audio:`, {
+        firstSentence: {
+          text: firstSentence?.text,
+          startTime: firstSentence?.startTime,
+          audioUrl: firstSentence?.audioUrl,
+        },
+        lastSentence: {
+          text: lastSentence?.text,
+          endTime: lastSentence?.endTime,
+          audioUrl: lastSentence?.audioUrl,
+        },
+        totalSentences: correctOrderSentences.length,
+      });
+
+      // Check if we have valid audio data
+      if (
+        !firstSentence?.audioUrl ||
+        firstSentence.startTime === undefined ||
+        lastSentence?.endTime === undefined
+      ) {
+        toast.error("Audio data not available for playback");
+        return;
+      }
+
+      // Play continuous audio from start of first sentence to end of last sentence
+      await new Promise<void>((resolve) => {
+        let intervalRef: NodeJS.Timeout | null = null;
+
+        const cleanup = () => {
+          if (intervalRef) {
+            clearInterval(intervalRef);
+            intervalRef = null;
+          }
+          audio.removeEventListener("canplaythrough", handleCanPlay);
+          audio.removeEventListener("error", handleError);
+        };
+
+        const handleCanPlay = () => {
+          audio.removeEventListener("canplaythrough", handleCanPlay);
+
+          // Set start time to the beginning of the first sentence
+          audio.currentTime = firstSentence.startTime! - 0.05;
+
+          audio
+            .play()
+            .then(() => {
+              const tolerance = 0.0005;
+              intervalRef = setInterval(() => {
+                // Stop at the end of the last sentence
+                if (audio.currentTime + tolerance >= lastSentence.endTime!) {
+                  audio.pause();
+                  cleanup();
+                  resolve(void 0);
+                }
+              }, 50);
+            })
+            .catch(() => {
+              cleanup();
+              resolve();
+            });
+        };
+
+        const handleError = () => {
+          cleanup();
+          resolve();
+        };
+
+        audio.addEventListener("canplaythrough", handleCanPlay);
+        audio.addEventListener("error", handleError);
+
+        audio.src = firstSentence.audioUrl!;
+        audio.load();
+
+        // Fallback timeout
+        setTimeout(() => {
+          cleanup();
+          resolve();
+        }, 10000);
+      });
 
       toast.success("Audio sequence completed! 🎵");
     } catch (error) {

@@ -8,18 +8,18 @@ import {
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { Article } from "@/types";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, BookCheck } from "lucide-react";
 import ArticleContent from "./article-content";
 import { getLocale, getTranslations } from "next-intl/server";
 
 // import RatingPopup from "./rating-popup";
 
 type Props = {
-  article: Article;
+  article: Article & { articleActivityLog: any[] };
   userId?: string;
 };
 
-export default async function ArticleCard({ article, userId }: Props) {
+export default async function ArticleCard({ article }: Props) {
   const locale = await getLocale();
   const t = await getTranslations();
   const getLocalizedSummary = () => {
@@ -34,6 +34,11 @@ export default async function ArticleCard({ article, userId }: Props) {
   };
 
   const imageUrl = `https://storage.googleapis.com/primary-app-storage/images/${article.id}.png`;
+  // const imageUrl = `/nopic.png`;
+
+  const isSaved = article.articleActivityLog.some(
+    (activity) => activity.isSentenceAndWordsSaved === true,
+  );
 
   return (
     <div className="md:basis-3/5">
@@ -47,18 +52,22 @@ export default async function ArticleCard({ article, userId }: Props) {
             <Badge>
               {t("Article.cefrLevel", { level: article.cefrLevel })}
             </Badge>
+            <Badge>
+              <BookCheck className="h-4 w-4" />
+              Article Saved to Flashcard: {isSaved ? "Saved" : "Not Saved"}
+            </Badge>
           </div>
           <CardDescription className="font-article text-lg md:text-xl">
             {getLocalizedSummary()}
           </CardDescription>
           <div className="flex justify-center">
-            <Image
+            {/* <Image
               src={imageUrl}
               alt="Malcolm X"
               width={640}
               height={640}
               unoptimized
-            />
+            /> */}
           </div>
           <ArticleContent article={article} />
         </CardHeader>

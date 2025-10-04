@@ -30,6 +30,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { saveFlashcard } from "@/actions/flashcard";
 import { toast } from "sonner";
 import { fetchArticleActivity } from "@/actions/article";
+import Image from "next/image";
 
 type Props = {
   article: Article;
@@ -894,7 +895,7 @@ export default function ArticleContent({ article }: Props) {
           return paragraphs.map((p, index) => (
             <p
               key={index}
-              className="mb-2 indent-4 hyphens-auto whitespace-pre-wrap"
+              className="font-article mb-2 indent-4 text-lg hyphens-auto whitespace-pre-wrap"
             >
               {p}
             </p>
@@ -931,119 +932,116 @@ export default function ArticleContent({ article }: Props) {
 
         const paragraphGroups = groupSentencesIntoParagraphs();
 
-        return paragraphGroups.map((group, groupIndex) => (
-          <p key={groupIndex} className="mb-4 indent-8 whitespace-pre-wrap">
-            {group.sentences.map((sentenceIndex) => {
-              const sentence = article.sentences?.[sentenceIndex];
-              const isCurrentSentence = sentenceIndex === currentSentenceIndex;
+        return paragraphGroups.map((group, groupIndex) => {
+          return (
+            <div key={groupIndex} className="flex flex-col gap-4">
+              <Image
+                className="rounded-lg shadow-xl"
+                src={`https://storage.googleapis.com/primary-app-storage/images/${article.id}_${groupIndex + 1}.png`}
+                alt="Article Image"
+                width={640}
+                height={640}
+              />
+              <p className="mb-4 indent-8 whitespace-pre-wrap">
+                {group.sentences.map((sentenceIndex) => {
+                  const sentence = article.sentences?.[sentenceIndex];
+                  const isCurrentSentence =
+                    sentenceIndex === currentSentenceIndex;
 
-              return (
-                <ContextMenu key={sentenceIndex}>
-                  <ContextMenuTrigger>
-                    <span
-                      ref={isCurrentSentence ? currentSentenceRef : null}
-                      className={`font-article rounded px-0.5 text-lg transition-all duration-200 md:text-xl ${
-                        sentenceIndex === currentSentenceIndex
-                          ? "bg-blue-300 dark:bg-blue-900/70"
-                          : ""
-                      }`}
-                    >
-                      {(() => {
-                        // ... existing word rendering logic ...
-                        const parts = sentence?.sentence.split(
-                          /(\s+|[.!?;:,"""''`()[\]{}—–\u2013\u2014\u2026]+)/,
-                        );
-                        let wordIndex = 0;
-
-                        const mergedParts = [];
-                        for (let i = 0; i < (parts?.length ?? 0); i++) {
-                          const current = parts?.[i];
-                          const next = parts?.[i + 1];
-                          const after = parts?.[i + 2];
-
-                          if (
-                            current &&
-                            /^\w+$/.test(current) &&
-                            (next === "'" || next === "'") &&
-                            after &&
-                            /^[a-z]+$/i.test(after) &&
-                            (after.toLowerCase() === "t" ||
-                              after.toLowerCase() === "s" ||
-                              after.toLowerCase() === "re" ||
-                              after.toLowerCase() === "ll" ||
-                              after.toLowerCase() === "ve" ||
-                              after.toLowerCase() === "d" ||
-                              after.toLowerCase() === "m")
-                          ) {
-                            mergedParts.push(current + next + after);
-                            i += 2;
-                          } else {
-                            mergedParts.push(current);
-                          }
-                        }
-
-                        return mergedParts.map((part, partIndex) => {
-                          const isActualWord =
-                            /[\w]/.test(part ?? "") &&
-                            /^[\w'-]+$/.test(part ?? "") &&
-                            part?.trim() !== "";
-
-                          const currentPartWordIndex = isActualWord
-                            ? wordIndex
-                            : -1;
-
-                          if (isActualWord) {
-                            wordIndex++;
-                          }
-
-                          const isCurrentWord =
-                            sentenceIndex === currentSentenceIndex &&
-                            currentPartWordIndex !== -1 &&
-                            currentPartWordIndex === currentWordIndex &&
-                            isActualWord;
-
-                          return (
-                            <span
-                              key={partIndex}
-                              className={cn(
-                                isActualWord
-                                  ? "cursor-pointer rounded transition-colors duration-150"
-                                  : "",
-                                isCurrentWord && isPlaying
-                                  ? "bg-blue-500 text-white"
-                                  : isActualWord
-                                    ? "hover:bg-blue-200 dark:hover:bg-blue-900/50"
-                                    : "",
-                              )}
-                              onClick={() =>
-                                handleWordClick(
-                                  sentenceIndex,
-                                  currentPartWordIndex,
-                                  sentence as SentenceTimepoint,
-                                )
-                              }
-                            >
-                              {part}
-                            </span>
-                          );
-                        });
-                      })()}
-                    </span>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent className="w-50">
-                    {loading ? (
-                      <ContextMenuItem inset disabled>
-                        Loading
-                      </ContextMenuItem>
-                    ) : (
-                      <>
-                        <ContextMenuItem
-                          inset
-                          disabled={loading}
-                          onClick={handleSaveToFlashcard}
+                  return (
+                    <ContextMenu key={sentenceIndex}>
+                      <ContextMenuTrigger>
+                        <span
+                          ref={isCurrentSentence ? currentSentenceRef : null}
+                          className={`font-article rounded px-0.5 text-lg transition-all duration-200 md:text-xl ${
+                            sentenceIndex === currentSentenceIndex
+                              ? "bg-blue-300 dark:bg-blue-900/70"
+                              : ""
+                          }`}
                         >
-                          {t("saveToFlashcard")}
-                        </ContextMenuItem>
+                          {(() => {
+                            // ... existing word rendering logic ...
+                            const parts = sentence?.sentence.split(
+                              /(\s+|[.!?;:,"""''`()[\]{}—–\u2013\u2014\u2026]+)/,
+                            );
+                            let wordIndex = 0;
+
+                            const mergedParts = [];
+                            for (let i = 0; i < (parts?.length ?? 0); i++) {
+                              const current = parts?.[i];
+                              const next = parts?.[i + 1];
+                              const after = parts?.[i + 2];
+
+                              if (
+                                current &&
+                                /^\w+$/.test(current) &&
+                                (next === "'" || next === "'") &&
+                                after &&
+                                /^[a-z]+$/i.test(after) &&
+                                (after.toLowerCase() === "t" ||
+                                  after.toLowerCase() === "s" ||
+                                  after.toLowerCase() === "re" ||
+                                  after.toLowerCase() === "ll" ||
+                                  after.toLowerCase() === "ve" ||
+                                  after.toLowerCase() === "d" ||
+                                  after.toLowerCase() === "m")
+                              ) {
+                                mergedParts.push(current + next + after);
+                                i += 2;
+                              } else {
+                                mergedParts.push(current);
+                              }
+                            }
+
+                            return mergedParts.map((part, partIndex) => {
+                              const isActualWord =
+                                /[\w]/.test(part ?? "") &&
+                                /^[\w'-]+$/.test(part ?? "") &&
+                                part?.trim() !== "";
+
+                              const currentPartWordIndex = isActualWord
+                                ? wordIndex
+                                : -1;
+
+                              if (isActualWord) {
+                                wordIndex++;
+                              }
+
+                              const isCurrentWord =
+                                sentenceIndex === currentSentenceIndex &&
+                                currentPartWordIndex !== -1 &&
+                                currentPartWordIndex === currentWordIndex &&
+                                isActualWord;
+
+                              return (
+                                <span
+                                  key={partIndex}
+                                  className={cn(
+                                    isActualWord
+                                      ? "cursor-pointer rounded transition-colors duration-150"
+                                      : "",
+                                    isCurrentWord && isPlaying
+                                      ? "bg-blue-500 text-white"
+                                      : isActualWord
+                                        ? "hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                                        : "",
+                                  )}
+                                  onClick={() =>
+                                    handleWordClick(
+                                      sentenceIndex,
+                                      currentPartWordIndex,
+                                      sentence as SentenceTimepoint,
+                                    )
+                                  }
+                                >
+                                  {part}
+                                </span>
+                              );
+                            });
+                          })()}
+                        </span>
+                      </ContextMenuTrigger>
+                      <ContextMenuContent className="w-50">
                         <ContextMenuItem
                           inset
                           disabled={loading || currentSentenceIndex === -1}
@@ -1051,14 +1049,14 @@ export default function ArticleContent({ article }: Props) {
                         >
                           {t("translate")}
                         </ContextMenuItem>
-                      </>
-                    )}
-                  </ContextMenuContent>
-                </ContextMenu>
-              );
-            })}
-          </p>
-        ));
+                      </ContextMenuContent>
+                    </ContextMenu>
+                  );
+                })}
+              </p>
+            </div>
+          );
+        });
       })()}
     </div>
   );

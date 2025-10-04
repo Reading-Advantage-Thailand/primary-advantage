@@ -4,11 +4,12 @@ import { currentUser } from "@/lib/session";
 import { createEmptyCard, Card, State, Rating } from "ts-fsrs";
 import { prisma } from "@/lib/prisma";
 import { ActivityType, FlashcardType } from "@/types/enum";
-import { FlashcardCard } from "@/types";
+import { FlashcardCard, SentenceTimepoint, WordListTimestamp } from "@/types";
 import { CardState } from "@prisma/client";
 import { fsrsService } from "@/lib/fsrs-service";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 
 interface WordList {
   vocabulary: string;
@@ -32,9 +33,10 @@ interface Sentence {
     tw: string;
     vi: string;
   };
+  timeSeconds?: number;
+  audioUrl: string;
   startTime: number;
   endTime: number;
-  audioUrl: string;
 }
 
 export async function saveFlashcard(
@@ -587,6 +589,96 @@ export async function reviewCard(
     };
   } catch (error) {
     console.error("Error processing card review:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export async function saveArticleToFlashcard(
+  articleId: string,
+  ArticleActivityLogId: string,
+) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+      select: {
+        sentencsAndWordsForFlashcard: true,
+      },
+    });
+
+    if (!article) {
+      return NextResponse.json({ error: "Article not found" }, { status: 404 });
+    }
+
+    let wordlist = [];
+    let sentencesList = [];
+
+    const wordsList = article.sentencsAndWordsForFlashcard.flatMap(
+      (word) => word.words as unknown as WordListTimestamp[],
+    );
+
+    const sentences = article.sentencsAndWordsForFlashcard.flatMap(
+      (sentence) => sentence.sentence as unknown as Sentence[],
+    );
+
+    wordlist = wordsList.map((word: WordListTimestamp, index: number) => {
+      const startTime = word?.timeSeconds as number;
+      const endTime =
+        index === wordsList.length - 1
+          ? (word?.timeSeconds as number) + 10
+          : (wordsList[index + 1].timeSeconds as number);
+
+      return {
+        vocabulary: word?.vocabulary,
+        definition: word?.definition,
+        startTime,
+        endTime,
+        audioUrl: article.sentencsAndWordsForFlashcard[0].wordsUrl as string,
+      };
+    });
+
+    sentencesList = sentences.map((sentence: Sentence, index: number) => {
+      const startTime = sentence?.timeSeconds as number;
+      const endTime =
+        index === sentences.length - 1
+          ? (sentence?.timeSeconds as number) + 10
+          : (sentences[index + 1].timeSeconds as number);
+
+      return {
+        sentence: sentence?.sentence,
+        translation: sentence?.translation,
+        startTime,
+        endTime,
+        audioUrl: article.sentencsAndWordsForFlashcard[0]
+          .audioSentencesUrl as string,
+      };
+    });
+
+    await Promise.all([
+      saveFlashcard(articleId, wordlist),
+      saveFlashcard(articleId, [], sentencesList),
+    ]);
+
+    await prisma.articleActivityLog.update({
+      where: {
+        id: ArticleActivityLogId,
+      },
+      data: { isSentenceAndWordsSaved: true },
+    });
+
+    return {
+      success: true,
+      message: "Article saved to flashcard successfully",
+    };
+  } catch (error) {
+    console.error("Error saving article to flashcard:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",

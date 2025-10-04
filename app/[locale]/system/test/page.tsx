@@ -4,9 +4,10 @@ import AudioTestWord from "./audio-test-word";
 import { testConnection } from "@/lib/test";
 import ArticleTestGenerate from "./article-test-genarate";
 import UploadTest from "./upload-test";
-import { deleteAllArticles } from "@/actions/test";
+import { deleteAllArticles, generateImages } from "@/actions/test";
 // import FlashcardGame from "@/components/flashcards/flashcard-game";
 // import { FlashcardType } from "@/types/enum";
+import GenerateImages from "./generate-images";
 
 export default async function TestFunctionality() {
   return (
@@ -28,12 +29,13 @@ export default async function TestFunctionality() {
       <Button
         onClick={async () => {
           "use server";
-          const result = await deleteAllArticles();
+          await deleteAllArticles();
         }}
       >
         Delete All Articles
       </Button>
       <UploadTest />
+      <GenerateImages />
     </div>
   );
 }

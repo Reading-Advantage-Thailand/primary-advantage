@@ -58,7 +58,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
           ref={ref}
           className="flex h-[20rem] flex-col gap-1 rounded-md bg-black bg-cover bg-center p-3 transition-all duration-300 hover:scale-105"
           style={{
-            backgroundImage: `url('https://storage.googleapis.com/primary-app-storage/images/${article.id}.png')`,
+            backgroundImage: `url('https://storage.googleapis.com/primary-app-storage/images/${article.id}_1.png')`,
             boxShadow: "inset 80px 10px 90px 10px rgba(0, 0, 0, 0.9)",
             opacity:
               article.is_read ||
@@ -75,10 +75,10 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
           <Badge className="max-w-max shadow-lg" variant="destructive">
             {t("cefrLevel", { level: article.cefrLevel ?? 0 })}
           </Badge>
-          <Badge className="max-w-max shadow-lg" variant="destructive">
+          {/* <Badge className="max-w-max shadow-lg" variant="destructive">
             {t(`subgenres.${sanitizeTranslationKey(article.subGenre ?? "")}`)},{" "}
             {t(`genres.${sanitizeTranslationKey(article.genre ?? "")}`)}
-          </Badge>
+          </Badge> */}
           <Badge className="max-w-max shadow-lg" variant="destructive">
             <StarRating initialRating={article.rating} readOnly />
           </Badge>

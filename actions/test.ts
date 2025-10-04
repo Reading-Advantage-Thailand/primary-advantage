@@ -5,6 +5,7 @@ import { getArticleById } from "@/server/models/articleModel";
 import { generateAudio } from "@/server/utils/genaretors/audio-generator";
 import { generateWordLists } from "@/server/utils/genaretors/audio-word-generator";
 import { deleteFile, uploadToBucket } from "@/utils/storage";
+import { generateImage } from "@/server/utils/genaretors/image-generator";
 
 export async function generateAudios(articleId: string) {
   try {
@@ -93,6 +94,30 @@ export async function deleteAllArticles() {
         failed: failedFileDeletions,
       },
     };
+  } catch (error) {
+    console.log("error", error);
+    return { error: true };
+  }
+}
+
+export async function generateImages(articleId: string) {
+  try {
+    const articles = await prisma.article.findUnique({
+      where: { id: articleId },
+      select: { id: true, passage: true, imageDescription: true },
+    });
+
+    const result = await generateImage({
+      imageDesc: articles?.imageDescription as string[],
+      articleId: articles?.id as string,
+      passage: articles?.passage as string,
+    });
+
+    if (result.success) {
+      return { success: true, message: "Images generated successfully" };
+    } else {
+      return { error: true, message: "Failed to generate images" };
+    }
   } catch (error) {
     console.log("error", error);
     return { error: true };

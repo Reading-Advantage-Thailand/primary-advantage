@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
+import { ActivityType } from "@/types/enum";
 
 // Helper function to tokenize a sentence into words
 function tokenizeSentence(sentence: string) {
@@ -228,9 +229,9 @@ export async function GET(
             // For individual words, we don't have word-level translations
             // Could be enhanced with a dictionary API later
           },
-          audioUrl: `https://storage.googleapis.com/primary-app-storage${article.audioUrl}`,
-          startTime,
-          endTime,
+          audioUrl: `https://storage.googleapis.com/primary-app-storage${flashcardCard.audioUrl}`,
+          startTime: flashcardCard.startTime,
+          endTime: flashcardCard.endTime,
           partOfSpeech: getPartOfSpeech(word, index, words.length),
         };
       });
@@ -263,7 +264,7 @@ export async function GET(
         difficulty: getDifficulty(words.length, article.cefrLevel),
         context: context,
         // Add sentence-level translations
-        sentenceTranslations: sentenceTranslations,
+        sentenceTranslations: flashcardCard.translation,
       });
     }
 
@@ -284,4 +285,51 @@ export async function GET(
       { status: 500 },
     );
   }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ deckId: string }> },
+) {
+  const user = await currentUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { deckId } = await params;
+  const { score, timer } = await request.json();
+
+  const xpEarned = Math.floor(score * 2);
+
+  const userActivity = await prisma.userActivity.create({
+    data: {
+      userId: user.id as string,
+      activityType: ActivityType.SENTENCE_WORD_ORDERING,
+      targetId: deckId,
+      timer: timer,
+      details: {
+        timer: timer,
+        score: score,
+        xp: xpEarned,
+      },
+      completed: true,
+    },
+  });
+
+  await prisma.xPLogs.create({
+    data: {
+      userId: user.id as string,
+      xpEarned: xpEarned,
+      activityId: userActivity.id,
+      activityType: ActivityType.SENTENCE_WORD_ORDERING,
+    },
+  });
+
+  await prisma.user.update({
+    where: { id: user.id as string },
+    data: { xp: { increment: xpEarned } },
+  });
+
+  return NextResponse.json({ success: true });
 }

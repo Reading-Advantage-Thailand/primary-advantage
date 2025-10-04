@@ -38,6 +38,34 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+// Language options for translation matching
+const TRANSLATION_LANGUAGES = {
+  th: {
+    code: "th",
+    name: "Thai",
+    flag: "🇹🇭",
+    nativeName: "ไทย",
+  },
+  vi: {
+    code: "vi",
+    name: "Vietnamese",
+    flag: "🇻🇳",
+    nativeName: "Tiếng Việt",
+  },
+  cn: {
+    code: "cn",
+    name: "Chinese (Simplified)",
+    flag: "🇨🇳",
+    nativeName: "简体中文",
+  },
+  tw: {
+    code: "tw",
+    name: "Chinese (Traditional)",
+    flag: "🇹🇼",
+    nativeName: "繁體中文",
+  },
+};
+
 interface MatchingPair {
   id: string;
   left: {
@@ -60,7 +88,7 @@ interface MatchingPair {
 interface MatchingGameData {
   id: string;
   pairs: MatchingPair[];
-  difficulty: "easy" | "medium" | "hard";
+  language: "th" | "vi" | "cn" | "tw";
 }
 
 interface MatchingGameProps {
@@ -88,9 +116,9 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
   const [timer, setTimer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<
-    "easy" | "medium" | "hard"
-  >("medium");
+  const [selectedLanguage, setSelectedLanguage] = useState<
+    "th" | "vi" | "cn" | "tw"
+  >("th");
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [hintsEnabled, setHintsEnabled] = useState(false);
@@ -105,22 +133,16 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
   const generatePairsForGame = useCallback(
     (
       gameData: MatchingGameData[],
-      difficulty: "easy" | "medium" | "hard",
+      language: "th" | "vi" | "cn" | "tw",
     ): MatchingGameData[] => {
-      const pairCount =
-        difficulty === "easy" ? 4 : difficulty === "medium" ? 6 : 8;
-
+      // For translation matching, we use all available pairs
       return gameData.map((game) => {
         const shuffledPairs = [...game.pairs].sort(() => Math.random() - 0.5);
-        const selectedPairs = shuffledPairs.slice(
-          0,
-          Math.min(pairCount, game.pairs.length),
-        );
 
         return {
           ...game,
-          pairs: selectedPairs,
-          difficulty,
+          pairs: shuffledPairs,
+          language,
         };
       });
     },
@@ -185,7 +207,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/flashcard/decks/${deckId}/sentences-for-matching`,
+        `/api/flashcard/decks/${deckId}/sentences-for-matching?language=${selectedLanguage}`,
       );
       if (response.ok) {
         const data = await response.json();
@@ -199,17 +221,24 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [deckId]);
+  }, [deckId, selectedLanguage]);
 
   const handleStartGame = useCallback(() => {
     setIsPlaying(true);
   }, []);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (currentIndex < activeGameData.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
       setGameComplete(true);
+      await fetch(`/api/flashcard/decks/${deckId}/sentences-for-matching`, {
+        method: "POST",
+        body: JSON.stringify({
+          score: score,
+          timer: timer,
+        }),
+      });
       setIsPlaying(false);
     }
   }, [currentIndex, activeGameData.length]);
@@ -393,8 +422,8 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
   // Memo hooks - always called in the same order
   const activeGameDataWithPairs = useMemo(() => {
     if (rawGameData.length === 0) return [];
-    return generatePairsForGame(rawGameData, selectedDifficulty);
-  }, [rawGameData, selectedDifficulty, generatePairsForGame]);
+    return generatePairsForGame(rawGameData, selectedLanguage);
+  }, [rawGameData, selectedLanguage, generatePairsForGame]);
 
   const currentGame = useMemo(
     () => activeGameData[currentIndex],
@@ -581,15 +610,15 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
     return (
       <div className="container mx-auto max-w-4xl space-y-8 px-4">
         <Header
-          heading="Matching Game"
-          text="Test your vocabulary by matching words with their meanings"
+          heading="Translation Matching Game"
+          text="Match sentences with their translations in your selected language"
         />
 
         <Card className="mx-auto max-w-2xl">
           <CardHeader className="pb-6 text-center">
             <CardTitle className="text-2xl">Ready to Match?</CardTitle>
             <p className="text-muted-foreground">
-              Connect words with their correct meanings or translations
+              Match English sentences with their translations
             </p>
           </CardHeader>
 
@@ -607,13 +636,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
 
               <div className="space-y-2 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
-                  <Link className="h-6 w-6 text-green-600" />
+                  <Languages className="h-6 w-6 text-green-600" />
                 </div>
-                <p className="text-sm font-medium">Match Pairs</p>
+                <p className="text-sm font-medium">Translation</p>
                 <p className="text-muted-foreground text-xs">
-                  {selectedDifficulty === "easy" && "4 pairs each"}
-                  {selectedDifficulty === "medium" && "6 pairs each"}
-                  {selectedDifficulty === "hard" && "8 pairs each"}
+                  {TRANSLATION_LANGUAGES[selectedLanguage].flag}{" "}
+                  {TRANSLATION_LANGUAGES[selectedLanguage].nativeName}
                 </p>
               </div>
 
@@ -621,15 +649,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10">
                   <Clock className="h-6 w-6 text-purple-600" />
                 </div>
-                <p className="text-sm font-medium">
-                  ~
-                  {selectedDifficulty === "easy"
-                    ? "3"
-                    : selectedDifficulty === "medium"
-                      ? "5"
-                      : "8"}{" "}
-                  min
-                </p>
+                <p className="text-sm font-medium">~5 min</p>
                 <p className="text-muted-foreground text-xs">Estimated time</p>
               </div>
             </div>
@@ -642,9 +662,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 <p className="text-sm font-medium">How to Play</p>
               </div>
               <ul className="text-muted-foreground ml-4 space-y-2 text-sm">
-                <li>• Click on an item from the left column to select it</li>
-                <li>• Then click on the matching item from the right column</li>
-                <li>• Match all pairs correctly to complete each set</li>
+                <li>• Click on a sentence from the left column to select it</li>
+                <li>• Then click on its translation from the right column</li>
+                <li>
+                  • Match all sentence-translation pairs correctly to complete
+                  each set
+                </li>
               </ul>
             </div>
 
@@ -652,64 +675,49 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="difficulty" className="text-sm font-medium">
-                  Choose Difficulty Level
+                <Label htmlFor="language" className="text-sm font-medium">
+                  Choose Translation Language
                 </Label>
                 <Select
-                  value={selectedDifficulty}
-                  onValueChange={(value: "easy" | "medium" | "hard") => {
-                    setSelectedDifficulty(value);
+                  value={selectedLanguage}
+                  onValueChange={(value: "th" | "vi" | "cn" | "tw") => {
+                    setSelectedLanguage(value);
                     setActiveGameData([]);
+                    setRawGameData([]);
                   }}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select difficulty" />
+                    <SelectValue placeholder="Select language" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="easy">
-                      <div className="flex items-center gap-2">
-                        <span className="text-green-600">🟢</span>
-                        <span>Easy</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="medium">
-                      <div className="flex items-center gap-2">
-                        <span className="text-yellow-600">🟡</span>
-                        <span>Medium</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="hard">
-                      <div className="flex items-center gap-2">
-                        <span className="text-red-600">🔴</span>
-                        <span>Hard</span>
-                      </div>
-                    </SelectItem>
+                    {Object.entries(TRANSLATION_LANGUAGES).map(
+                      ([code, lang]) => (
+                        <SelectItem key={code} value={code}>
+                          <div className="flex items-center gap-2">
+                            <span>{lang.flag}</span>
+                            <span>{lang.name}</span>
+                            <span className="text-muted-foreground text-sm">
+                              ({lang.nativeName})
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ),
+                    )}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="bg-muted/50 rounded-lg p-4">
                 <div className="mb-2 flex items-center gap-2">
-                  {selectedDifficulty === "easy" && (
-                    <span className="text-green-600">🟢</span>
-                  )}
-                  {selectedDifficulty === "medium" && (
-                    <span className="text-yellow-600">🟡</span>
-                  )}
-                  {selectedDifficulty === "hard" && (
-                    <span className="text-red-600">🔴</span>
-                  )}
-                  <span className="font-medium capitalize">
-                    {selectedDifficulty} Mode
+                  <span>{TRANSLATION_LANGUAGES[selectedLanguage].flag}</span>
+                  <span className="font-medium">
+                    {TRANSLATION_LANGUAGES[selectedLanguage].name} Translation
                   </span>
                 </div>
                 <p className="text-muted-foreground text-sm">
-                  {selectedDifficulty === "easy" &&
-                    "Perfect for beginners. Match 4 pairs in each set."}
-                  {selectedDifficulty === "medium" &&
-                    "Moderate challenge. Match 6 pairs in each set."}
-                  {selectedDifficulty === "hard" &&
-                    "Maximum challenge. Match 8 pairs in each set."}
+                  Match English sentences with their{" "}
+                  {TRANSLATION_LANGUAGES[selectedLanguage].name} translations (
+                  {TRANSLATION_LANGUAGES[selectedLanguage].nativeName}).
                 </p>
               </div>
             </div>
@@ -729,15 +737,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading {selectedDifficulty} pairs...
+                  Loading translation pairs...
                 </>
               ) : (
                 <>
                   <Play className="mr-2 h-5 w-5" />
-                  Start{" "}
-                  {selectedDifficulty.charAt(0).toUpperCase() +
-                    selectedDifficulty.slice(1)}{" "}
-                  Game
+                  Start Translation Game
                 </>
               )}
             </Button>
@@ -761,8 +766,8 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
   return (
     <div className="container mx-auto max-w-6xl space-y-4 px-4">
       <Header
-        heading="Matching Game"
-        text="Connect each word with its correct meaning"
+        heading="Translation Matching Game"
+        text="Match each sentence with its correct translation"
       />
 
       <div className="space-y-2">
@@ -787,9 +792,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
         <CardHeader>
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="space-y-3">
-              <CardTitle className="text-xl">🔗 Match the Pairs</CardTitle>
+              <CardTitle className="text-xl">
+                🌐 Match Sentences with Translations
+              </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Click an item on the left, then click its match on the right
+                Click a sentence on the left, then click its translation on the
+                right
               </p>
             </div>
           </div>
@@ -845,7 +853,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-blue-500" />
-                  <h3 className="font-medium">Words & Phrases</h3>
+                  <h3 className="font-medium">English Sentences</h3>
                 </div>
                 <div className="space-y-2">
                   {currentGame.pairs.map((pair) => {
@@ -899,21 +907,13 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 </div>
               </div>
 
-              <div className="hidden items-center justify-center lg:flex">
-                <div className="text-center">
-                  <CornerDownRight className="text-muted-foreground mx-auto h-8 w-8" />
-                  <p className="text-muted-foreground mt-2 text-xs">
-                    {selectedLeft
-                      ? "Now select a match →"
-                      : "Select from left first"}
-                  </p>
-                </div>
-              </div>
-
               <div className="space-y-3 lg:col-start-2">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-green-500" />
-                  <h3 className="font-medium">Meanings & Translations</h3>
+                  <h3 className="font-medium">
+                    {TRANSLATION_LANGUAGES[selectedLanguage].flag}{" "}
+                    {TRANSLATION_LANGUAGES[selectedLanguage].name} Translations
+                  </h3>
                 </div>
                 <div className="space-y-2">
                   {shuffledRightItems.map((rightItem) => {

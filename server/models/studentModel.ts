@@ -642,7 +642,7 @@ export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
         xp: true,
         cefrLevel: true,
         createdAt: true,
-        UserActiclity: {
+        userActivity: {
           where: {
             createdAt: {
               gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
@@ -682,7 +682,7 @@ export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
     // Calculate active users this week
     const activeUserIds = new Set(
       allStudentsForStats.flatMap((student) =>
-        student.UserActiclity.map((activity) => activity.userId),
+        student.userActivity.map((activity) => activity.userId),
       ),
     );
     const activeThisWeek = activeUserIds.size;

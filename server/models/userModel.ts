@@ -97,6 +97,7 @@ export const updateUserActivity = async (
 
 export const getUserByEmail = async (email: string) => {
   try {
+    console.log("email: ", email);
     const user = await prisma.user.findUnique({
       where: {
         email: email,

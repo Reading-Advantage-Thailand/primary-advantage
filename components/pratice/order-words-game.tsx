@@ -225,7 +225,7 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
         setIsCompleted(true);
         setShowResult(true);
         setScore((prev) => prev + 1);
-        toast.success("Perfect! Correct word order! 🎉");
+        // toast.success("Perfect! Correct word order! 🎉");
       }
     }
   }, [
@@ -258,11 +258,18 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
     );
   }, [selectedLanguage]);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (currentIndex < activeSentences.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
       setGameComplete(true);
+      await fetch(`/api/flashcard/decks/${deckId}/words-for-ordering`, {
+        method: "POST",
+        body: JSON.stringify({
+          score: score,
+          timer: timer,
+        }),
+      });
       setIsPlaying(false);
     }
   }, [currentIndex, activeSentences.length]);
@@ -382,101 +389,77 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
     if (!currentSentence?.words || isPlayingHintAudio) return;
 
     setIsPlayingHintAudio(true);
-    toast.success("Playing correct word order audio 🔊");
+    // toast.success("Playing correct word order audio 🔊");
 
     try {
-      // Get words in correct order
-      const correctOrderWords = currentSentence.correctOrder
-        .map((wordText) =>
-          currentSentence.words.find((w) => w.text === wordText),
-        )
-        .filter(Boolean);
+      await new Promise((resolve, reject) => {
+        const audio = new Audio();
+        let timeoutId: NodeJS.Timeout;
 
-      // Play audio for each word in correct order with delay
-      for (let i = 0; i < correctOrderWords.length; i++) {
-        const word = correctOrderWords[i];
-        if (
-          word?.audioUrl &&
-          word.startTime !== undefined &&
-          word.endTime !== undefined
-        ) {
-          try {
-            await new Promise((resolve, reject) => {
-              const audio = new Audio();
-              let timeoutId: NodeJS.Timeout;
+        const cleanup = () => {
+          audio.pause();
+          if (timeoutId) clearTimeout(timeoutId);
+          audio.removeEventListener("loadeddata", handleLoadedData);
+          audio.removeEventListener("seeked", handleSeeked);
+          audio.removeEventListener("timeupdate", handleTimeUpdate);
+          audio.removeEventListener("ended", handleEnded);
+          audio.removeEventListener("error", handleError);
+        };
 
-              const cleanup = () => {
-                audio.pause();
-                if (timeoutId) clearTimeout(timeoutId);
-                audio.removeEventListener("loadeddata", handleLoadedData);
-                audio.removeEventListener("seeked", handleSeeked);
-                audio.removeEventListener("timeupdate", handleTimeUpdate);
-                audio.removeEventListener("ended", handleEnded);
-                audio.removeEventListener("error", handleError);
-              };
+        const handleLoadedData = () => {
+          audio.removeEventListener("loadeddata", handleLoadedData);
+          audio.currentTime = currentSentence.words[currentIndex].startTime!;
+        };
 
-              const handleLoadedData = () => {
-                audio.removeEventListener("loadeddata", handleLoadedData);
-                audio.currentTime = word.startTime!;
-              };
+        const handleSeeked = () => {
+          audio.removeEventListener("seeked", handleSeeked);
+          audio
+            .play()
+            .then(() => {
+              audio.addEventListener("timeupdate", handleTimeUpdate);
+            })
+            .catch(handleError);
+        };
 
-              const handleSeeked = () => {
-                audio.removeEventListener("seeked", handleSeeked);
-                audio
-                  .play()
-                  .then(() => {
-                    audio.addEventListener("timeupdate", handleTimeUpdate);
-                  })
-                  .catch(handleError);
-              };
-
-              const handleTimeUpdate = () => {
-                if (audio.currentTime >= word.endTime!) {
-                  cleanup();
-                  resolve(void 0);
-                }
-              };
-
-              const handleEnded = () => {
-                cleanup();
-                resolve(void 0);
-              };
-
-              const handleError = (error: any) => {
-                cleanup();
-                reject(error);
-              };
-
-              audio.addEventListener("loadeddata", handleLoadedData);
-              audio.addEventListener("seeked", handleSeeked);
-              audio.addEventListener("ended", handleEnded);
-              audio.addEventListener("error", handleError);
-
-              timeoutId = setTimeout(() => {
-                cleanup();
-                resolve(void 0);
-              }, 5000);
-
-              audio.preload = "auto";
-              audio.src = word.audioUrl!;
-              audio.load();
-            });
-
-            // Add delay between words
-            if (i < correctOrderWords.length - 1) {
-              await new Promise((resolve) => setTimeout(resolve, 300));
-            }
-          } catch (error) {
-            console.warn(`Failed to play audio for word ${i + 1}:`, error);
+        const handleTimeUpdate = () => {
+          const tolerance = 0.5;
+          if (
+            audio.currentTime + tolerance >=
+            currentSentence.words[currentIndex].endTime!
+          ) {
+            cleanup();
+            resolve(void 0);
           }
-        }
-      }
+        };
 
-      toast.success("Audio sequence completed! 🎵");
+        const handleEnded = () => {
+          cleanup();
+          resolve(void 0);
+        };
+
+        const handleError = (error: any) => {
+          cleanup();
+          reject(error);
+        };
+
+        audio.addEventListener("loadeddata", handleLoadedData);
+        audio.addEventListener("seeked", handleSeeked);
+        audio.addEventListener("ended", handleEnded);
+        audio.addEventListener("error", handleError);
+
+        timeoutId = setTimeout(() => {
+          cleanup();
+          resolve(void 0);
+        }, 5000);
+
+        audio.preload = "auto";
+        audio.src = currentSentence.words[currentIndex].audioUrl!;
+        audio.load();
+      });
     } catch (error) {
-      console.error("Error playing hint audio:", error);
-      toast.error("Failed to play hint audio");
+      // console.warn(`Failed to play audio for word ${i + 1}:`, error);
     } finally {
+      // toast.success("Audio sequence completed! 🎵");
       setIsPlayingHintAudio(false);
     }
   }, [currentSentence, isPlayingHintAudio]);

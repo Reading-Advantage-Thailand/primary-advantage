@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { generateArticle } from "@/actions/article";
+import { generateArticle, generateArticleNew } from "@/actions/article";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -22,6 +22,15 @@ export default function ArticleTestGenerate() {
     });
   };
 
+  const handleGenerateNew = async () => {
+    console.log("generate new");
+    startTransition(async () => {
+      generateArticleNew(amount).then((result) => {
+        console.log(result);
+      });
+    });
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <h1>Generate Articles</h1>
@@ -33,6 +42,12 @@ export default function ArticleTestGenerate() {
       />
       <Button onClick={handleGenerate} disabled={isPending}>
         Generate
+      </Button>
+
+      <h1>New Generator</h1>
+
+      <Button onClick={handleGenerateNew} disabled={isPending}>
+        New Generator
       </Button>
     </div>
   );

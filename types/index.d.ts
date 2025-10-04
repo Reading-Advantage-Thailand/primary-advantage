@@ -77,8 +77,8 @@ export interface ArticleShowcase {
   is_completed?: boolean;
   is_approved?: boolean;
   type?: string;
-  subGenre?: string;
-  genre?: string;
+  subGenre?: string | null;
+  genre?: string | null;
   storyBible?: StoryBible;
 }
 
@@ -106,7 +106,7 @@ export interface Article {
   title: string;
   cefrLevel: string;
   raLevel: number;
-  subGenre: string;
+  subGenre?: string | null;
   genre: string;
   id: string;
   audioUrl?: string;

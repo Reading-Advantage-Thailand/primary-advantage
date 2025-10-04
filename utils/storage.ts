@@ -42,9 +42,10 @@ export const uploadToBucket = async (
     }
 
     // delete the file from the local file system
-    if (isDeleteLocal) {
-      fs.unlinkSync(filePath);
-    }
+    // if (isDeleteLocal) {
+    //   fs.unlinkSync(filePath);
+    // }
+
     console.log(`✅ Uploaded to bucket: ${destination}`);
   } catch (error) {
     console.error("ERROR UPLOADING TO BUCKET: ", error);
@@ -58,9 +59,12 @@ export async function deleteFile(fileName: string): Promise<{
 }> {
   try {
     const filePatterns = [
-      `images/${fileName}.png`,
-      `audios/sentences/${fileName}.mp3`,
+      `images/${fileName}_1.png`,
+      `images/${fileName}_2.png`,
+      `images/${fileName}_3.png`,
+      `audios/articles/${fileName}.mp3`,
       `audios/words/${fileName}.mp3`,
+      `audios/sentences/${fileName}.mp3`,
     ];
 
     const results = { deleted: [] as string[], failed: [] as string[] };
