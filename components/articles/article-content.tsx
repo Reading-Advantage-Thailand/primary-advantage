@@ -944,6 +944,7 @@ export default function ArticleContent({ article }: Props) {
                 alt="Article Image"
                 width={640}
                 height={640}
+                unoptimized
               />
               <p className="mb-4 indent-8 whitespace-pre-wrap">
                 {group.sentences.map((sentenceIndex) => {
