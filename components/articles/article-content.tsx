@@ -938,7 +938,9 @@ export default function ArticleContent({ article }: Props) {
             <div key={groupIndex} className="flex flex-col gap-4">
               <Image
                 className="rounded-lg shadow-xl"
-                src={getArticleImageUrl(article.id, groupIndex + 1)}
+                src={
+                  getArticleImageUrl(article.id, groupIndex + 1) || `/nopic.png`
+                }
                 alt="Article Image"
                 width={640}
                 height={640}
