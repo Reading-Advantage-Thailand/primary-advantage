@@ -186,8 +186,8 @@ export default function MyStudents() {
         );
       },
     },
-    // Conditionally add classrooms column for SYSTEM users
-    ...(userRole === "SYSTEM"
+    // Conditionally add classrooms column for system users
+    ...(userRole === "system"
       ? [
           {
             accessorKey: "classrooms",
@@ -207,7 +207,7 @@ export default function MyStudents() {
                       {classrooms.slice(0, 2).map((classroom, index) => (
                         <span
                           key={index}
-                          className="items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-700/10"
+                          className="items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-700/10 ring-inset"
                         >
                           {classroom.name}
                           {classroom.teacher && (

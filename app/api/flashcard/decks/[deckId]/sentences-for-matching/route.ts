@@ -69,7 +69,6 @@ export async function GET(
         translationLanguage,
       );
 
-      console.log("translationPairs", translationPairs);
       if (translationPairs.length > 0) {
         matchingGames.push({
           id: `translation-${Date.now()}-${Math.random()}`,

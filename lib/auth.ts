@@ -84,7 +84,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user, account, trigger, session }) {
+    async jwt({ token, user, account, trigger }) {
       if (user) {
         token.id = user.id as string;
         token.email = user.email as string;
@@ -114,7 +114,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const dbUser = await getUserByEmail(user.email);
 
         const role = await prisma.role.findFirst({
-          where: { name: "USER" },
+          where: { name: "user" },
         });
 
         if (!dbUser) {

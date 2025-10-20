@@ -100,10 +100,11 @@ export const teacherPageConfig: PageConfig = {
     //   href: "/teacher/classroom",
     //   icon: "GraduationCapIcon",
     // },
-    // {
-    //   title: "assignments",
-    //   href: "/teacher/assignments",
-    //   icon: "ClipboardCheckIcon",
-    // },
+    {
+      title: "assignments",
+      href: "/teacher/assignments",
+      icon: "ClipboardCheckIcon",
+      requiredPermissions: ["TEACHER_ACCESS"],
+    },
   ],
 };

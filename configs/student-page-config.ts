@@ -38,6 +38,12 @@ export const studentPageConfig: PageConfig = {
     //   requiredPermissions: ["STUDENT_ACCESS"],
     // },
     {
+      title: "assignments",
+      href: "/student/assignments",
+      icon: "ClipboardCheckIcon",
+      requiredPermissions: ["STUDENT_ACCESS"],
+    },
+    {
       id: "onborda-sentences",
       title: "sentences",
       href: "/student/sentences",

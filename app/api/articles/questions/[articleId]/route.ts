@@ -1,25 +1,30 @@
 import { handleUpdateUserActivity } from "@/server/controllers/userController";
+import { getQuestionsByArticleId } from "@/server/models/articleModel";
 import { NextRequest, NextResponse } from "next/server";
+import { ActivityType } from "@/types/enum";
 
-// export async function GET(req: NextRequest) {
-//   try {
-//     const { searchParams } = req.nextUrl;
-//     const articleId = searchParams.get("articleId");
-//     const questionType = searchParams.get("questionType");
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = req.nextUrl;
+    const articleId = searchParams.get("articleId");
+    const questionType = searchParams.get("questionType");
 
-//     if (!articleId || !questionType) {
-//       return new Response("Missing parameters", { status: 400 });
-//     }
+    if (!articleId || !questionType) {
+      return new Response("Missing parameters", { status: 400 });
+    }
 
-//     // Fetch questions based on articleId and questionType
-//     // This is a placeholder. Replace with actual fetching logic.
-//     const questions = await fetchQuestions(articleId, questionType);
+    // Fetch questions based on articleId and questionType
+    // This is a placeholder. Replace with actual fetching logic.
+    const questions = await getQuestionsByArticleId(
+      articleId,
+      questionType as ActivityType,
+    );
 
-//     return new Response(JSON.stringify(questions), { status: 200 });
-//   } catch (error) {
-//     return new Response("Error", { status: 500 });
-//   }
-// }
+    return new Response(JSON.stringify(questions), { status: 200 });
+  } catch (error) {
+    return new Response("Error", { status: 500 });
+  }
+}
 
 export async function POST(
   req: NextRequest,

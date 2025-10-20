@@ -195,9 +195,9 @@ export default function ImportDataPage() {
         "Import student information including personal details and class assignments",
       headers: ["name", "email", "classroom_name", "role"],
       example: [
-        ["John Doe", "john.doe@email.com", "Classroom 1", "STUDENT"],
-        ["Jane Smith", "jane.smith@email.com", "Classroom 2", "STUDENT"],
-        ["Bob Johnson", "bob.johnson@email.com", "Classroom 3", "STUDENT"],
+        ["John Doe", "john.doe@email.com", "Classroom 1", "student"],
+        ["Jane Smith", "jane.smith@email.com", "Classroom 2", "student"],
+        ["Bob Johnson", "bob.johnson@email.com", "Classroom 3", "student"],
       ],
       requirements: [
         "File name must be students.csv",
@@ -210,9 +210,9 @@ export default function ImportDataPage() {
       description: "Import teacher information and their assigned subjects",
       headers: ["name", "email", "classroom_name", "role"],
       example: [
-        ["Alice Wilson", "alice.wilson@school.edu", "Classroom 1", "Teacher"],
-        ["David Brown", "david.brown@school.edu", "Classroom 2", "Teacher"],
-        ["Sarah Davis", "sarah.davis@school.edu", "", "Admin"],
+        ["Alice Wilson", "alice.wilson@school.edu", "Classroom 1", "teacher"],
+        ["David Brown", "david.brown@school.edu", "Classroom 2", "teacher"],
+        ["Sarah Davis", "sarah.davis@school.edu", "", "admin"],
       ],
       requirements: [
         "File name must be teachers.csv",

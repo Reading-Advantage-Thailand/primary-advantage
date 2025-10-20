@@ -147,45 +147,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    console.log(
-      "Current user roles:",
-      currentUser.roles.map((r) => r.role.name),
-    );
-
     // Check if user has Admin role
     const hasAdminRole = currentUser.roles.some(
-      (userRole) => userRole.role.name === "Admin",
+      (userRole) => userRole.role.name === "admin",
     );
-
-    console.log("Has admin role:", hasAdminRole);
 
     // Check what roles exist in the database
     const allRoles = await prisma.role.findMany();
-    console.log(
-      "All roles in database:",
-      allRoles.map((r) => r.name),
-    );
 
     // If user doesn't have Admin role and is currently User or Teacher, upgrade them
     if (!hasAdminRole) {
       const currentRoles = currentUser.roles.map((ur) => ur.role.name);
-      console.log("Current roles:", currentRoles);
-      console.log(
-        "Checking for User or Teacher:",
-        currentRoles.includes("User") || currentRoles.includes("Teacher"),
-      );
 
-      if (currentRoles.includes("User") || currentRoles.includes("Teacher")) {
+      if (currentRoles.includes("user") || currentRoles.includes("teacher")) {
         // Find or create Admin role
         let adminRole = await prisma.role.findFirst({
-          where: { name: "Admin" },
+          where: { name: "admin" },
         });
-
-        console.log("Found Admin role:", adminRole);
 
         if (!adminRole) {
           adminRole = await prisma.role.create({
-            data: { name: "Admin" },
+            data: { name: "admin" },
           });
         }
 
@@ -270,10 +252,8 @@ export async function POST(request: NextRequest) {
     const roleUpgraded =
       !hasAdminRole &&
       currentUser.roles.some(
-        (ur) => ur.role.name === "User" || ur.role.name === "Teacher",
+        (ur) => ur.role.name === "user" || ur.role.name === "teacher",
       );
-
-    console.log("Role upgraded calculation:", { hasAdminRole, roleUpgraded });
 
     const responseData = {
       ...schoolWithOwner,
@@ -470,18 +450,18 @@ export async function DELETE() {
     // Downgrade owner's role from Admin to User if they have Admin role
     if (ownerWithRoles) {
       const hasAdminRole = ownerWithRoles.roles.some(
-        (ur) => ur.role.name === "Admin",
+        (ur) => ur.role.name === "admin",
       );
 
       if (hasAdminRole) {
         // Find or create User role
         let userRole = await prisma.role.findFirst({
-          where: { name: "User" },
+          where: { name: "user" },
         });
 
         if (!userRole) {
           userRole = await prisma.role.create({
-            data: { name: "User" },
+            data: { name: "user" },
           });
         }
 

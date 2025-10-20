@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user has SYSTEM role (only system admins can create schools)
-    if (session.user.role !== "SYSTEM") {
+    // Check if user has system role (only system admins can create schools)
+    if (session.user.role !== "system") {
       return NextResponse.json(
         {
           error: "Forbidden. Only system administrators can create schools.",
@@ -79,8 +79,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user has SYSTEM role
-    if (session.user.role !== "System") {
+    // Check if user has system role
+    if (session.user.role !== "system") {
       return NextResponse.json(
         {
           error: "Forbidden. Only system administrators can view schools.",

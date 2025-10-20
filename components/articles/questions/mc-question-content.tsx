@@ -208,45 +208,42 @@ export default function MCQuestionContent({
           </p>
         </Button>
       ))}
-      {
-        <Button
-          variant={"outline"}
-          size={"sm"}
-          className="mt-2"
-          disabled={isPanding}
-          onClick={() => {
-            if (currentIndex < questions.length - 1) {
-              if (activeQuestion) {
-                handleNextQuestion();
-              } else {
-                toast("Please select an option to continue", {
-                  style: {
-                    background: `var(--destructive)`,
-                  },
-                });
-              }
+
+      <Button
+        variant={"outline"}
+        size={"sm"}
+        className="mt-2"
+        disabled={isPanding}
+        onClick={() => {
+          if (currentIndex < questions.length - 1) {
+            if (activeQuestion) {
+              handleNextQuestion();
             } else {
-              if (activeQuestion) {
-                handleFinishQuiz();
-              } else {
-                toast("Please select an option to continue", {
-                  style: {
-                    background: `var(--destructive)`,
-                  },
-                });
-              }
+              toast("Please select an option to continue", {
+                style: {
+                  background: `var(--destructive)`,
+                },
+              });
             }
-          }}
-        >
-          {currentIndex < questions.length - 1 ? (
-            <span className="flex items-center gap-2">{tc("nextButton")}</span>
-          ) : (
-            <span className="flex items-center gap-2">
-              {tc("finishButton")}
-            </span>
-          )}
-        </Button>
-      }
+          } else {
+            if (activeQuestion) {
+              handleFinishQuiz();
+            } else {
+              toast("Please select an option to continue", {
+                style: {
+                  background: `var(--destructive)`,
+                },
+              });
+            }
+          }
+        }}
+      >
+        {currentIndex < questions.length - 1 ? (
+          <span className="flex items-center gap-2">{tc("nextButton")}</span>
+        ) : (
+          <span className="flex items-center gap-2">{tc("finishButton")}</span>
+        )}
+      </Button>
     </CardContent>
   );
 }

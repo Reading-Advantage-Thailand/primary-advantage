@@ -21,7 +21,7 @@ export const createUser = async (data: {
 
     // Find the User role
     const userRole = await prisma.role.findFirst({
-      where: { name: "User" },
+      where: { name: "user" },
     });
 
     if (!userRole) {
@@ -97,7 +97,6 @@ export const updateUserActivity = async (
 
 export const getUserByEmail = async (email: string) => {
   try {
-    console.log("email: ", email);
     const user = await prisma.user.findUnique({
       where: {
         email: email,
@@ -110,6 +109,34 @@ export const getUserByEmail = async (email: string) => {
         },
       },
     });
+
+    if (user?.roles.length === 0) {
+      return await prisma.$transaction(async (tx) => {
+        const role = await tx.role.findFirst({
+          where: { name: "user" },
+        });
+
+        if (!role) {
+          throw new Error("Default user role not found");
+        }
+
+        await tx.userRole.create({
+          data: { userId: user.id, roleId: role.id },
+        });
+
+        // Return updated user
+        return await tx.user.findUnique({
+          where: { email },
+          include: {
+            roles: {
+              include: {
+                role: true,
+              },
+            },
+          },
+        });
+      });
+    }
 
     return user;
   } catch (error) {

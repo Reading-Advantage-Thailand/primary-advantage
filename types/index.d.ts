@@ -116,6 +116,7 @@ export interface Article {
   multipleChoiceQuestions?: MCQuestion[];
   shortAnswerQuestions?: SAQuestion[];
   longAnswerQuestions?: LAQuestion[];
+  sentencsAndWordsForFlashcard?: SentencsAndWordsForFlashcard[];
 }
 
 export interface WordList {
@@ -144,6 +145,11 @@ export interface LAQuestion {
   id: string;
   question: string;
   articleId: string;
+}
+
+export interface SaveSentenceAndWordFlashcard {
+  sentences: SaveSentence[];
+  words: WordListTimestamp[];
 }
 
 interface TimePoint {
@@ -177,6 +183,13 @@ export interface SentenceTimepoint {
   endTime: number;
   words: WordTimestamp[];
   sentence: string;
+  translations?: {
+    th?: string;
+    cn?: string;
+    tw?: string;
+    vi?: string;
+    en?: string;
+  };
 }
 
 export interface QuestionResponse {
@@ -330,7 +343,7 @@ export interface TeachersResponse {
 export interface CreateTeacherRequest {
   name: string;
   email: string;
-  role: "Teacher" | "Admin";
+  role: "teacher" | "admin";
   cefrLevel?: string;
   classroomIds?: string[];
   password?: string;
@@ -339,7 +352,7 @@ export interface CreateTeacherRequest {
 export interface UpdateTeacherRequest {
   name?: string;
   email?: string;
-  role?: "Teacher" | "Admin";
+  role?: "teacher" | "admin";
   cefrLevel?: string;
   classroomIds?: string[];
   password?: string;
@@ -463,3 +476,42 @@ export interface License {
 
 // Re-export ts-fsrs types for convenience
 export { Rating, State as FSRSState } from "ts-fsrs";
+
+export interface Assignment {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+  classroomId: string;
+  articleId: string;
+  teacherId: string;
+  teacherName: string;
+  dueDate: Date;
+  AssignmentStudent?: AssignmentStudent[] | null;
+  article?: Article | null;
+  classroom?: Classroom | null;
+}
+
+export interface AssignmentStudent {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  status: AssignmentStatus;
+  startedAt: Date;
+  completedAt: Date;
+  assignment?: Assignment | null;
+  student?: User | null;
+}
+
+export interface Classroom {
+  id: string;
+  name: string;
+  classCode: string;
+  codeExpiresAt: Date;
+  grade: string;
+  passwordStudents: string;
+  schoolId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

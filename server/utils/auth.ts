@@ -61,33 +61,19 @@ export const checkAdminPermissions = async (
   userWithRoles: UserWithRoles,
 ): Promise<boolean> => {
   try {
-    console.log(
-      "Auth Utils: Checking admin permissions for user:",
-      userWithRoles.id,
-    );
-
     // Check if user has system or admin role
     const isSystemAdmin = userWithRoles.roles.some(
-      (userRole) =>
-        userRole.role.name === "SYSTEM" || userRole.role.name === "System",
+      (userRole) => userRole.role.name === "system",
     );
 
     const isAdmin = userWithRoles.roles.some(
-      (userRole) =>
-        userRole.role.name === "ADMIN" || userRole.role.name === "Admin",
+      (userRole) => userRole.role.name === "admin",
     );
 
     // Check if user is a school admin
     const isSchoolAdmin = userWithRoles.SchoolAdmins.length > 0;
 
     const hasPermission = isSystemAdmin || isAdmin || isSchoolAdmin;
-
-    console.log("Auth Utils: Permission check result:", {
-      isSystemAdmin,
-      isAdmin,
-      isSchoolAdmin,
-      hasPermission,
-    });
 
     return hasPermission;
   } catch (error) {
@@ -101,32 +87,18 @@ export const checkTeacherPermissions = async (
   userWithRoles: UserWithRoles,
 ): Promise<boolean> => {
   try {
-    console.log(
-      "Auth Utils: Checking teacher permissions for user:",
-      userWithRoles.id,
-    );
-
     // Check if user has teacher role or higher
     const isTeacher = userWithRoles.roles.some(
       (userRole) =>
-        userRole.role.name === "TEACHER" ||
-        userRole.role.name === "Teacher" ||
-        userRole.role.name === "ADMIN" ||
-        userRole.role.name === "Admin" ||
-        userRole.role.name === "SYSTEM" ||
-        userRole.role.name === "System",
+        userRole.role.name === "teacher" ||
+        userRole.role.name === "admin" ||
+        userRole.role.name === "system",
     );
 
     // Check if user is a school admin (can also manage teachers/students)
     const isSchoolAdmin = userWithRoles.SchoolAdmins.length > 0;
 
     const hasPermission = isTeacher || isSchoolAdmin;
-
-    console.log("Auth Utils: Teacher permission check result:", {
-      isTeacher,
-      isSchoolAdmin,
-      hasPermission,
-    });
 
     return hasPermission;
   } catch (error) {
@@ -140,37 +112,21 @@ export const checkStudentPermissions = async (
   userWithRoles: UserWithRoles,
 ): Promise<boolean> => {
   try {
-    console.log(
-      "Auth Utils: Checking student permissions for user:",
-      userWithRoles.id,
-    );
-
     // Students can only access their own data, but admins and teachers can access student data
     const hasHigherPermissions = userWithRoles.roles.some(
       (userRole) =>
-        userRole.role.name === "TEACHER" ||
-        userRole.role.name === "Teacher" ||
-        userRole.role.name === "ADMIN" ||
-        userRole.role.name === "Admin" ||
-        userRole.role.name === "SYSTEM" ||
-        userRole.role.name === "System",
+        userRole.role.name === "teacher" ||
+        userRole.role.name === "admin" ||
+        userRole.role.name === "system",
     );
 
     const isStudent = userWithRoles.roles.some(
-      (userRole) =>
-        userRole.role.name === "STUDENT" || userRole.role.name === "Student",
+      (userRole) => userRole.role.name === "student",
     );
 
     const isSchoolAdmin = userWithRoles.SchoolAdmins.length > 0;
 
     const hasPermission = hasHigherPermissions || isStudent || isSchoolAdmin;
-
-    console.log("Auth Utils: Student permission check result:", {
-      hasHigherPermissions,
-      isStudent,
-      isSchoolAdmin,
-      hasPermission,
-    });
 
     return hasPermission;
   } catch (error) {
@@ -184,15 +140,9 @@ export const getUserSchoolIds = async (
   userWithRoles: UserWithRoles,
 ): Promise<string[]> => {
   try {
-    console.log(
-      "Auth Utils: Getting accessible school IDs for user:",
-      userWithRoles.id,
-    );
-
     // System admins can access all schools
     const isSystemAdmin = userWithRoles.roles.some(
-      (userRole) =>
-        userRole.role.name === "SYSTEM" || userRole.role.name === "System",
+      (userRole) => userRole.role.name === "system",
     );
 
     if (isSystemAdmin) {
@@ -201,10 +151,6 @@ export const getUserSchoolIds = async (
       });
       const schoolIds = allSchools.map((school) => school.id);
 
-      console.log(
-        "Auth Utils: System admin can access all schools:",
-        schoolIds.length,
-      );
       return schoolIds;
     }
 
@@ -225,7 +171,6 @@ export const getUserSchoolIds = async (
       }
     });
 
-    console.log("Auth Utils: User can access schools:", schoolIds);
     return schoolIds;
   } catch (error) {
     console.error("Auth Utils: Error getting user school IDs:", error);
@@ -239,17 +184,9 @@ export const canAccessSchool = async (
   schoolId: string,
 ): Promise<boolean> => {
   try {
-    console.log(
-      "Auth Utils: Checking school access for user:",
-      userWithRoles.id,
-      "school:",
-      schoolId,
-    );
-
     const accessibleSchoolIds = await getUserSchoolIds(userWithRoles);
     const hasAccess = accessibleSchoolIds.includes(schoolId);
 
-    console.log("Auth Utils: School access result:", hasAccess);
     return hasAccess;
   } catch (error) {
     console.error("Auth Utils: Error checking school access:", error);

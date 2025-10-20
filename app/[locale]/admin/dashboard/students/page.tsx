@@ -80,7 +80,7 @@ export default function DashboardPage() {
       email: "john.doe@example.com",
       cefrLevel: "B1",
       xp: 1250,
-      role: "STUDENT",
+      role: "student",
       createdAt: "2024-01-15",
     },
     {
@@ -89,7 +89,7 @@ export default function DashboardPage() {
       email: "jane.smith@example.com",
       cefrLevel: "A2",
       xp: 800,
-      role: "STUDENT",
+      role: "student",
       createdAt: "2024-01-20",
     },
     {
@@ -98,7 +98,7 @@ export default function DashboardPage() {
       email: "mike.johnson@example.com",
       cefrLevel: "C1",
       xp: 2100,
-      role: "STUDENT",
+      role: "student",
       createdAt: "2024-02-01",
     },
   ]);
@@ -113,7 +113,7 @@ export default function DashboardPage() {
     name: "",
     email: "",
     cefrLevel: "A1",
-    role: "STUDENT",
+    role: "student",
   });
 
   // Handle form input changes
@@ -127,7 +127,7 @@ export default function DashboardPage() {
       name: "",
       email: "",
       cefrLevel: "A1",
-      role: "STUDENT",
+      role: "student",
     });
   };
 
@@ -191,11 +191,11 @@ export default function DashboardPage() {
   // Get role badge variant
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
-      case "ADMIN":
+      case "admin":
         return "destructive";
-      case "TEACHER":
+      case "teacher":
         return "default";
-      case "STUDENT":
+      case "student":
         return "secondary";
       default:
         return "outline";
@@ -361,9 +361,9 @@ export default function DashboardPage() {
   //                       <SelectValue placeholder="Select role" />
   //                     </SelectTrigger>
   //                     <SelectContent>
-  //                       <SelectItem value="STUDENT">Student</SelectItem>
-  //                       <SelectItem value="TEACHER">Teacher</SelectItem>
-  //                       <SelectItem value="ADMIN">Admin</SelectItem>
+  //                       <SelectItem value="student">Student</SelectItem>
+  //                       <SelectItem value="teacher">Teacher</SelectItem>
+  //                       <SelectItem value="admin">Admin</SelectItem>
   //                     </SelectContent>
   //                   </Select>
   //                 </div>
@@ -532,9 +532,9 @@ export default function DashboardPage() {
   //                   <SelectValue placeholder="Select role" />
   //                 </SelectTrigger>
   //                 <SelectContent>
-  //                   <SelectItem value="STUDENT">Student</SelectItem>
-  //                   <SelectItem value="TEACHER">Teacher</SelectItem>
-  //                   <SelectItem value="ADMIN">Admin</SelectItem>
+  //                   <SelectItem value="student">Student</SelectItem>
+  //                   <SelectItem value="teacher">Teacher</SelectItem>
+  //                   <SelectItem value="admin">Admin</SelectItem>
   //                 </SelectContent>
   //               </Select>
   //             </div>

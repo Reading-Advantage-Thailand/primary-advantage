@@ -101,18 +101,16 @@ export function SchoolProfileForm({
 
       const school = await response.json();
 
-      console.log("school", school);
-
       if (school.roleUpgraded) {
         await update({
           ...session,
-          user: { ...session?.user, role: "Admin" },
+          user: { ...session?.user, role: "admin" },
         });
       }
 
       toast.success("School created successfully!", {
         description: school.roleUpgraded
-          ? `${school.name} has been created and you've been upgraded to Admin to access admin features.`
+          ? `${school.name} has been created and you've been upgraded to admin to access admin features.`
           : `${school.name} has been created and associated with your account.`,
       });
 

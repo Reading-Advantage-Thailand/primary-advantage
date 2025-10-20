@@ -4,9 +4,7 @@ import { prisma } from "@/lib/prisma";
 // Initialize required roles in the database
 export async function POST(request: NextRequest) {
   try {
-    const requiredRoles = ["User", "Student", "Teacher", "Admin", "System"];
-
-    console.log("Initializing roles...");
+    const requiredRoles = ["user", "student", "teacher", "admin", "system"];
 
     const createdRoles = [];
 
@@ -77,4 +75,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Failed to get roles" }, { status: 500 });
   }
 }
-

@@ -41,7 +41,7 @@ export const generateArticleNew = async (
   );
 
   const titleData = fs.readFileSync(
-    path.join(process.cwd(), "data", "title-a2.json"),
+    path.join(process.cwd(), "data", "title-a0.json"),
     "utf-8",
   );
 

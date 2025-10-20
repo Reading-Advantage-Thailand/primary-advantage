@@ -7,20 +7,20 @@ import { currentUser } from "./lib/session";
 
 // Define protected routes and their required roles
 const protectedRoutes = {
-  "/admin": ["Admin", "System"],
-  "/teacher": ["Teacher", "Admin", "System"],
-  "/student": ["Student", "Teacher", "Admin", "System"],
-  "/system": ["System"],
-  "/settings": ["User", "Student", "Teacher", "Admin", "System"],
+  "/admin": ["admin", "system"],
+  "/teacher": ["teacher", "admin", "system"],
+  "/student": ["student", "teacher", "admin", "system"],
+  "/system": ["system"],
+  "/settings": ["user", "student", "teacher", "admin", "system"],
 };
 
 // Define role-based default redirects after login
 const roleDefaultRedirects = {
-  User: "/",
-  Student: "/student/read",
-  Teacher: "/teacher/my-classes",
-  Admin: "/admin/dashboard",
-  System: "/system/dashboard",
+  user: "/",
+  student: "/student/read",
+  teacher: "/teacher/my-classes",
+  admin: "/admin/dashboard",
+  system: "/system/dashboard",
 };
 
 // Create the intl middleware

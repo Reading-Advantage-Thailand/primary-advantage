@@ -55,7 +55,7 @@ interface SingleDeckViewInlineProps {
   deckType?: "VOCABULARY" | "SENTENCE";
 }
 
-const VOCABULARY_LANGUAGES = {
+export const VOCABULARY_LANGUAGES = {
   en: {
     code: "en",
     name: "English",
@@ -88,7 +88,7 @@ const VOCABULARY_LANGUAGES = {
   },
 };
 
-const SENTENCE_LANGUAGES = {
+export const SENTENCE_LANGUAGES = {
   th: {
     code: "th",
     name: "Thai",

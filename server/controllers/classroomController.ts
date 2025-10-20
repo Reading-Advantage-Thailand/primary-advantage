@@ -51,7 +51,7 @@ export async function getClassroomController(
     }
 
     // Only teachers and system can view classroom details
-    // if (user.role !== "Teacher" && user.role !== "System") {
+    // if (user.role !== "teacher" && user.role !== "system") {
     //   return NextResponse.json(
     //     { error: "Access denied. Insufficient permissions." },
     //     { status: 403 },
@@ -61,7 +61,7 @@ export async function getClassroomController(
     const { id: classroomId } = await params;
 
     // For teachers, verify they own the classroom
-    const teacherId = user.role === "Teacher" ? user.id : undefined;
+    const teacherId = user.role === "teacher" ? user.id : undefined;
 
     const classroomData = await getClassroomWithStudents(
       classroomId,
@@ -210,13 +210,13 @@ export async function fetchStudentsByRole() {
 
     // Role-based access control
     switch (user.role) {
-      case "System":
-        // SYSTEM can see all students in the system
+      case "system":
+        // system can see all students in the system
         students = await getAllStudentsInSystem();
         break;
 
-      case "Teacher":
-        // TEACHER can only see students in their own classes
+      case "teacher":
+        // teacher can only see students in their own classes
         students = await getAllStudentsByTeacher(user.id);
         break;
 
@@ -249,7 +249,7 @@ export async function enrollStudentController(
     }
 
     // Only teachers and system can enroll students
-    if (user.role !== "TEACHER" && user.role !== "SYSTEM") {
+    if (user.role !== "teacher" && user.role !== "system") {
       return NextResponse.json(
         { error: "Access denied. Insufficient permissions." },
         { status: 403 },
@@ -267,7 +267,7 @@ export async function enrollStudentController(
     }
 
     // For teachers, verify they own the classroom
-    const teacherId = user.role === "TEACHER" ? user.id : undefined;
+    const teacherId = user.role === "teacher" ? user.id : undefined;
 
     const enrollment = await enrollStudentInClassroom(studentId, classroomId);
 
@@ -299,7 +299,7 @@ export async function unenrollStudentController(
     }
 
     // Only teachers and system can unenroll students
-    if (user.role !== "TEACHER" && user.role !== "SYSTEM") {
+    if (user.role !== "teacher" && user.role !== "system") {
       return NextResponse.json(
         { error: "Access denied. Insufficient permissions." },
         { status: 403 },
@@ -317,7 +317,7 @@ export async function unenrollStudentController(
     }
 
     // For teachers, verify they own the classroom
-    const teacherId = user.role === "TEACHER" ? user.id : undefined;
+    const teacherId = user.role === "teacher" ? user.id : undefined;
 
     const enrollment = await unenrollStudentFromClassroom(
       studentId,
@@ -353,7 +353,7 @@ export async function getAvailableStudentsController(
     }
 
     // Only teachers and system can view available students
-    if (user.role !== "TEACHER" && user.role !== "SYSTEM") {
+    if (user.role !== "teacher" && user.role !== "system") {
       return NextResponse.json(
         { error: "Access denied. Insufficient permissions." },
         { status: 403 },
@@ -363,7 +363,7 @@ export async function getAvailableStudentsController(
     const { id: classroomId } = await params;
 
     // For teachers, verify they own the classroom
-    const teacherId = user.role === "TEACHER" ? user.id : undefined;
+    const teacherId = user.role === "teacher" ? user.id : undefined;
 
     const availableStudents = await getAvailableStudentsForClassroom(
       classroomId,
@@ -392,7 +392,7 @@ export async function generateClassCodeController(
     }
 
     // Only teachers and system can generate class codes
-    // if (user.role !== "Teacher" && user.role !== "System") {
+    // if (user.role !== "teacher" && user.role !== "system") {
     //   return NextResponse.json(
     //     { error: "Access denied. Insufficient permissions." },
     //     { status: 403 },
@@ -402,7 +402,7 @@ export async function generateClassCodeController(
     const { id: classroomId } = await params;
 
     // For teachers, verify they own the classroom
-    const teacherId = user.role === "Teacher" ? user.id : undefined;
+    const teacherId = user.role === "teacher" ? user.id : undefined;
 
     const classroom = await generateClassCode(classroomId, teacherId);
 

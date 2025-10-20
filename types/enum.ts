@@ -1,9 +1,9 @@
 export enum Role {
-  User = "User",
-  Student = "Student",
-  Teacher = "Teacher",
-  Admin = "Admin",
-  System = "System",
+  user = "user",
+  student = "student",
+  teacher = "teacher",
+  admin = "admin",
+  system = "system",
 }
 
 export enum ArticleType {
@@ -82,18 +82,27 @@ export enum AnswerStatus {
 
 export enum UserXpEarned {
   MCQuestion = 2,
-  Article_Rating = 10,
-  Chapter_Rating = 10,
-  Vocabulary_Flashcards = 15,
-  Vocabulary_Matching = 5,
-  Sentence_Flashcards = 15,
-  Sentence_Matching = 5,
-  Sentence_Cloze_Test = 2,
-  Sentence_Ordering = 5,
-  Sentence_Word_Ordering = 5,
+  ARTICLE_RATING = 10,
+  CHAPTER_RATING = 10,
+  VOCABULARY_FLASHCARDS = 15,
+  VOCABULARY_MATCHING = 5,
+  SENTENCE_FLASHCARDS = 15,
+  SENTENCE_MATCHING = 5,
+  SENTENCE_CLOZE_TEST = 2,
+  SENTENCE_ORDERING = 5,
+  SENTENCE_WORD_ORDERING = 5,
 }
 
 export enum FlashcardType {
   VOCABULARY = "VOCABULARY",
   SENTENCE = "SENTENCE",
+}
+
+export enum GameState {
+  Loading,
+  Starting,
+  Playing,
+  Completed,
+  NoCards,
+  Error,
 }

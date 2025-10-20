@@ -85,7 +85,7 @@ export default async function AppLayout({
       >
         {!disableSidebar && (
           <aside className="lg:flex lg:w-[230px] lg:flex-col">
-            <SidebarNav items={sidebarNavConfig || []} />
+            <SidebarNav items={sidebarNavConfig || []} user={session?.user} />
             {/* {user.license_id && !disableLeaderboard ? (
               <Leaderboard data={leaderboard} />
             ) : null} */}

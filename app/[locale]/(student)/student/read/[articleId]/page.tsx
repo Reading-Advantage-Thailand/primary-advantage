@@ -12,6 +12,7 @@ import Sentence, {
 import { currentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { saveArticleToFlashcard } from "@/actions/flashcard";
+import AssignButton from "@/components/teacher/assign-button";
 
 export const metadata = {
   title: "Article",
@@ -29,6 +30,11 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
 
   const { articleId } = await params;
   const { article } = await getArticleById(articleId);
+
+  const isAtLeastTeacher = (role: string) =>
+    role.includes("teacher") ||
+    role.includes("admin") ||
+    role.includes("system");
 
   const isSaved = article.articleActivityLog.some(
     (activity) =>
@@ -59,15 +65,16 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
         />
         <div className="flex flex-col items-start gap-4 md:basis-2/5">
           <div className="flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap">
-            {/* {isAtLeastTeacher(user.role) && (
+            {isAtLeastTeacher(user.role as string) && (
               <>
-                <PrintArticle
+                {/* <PrintArticle
                   articleId={params.articleId}
                   article={articleResponse.article}
-                />
+                /> */}
+                <AssignButton article={article} />
               </>
             )}
-            {isAboveTeacher(user.role) && (
+            {/* {isAboveTeacher(user.role) && (
               <ArticleActions
                 article={articleResponse.article}
                 articleId={params.articleId}
@@ -83,7 +90,6 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
                 article.sentencsAndWordsForFlashcard[0].wordsUrl as string
               }
             />
-
             <Sentence
               sentences={article.sentencsAndWordsForFlashcard.flatMap(
                 (sentence) => sentence.sentence as unknown as SentenceType[],

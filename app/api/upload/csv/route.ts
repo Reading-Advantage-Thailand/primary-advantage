@@ -56,9 +56,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user has permission to upload (ADMIN, SYSTEM, or TEACHER roles)
+    // Check if user has permission to upload (admin, system, or teacher roles)
     const currentUserRoles = currentUser.roles.map((ur) => ur.role.name);
-    const allowedRoles = ["Admin", "System", "Teacher"];
+    const allowedRoles = ["admin", "system", "teacher"];
     const hasPermission = currentUserRoles.some((role) =>
       allowedRoles.includes(role),
     );
@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For non-SYSTEM users, require school association
-    if (!currentUserRoles.includes("System") && !currentUser.schoolId) {
+    // For non-system users, require school association
+    if (!currentUserRoles.includes("system") && !currentUser.schoolId) {
       return NextResponse.json(
         {
           error: "School association required",
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate and process CSV data
-    const validRoles = ["Student", "Teacher", "Admin", "System"];
+    const validRoles = ["student", "teacher", "admin", "system"];
     const processedUsers: any[] = [];
     const userRoleAssignments: { userId: string; roleName: string }[] = [];
     const classroomAssignments: {
@@ -256,7 +256,7 @@ export async function POST(request: NextRequest) {
       const classroomName = row.classroom_name
         ? row.classroom_name.toString().trim()
         : "";
-      if ((role === "Student" || role === "Teacher") && !classroomName) {
+      if ((role === "student" || role === "teacher") && !classroomName) {
         errors.push(
           `Row ${rowNumber}: classroom_name is required for ${role} role`,
         );
@@ -271,14 +271,14 @@ export async function POST(request: NextRequest) {
         cefrLevel: "A1-", // Default CEFR level
         level: 1, // Default level
         xp: 0, // Default XP
-        schoolId: currentUser.schoolId, // Assign to current user's school (null for SYSTEM users)
+        schoolId: currentUser.schoolId, // Assign to current user's school (null for system users)
       };
 
       processedUsers.push(userData);
       userRoleAssignments.push({ userId: "", roleName: role }); // userId will be filled after user creation
 
       // Store classroom assignment for non-Admin roles
-      if ((role === "Student" || role === "Teacher") && classroomName) {
+      if ((role === "student" || role === "teacher") && classroomName) {
         classroomAssignments.push({
           userId: "",
           classroomName,
@@ -422,7 +422,7 @@ export async function POST(request: NextRequest) {
 
         // Assign users to classroom
         for (const assignment of assignments) {
-          if (assignment.role === "Student") {
+          if (assignment.role === "student") {
             // Add student to classroom
             await prisma.classroomStudent.upsert({
               where: {
@@ -438,7 +438,7 @@ export async function POST(request: NextRequest) {
               },
             });
             studentAssignments++;
-          } else if (assignment.role === "Teacher") {
+          } else if (assignment.role === "teacher") {
             // Add teacher to classroom (check if already exists)
             const existingTeacher = await prisma.classroomTeachers.findFirst({
               where: {
@@ -493,7 +493,7 @@ export async function POST(request: NextRequest) {
             note: "All imported users have been assigned to this school",
           }
         : {
-            note: "SYSTEM user - users imported without school assignment",
+            note: "system user - users imported without school assignment",
           },
       note: "Users created with default values: password=null, cefrLevel=A1-, level=1, xp=0",
     });

@@ -12,14 +12,17 @@ import {
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useCurrentUser } from "@/hooks/use-current-user";
-import { hasPermission, hasAnyPermission } from "@/lib/permissions";
+import {
+  hasPermission,
+  hasAnyPermission,
+  UserForPermissions,
+} from "@/lib/permissions";
 import {
   Tooltip,
   TooltipContent,
@@ -29,15 +32,15 @@ import {
 
 interface SidebarNavProps {
   items?: SidebarNavItem[];
+  user?: UserForPermissions | null | undefined;
 }
 
-export function SidebarNav({ items }: SidebarNavProps) {
+export function SidebarNav({ items, user }: SidebarNavProps) {
   const path = usePathname();
   const pathWithoutLocale = "/" + path.split("/").slice(2).join("/");
   const t = useTranslations("Sidebar");
   const tSubItem = useTranslations("Sidebar.subItem");
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
-  const currentUser = useCurrentUser();
 
   // console.log("SidebarNav Debug - Current User:", currentUser);
 
@@ -49,14 +52,28 @@ export function SidebarNav({ items }: SidebarNavProps) {
   };
 
   const isItemActive = (href: string) => {
+    // Remove query parameters from current path for comparison
+    const currentPathBase = pathWithoutLocale.split("?")[0];
+    const hrefBase = href.split("?")[0];
+
     // Exact match for the current path
-    return pathWithoutLocale === href;
+    if (currentPathBase === hrefBase) {
+      return true;
+    }
+
+    // Check if current path starts with href (for dynamic routes like /class-roaster/[id])
+    // This handles cases where href is /class-roaster and current path is /class-roaster/123
+    return currentPathBase.startsWith(hrefBase + "/");
   };
 
   const isParentActive = (href: string) => {
+    // Remove query parameters from both paths for comparison
+    const currentPathBase = pathWithoutLocale.split("?")[0];
+    const hrefBase = href.split("?")[0];
+
     // For parent paths, check if current path starts with the href followed by a slash
     // This prevents false positives like /teacher/my-students matching /teacher/my-students-archive
-    return pathWithoutLocale.startsWith(href + "/");
+    return currentPathBase.startsWith(hrefBase + "/");
   };
 
   const isAnyChildActive = (items: any[]) => {
@@ -74,7 +91,7 @@ export function SidebarNav({ items }: SidebarNavProps) {
     if (!item.requiredPermissions || item.requiredPermissions.length === 0) {
       return true; // No permissions required
     }
-    return hasAnyPermission(currentUser, item.requiredPermissions);
+    return hasAnyPermission(user, item.requiredPermissions);
   };
 
   const shouldHideItem = (item: SidebarNavItem | any) => {

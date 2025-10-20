@@ -127,7 +127,7 @@ export const enrollStudentInClassroom = async (
         roles: {
           some: {
             role: {
-              name: "Student",
+              name: "student",
             },
           },
         },
@@ -269,7 +269,7 @@ export const getAvailableStudentsForClassroom = async (
         roles: {
           some: {
             role: {
-              name: "Student",
+              name: "student",
             },
           },
         },
@@ -304,15 +304,15 @@ export const getAllClassrooms = async (userWithRoles: UserWithRoles) => {
   try {
     // Check user roles to determine access level
     const isSystemAdmin = userWithRoles.roles.some(
-      (userRole) => userRole.role.name === "System",
+      (userRole) => userRole.role.name === "system",
     );
 
     const isAdmin = userWithRoles.roles.some(
-      (userRole) => userRole.role.name === "Admin",
+      (userRole) => userRole.role.name === "admin",
     );
 
     const isTeacher = userWithRoles.roles.some(
-      (userRole) => userRole.role.name === "Teacher",
+      (userRole) => userRole.role.name === "teacher",
     );
 
     const isSchoolAdmin = userWithRoles.SchoolAdmins.length > 0;
@@ -368,7 +368,6 @@ export const getAllClassrooms = async (userWithRoles: UserWithRoles) => {
           prisma.classroomTeachers.findMany({
             where: { classroomId: classroom.id },
             select: {
-              id: true,
               user: {
                 select: { id: true, name: true, email: true },
               },
@@ -377,7 +376,6 @@ export const getAllClassrooms = async (userWithRoles: UserWithRoles) => {
           prisma.classroomStudent.findMany({
             where: { classroomId: classroom.id },
             select: {
-              id: true,
               student: {
                 select: { id: true, name: true, email: true },
               },
@@ -387,8 +385,8 @@ export const getAllClassrooms = async (userWithRoles: UserWithRoles) => {
 
         return {
           ...classroom,
-          teachers,
-          students,
+          teachers: teachers.map((teacher) => teacher.user),
+          students: students.map((student) => student.student),
         };
       }),
     );
@@ -540,7 +538,7 @@ export const getAllStudentsByTeacher = async (teacherId: string) => {
   }
 };
 
-// Get all students in the system (for SYSTEM role)
+// Get all students in the system (for system role)
 export const getAllStudentsInSystem = async () => {
   try {
     // Get all users with STUDENT role
@@ -549,7 +547,7 @@ export const getAllStudentsInSystem = async () => {
         roles: {
           some: {
             role: {
-              name: "Student",
+              name: "student",
             },
           },
         },

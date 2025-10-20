@@ -140,7 +140,7 @@ export default function StudentsPage() {
     name: "",
     email: "",
     cefrLevel: "A1",
-    role: "STUDENT",
+    role: "student",
   });
 
   // Fetch students data
@@ -273,7 +273,7 @@ export default function StudentsPage() {
       name: "",
       email: "",
       cefrLevel: "A1",
-      role: "STUDENT",
+      role: "student",
     });
   };
 
@@ -347,11 +347,11 @@ export default function StudentsPage() {
   // Get role badge variant
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
-      case "ADMIN":
+      case "admin":
         return "destructive";
-      case "TEACHER":
+      case "teacher":
         return "default";
-      case "STUDENT":
+      case "student":
         return "secondary";
       default:
         return "outline";
@@ -542,9 +542,9 @@ export default function StudentsPage() {
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="STUDENT">Student</SelectItem>
-                          <SelectItem value="TEACHER">Teacher</SelectItem>
-                          <SelectItem value="ADMIN">Admin</SelectItem>
+                          <SelectItem value="student">Student</SelectItem>
+                          <SelectItem value="teacher">Teacher</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -911,9 +911,9 @@ export default function StudentsPage() {
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="STUDENT">Student</SelectItem>
-                    <SelectItem value="TEACHER">Teacher</SelectItem>
-                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="student">Student</SelectItem>
+                    <SelectItem value="teacher">Teacher</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

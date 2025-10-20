@@ -43,7 +43,7 @@ export const getStudents = async (
       roles: {
         some: {
           role: {
-            name: "Student",
+            name: "student",
           },
         },
       },
@@ -52,7 +52,7 @@ export const getStudents = async (
     // If user is school admin, only show students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "SYSTEM")
+      !userWithRoles.roles.some((r: any) => r.role.name === "system")
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -138,8 +138,8 @@ export const getStudents = async (
       cefrLevel: student.cefrLevel,
       xp: student.xp,
       role:
-        student.roles.find((r) => r.role.name === "STUDENT")?.role.name ||
-        "STUDENT",
+        student.roles.find((r) => r.role.name === "student")?.role.name ||
+        "student",
       createdAt: student.createdAt.toISOString().split("T")[0],
       className: student.studentClassroom[0]?.classroom.name || null,
       classroomId: student.studentClassroom[0]?.classroom.id || null,
@@ -166,7 +166,7 @@ export const getStudentById = async (
       roles: {
         some: {
           role: {
-            name: "Student",
+            name: "student",
           },
         },
       },
@@ -175,7 +175,7 @@ export const getStudentById = async (
     // If user is school admin, only show students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "SYSTEM")
+      !userWithRoles.roles.some((r: any) => r.role.name === "system")
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -214,8 +214,8 @@ export const getStudentById = async (
       cefrLevel: student.cefrLevel,
       xp: student.xp,
       role:
-        student.roles.find((r) => r.role.name === "STUDENT")?.role.name ||
-        "STUDENT",
+        student.roles.find((r) => r.role.name === "student")?.role.name ||
+        "student",
       createdAt: student.createdAt.toISOString().split("T")[0],
       className: student.studentClassroom[0]?.classroom.name || null,
       classroomId: student.studentClassroom[0]?.classroom.id || null,
@@ -256,7 +256,7 @@ export const createStudent = async (params: {
 
     // Get the Student role ID
     const roleRecord = await prisma.role.findFirst({
-      where: { name: "Student" },
+      where: { name: "student" },
     });
 
     if (!roleRecord) {
@@ -339,7 +339,7 @@ export const createStudent = async (params: {
       email: newStudent.email,
       cefrLevel: newStudent.cefrLevel,
       xp: newStudent.xp,
-      role: newStudent.roles[0]?.role.name || "STUDENT",
+      role: newStudent.roles[0]?.role.name || "student",
       createdAt: newStudent.createdAt.toISOString().split("T")[0],
       className: newStudent.studentClassroom[0]?.classroom.name || null,
       classroomId: newStudent.studentClassroom[0]?.classroom.id || null,
@@ -368,7 +368,7 @@ export const updateStudent = async (
       roles: {
         some: {
           role: {
-            name: "Student",
+            name: "student",
           },
         },
       },
@@ -377,7 +377,7 @@ export const updateStudent = async (
     // If user is school admin, only allow updates to students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "SYSTEM")
+      !userWithRoles.roles.some((r: any) => r.role.name === "system")
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -505,8 +505,8 @@ export const updateStudent = async (
           cefrLevel: finalStudent.cefrLevel,
           xp: finalStudent.xp,
           role:
-            finalStudent.roles.find((r) => r.role.name === "STUDENT")?.role
-              .name || "STUDENT",
+            finalStudent.roles.find((r) => r.role.name === "student")?.role
+              .name || "student",
           createdAt: finalStudent.createdAt.toISOString().split("T")[0],
           className: finalStudent.studentClassroom[0]?.classroom.name || null,
           classroomId: finalStudent.studentClassroom[0]?.classroom.id || null,
@@ -528,8 +528,8 @@ export const updateStudent = async (
       cefrLevel: updatedStudent.cefrLevel,
       xp: updatedStudent.xp,
       role:
-        updatedStudent.roles.find((r) => r.role.name === "STUDENT")?.role
-          .name || "STUDENT",
+        updatedStudent.roles.find((r) => r.role.name === "student")?.role
+          .name || "student",
       createdAt: updatedStudent.createdAt.toISOString().split("T")[0],
       className: updatedStudent.studentClassroom[0]?.classroom.name || null,
       classroomId: updatedStudent.studentClassroom[0]?.classroom.id || null,
@@ -557,7 +557,7 @@ export const deleteStudent = async (
       roles: {
         some: {
           role: {
-            name: "Student",
+            name: "student",
           },
         },
       },
@@ -566,7 +566,7 @@ export const deleteStudent = async (
     // If user is school admin, only allow deletion of students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "SYSTEM")
+      !userWithRoles.roles.some((r: any) => r.role.name === "system")
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -621,7 +621,7 @@ export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
       roles: {
         some: {
           role: {
-            name: "Student",
+            name: "student",
           },
         },
       },
@@ -630,7 +630,7 @@ export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
     // If user is school admin, only show students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "SYSTEM")
+      !userWithRoles.roles.some((r: any) => r.role.name === "system")
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
