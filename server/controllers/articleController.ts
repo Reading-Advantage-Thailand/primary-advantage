@@ -44,7 +44,7 @@ export const generateAllArticleNew = async (amountPerGenre: number) => {
     console.log(`Starting generation of ${amountPerGenre} articles...`);
     for (let i = 0; i < amountPerGenre; i++) {
       console.log(`Generating article number ${i + 1}`);
-      await generateArticleNew(ArticleBaseCefrLevel.A2);
+      await generateArticleNew(ArticleBaseCefrLevel.A0);
     }
     console.log(`Successfully generated ${amountPerGenre} articles`);
   } catch (error) {

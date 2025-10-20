@@ -101,19 +101,19 @@ export async function DELETE(
 
       if (userWithRoles) {
         const hasAdminRole = userWithRoles.roles.some(
-          (ur) => ur.role.name === "Admin",
+          (ur) => ur.role.name === "admin",
         );
 
         // Only downgrade if they only have Admin role and no other admin responsibilities
         if (hasAdminRole && userWithRoles.roles.length === 1) {
           // Find or create Teacher role as default
           let teacherRole = await prisma.role.findFirst({
-            where: { name: "Teacher" },
+            where: { name: "teacher" },
           });
 
           if (!teacherRole) {
             teacherRole = await prisma.role.create({
-              data: { name: "Teacher" },
+              data: { name: "teacher" },
             });
           }
 

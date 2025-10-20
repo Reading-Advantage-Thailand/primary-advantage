@@ -21,18 +21,17 @@ interface UserAccountNavProps {
 }
 
 export function UserAccountNav({ user }: UserAccountNavProps) {
-  const currentUser = useCurrentUser();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const roles = {
-    System: { label: "system", color: "bg-[#FFC107]" },
-    Admin: { label: "admin", color: "bg-[#DC3545]" },
-    Teacher: { label: "teacher", color: "bg-[#007BFF]" },
-    Student: { label: "student", color: "bg-[#28A745]" },
-    User: { label: "user", color: "bg-[#6C757D]" },
+    system: { label: "system", color: "bg-[#FFC107]" },
+    admin: { label: "admin", color: "bg-[#DC3545]" },
+    teacher: { label: "teacher", color: "bg-[#007BFF]" },
+    student: { label: "student", color: "bg-[#28A745]" },
+    user: { label: "user", color: "bg-[#6C757D]" },
   };
 
-  const { label, color } = roles[(user?.role as keyof typeof roles) || "User"];
+  const { label, color } = roles[(user?.role as keyof typeof roles) || "user"];
 
   return (
     <DropdownMenu>
@@ -101,23 +100,23 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
             </Link>
           </DropdownMenuItem>
         )} */}
-        {(user?.role === Role.Teacher ||
-          user?.role === Role.Admin ||
-          user?.role === Role.System) && (
+        {(user?.role === Role.teacher ||
+          user?.role === Role.admin ||
+          user?.role === Role.system) && (
           <DropdownMenuItem asChild>
             <Link href="/teacher/my-classes" className="flex items-center">
               <span>Teacher Dashboard</span>
             </Link>
           </DropdownMenuItem>
         )}
-        {(user?.role === Role.Admin || user?.role === Role.System) && (
+        {(user?.role === Role.admin || user?.role === Role.system) && (
           <DropdownMenuItem asChild>
             <Link href="/admin" className="flex items-center">
               <span>Admin Dashboard</span>
             </Link>
           </DropdownMenuItem>
         )}
-        {user?.role === Role.System && (
+        {user?.role === Role.system && (
           <>
             <DropdownMenuItem asChild>
               <Link href="/system/dashboard" className="flex items-center">
@@ -139,7 +138,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
             <span>Contact Us</span>
           </Link>
         </DropdownMenuItem>
-        {user?.role !== Role.Student && (
+        {user?.role !== Role.student && (
           <DropdownMenuItem asChild>
             <Link href="/settings/user-profile" className="flex items-center">
               <span>Settings</span>

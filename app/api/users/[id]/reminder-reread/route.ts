@@ -15,8 +15,8 @@ export async function GET(
 
     // Only teachers and system users can access other users' data
     if (
-      user.role !== "TEACHER" &&
-      user.role !== "SYSTEM" &&
+      user.role !== "teacher" &&
+      user.role !== "system" &&
       user.id !== (await params).id
     ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

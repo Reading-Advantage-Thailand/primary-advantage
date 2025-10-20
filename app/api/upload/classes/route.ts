@@ -43,7 +43,7 @@ const userCsvRowSchema = z.object({
       (val) => /^[a-zA-Z0-9\s\-\/_(),]+$/.test(val),
       "Classroom names can only contain letters, numbers, spaces, hyphens, underscores, parentheses, and commas",
     ),
-  role: z.enum(["Student", "Teacher", "Admin"], {
+  role: z.enum(["student", "teacher", "admin"], {
     errorMap: () => ({ message: "Role must be Student, Teacher, or Admin" }),
   }),
 });
@@ -68,10 +68,10 @@ const csvFileSchema = z.object({
     ),
 });
 
-const validRoles = ["Student", "Teacher", "Admin"];
+const validRoles = ["student", "teacher", "admin"];
 
 // Role validation helper
-const isValidRole = (role: string): role is "Student" | "Teacher" | "Admin" => {
+const isValidRole = (role: string): role is "student" | "teacher" | "admin" => {
   return validRoles.includes(role as any);
 };
 
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user has permission to upload (Admin, System, or Teacher roles)
     const currentUserRoles = currentUser.roles.map((ur) => ur.role.name);
-    const allowedRoles = ["Admin", "System", "Teacher"];
+    const allowedRoles = ["admin", "system", "teacher"];
     const hasPermission = currentUserRoles.some((role) =>
       allowedRoles.includes(role),
     );
@@ -191,8 +191,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For non-System users, require school association
-    if (!currentUserRoles.includes("System") && !currentUser.schoolId) {
+    // For non-system users, require school association
+    if (!currentUserRoles.includes("system") && !currentUser.schoolId) {
       return NextResponse.json(
         {
           error: "School association required",
@@ -433,7 +433,7 @@ export async function POST(request: NextRequest) {
         if (
           item.validatedData &&
           !item.error &&
-          item.validatedData.role !== "Admin"
+          item.validatedData.role !== "admin"
         ) {
           const classroomNames = parseClassroomNames(
             item.validatedData.classroom_name,
@@ -478,7 +478,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Parse and validate classroom names for non-Admin roles
-        if (validatedRow.role !== "Admin") {
+        if (validatedRow.role !== "admin") {
           const classroomNames = parseClassroomNames(
             validatedRow.classroom_name,
           );
@@ -551,7 +551,7 @@ export async function POST(request: NextRequest) {
           password: null,
           schoolId: currentUser.schoolId,
           classroomNames:
-            validatedRow.role !== "Admin"
+            validatedRow.role !== "admin"
               ? parseClassroomNames(validatedRow.classroom_name)
               : [],
         };
@@ -871,18 +871,18 @@ export async function POST(request: NextRequest) {
         if (!userId || userData.classroomNames.length === 0) continue;
 
         const userRole = userRoleMap.get(userData.email);
-        if (userRole === "Admin") continue;
+        if (userRole === "admin") continue;
 
         for (const className of userData.classroomNames) {
           const classroomId = classroomNameToIdMap.get(className);
           if (!classroomId) continue;
 
-          if (userRole === "Student") {
+          if (userRole === "student") {
             studentAssignmentsToCreate.push({
               classroomId,
               studentId: userId,
             });
-          } else if (userRole === "Teacher") {
+          } else if (userRole === "teacher") {
             existingTeacherChecks.push({
               classroomId,
               userId,
@@ -1049,7 +1049,7 @@ export async function POST(request: NextRequest) {
                 : "All imported classes have been assigned to this school",
           }
         : {
-            note: "System user - data imported without school assignment",
+            note: "system user - data imported without school assignment",
           },
       classrooms: createdClassrooms,
       note: note,

@@ -30,7 +30,7 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
       description:
         "The Student role is designed for users who are enrolled in courses and participating in learning activities.",
       icon: <UserCircle size={32} />,
-      value: Role.Student,
+      value: Role.student,
       color: "blue",
     },
     {
@@ -38,7 +38,7 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
       description:
         "The Teacher role is intended for users who are responsible for delivering course content and evaluating student performance.",
       icon: <GraduationCap size={32} />,
-      value: Role.Teacher,
+      value: Role.teacher,
       color: "blue",
     },
   ];
@@ -49,21 +49,21 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
         title: "Admin",
         description: "Display only in development mode. (School Admin)",
         icon: <School size={32} />,
-        value: Role.Admin,
+        value: Role.admin,
         color: "red",
       },
       {
         title: "System",
         description: "Display only in development mode. (System Admin)",
         icon: <Ghost size={32} />,
-        value: Role.System,
+        value: Role.system,
         color: "red",
       },
     );
   }
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role>(userRole);
-  //   const { update } = useSession();
+  const { update } = useSession();
   const router = useRouter();
 
   async function handleRoleChange() {
@@ -90,6 +90,9 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
 
       //   // refresh the page
       //   router.refresh();
+      await update({
+        user: { role: selectedRole },
+      });
 
       toast("Role updated.", {
         description: `Changed role to ${selectedRole}.`,

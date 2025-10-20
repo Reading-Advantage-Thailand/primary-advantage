@@ -10,9 +10,11 @@ import {
 export const QuizContext = createContext<{
   timer: number;
   setPaused: Dispatch<SetStateAction<boolean>>;
+  setTimer: Dispatch<SetStateAction<number>>;
 }>({
   timer: 0,
   setPaused: () => {},
+  setTimer: () => {},
 });
 interface Props {
   children: React.ReactNode;
@@ -33,7 +35,7 @@ export function QuizContextProvider({ children }: Props) {
   }, [setTimer, paused]);
 
   return (
-    <QuizContext.Provider value={{ timer, setPaused }}>
+    <QuizContext.Provider value={{ timer, setPaused, setTimer }}>
       {children}
     </QuizContext.Provider>
   );

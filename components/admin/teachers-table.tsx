@@ -90,7 +90,7 @@ export function TeachersTable() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "Teacher" as "Teacher" | "Admin",
+    role: "teacher" as "teacher" | "admin",
     cefrLevel: "A1",
     assignedClassroomIds: [] as string[],
     password: "",
@@ -129,10 +129,8 @@ export function TeachersTable() {
   const fetchClassrooms = async () => {
     try {
       setIsClassroomsLoading(true);
-      console.log("🔍 Fetching classrooms...");
-      const response = await fetch("/api/classrooms");
 
-      console.log("🔍 Classrooms response status:", response.status);
+      const response = await fetch("/api/classrooms");
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -143,13 +141,12 @@ export function TeachersTable() {
       }
 
       const data = await response.json();
-      console.log("🔍 Classrooms data received:", data);
 
       // Handle both possible response formats
       const classroomsArray = Array.isArray(data)
         ? data
         : data.classrooms || [];
-      console.log("🔍 Setting classrooms:", classroomsArray);
+
       setClassrooms(classroomsArray);
     } catch (error) {
       console.error("🔍 Error fetching classrooms:", error);
@@ -188,8 +185,6 @@ export function TeachersTable() {
         ...(formData.password && { password: formData.password }),
       };
 
-      console.log("🔍 Creating teacher with data:", requestData);
-
       const response = await fetch("/api/teachers", {
         method: "POST",
         headers: {
@@ -198,8 +193,6 @@ export function TeachersTable() {
         body: JSON.stringify(requestData),
       });
 
-      console.log("🔍 Create teacher response status:", response.status);
-
       if (!response.ok) {
         const errorData = await response.json();
         console.error("🔍 Create teacher error:", errorData);
@@ -207,7 +200,6 @@ export function TeachersTable() {
       }
 
       const result = await response.json();
-      console.log("🔍 Teacher created successfully:", result);
 
       toast.success("Teacher created successfully");
 
@@ -236,9 +228,6 @@ export function TeachersTable() {
         ...(formData.password && { password: formData.password }),
       };
 
-      console.log("🔍 Updating teacher with data:", requestData);
-      console.log("🔍 Selected teacher ID:", selectedTeacher.id);
-
       const response = await fetch(`/api/teachers/${selectedTeacher.id}`, {
         method: "PUT",
         headers: {
@@ -247,8 +236,6 @@ export function TeachersTable() {
         body: JSON.stringify(requestData),
       });
 
-      console.log("🔍 Update teacher response status:", response.status);
-
       if (!response.ok) {
         const errorData = await response.json();
         console.error("🔍 Update teacher error:", errorData);
@@ -256,7 +243,6 @@ export function TeachersTable() {
       }
 
       const result = await response.json();
-      console.log("🔍 Teacher updated successfully:", result);
 
       toast.success("Teacher updated successfully");
 
@@ -299,7 +285,7 @@ export function TeachersTable() {
     setFormData({
       name: teacher.name || "",
       email: teacher.email || "",
-      role: teacher.role as "Teacher" | "Admin",
+      role: teacher.role as "teacher" | "admin",
       cefrLevel: teacher.cefrLevel || "A1",
       assignedClassroomIds: teacher.assignedClassrooms?.map((c) => c.id) || [],
       password: "",
@@ -317,7 +303,7 @@ export function TeachersTable() {
     setFormData({
       name: "",
       email: "",
-      role: "Teacher",
+      role: "teacher",
       cefrLevel: "A1",
       assignedClassroomIds: [],
       password: "",
@@ -336,9 +322,9 @@ export function TeachersTable() {
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
-      case "ADMIN":
+      case "admin":
         return "destructive";
-      case "TEACHER":
+      case "teacher":
         return "default";
       default:
         return "secondary";
@@ -451,7 +437,7 @@ export function TeachersTable() {
                   <Label htmlFor="add-role">Role</Label>
                   <Select
                     value={formData.role}
-                    onValueChange={(value: "Teacher" | "Admin") =>
+                    onValueChange={(value: "teacher" | "admin") =>
                       setFormData({ ...formData, role: value })
                     }
                   >
@@ -459,8 +445,8 @@ export function TeachersTable() {
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Teacher">Teacher</SelectItem>
-                      <SelectItem value="Admin">Admin</SelectItem>
+                      <SelectItem value="teacher">Teacher</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -750,7 +736,7 @@ export function TeachersTable() {
               <Label htmlFor="edit-role">Role</Label>
               <Select
                 value={formData.role}
-                onValueChange={(value: "Teacher" | "Admin") =>
+                onValueChange={(value: "teacher" | "admin") =>
                   setFormData({ ...formData, role: value })
                 }
               >
@@ -758,8 +744,8 @@ export function TeachersTable() {
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Teacher">Teacher</SelectItem>
-                  <SelectItem value="Admin">Admin</SelectItem>
+                  <SelectItem value="teacher">Teacher</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>

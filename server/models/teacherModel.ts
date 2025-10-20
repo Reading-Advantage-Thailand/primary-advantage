@@ -26,13 +26,6 @@ export const getTeachers = async (
   const { page, limit, search, role, userWithRoles } = params;
 
   try {
-    console.log("Teacher Model: Fetching teachers with params:", {
-      page,
-      limit,
-      search,
-      role,
-    });
-
     // Calculate offset for pagination
     const offset = (page - 1) * limit;
 
@@ -41,10 +34,6 @@ export const getTeachers = async (
     if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
       // School admin - only see teachers from their school
       schoolFilter = { schoolId: userWithRoles.schoolId };
-      console.log(
-        "Teacher Model: Filtering by school:",
-        userWithRoles.schoolId,
-      );
     }
 
     // Build the where clause for filtering
@@ -54,7 +43,7 @@ export const getTeachers = async (
         some: {
           role: {
             name: {
-              in: role ? [role] : ["Teacher", "Admin"],
+              in: role ? [role] : ["teacher", "admin"],
             },
           },
         },
@@ -68,11 +57,6 @@ export const getTeachers = async (
         { email: { contains: search, mode: "insensitive" } },
       ];
     }
-
-    console.log(
-      "Teacher Model: Where clause:",
-      JSON.stringify(whereClause, null, 2),
-    );
 
     // Fetch teachers with pagination
     const [teachers, totalCount] = await Promise.all([
@@ -111,17 +95,13 @@ export const getTeachers = async (
       }),
     ]);
 
-    console.log(
-      `Teacher Model: Found ${teachers.length} teachers, total: ${totalCount}`,
-    );
-
     // Transform data to match the expected interface
     const teachersData: TeacherData[] = teachers.map((teacher) => {
       // Get primary role (first role or most important one)
       const primaryRole =
-        teacher.roles.find((r) => r.role.name === "Admin")?.role.name ||
+        teacher.roles.find((r) => r.role.name === "admin")?.role.name ||
         teacher.roles[0]?.role.name ||
-        "Teacher";
+        "teacher";
 
       // Calculate total students across all classrooms
       const totalStudents = teacher.ClassroomTeachers.reduce((sum, ct) => {
@@ -163,8 +143,6 @@ export const getTeacherById = async (
   userWithRoles: UserWithRoles,
 ): Promise<TeacherData | null> => {
   try {
-    console.log("Teacher Model: Fetching teacher by ID:", id);
-
     // Determine school filter based on user's role
     let schoolFilter: any = {};
     if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
@@ -179,7 +157,7 @@ export const getTeacherById = async (
           some: {
             role: {
               name: {
-                in: ["Teacher", "Admin"],
+                in: ["teacher", "admin"],
               },
             },
           },
@@ -210,15 +188,14 @@ export const getTeacherById = async (
     });
 
     if (!teacher) {
-      console.log("Teacher Model: Teacher not found:", id);
       return null;
     }
 
     // Transform data
     const primaryRole =
-      teacher.roles.find((r) => r.role.name === "Admin")?.role.name ||
+      teacher.roles.find((r) => r.role.name === "admin")?.role.name ||
       teacher.roles[0]?.role.name ||
-      "Teacher";
+      "teacher";
 
     const totalStudents = teacher.ClassroomTeachers.reduce((sum, ct) => {
       return sum + ct.classroom.students.length;
@@ -244,7 +221,6 @@ export const getTeacherById = async (
       })),
     };
 
-    console.log("Teacher Model: Successfully fetched teacher:", teacherData.id);
     return teacherData;
   } catch (error) {
     console.error("Teacher Model: Error fetching teacher by ID:", error);
@@ -273,15 +249,12 @@ export const createTeacher = async (params: {
   } = params;
 
   try {
-    console.log("Teacher Model: Creating teacher with email:", email);
-
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
 
     if (existingUser) {
-      console.log("Teacher Model: User already exists with email:", email);
       return { success: false, error: "User with this email already exists" };
     }
 
@@ -291,7 +264,6 @@ export const createTeacher = async (params: {
     });
 
     if (!roleRecord) {
-      console.log("Teacher Model: Invalid role specified:", role);
       return { success: false, error: "Invalid role specified" };
     }
 
@@ -398,7 +370,7 @@ export const createTeacher = async (params: {
       id: newTeacher.id,
       name: newTeacher.name,
       email: newTeacher.email,
-      role: newTeacher.roles[0]?.role.name || "Teacher",
+      role: newTeacher.roles[0]?.role.name || "teacher",
       createdAt: newTeacher.createdAt.toISOString(),
       image: newTeacher.image,
       schoolId: newTeacher.schoolId,
@@ -412,7 +384,6 @@ export const createTeacher = async (params: {
       })),
     };
 
-    console.log("Teacher Model: Successfully created teacher:", teacherData.id);
     return { success: true, teacher: teacherData };
   } catch (error) {
     console.error("Teacher Model: Error creating teacher:", error);
@@ -427,8 +398,6 @@ export const updateTeacher = async (
   userWithRoles: UserWithRoles,
 ): Promise<{ success: boolean; teacher?: TeacherData; error?: string }> => {
   try {
-    console.log("Teacher Model: Updating teacher:", id);
-
     // Determine school filter based on user's role
     let schoolFilter: any = {};
     if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
@@ -444,7 +413,7 @@ export const updateTeacher = async (
           some: {
             role: {
               name: {
-                in: ["Teacher", "Admin"],
+                in: ["teacher", "admin"],
               },
             },
           },
@@ -453,7 +422,6 @@ export const updateTeacher = async (
     });
 
     if (!existingTeacher) {
-      console.log("Teacher Model: Teacher not found or no permission:", id);
       return { success: false, error: "Teacher not found" };
     }
 
@@ -464,7 +432,6 @@ export const updateTeacher = async (
       });
 
       if (emailExists) {
-        console.log("Teacher Model: Email already in use:", updateData.email);
         return { success: false, error: "Email already in use" };
       }
     }
@@ -580,9 +547,9 @@ export const updateTeacher = async (
 
     // Format response
     const primaryRole =
-      updatedTeacher.roles.find((r) => r.role.name === "Admin")?.role.name ||
+      updatedTeacher.roles.find((r) => r.role.name === "admin")?.role.name ||
       updatedTeacher.roles[0]?.role.name ||
-      "Teacher";
+      "teacher";
 
     const totalStudents = updatedTeacher.ClassroomTeachers.reduce((sum, ct) => {
       return sum + ct.classroom.students.length;
@@ -608,7 +575,6 @@ export const updateTeacher = async (
       })),
     };
 
-    console.log("Teacher Model: Successfully updated teacher:", teacherData.id);
     return { success: true, teacher: teacherData };
   } catch (error) {
     console.error("Teacher Model: Error updating teacher:", error);
@@ -622,8 +588,6 @@ export const deleteTeacher = async (
   userWithRoles: UserWithRoles,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    console.log("Teacher Model: Deleting teacher:", id);
-
     // Determine school filter based on user's role
     let schoolFilter: any = {};
     if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
@@ -639,7 +603,7 @@ export const deleteTeacher = async (
           some: {
             role: {
               name: {
-                in: ["Teacher", "Admin"],
+                in: ["teacher", "admin"],
               },
             },
           },
@@ -648,7 +612,6 @@ export const deleteTeacher = async (
     });
 
     if (!existingTeacher) {
-      console.log("Teacher Model: Teacher not found or no permission:", id);
       return { success: false, error: "Teacher not found" };
     }
 
@@ -666,7 +629,6 @@ export const deleteTeacher = async (
       where: { id },
     });
 
-    console.log("Teacher Model: Successfully deleted teacher:", id);
     return { success: true };
   } catch (error) {
     console.error("Teacher Model: Error deleting teacher:", error);
@@ -677,8 +639,6 @@ export const deleteTeacher = async (
 // Get teacher statistics
 export const getTeacherStatistics = async (userWithRoles: UserWithRoles) => {
   try {
-    console.log("Teacher Model: Calculating statistics");
-
     // Determine school filter based on user's role
     let schoolFilter: any = {};
     if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
@@ -691,7 +651,7 @@ export const getTeacherStatistics = async (userWithRoles: UserWithRoles) => {
         some: {
           role: {
             name: {
-              in: ["Teacher", "Admin"],
+              in: ["teacher", "admin"],
             },
           },
         },
@@ -747,7 +707,6 @@ export const getTeacherStatistics = async (userWithRoles: UserWithRoles) => {
       activeTeachers,
     };
 
-    console.log("Teacher Model: Statistics calculated:", statistics);
     return statistics;
   } catch (error) {
     console.error("Teacher Model: Error calculating statistics:", error);

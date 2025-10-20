@@ -21,6 +21,8 @@ model User {
   xp                 Int                  @default(0)
   schoolId           String?              @map("school_id")
   accounts           Account[]
+  ArticleActivityLog ArticleActivityLog[]
+  AssignmentStudent  AssignmentStudent[]
   studentClassroom   ClassroomStudent[]
   ClassroomTeachers  ClassroomTeachers[]
   FlashcardDeck      FlashcardDeck[]
@@ -30,7 +32,7 @@ model User {
   roles              UserRole[]
   School             School?              @relation(fields: [schoolId], references: [id])
   XpLogs             XPLogs[]
-  ArticleActivityLog ArticleActivityLog[]
+  userLessonProgress UserLessonProgress[]
 
   @@map("users")
 }
@@ -150,12 +152,14 @@ model Article {
   brainstorming                String?                        @map("brainstorming")
   planning                     String?                        @map("planning")
   topic                        String?
+  articleActivityLog           ArticleActivityLog[]
+  Assignment                   Assignment[]
+  flashcardCards               FlashcardCard[]
   longAnswerQuestions          LongAnswerQuestion[]
   multipleChoiceQuestions      MultipleChoiceQuestion[]
-  shortAnswerQuestions         ShortAnswerQuestion[]
   sentencsAndWordsForFlashcard SentencsAndWordsForFlashcard[]
-  articleActivityLog           ArticleActivityLog[]
-  flashcardCards               FlashcardCard[]
+  shortAnswerQuestions         ShortAnswerQuestion[]
+  userLessonProgress           UserLessonProgress[]
 
   @@map("article")
 }
@@ -171,9 +175,13 @@ model ArticleActivityLog {
   isLongAnswerQuestionCompleted     Boolean  @default(false)
   isRated                           Boolean  @default(false)
   isSentenceAndWordsSaved           Boolean  @default(false)
+  isSentenceMatchingCompleted       Boolean  @default(false)
+  isSentenceOrderingCompleted       Boolean  @default(false)
+  isSentenceWordOrderingCompleted   Boolean  @default(false)
+  isSentenceClozeTestCompleted      Boolean  @default(false)
+  userId                            String   @map("user_id")
   article                           Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
   user                              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId                            String   @map("user_id")
 
   @@map("article_activity_logs")
 }
@@ -269,9 +277,9 @@ model FlashcardCard {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   reviews       CardReview[]
-  deck          FlashcardDeck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  article       Article?        @relation(fields: [articleId], references: [id], onDelete: Cascade)
   clozeTestGame ClozeTestGame[]
+  article       Article?        @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  deck          FlashcardDeck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
 
   @@map("flashcard_cards")
 }
@@ -307,6 +315,7 @@ model Classroom {
   grade            String?
   passwordStudents String?             @map("password_students")
   schoolId         String?             @map("school_id")
+  Assignment       Assignment[]
   students         ClassroomStudent[]
   teachers         ClassroomTeachers[]
   school           School?             @relation(fields: [schoolId], references: [id])
@@ -334,8 +343,8 @@ model School {
   updatedAt    DateTime       @updatedAt
   ownerId      String?        @map("owner_id")
   classrooms   Classroom[]
-  admins       SchoolAdmins[]
   licenses     License[]
+  admins       SchoolAdmins[]
   users        User[]
 
   @@map("schools")
@@ -383,6 +392,41 @@ model ClassroomTeachers {
   @@map("classroom_teachers")
 }
 
+model Assignment {
+  id                 String               @id @default(cuid())
+  name               String?
+  description        String?
+  classroomId        String               @map("classroom_id")
+  articleId          String               @map("article_id")
+  teacherId          String               @map("teacher_id")
+  teacherName        String               @map("teacher_name")
+  dueDate            DateTime             @map("due_date")
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  AssignmentStudent  AssignmentStudent[]
+  article            Article              @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  classroom          Classroom            @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  userLessonProgress UserLessonProgress[]
+
+  @@map("assignments")
+}
+
+model AssignmentStudent {
+  id           String           @id @default(cuid())
+  assignmentId String           @map("assignment_id")
+  studentId    String           @map("student_id")
+  status       AssignmentStatus @default(NOT_STARTED)
+  startedAt    DateTime?        @map("started_at")
+  completedAt  DateTime?        @map("completed_at")
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student      User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+  @@map("assignment_students")
+}
+
 enum ActivityType {
   ARTICLE_RATING
   ARTICLE_READ
@@ -419,4 +463,27 @@ enum SubscriptionType {
   BASIC
   PREMIUM
   ENTERPRISE
+}
+
+enum AssignmentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model UserLessonProgress {
+  id           String     @id @default(cuid())
+  userId       String     @map("user_id")
+  articleId    String     @map("article_id")
+  assignmentId String     @map("assignment_id")
+  progress     Int        @default(0)
+  timeSpent    Int        @default(0)
+  isCompleted  Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article      Article    @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@map("user_lesson_progress")
 }

@@ -13,7 +13,7 @@ export default async function ReportsPage() {
     return <AuthErrorPage />;
   }
 
-  // if (user.role !== "TEACHER" && user.role !== "SYSTEM") {
+  // if (user.role !== "teacher" && user.role !== "system") {
   //   return <AuthErrorPage />;
   // }
 

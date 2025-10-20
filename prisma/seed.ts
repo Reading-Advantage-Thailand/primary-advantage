@@ -28,9 +28,9 @@ async function main() {
   // });
 
   // const systemRole = await prisma.role.upsert({
-  //   where: { name: "SYSTEM" },
+  //   where: { name: "system" },
   //   update: {},
-  //   create: { name: "SYSTEM" },
+  //   create: { name: "system" },
   // });
 
   const usersToCreate = 2; // You can change this number
@@ -70,11 +70,11 @@ async function main() {
   console.log("Database seeded successfully!");
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// main()
+//   .catch((e) => {
+//     console.error(e);
+//     process.exit(1);
+//   })
+//   .finally(async () => {
+//     await prisma.$disconnect();
+//   });

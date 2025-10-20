@@ -10,6 +10,121 @@ import { fsrsService } from "@/lib/fsrs-service";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+import { getAudioUrl } from "@/lib/storage-config";
+
+function tokenizeSentence(sentence: string) {
+  // Split by spaces and filter out empty strings, while preserving punctuation
+  const tokens = sentence
+    .split(/(\s+)/)
+    .filter((token) => token.trim().length > 0)
+    .map((token) => token.trim());
+
+  return tokens;
+}
+
+function getPartOfSpeech(
+  word: string,
+  position: number,
+  totalWords: number,
+): string {
+  const cleanWord = word.toLowerCase().replace(/[^\w]/g, "");
+
+  // Common articles
+  if (["a", "an", "the"].includes(cleanWord)) return "article";
+
+  // Common prepositions
+  if (
+    [
+      "in",
+      "on",
+      "at",
+      "by",
+      "for",
+      "with",
+      "to",
+      "from",
+      "of",
+      "about",
+      "under",
+      "over",
+    ].includes(cleanWord)
+  )
+    return "preposition";
+
+  // Common conjunctions
+  if (["and", "but", "or", "so", "yet", "for", "nor"].includes(cleanWord))
+    return "conjunction";
+
+  // Common pronouns
+  if (
+    [
+      "i",
+      "you",
+      "he",
+      "she",
+      "it",
+      "we",
+      "they",
+      "me",
+      "him",
+      "her",
+      "us",
+      "them",
+    ].includes(cleanWord)
+  )
+    return "pronoun";
+
+  // Common verbs (simplified detection)
+  if (
+    [
+      "is",
+      "are",
+      "was",
+      "were",
+      "be",
+      "been",
+      "being",
+      "have",
+      "has",
+      "had",
+      "do",
+      "does",
+      "did",
+      "will",
+      "would",
+      "can",
+      "could",
+      "should",
+      "may",
+      "might",
+    ].includes(cleanWord)
+  )
+    return "verb";
+
+  // If it ends with common verb suffixes
+  if (
+    cleanWord.endsWith("ed") ||
+    cleanWord.endsWith("ing") ||
+    cleanWord.endsWith("s")
+  )
+    return "verb";
+
+  // If it ends with common adjective suffixes
+  if (cleanWord.endsWith("ly")) return "adverb";
+  if (
+    cleanWord.endsWith("ful") ||
+    cleanWord.endsWith("less") ||
+    cleanWord.endsWith("ive") ||
+    cleanWord.endsWith("able")
+  )
+    return "adjective";
+
+  // Position-based heuristics
+  if (position === 0) return "noun"; // First word often a noun or pronoun
+  if (position === totalWords - 1 && word.includes(".")) return "noun"; // Last word often a noun
+
+  return "noun"; // Default to noun
+}
 
 interface WordList {
   vocabulary: string;
@@ -598,7 +713,7 @@ export async function reviewCard(
 
 export async function saveArticleToFlashcard(
   articleId: string,
-  ArticleActivityLogId: string,
+  ArticleActivityLogId?: string,
 ) {
   try {
     const user = await currentUser();
@@ -666,12 +781,14 @@ export async function saveArticleToFlashcard(
       saveFlashcard(articleId, [], sentencesList),
     ]);
 
-    await prisma.articleActivityLog.update({
-      where: {
-        id: ArticleActivityLogId,
-      },
-      data: { isSentenceAndWordsSaved: true },
-    });
+    if (ArticleActivityLogId) {
+      await prisma.articleActivityLog.update({
+        where: {
+          id: ArticleActivityLogId,
+        },
+        data: { isSentenceAndWordsSaved: true },
+      });
+    }
 
     return {
       success: true,
@@ -682,6 +799,402 @@ export async function saveArticleToFlashcard(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export async function getLessonFlashcards(
+  articleId: string,
+  type: FlashcardType,
+) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
+
+    const deck = await prisma.flashcardDeck.findFirst({
+      where: {
+        userId: user.id,
+        type,
+      },
+    });
+
+    const flashcards = await prisma.flashcardCard.findMany({
+      where: {
+        deckId: deck?.id,
+        articleId,
+        type,
+      },
+    });
+
+    return {
+      success: true,
+      cards: flashcards,
+    };
+  } catch (error) {
+    console.error("Error fetching vocabulary flashcards:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      cards: [],
+    };
+  }
+}
+
+export async function getLessonOrderingSentences(articleId: string) {
+  try {
+    const user = await currentUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const deck = await prisma.flashcardDeck.findFirst({
+      where: {
+        userId: user.id,
+        type: FlashcardType.SENTENCE,
+      },
+    });
+
+    const flashcards = await prisma.flashcardCard.findMany({
+      where: {
+        deckId: deck?.id,
+        articleId,
+        type: FlashcardType.SENTENCE,
+      },
+    });
+
+    // Process each flashcard sentence individually
+    const sentenceGroups = [];
+
+    for (const flashcardCard of flashcards) {
+      // Get the full article with sentences
+      const article = await prisma.article.findUnique({
+        where: { id: flashcardCard.articleId! },
+        select: {
+          id: true,
+          title: true,
+          sentences: true,
+          audioUrl: true,
+          translatedPassage: true,
+          cefrLevel: true,
+        },
+      });
+
+      if (!article || !article.sentences) continue;
+
+      const articleSentences = article.sentences as any[];
+
+      // If less than 5 sentences total, skip this article
+      if (articleSentences.length < 5) continue;
+
+      // Find the index of the flashcard sentence in the article
+      const flashcardSentenceIndex = articleSentences.findIndex(
+        (s) => s.sentence === flashcardCard.sentence,
+      );
+
+      if (flashcardSentenceIndex === -1) continue;
+
+      // Generate random starting position around the flashcard sentence
+      // Ensure we get 5 sentences and include the flashcard sentence
+      const maxStartIndex = Math.min(
+        flashcardSentenceIndex, // Can start at flashcard position (flashcard at end)
+        articleSentences.length - 5, // Don't go beyond array bounds
+      );
+
+      const minStartIndex = Math.max(
+        0, // Don't go below 0
+        flashcardSentenceIndex - 4, // Can start 4 positions before flashcard (flashcard at end)
+      );
+
+      // Random start index within valid range
+      const startIndex =
+        Math.floor(Math.random() * (maxStartIndex - minStartIndex + 1)) +
+        minStartIndex;
+
+      const selectedSentences = articleSentences.slice(
+        startIndex,
+        startIndex + 5,
+      );
+
+      // Create the sentence group
+      const sentences = selectedSentences.map((sentence, index) => {
+        const globalIndex = startIndex + index;
+        const isFromFlashcard = globalIndex === flashcardSentenceIndex;
+
+        return {
+          id: `${article.id}-${globalIndex}-${Date.now()}-${Math.random()}`, // Unique ID
+          text: sentence.sentence,
+          translation: {
+            th: (article.translatedPassage as any)?.th?.[globalIndex],
+            cn: (article.translatedPassage as any)?.cn?.[globalIndex],
+            tw: (article.translatedPassage as any)?.tw?.[globalIndex],
+            vi: (article.translatedPassage as any)?.vi?.[globalIndex],
+          },
+          audioUrl: getAudioUrl(article.audioUrl || ""),
+          startTime: sentence.startTime,
+          endTime: sentence.endTime,
+          isFromFlashcard,
+        };
+      });
+
+      // Determine difficulty based on CEFR level
+      const getDifficulty = (cefrLevel: string) => {
+        if (["A1", "A2"].includes(cefrLevel)) return "easy";
+        if (["B1", "B2"].includes(cefrLevel)) return "medium";
+        return "hard";
+      };
+
+      sentenceGroups.push({
+        id: `${article.id}-${flashcardSentenceIndex}-${Date.now()}-${Math.random()}`, // Unique ID per game
+        articleId: article.id,
+        articleTitle: article.title,
+        flashcardSentence: flashcardCard.sentence,
+        correctOrder: sentences.map((s) => s.text),
+        sentences,
+        difficulty: getDifficulty(article.cefrLevel),
+        startIndex,
+        flashcardIndex: flashcardSentenceIndex,
+      });
+    }
+
+    // Shuffle the sentence groups
+    const shuffledGroups = sentenceGroups.sort(() => Math.random() - 0.5);
+
+    return {
+      sentenceGroups: shuffledGroups,
+      totalGroups: shuffledGroups.length,
+    };
+  } catch (error) {
+    console.error("Error fetching sentences for ordering:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to fetch sentences",
+      sentenceGroups: [],
+      totalGroups: 0,
+    };
+  }
+}
+
+export async function getLessonClozeTestSentences(
+  articleId: string,
+  difficulty: "easy" | "medium" | "hard",
+) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const deck = await prisma.flashcardDeck.findFirst({
+      where: {
+        userId: user.id,
+        type: FlashcardType.SENTENCE,
+      },
+    });
+
+    const flashcards = await prisma.flashcardCard.findMany({
+      where: {
+        deckId: deck?.id,
+        articleId,
+        type: FlashcardType.SENTENCE,
+      },
+    });
+
+    // Process each flashcard sentence to create cloze tests
+    const clozeTests = [];
+
+    for (const flashcardCard of flashcards) {
+      // Get the full article with sentences
+      const article = await prisma.article.findUnique({
+        where: { id: flashcardCard.articleId! },
+        select: {
+          id: true,
+          title: true,
+          cefrLevel: true,
+        },
+      });
+
+      if (!article || !flashcardCard.sentence) continue;
+
+      clozeTests.push({
+        id: `${article.id}-${flashcardCard.id}-${Date.now()}-${Math.random()}`,
+        articleId: article.id,
+        articleTitle: article.title,
+        sentence: flashcardCard.sentence,
+        // words: matchingSentence.words,
+        blanks: [],
+        translation: flashcardCard.translation,
+        audioUrl: getAudioUrl(flashcardCard.audioUrl || ""),
+        startTime: flashcardCard.startTime,
+        endTime: flashcardCard.endTime,
+        difficulty: difficulty,
+      });
+    }
+
+    // Shuffle the cloze tests
+    const shuffledTests = clozeTests.sort(() => Math.random() - 0.5);
+
+    return {
+      clozeTests: shuffledTests,
+      totalTests: shuffledTests.length,
+      // difficulty: d  ifficulty,
+    };
+  } catch (error) {
+    console.error("Error fetching sentences for cloze test:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to fetch sentences",
+      clozeTests: [],
+      totalTests: 0,
+    };
+  }
+}
+
+export async function getLessonOrderingWords(articleId: string) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const deck = await prisma.flashcardDeck.findFirst({
+      where: {
+        userId: user.id,
+        type: FlashcardType.SENTENCE,
+      },
+    });
+
+    const flashcards = await prisma.flashcardCard.findMany({
+      where: {
+        deckId: deck?.id,
+        articleId,
+        type: FlashcardType.SENTENCE,
+      },
+    });
+
+    // Process each flashcard sentence
+    const sentences = [];
+
+    for (const flashcardCard of flashcards) {
+      // Get the article for context and translations
+      const article = await prisma.article.findUnique({
+        where: { id: flashcardCard.articleId! },
+        select: {
+          id: true,
+          title: true,
+          sentences: true,
+          audioUrl: true,
+          translatedPassage: true,
+          cefrLevel: true,
+        },
+      });
+
+      if (!article) continue;
+
+      const sentence = flashcardCard.sentence;
+
+      // Skip very short sentences (less than 3 words)
+      const words = tokenizeSentence(sentence as string);
+      if (words.length < 3) continue;
+
+      // Skip very long sentences (more than 15 words) to keep game manageable
+      if (words.length > 15) continue;
+
+      // Find the sentence in the article for audio timing and translation
+      const articleSentences = article.sentences as any[];
+      const sentenceIndex = articleSentences.findIndex(
+        (s) => s.sentence === sentence,
+      );
+      const sentenceData = articleSentences[sentenceIndex];
+
+      // Get sentence-level translations
+      const sentenceTranslations = {
+        th: (article.translatedPassage as any)?.th?.[sentenceIndex],
+        vi: (article.translatedPassage as any)?.vi?.[sentenceIndex],
+        cn: (article.translatedPassage as any)?.cn?.[sentenceIndex],
+        tw: (article.translatedPassage as any)?.tw?.[sentenceIndex],
+      };
+
+      // Create word objects
+      const wordObjects = words.map((word, index) => {
+        // Calculate approximate timing for each word if audio data exists
+        let startTime: number | undefined;
+        let endTime: number | undefined;
+
+        if (sentenceData?.startTime && sentenceData?.endTime) {
+          const totalDuration = sentenceData.endTime - sentenceData.startTime;
+          const wordDuration = totalDuration / words.length;
+          startTime = sentenceData.startTime + index * wordDuration;
+          endTime = (startTime as number) + wordDuration;
+        }
+
+        return {
+          id: `${article.id}-${flashcardCard.id}-word-${index}-${Date.now()}`,
+          text: word,
+          translation: {
+            // For individual words, we don't have word-level translations
+            // Could be enhanced with a dictionary API later
+          },
+          audioUrl: getAudioUrl(flashcardCard.audioUrl || ""),
+          startTime: flashcardCard.startTime,
+          endTime: flashcardCard.endTime,
+          partOfSpeech: getPartOfSpeech(word, index, words.length),
+        };
+      });
+
+      // Determine difficulty based on sentence length and CEFR level
+      const getDifficulty = (wordCount: number, cefrLevel: string) => {
+        if (wordCount <= 5 && ["A1", "A2"].includes(cefrLevel)) return "easy";
+        if (wordCount <= 8 && ["A1", "A2", "B1"].includes(cefrLevel))
+          return "medium";
+        return "hard";
+      };
+
+      // Get some context from surrounding sentences
+      let context = "";
+      if (sentenceIndex > 0) {
+        const prevSentence = articleSentences[sentenceIndex - 1]?.sentence;
+        if (prevSentence && prevSentence.length < 100) {
+          // Keep context concise
+          context = `Previous: "${prevSentence}"`;
+        }
+      }
+
+      sentences.push({
+        id: `${article.id}-${flashcardCard.id}-${Date.now()}-${Math.random()}`,
+        articleId: article.id,
+        articleTitle: article.title,
+        sentence: sentence,
+        correctOrder: words, // The correct order of words
+        words: wordObjects,
+        difficulty: getDifficulty(words.length, article.cefrLevel),
+        context: context,
+        // Add sentence-level translations
+        sentenceTranslations: flashcardCard.translation,
+      });
+    }
+
+    // Shuffle the sentences
+    const shuffledSentences = sentences.sort(() => Math.random() - 0.5);
+
+    // Limit to reasonable number for game session
+    const limitedSentences = shuffledSentences.slice(0, 20);
+
+    return {
+      sentences: limitedSentences,
+      totalSentences: limitedSentences.length,
+    };
+  } catch (error) {
+    console.error("Error fetching words for ordering:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch words",
+      sentences: [],
+      totalSentences: 0,
     };
   }
 }

@@ -39,7 +39,7 @@ export async function GET(
 
     const isAdmin = userWithRoles.roles.some(
       (userRole) =>
-        userRole.role.name === "ADMIN" || userRole.role.name === "SYSTEM",
+        userRole.role.name === "admin" || userRole.role.name === "system",
     );
 
     if (!isAdmin && userWithRoles.SchoolAdmins.length === 0) {
@@ -55,7 +55,7 @@ export async function GET(
     // If user is school admin, only show classrooms from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r) => r.role.name === "SYSTEM")
+      !userWithRoles.roles.some((r) => r.role.name === "system")
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -89,7 +89,7 @@ export async function GET(
       name: classroom.name,
       grade: classroom.grade,
       studentCount: classroom.students.filter((cs) =>
-        cs.student.roles.some((r) => r.role.name === "Student"),
+        cs.student.roles.some((r) => r.role.name === "student"),
       ).length,
     }));
 

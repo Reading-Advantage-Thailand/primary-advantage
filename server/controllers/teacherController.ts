@@ -21,8 +21,6 @@ export const getTeachersController = async (
   request: NextRequest,
 ): Promise<NextResponse<TeachersResponse | { error: string }>> => {
   try {
-    console.log("Teacher Controller: Starting GET request...");
-
     const user = await currentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -48,13 +46,6 @@ export const getTeachersController = async (
     const limit = parseInt(searchParams.get("limit") || "50");
     const search = searchParams.get("search") || "";
     const role = searchParams.get("role") || "";
-
-    console.log("Teacher Controller: Query params:", {
-      page,
-      limit,
-      search,
-      role,
-    });
 
     // Get teachers data using model
     const { teachers, totalCount } = await getTeachers({
@@ -83,7 +74,6 @@ export const getTeachersController = async (
       pagination,
     };
 
-    console.log("Teacher Controller: Successfully fetched teachers");
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
     console.error("Teacher Controller: Error in getTeachersController:", error);
@@ -101,8 +91,6 @@ export const createTeacherController = async (
   NextResponse<{ success: boolean; teacher?: TeacherData } | { error: string }>
 > => {
   try {
-    console.log("Teacher Controller: Starting POST request...");
-
     const user = await currentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -163,10 +151,6 @@ export const createTeacherController = async (
       );
     }
 
-    console.log(
-      "Teacher Controller: Successfully created teacher:",
-      result.teacher?.id,
-    );
     return NextResponse.json(
       { success: true, teacher: result.teacher },
       { status: 201 },
@@ -190,7 +174,6 @@ export const getTeacherByIdController = async (
 ): Promise<NextResponse<{ teacher: TeacherData } | { error: string }>> => {
   try {
     const { id } = await params;
-    console.log("Teacher Controller: Getting teacher by ID:", id);
 
     const user = await currentUser();
     if (!user) {
@@ -217,10 +200,6 @@ export const getTeacherByIdController = async (
       return NextResponse.json({ error: "Teacher not found" }, { status: 404 });
     }
 
-    console.log(
-      "Teacher Controller: Successfully fetched teacher:",
-      teacher.id,
-    );
     return NextResponse.json({ teacher }, { status: 200 });
   } catch (error) {
     console.error(
@@ -243,7 +222,6 @@ export const updateTeacherController = async (
 > => {
   try {
     const { id } = await params;
-    console.log("Teacher Controller: Updating teacher:", id);
 
     const user = await currentUser();
     if (!user) {
@@ -277,10 +255,6 @@ export const updateTeacherController = async (
       );
     }
 
-    console.log(
-      "Teacher Controller: Successfully updated teacher:",
-      result.teacher?.id,
-    );
     return NextResponse.json(
       { success: true, teacher: result.teacher },
       { status: 200 },
@@ -304,7 +278,6 @@ export const deleteTeacherController = async (
 ): Promise<NextResponse<{ success: boolean } | { error: string }>> => {
   try {
     const { id } = await params;
-    console.log("Teacher Controller: Deleting teacher:", id);
 
     const user = await currentUser();
     if (!user) {
@@ -335,7 +308,6 @@ export const deleteTeacherController = async (
       );
     }
 
-    console.log("Teacher Controller: Successfully deleted teacher:", id);
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error(

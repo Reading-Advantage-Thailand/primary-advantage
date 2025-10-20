@@ -15,10 +15,10 @@ export type Permission =
 
 // Role hierarchy mapping
 const ROLE_HIERARCHY: Record<string, number> = {
-  [Role.Student]: 1,
-  [Role.Teacher]: 2,
-  [Role.Admin]: 3,
-  [Role.System]: 4,
+  [Role.student]: 1,
+  [Role.teacher]: 2,
+  [Role.admin]: 3,
+  [Role.system]: 4,
 };
 
 // Permission requirements mapping
@@ -31,50 +31,50 @@ const PERMISSION_REQUIREMENTS: Record<
   }
 > = {
   STUDENT_ACCESS: {
-    roles: [Role.Student, Role.Teacher, Role.Admin, Role.System],
+    roles: [Role.student, Role.teacher, Role.admin, Role.system],
     schoolAdminAllowed: true,
   },
   TEACHER_ACCESS: {
-    roles: [Role.Teacher, Role.Admin, Role.System],
+    roles: [Role.teacher, Role.admin, Role.system],
     minHierarchyLevel: 2,
     schoolAdminAllowed: true,
   },
   ADMIN_ACCESS: {
-    roles: [Role.Admin, Role.System],
+    roles: [Role.admin, Role.system],
     minHierarchyLevel: 3,
     schoolAdminAllowed: true,
   },
   SYSTEM_ACCESS: {
-    roles: [Role.System],
+    roles: [Role.system],
     minHierarchyLevel: 4,
     schoolAdminAllowed: false,
   },
   SCHOOL_ADMIN_ACCESS: {
-    roles: [Role.Admin, Role.System],
+    roles: [Role.admin, Role.system],
     schoolAdminAllowed: true,
   },
   ARTICLE_CREATION: {
-    roles: [Role.Admin, Role.System],
+    roles: [Role.admin, Role.system],
     minHierarchyLevel: 3,
     schoolAdminAllowed: true,
   },
   USER_MANAGEMENT: {
-    roles: [Role.Admin, Role.System],
+    roles: [Role.admin, Role.system],
     minHierarchyLevel: 3,
     schoolAdminAllowed: true,
   },
   IMPORT_DATA: {
-    roles: [Role.Admin, Role.System],
+    roles: [Role.admin, Role.system],
     minHierarchyLevel: 3,
     schoolAdminAllowed: true,
   },
   REPORTS_ACCESS: {
-    roles: [Role.Teacher, Role.Admin, Role.System],
+    roles: [Role.teacher, Role.admin, Role.system],
     minHierarchyLevel: 2,
     schoolAdminAllowed: true,
   },
   CLASS_MANAGEMENT: {
-    roles: [Role.Teacher, Role.Admin, Role.System],
+    roles: [Role.teacher, Role.admin, Role.system],
     minHierarchyLevel: 2,
     schoolAdminAllowed: true,
   },
@@ -195,7 +195,7 @@ export function getEffectiveRole(
     const currentLevel = ROLE_HIERARCHY[current] || 0;
     const highestLevel = ROLE_HIERARCHY[highest] || 0;
     return currentLevel > highestLevel ? current : highest;
-  }, Role.Student);
+  }, Role.student);
 
   return highestRole;
 }

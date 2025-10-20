@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
-import { ActivityType } from "@/types/enum";
+import { ActivityType, FlashcardType } from "@/types/enum";
 import { getAudioUrl } from "@/lib/storage-config";
 
 export async function GET(
@@ -10,6 +10,7 @@ export async function GET(
 ) {
   try {
     const user = await currentUser();
+
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

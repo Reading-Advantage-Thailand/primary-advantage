@@ -88,20 +88,20 @@ export async function POST(request: NextRequest) {
 
     // Check if user needs Admin role upgrade
     const hasAdminRole = targetUser.roles.some(
-      (userRole) => userRole.role.name === "Admin",
+      (userRole) => userRole.role.name === "admin",
     );
 
     if (!hasAdminRole) {
       const currentRoles = targetUser.roles.map((ur) => ur.role.name);
-      if (currentRoles.includes("User") || currentRoles.includes("Teacher")) {
+      if (currentRoles.includes("user") || currentRoles.includes("teacher")) {
         // Find or create Admin role
         let adminRole = await prisma.role.findFirst({
-          where: { name: "Admin" },
+          where: { name: "admin" },
         });
 
         if (!adminRole) {
           adminRole = await prisma.role.create({
-            data: { name: "Admin" },
+            data: { name: "admin" },
           });
         }
 
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       roleUpgraded:
         !hasAdminRole &&
         targetUser.roles.some(
-          (ur) => ur.role.name === "User" || ur.role.name === "Teacher",
+          (ur) => ur.role.name === "user" || ur.role.name === "teacher",
         ),
     });
   } catch (error) {
