@@ -15,7 +15,7 @@ COPY . .
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
 
-RUN npm run prisma:migrate-deploy && npm run build
+RUN npm run prisma:generate && npm run build
 
 
 
