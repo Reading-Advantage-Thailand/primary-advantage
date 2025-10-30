@@ -37,6 +37,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 // Language options for translation matching
 const TRANSLATION_LANGUAGES = {
@@ -105,6 +106,7 @@ interface UserMatch {
 export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
   // ALL HOOKS MUST BE DECLARED AT THE TOP LEVEL - NO CONDITIONAL HOOKS
   const router = useRouter();
+  const t = useTranslations("SentencesPage.matchingGame");
 
   // State hooks - always called in the same order
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -179,12 +181,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
       setSelectedLeft(null);
 
       if (isCorrect) {
-        toast.success("Correct match! ✅");
+        toast.success(t("results.correctMatch"));
       } else {
-        toast.error("Incorrect match. Try again! ❌");
+        toast.error(t("results.incorrectMatch"));
       }
     },
-    [activeGameData, currentIndex, isCompleted],
+    [activeGameData, currentIndex, isCompleted, t],
   );
 
   const handleLeftItemClick = useCallback(
@@ -213,15 +215,15 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
         const data = await response.json();
         setRawGameData(data.matchingGames || []);
       } else {
-        toast.error("Failed to load matching data from flashcard deck");
+        toast.error(t("toast.failedToLoad"));
       }
     } catch (error) {
       console.error("Error loading matching data:", error);
-      toast.error("Failed to load matching data");
+      toast.error(t("toast.failedToLoadData"));
     } finally {
       setIsLoading(false);
     }
-  }, [deckId, selectedLanguage]);
+  }, [deckId, selectedLanguage, t]);
 
   const handleStartGame = useCallback(() => {
     setIsPlaying(true);
@@ -241,7 +243,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
       });
       setIsPlaying(false);
     }
-  }, [currentIndex, activeGameData.length]);
+  }, [currentIndex, activeGameData.length, deckId, score, timer]);
 
   const handleRestart = useCallback(() => {
     setUserMatches([]);
@@ -266,13 +268,16 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
 
     if (isAllCorrect) {
       setScore((prev) => prev + 1);
-      toast.success("Perfect! All pairs matched correctly! 🎉");
+      toast.success(t("results.perfect"));
     } else {
       toast.error(
-        `${correctCount}/${currentGame.pairs.length} correct. Try again! 💪`,
+        t("results.tryAgain", {
+          correct: correctCount,
+          total: currentGame.pairs.length,
+        }),
       );
     }
-  }, [userMatches, activeGameData, currentIndex]);
+  }, [userMatches, activeGameData, currentIndex, t]);
 
   const handleRestartGame = useCallback(() => {
     setCurrentIndex(0);
@@ -285,8 +290,8 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
 
   const handleShowAnswers = useCallback(() => {
     setShowCorrectAnswers(true);
-    toast.info("Correct matches revealed! 📖");
-  }, []);
+    toast.info(t("results.showAnswers"));
+  }, [t]);
 
   const handleBack = useCallback(() => {
     router.back();
@@ -307,7 +312,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
     if (!currentPair?.audioUrl || isPlayingAudio) return;
 
     setIsPlayingAudio(true);
-    toast.success("Playing audio hint 🔊");
+    toast.success(t("hints.playingAudio"));
 
     try {
       await new Promise((resolve, reject) => {
@@ -382,28 +387,26 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
         audio.load();
       });
 
-      toast.success("Audio completed! 🎵");
+      toast.success(t("hints.audioCompleted"));
     } catch (error) {
       console.error("Error playing audio:", error);
-      toast.error("Failed to play audio");
+      toast.error(t("hints.audioFailed"));
     } finally {
       setIsPlayingAudio(false);
     }
-  }, [activeGameData, currentIndex, selectedLeft, isPlayingAudio]);
+  }, [activeGameData, currentIndex, selectedLeft, isPlayingAudio, t]);
 
   const toggleHints = useCallback(() => {
     setHintsEnabled((prev) => {
       const newState = !prev;
       if (newState) {
-        toast.success(
-          "Hints enabled! 💡\n• Incorrect matches will be highlighted\n• Select an item to hear audio",
-        );
+        toast.success(t("hints.enabled"));
       } else {
-        toast.info("Hints disabled");
+        toast.info(t("hints.disabled"));
       }
       return newState;
     });
-  }, []);
+  }, [t]);
 
   const toggleAudioHints = useCallback(() => {
     setAudioHintsEnabled((prev) => !prev);
@@ -520,11 +523,9 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">
-              Loading your matching pairs...
-            </h3>
+            <h3 className="text-lg font-semibold">{t("loading.title")}</h3>
             <p className="text-muted-foreground text-sm">
-              Generating matches from your flashcard deck
+              {t("loading.description")}
             </p>
           </div>
         </div>
@@ -548,10 +549,10 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
 
           <div className="space-y-4">
             <h1 className="gradient-text text-4xl font-bold md:text-5xl">
-              🎉 Excellent Work!
+              {t("complete.title")}
             </h1>
             <p className="text-muted-foreground text-xl">
-              You completed {activeGameData.length} matching challenges
+              {t("complete.subtitle", { count: activeGameData.length })}
             </p>
           </div>
 
@@ -560,7 +561,9 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
               <CardContent className="p-6 text-center">
                 <Target className="mx-auto mb-3 h-8 w-8 text-blue-500" />
                 <div className="text-3xl font-bold text-blue-600">{score}</div>
-                <p className="text-muted-foreground text-sm">Perfect Scores</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.perfectScores")}
+                </p>
               </CardContent>
             </Card>
 
@@ -570,7 +573,9 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 <div className="text-3xl font-bold text-green-600">
                   {accuracy}%
                 </div>
-                <p className="text-muted-foreground text-sm">Accuracy</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.accuracy")}
+                </p>
               </CardContent>
             </Card>
 
@@ -580,7 +585,9 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 <div className="text-3xl font-bold text-purple-600">
                   {formatTime(timer)}
                 </div>
-                <p className="text-muted-foreground text-sm">Total Time</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.totalTime")}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -593,11 +600,11 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
               className="flex-1"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Menu
+              {t("complete.backToMenu")}
             </Button>
             <Button onClick={handleRestartGame} size="lg" className="flex-1">
               <RotateCcw className="mr-2 h-4 w-4" />
-              Play Again
+              {t("complete.playAgain")}
             </Button>
           </div>
         </div>
@@ -609,17 +616,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
   if (!isPlaying) {
     return (
       <div className="container mx-auto max-w-4xl space-y-8 px-4">
-        <Header
-          heading="Translation Matching Game"
-          text="Match sentences with their translations in your selected language"
-        />
+        <Header heading={t("title")} text={t("descriptionShort")} />
 
         <Card className="mx-auto max-w-2xl">
           <CardHeader className="pb-6 text-center">
-            <CardTitle className="text-2xl">Ready to Match?</CardTitle>
-            <p className="text-muted-foreground">
-              Match English sentences with their translations
-            </p>
+            <CardTitle className="text-2xl">{t("startScreen.title")}</CardTitle>
+            <p className="text-muted-foreground">{t("startScreen.subtitle")}</p>
           </CardHeader>
 
           <CardContent className="space-y-8">
@@ -630,15 +632,21 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                     {activeGameData.length}
                   </span>
                 </div>
-                <p className="text-sm font-medium">Matching Sets</p>
-                <p className="text-muted-foreground text-xs">Ready to play</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.stats.matchingSets")}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t("startScreen.stats.readyToPlay")}
+                </p>
               </div>
 
               <div className="space-y-2 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                   <Languages className="h-6 w-6 text-green-600" />
                 </div>
-                <p className="text-sm font-medium">Translation</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.stats.translation")}
+                </p>
                 <p className="text-muted-foreground text-xs">
                   {TRANSLATION_LANGUAGES[selectedLanguage].flag}{" "}
                   {TRANSLATION_LANGUAGES[selectedLanguage].nativeName}
@@ -649,8 +657,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10">
                   <Clock className="h-6 w-6 text-purple-600" />
                 </div>
-                <p className="text-sm font-medium">~5 min</p>
-                <p className="text-muted-foreground text-xs">Estimated time</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.stats.estimatedTime", { time: "5" })}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t("startScreen.stats.estimatedTimeLabel")}
+                </p>
               </div>
             </div>
 
@@ -659,15 +671,14 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
             <div className="bg-muted/50 space-y-3 rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <div className="bg-primary h-2 w-2 rounded-full" />
-                <p className="text-sm font-medium">How to Play</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.howToPlay")}
+                </p>
               </div>
               <ul className="text-muted-foreground ml-4 space-y-2 text-sm">
-                <li>• Click on a sentence from the left column to select it</li>
-                <li>• Then click on its translation from the right column</li>
-                <li>
-                  • Match all sentence-translation pairs correctly to complete
-                  each set
-                </li>
+                <li>• {t("startScreen.instructions.step1")}</li>
+                <li>• {t("startScreen.instructions.step2")}</li>
+                <li>• {t("startScreen.instructions.step3")}</li>
               </ul>
             </div>
 
@@ -676,7 +687,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="language" className="text-sm font-medium">
-                  Choose Translation Language
+                  {t("startScreen.language.title")}
                 </Label>
                 <Select
                   value={selectedLanguage}
@@ -711,12 +722,13 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 <div className="mb-2 flex items-center gap-2">
                   <span>{TRANSLATION_LANGUAGES[selectedLanguage].flag}</span>
                   <span className="font-medium">
-                    {TRANSLATION_LANGUAGES[selectedLanguage].name} Translation
+                    {TRANSLATION_LANGUAGES[selectedLanguage].name}{" "}
+                    {t("startScreen.language.selected")}
                   </span>
                 </div>
                 <p className="text-muted-foreground text-sm">
-                  Match English sentences with their{" "}
-                  {TRANSLATION_LANGUAGES[selectedLanguage].name} translations (
+                  {t("descriptionLong")}{" "}
+                  {TRANSLATION_LANGUAGES[selectedLanguage].name} (
                   {TRANSLATION_LANGUAGES[selectedLanguage].nativeName}).
                 </p>
               </div>
@@ -737,12 +749,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading translation pairs...
+                  {t("startScreen.loadingButton")}
                 </>
               ) : (
                 <>
                   <Play className="mr-2 h-5 w-5" />
-                  Start Translation Game
+                  {t("startScreen.startButton")}
                 </>
               )}
             </Button>
@@ -757,7 +769,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
-          <p className="text-muted-foreground">Loading next matching set...</p>
+          <p className="text-muted-foreground">{t("loading.nextSet")}</p>
         </div>
       </div>
     );
@@ -765,19 +777,22 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
 
   return (
     <div className="container mx-auto max-w-6xl space-y-4 px-4">
-      <Header
-        heading="Translation Matching Game"
-        text="Match each sentence with its correct translation"
-      />
+      <Header heading={t("title")} text={t("gameplay.instruction")} />
 
       <div className="space-y-2">
         <div className="text-muted-foreground flex items-center justify-between text-sm">
           <span>
-            {currentIndex + 1} of {activeGameData.length}
+            {t("gameplay.progress", {
+              current: currentIndex + 1,
+              total: activeGameData.length,
+            })}
           </span>
           <div className="flex items-center gap-4">
             <span>
-              {score}/{activeGameData.length} perfect
+              {t("gameplay.score", {
+                score,
+                total: activeGameData.length,
+              })}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
@@ -793,11 +808,10 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="space-y-3">
               <CardTitle className="text-xl">
-                🌐 Match Sentences with Translations
+                🌐 {t("gameplay.title")}
               </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Click a sentence on the left, then click its translation on the
-                right
+                {t("gameplay.instruction")}
               </p>
             </div>
           </div>
@@ -807,7 +821,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
           <div className="bg-muted/30 flex flex-wrap items-center gap-3 rounded-lg border p-4">
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium">Hints:</span>
+              <span className="text-sm font-medium">{t("hints.title")}</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -818,7 +832,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 className="h-8"
               >
                 <Volume2 className="mr-1 h-3 w-3" />
-                Audio
+                {t("hints.audio")}
               </Button>
             </div>
 
@@ -835,12 +849,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                   {isPlayingAudio ? (
                     <>
                       <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                      Playing...
+                      {t("hints.playing")}
                     </>
                   ) : (
                     <>
                       <Play className="mr-2 h-3 w-3" />
-                      Play Audio
+                      {t("hints.playAudio")}
                     </>
                   )}
                 </Button>
@@ -853,7 +867,9 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-blue-500" />
-                  <h3 className="font-medium">English Sentences</h3>
+                  <h3 className="font-medium">
+                    {t("gameplay.englishSentences")}
+                  </h3>
                 </div>
                 <div className="space-y-2">
                   {currentGame.pairs.map((pair) => {
@@ -912,7 +928,9 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                   <div className="h-3 w-3 rounded-full bg-green-500" />
                   <h3 className="font-medium">
                     {TRANSLATION_LANGUAGES[selectedLanguage].flag}{" "}
-                    {TRANSLATION_LANGUAGES[selectedLanguage].name} Translations
+                    {t("gameplay.translations", {
+                      language: TRANSLATION_LANGUAGES[selectedLanguage].name,
+                    })}
                   </h3>
                 </div>
                 <div className="space-y-2">
@@ -970,13 +988,17 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              Progress: {userMatches.length}/{currentGame.pairs.length} pairs
-              matched
+              {t("gameplay.pairsProgress", {
+                matched: userMatches.length,
+                total: currentGame.pairs.length,
+              })}
             </span>
             {userMatches.length > 0 && (
               <span className="text-muted-foreground">
-                Correct: {userMatches.filter((m) => m.isCorrect).length}/
-                {userMatches.length}
+                {t("gameplay.correctCount", {
+                  correct: userMatches.filter((m) => m.isCorrect).length,
+                  total: userMatches.length,
+                })}
               </span>
             )}
           </div>
@@ -1000,8 +1022,12 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                     )}
                     <h3 className="text-lg font-semibold">
                       {userMatches.every((m) => m.isCorrect)
-                        ? "Perfect! All pairs matched correctly! 🎉"
-                        : `${userMatches.filter((m) => m.isCorrect).length}/${currentGame.pairs.length} correct 💪`}
+                        ? t("results.allCorrect")
+                        : t("results.partialCorrect", {
+                            correct: userMatches.filter((m) => m.isCorrect)
+                              .length,
+                            total: currentGame.pairs.length,
+                          })}
                     </h3>
                   </div>
 
@@ -1010,7 +1036,9 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                       <div className="space-y-3">
                         <Separator />
                         <div>
-                          <h4 className="mb-3 font-medium">Correct Matches:</h4>
+                          <h4 className="mb-3 font-medium">
+                            {t("results.correctMatches")}
+                          </h4>
                           <div className="space-y-2">
                             {currentGame.pairs.map((pair, index) => (
                               <div key={pair.id} className="flex gap-3 text-sm">
@@ -1047,7 +1075,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
               className="sm:w-auto"
             >
               <RotateCcw className="mr-2 h-4 w-4" />
-              Reset Matches
+              {t("buttons.resetMatches")}
             </Button>
 
             {!isCompleted && userMatches.length > 0 && (
@@ -1058,7 +1086,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                 className="sm:w-auto"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Check Matches
+                {t("buttons.checkMatches")}
               </Button>
             )}
 
@@ -1072,15 +1100,15 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
                   className="sm:w-auto"
                 >
                   <Eye className="mr-2 h-4 w-4" />
-                  Show Answers
+                  {t("buttons.showAnswers")}
                 </Button>
               )}
 
             {isCompleted && (
               <Button onClick={handleNext} className="flex-1">
                 {currentIndex < activeGameData.length - 1
-                  ? "Next Set"
-                  : "Finish Game"}
+                  ? t("buttons.nextSet")
+                  : t("buttons.finishGame")}
               </Button>
             )}
           </div>

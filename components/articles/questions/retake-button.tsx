@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function RetakeButton({
   articleId,
@@ -24,6 +25,7 @@ export default function RetakeButton({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const t = useTranslations("Components");
 
   const handleRetakeQuiz = async () => {
     await retakeQuiz(articleId, type);
@@ -35,22 +37,21 @@ export default function RetakeButton({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button size={"sm"} variant={"outline"}>
-          Retake
+          {t("retakeButton")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm Retake</DialogTitle>
+          <DialogTitle>{t("confirmRetake")}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to retake this quiz? Your previous answers
-            will be cleared.
+            {t("areYouSureYouWantToRetakeThisQuiz")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
-            Cancel
+            {t("cancelButton")}
           </Button>
-          <Button onClick={handleRetakeQuiz}>Confirm Retake</Button>
+          <Button onClick={handleRetakeQuiz}>{t("confirmRetake")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

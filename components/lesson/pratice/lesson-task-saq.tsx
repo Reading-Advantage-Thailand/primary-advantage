@@ -22,6 +22,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { useTranslations } from "next-intl";
 
 interface SAQFeedback {
   score: number;
@@ -33,6 +34,7 @@ interface LessonSAQProps {
 }
 
 function LessonSAQContent({ article }: { article: Article }) {
+  const t = useTranslations("LessonSAQ");
   const [state, setState] = useState(QuestionState.LOADING);
   const { timer, setPaused } = useContext(QuizContext);
   const [isPanding, startTransition] = useTransition();
@@ -51,7 +53,10 @@ function LessonSAQContent({ article }: { article: Article }) {
   }, [article]);
 
   const formSchema = z.object({
-    answer: z.string().trim().min(1, { message: "Please enter your answer" }),
+    answer: z
+      .string()
+      .trim()
+      .min(1, { message: t("form.validation.answerRequired") }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -134,7 +139,7 @@ function LessonSAQContent({ article }: { article: Article }) {
           </div>
           <div>
             <p className="font-medium text-green-600 dark:text-green-400">
-              Quiz Completed
+              {t("completed.title")}
             </p>
           </div>
         </div>
@@ -145,8 +150,7 @@ function LessonSAQContent({ article }: { article: Article }) {
               <>
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {/* {t("question")} */}
-                    Question:
+                    {t("labels.question")}
                   </h3>
                   <p className="leading-relaxed text-gray-700 dark:text-gray-300">
                     {feedback?.question}
@@ -154,8 +158,7 @@ function LessonSAQContent({ article }: { article: Article }) {
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {/* {t("yourAnswer")} */}
-                    Your Answer:
+                    {t("labels.yourAnswer")}
                   </h3>
                   <div className="rounded-lg border-l-4 border-green-500 bg-white p-4 dark:bg-gray-800">
                     <p className="font-medium text-green-700 dark:text-green-300">
@@ -165,8 +168,7 @@ function LessonSAQContent({ article }: { article: Article }) {
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {/* {t("suggestedAnswer")} */}
-                    Suggested Answer:
+                    {t("labels.suggestedAnswer")}
                   </h3>
                   <div className="rounded-lg border-l-4 border-blue-500 bg-blue-50 p-4 dark:bg-blue-900">
                     <p className="text-blue-700 dark:text-blue-300">
@@ -176,8 +178,7 @@ function LessonSAQContent({ article }: { article: Article }) {
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {/* {t("feedback")} */}
-                    Feedback:
+                    {t("labels.feedback")}
                   </h3>
                   <p className="text-gray-700 dark:text-gray-300">
                     {feedback?.feedback}
@@ -185,8 +186,7 @@ function LessonSAQContent({ article }: { article: Article }) {
                 </div>
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {/* {t("score")} */}
-                    Score:
+                    {t("labels.score")}
                   </h3>
                   <p className="text-gray-700 dark:text-gray-300">
                     {feedback?.score}
@@ -216,7 +216,7 @@ function LessonSAQContent({ article }: { article: Article }) {
                   className="flex items-center gap-2"
                 >
                   <Clock className="h-4 w-4" />
-                  Elapsed Time: {timer}
+                  {t("timer.elapsed", { time: timer })}
                 </Badge>
               </div>
 
@@ -238,7 +238,7 @@ function LessonSAQContent({ article }: { article: Article }) {
                         <TextareaAutosize
                           autoFocus
                           id="short-answer"
-                          placeholder="Type your answer here..."
+                          placeholder={t("form.placeholder.answer")}
                           className="min-h-[120px] w-full resize-none appearance-none overflow-hidden rounded-xl border-2 border-gray-200 bg-white p-4 text-gray-900 transition-all duration-200 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-800"
                           {...field}
                         />
@@ -250,7 +250,7 @@ function LessonSAQContent({ article }: { article: Article }) {
 
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500 dark:text-gray-400">
-                    Write a detailed response to demonstrate your understanding
+                    {t("form.help.detailedResponse")}
                   </span>
                   <span className="font-medium text-blue-600 dark:text-blue-400">
                     {/* {t("wordCount", { count: wordCount })} */}
@@ -267,10 +267,10 @@ function LessonSAQContent({ article }: { article: Article }) {
                   {isPanding ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submit
+                      {t("actions.submit")}
                     </>
                   ) : (
-                    "Submit"
+                    t("actions.submit")
                   )}
                 </Button>
               </div>

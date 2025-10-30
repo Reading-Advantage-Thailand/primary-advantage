@@ -40,6 +40,9 @@ interface ArticleRecord {
 }
 
 export function ArticleRecordsTable() {
+  const t = useTranslations("Student.history");
+  const tStatus = useTranslations("Overall.status");
+  const tComponents = useTranslations("Components");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -113,7 +116,7 @@ export function ArticleRecordsTable() {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Title
+            {t("title")}
             <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -125,7 +128,7 @@ export function ArticleRecordsTable() {
     {
       accessorKey: "scores",
       header: () => {
-        return <div>Score</div>;
+        return <div>{t("score")}</div>;
       },
       cell: ({ row }) => {
         return <div>{row.getValue("scores")}</div>;
@@ -134,7 +137,7 @@ export function ArticleRecordsTable() {
     {
       accessorKey: "updated_at",
       header: () => {
-        return <div>Date</div>;
+        return <div>{t("date")}</div>;
       },
       cell: ({ row }) => {
         const updatedAt = row.getValue("updated_at") as string;
@@ -144,7 +147,7 @@ export function ArticleRecordsTable() {
     },
     {
       accessorKey: "rated",
-      header: () => <div className="text-center">Rated</div>,
+      header: () => <div className="text-center">{t("rated")}</div>,
       cell: ({ row }) => {
         const amount = parseInt(row.getValue("rated"));
         return <div className="text-center font-medium">{amount}</div>;
@@ -152,15 +155,15 @@ export function ArticleRecordsTable() {
     },
     {
       accessorKey: "status",
-      header: () => <div className="text-center">Status</div>,
+      header: () => <div className="text-center">{t("status")}</div>,
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
         const map = {
-          READ: "Read",
-          COMPLETED_MCQ: "Completed MCQ",
-          COMPLETED_SAQ: "Completed SAQ",
-          COMPLETED_LAQ: "Completed LAQ",
-          UNRATED: "Unrated",
+          READ: tStatus("READ"),
+          COMPLETED_MCQ: tStatus("COMPLETED_MCQ"),
+          COMPLETED_SAQ: tStatus("COMPLETED_SAQ"),
+          COMPLETED_LAQ: tStatus("COMPLETED_LAQ"),
+          UNRATED: tStatus("UNRATED"),
         };
         return (
           <div className="text-center font-medium">
@@ -198,7 +201,7 @@ export function ArticleRecordsTable() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Search articles..."
+          placeholder={t("searchPlaceholder")}
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
           className="max-w-sm"
@@ -231,7 +234,7 @@ export function ArticleRecordsTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Loading...
+                  {t("loading")}
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
@@ -258,7 +261,7 @@ export function ArticleRecordsTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No article records found
+                  {t("noArticles")}
                 </TableCell>
               </TableRow>
             )}
@@ -273,7 +276,7 @@ export function ArticleRecordsTable() {
             onClick={() => fetchData(pagination.page - 1, searchValue)}
             disabled={pagination.page <= 1 || loading}
           >
-            Previous
+            {tComponents("previousButton")}
           </Button>
           <Button
             variant="outline"
@@ -281,7 +284,7 @@ export function ArticleRecordsTable() {
             onClick={() => fetchData(pagination.page + 1, searchValue)}
             disabled={pagination.page >= pagination.totalPages || loading}
           >
-            Next
+            {tComponents("nextButton")}
           </Button>
         </div>
       </div>

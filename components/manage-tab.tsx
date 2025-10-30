@@ -1,6 +1,7 @@
 "use client";
 
 import React, { startTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Header } from "./header";
 import { Input } from "@/components/ui/input";
 import {
@@ -65,7 +66,10 @@ interface ManageTabProps {
   data: Sentence[];
 }
 
-function getSimpleDueText(dueDate: Date): string {
+function getSimpleDueText(
+  dueDate: Date,
+  t: ReturnType<typeof useTranslations<"sentencesCard.manage">>,
+): string {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const due = new Date(
@@ -80,15 +84,17 @@ function getSimpleDueText(dueDate: Date): string {
 
   if (diffDays < 0) {
     const daysLate = Math.abs(diffDays);
-    return daysLate === 1 ? "1 day late" : `${daysLate} days late`;
+    return daysLate === 1
+      ? t("dueStatus.oneDayLate")
+      : t("dueStatus.daysLate", { count: daysLate });
   } else if (diffDays === 0) {
-    return "Due today";
+    return t("dueStatus.dueToday");
   } else if (diffDays === 1) {
-    return "Due tomorrow";
+    return t("dueStatus.dueTomorrow");
   } else if (diffDays <= 7) {
-    return `Due in ${diffDays} days`;
+    return t("dueStatus.dueInDays", { count: diffDays });
   } else {
-    return `Due in ${Math.ceil(diffDays / 7)} weeks`;
+    return t("dueStatus.dueInWeeks", { count: Math.ceil(diffDays / 7) });
   }
 }
 
@@ -111,6 +117,7 @@ function getDueColor(dueDate: Date): "destructive" | "secondary" | "default" {
 }
 
 export default function ManageTab({ data }: ManageTabProps) {
+  const t = useTranslations("SentencesPage.manage");
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "due", desc: false },
   ]);
@@ -122,7 +129,7 @@ export default function ManageTab({ data }: ManageTabProps) {
   const columns: ColumnDef<Sentence>[] = [
     {
       accessorKey: "sentence",
-      header: "Sentence",
+      header: t("tableHeaders.sentence"),
       cell: ({ row }) => {
         const sentence = row.getValue("sentence") as string;
         return <div className="whitespace-pre-wrap">{sentence}</div>;
@@ -136,7 +143,7 @@ export default function ManageTab({ data }: ManageTabProps) {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Created At
+            {t("tableHeaders.createdAt")}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -161,7 +168,7 @@ export default function ManageTab({ data }: ManageTabProps) {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Due
+            {t("tableHeaders.due")}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -174,7 +181,7 @@ export default function ManageTab({ data }: ManageTabProps) {
               variant={getDueColor(due)}
               className="flex items-center gap-1"
             >
-              {getSimpleDueText(due)}
+              {getSimpleDueText(due, t)}
             </Badge>
           </div>
         );
@@ -182,7 +189,7 @@ export default function ManageTab({ data }: ManageTabProps) {
     },
     {
       accessorKey: "action",
-      header: "Action",
+      header: t("tableHeaders.action"),
       cell: ({ row }) => {
         const id = row.original.id;
         const sentence = row.original.sentence;
@@ -195,24 +202,26 @@ export default function ManageTab({ data }: ManageTabProps) {
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete Flashcard</AlertDialogTitle>
+                <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to delete this flashcard?
+                  {t("deleteDialog.description")}
                 </AlertDialogDescription>
                 <div className="bg-muted mt-2 rounded p-2 font-mono text-sm">
                   "{sentence?.substring(0, 50)}..."
                 </div>
                 <div className="text-muted-foreground text-sm">
-                  This action cannot be undone.
+                  {t("deleteDialog.warning")}
                 </div>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>
+                  {t("deleteDialog.cancel")}
+                </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => handleDelete(id)}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Delete
+                  {t("deleteDialog.delete")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -251,14 +260,11 @@ export default function ManageTab({ data }: ManageTabProps) {
 
   return (
     <div className="space-y-6">
-      <Header
-        heading="Manage"
-        text="Manage your flashcard articles and sentences"
-      />
+      <Header heading={t("heading")} text={t("description")} />
       <div className="flex flex-col gap-4">
         <div className="flex items-center py-4">
           <Input
-            placeholder={"Search..."}
+            placeholder={t("searchPlaceholder")}
             value={
               (table.getColumn("sentence")?.getFilterValue() as string) ?? ""
             }
@@ -311,7 +317,7 @@ export default function ManageTab({ data }: ManageTabProps) {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    {t("noResults")}
                   </TableCell>
                 </TableRow>
               )}
@@ -325,7 +331,7 @@ export default function ManageTab({ data }: ManageTabProps) {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            {t("pagination.previous")}
           </Button>
           <Button
             variant="outline"
@@ -333,7 +339,7 @@ export default function ManageTab({ data }: ManageTabProps) {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            {t("pagination.next")}
           </Button>
         </div>
       </div>

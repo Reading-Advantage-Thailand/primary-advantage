@@ -9,6 +9,7 @@ import { SchoolProfileForm } from "@/components/school/school-profile-form";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Icons } from "@/components/icons";
+import { useTranslations } from "next-intl";
 
 interface SchoolAdmin {
   id: string;
@@ -53,6 +54,7 @@ interface School {
 }
 
 export default function SchoolProfileSettingsPage() {
+  const t = useTranslations("Settings.schoolProfile");
   const [school, setSchool] = useState<School | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -70,9 +72,9 @@ export default function SchoolProfileSettingsPage() {
         throw new Error("Failed to fetch school data");
       }
     } catch (error) {
-      toast.error("Failed to load school information", {
+      toast.error(t("loadError"), {
         description:
-          error instanceof Error ? error.message : "Please try again later.",
+          error instanceof Error ? error.message : t("tryAgainLater"),
       });
     } finally {
       setIsLoading(false);
@@ -116,10 +118,7 @@ export default function SchoolProfileSettingsPage() {
   if (isLoading) {
     return (
       <div>
-        <Header
-          heading="School Profile"
-          text="Manage your school information"
-        />
+        <Header heading={t("title")} text={t("subtitle")} />
         <Separator className="my-4" />
         <div className="flex items-center justify-center py-12">
           <Icons.spinner className="h-8 w-8 animate-spin" />
@@ -130,7 +129,7 @@ export default function SchoolProfileSettingsPage() {
 
   return (
     <div>
-      <Header heading="School Profile" text="Manage your school information" />
+      <Header heading={t("title")} text={t("subtitle")} />
       <Separator className="my-4" />
 
       <div className="space-y-6">

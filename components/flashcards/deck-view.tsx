@@ -36,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 interface SingleDeckViewInlineProps {
   deck: {
@@ -128,7 +129,8 @@ export function SingleDeckViewInline({
   const [selectedLanguage, setSelectedLanguage] = useState<string>(
     deck.type === "VOCABULARY" ? "en" : "th",
   );
-
+  const t = useTranslations("SentencesPage.sentencesCard");
+  const tVocabulary = useTranslations("VocabularyPage");
   const handleStartStudying = async () => {
     if (deck.totalCards < 5) return;
 
@@ -230,12 +232,9 @@ export function SingleDeckViewInline({
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="text-yellow-800 dark:text-yellow-200">
                 <div className="space-y-1">
-                  <p className="font-medium">
-                    Need more cards to start studying
-                  </p>
+                  <p className="font-medium">{t("needMoreCards")}</p>
                   <p className="text-sm">
-                    Add {5 - deck.totalCards} more cards from articles to unlock
-                    studying.
+                    {t("addMoreCards", { count: 5 - deck.totalCards })}
                   </p>
                 </div>
               </AlertDescription>
@@ -245,10 +244,8 @@ export function SingleDeckViewInline({
               <Trophy className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800 dark:text-green-200">
                 <div className="space-y-1">
-                  <p className="font-medium">🎉 All caught up!</p>
-                  <p className="text-sm">
-                    All cards are up to date. Come back later for more reviews.
-                  </p>
+                  <p className="font-medium">{t("allCaughtUp")}</p>
+                  <p className="text-sm">{t("allCardsUpToDate")}</p>
                 </div>
               </AlertDescription>
             </Alert>
@@ -257,9 +254,9 @@ export function SingleDeckViewInline({
               <Play className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800 dark:text-blue-200">
                 <div className="space-y-1">
-                  <p className="font-medium">Ready to study!</p>
+                  <p className="font-medium">{t("readyToStudy")}</p>
                   <p className="text-sm">
-                    {deck.dueCards} cards are ready for review.
+                    {t("cardsReadyForReview", { count: deck.dueCards })}
                   </p>
                 </div>
               </AlertDescription>
@@ -271,13 +268,13 @@ export function SingleDeckViewInline({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-blue-500" />
-                <span className="font-semibold">Learning Progress</span>
+                <span className="font-semibold">{t("learningProgress")}</span>
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-blue-600">
                   {Math.round(progressPercentage)}%
                 </div>
-                <p className="text-muted-foreground text-sm">Complete</p>
+                <p className="text-muted-foreground text-sm">{t("complete")}</p>
               </div>
             </div>
 
@@ -286,11 +283,11 @@ export function SingleDeckViewInline({
             <div className="text-muted-foreground flex justify-between text-sm">
               <span className="flex items-center gap-1">
                 <CheckCircle className="h-3 w-3 text-green-500" />
-                {deck.totalCards - deck.dueCards} mastered
+                {t("mastered", { count: deck.totalCards - deck.dueCards })}
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3 text-orange-500" />
-                {deck.dueCards} to review
+                {t("toReview", { count: deck.dueCards })}
               </span>
             </div>
           </div>
@@ -301,7 +298,7 @@ export function SingleDeckViewInline({
           <div className="space-y-4">
             <h4 className="flex items-center gap-2 text-lg font-semibold">
               <Target className="h-5 w-5 text-purple-500" />
-              Card Status Breakdown
+              {t("cardStatusBreakdown.title")}
             </h4>
             <div className="grid grid-cols-3 gap-4">
               <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20">
@@ -311,10 +308,10 @@ export function SingleDeckViewInline({
                       {deck.newCards}
                     </div>
                     <div className="text-muted-foreground text-sm font-medium">
-                      New
+                      {t("cardStatusBreakdown.new")}
                     </div>
                     <p className="text-xs text-blue-600">
-                      Fresh cards to learn
+                      {t("cardStatusBreakdown.newDescription")}
                     </p>
                   </div>
                 </CardContent>
@@ -327,9 +324,11 @@ export function SingleDeckViewInline({
                       {deck.learningCards}
                     </div>
                     <div className="text-muted-foreground text-sm font-medium">
-                      Learning
+                      {t("cardStatusBreakdown.learning")}
                     </div>
-                    <p className="text-xs text-orange-600">In progress</p>
+                    <p className="text-xs text-orange-600">
+                      {t("cardStatusBreakdown.learningDescription")}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -341,9 +340,11 @@ export function SingleDeckViewInline({
                       {deck.reviewCards}
                     </div>
                     <div className="text-muted-foreground text-sm font-medium">
-                      Review
+                      {t("cardStatusBreakdown.review")}
                     </div>
-                    <p className="text-xs text-green-600">Time for review</p>
+                    <p className="text-xs text-green-600">
+                      {t("cardStatusBreakdown.reviewDescription")}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -357,7 +358,7 @@ export function SingleDeckViewInline({
             <div className="flex items-center gap-2">
               <Languages className="h-5 w-5 text-indigo-500" />
               <Label className="text-base font-semibold">
-                Translation Language
+                {t("translationLanguage")}
               </Label>
             </div>
             <Select
@@ -420,8 +421,8 @@ export function SingleDeckViewInline({
             </Select>
             <p className="text-muted-foreground text-xs">
               {deck.type === "VOCABULARY"
-                ? "Definitions will be shown in this language"
-                : "Translations will be shown in this language"}
+                ? tVocabulary("translationLanguageDescription")
+                : t("translationLanguageDescription")}
             </p>
           </div>
 
@@ -439,12 +440,12 @@ export function SingleDeckViewInline({
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Loading Cards...
+                    {t("loadingCards")}
                   </>
                 ) : (
                   <>
                     <Play className="mr-2 h-5 w-5" />
-                    Start Studying ({deck.dueCards} cards)
+                    {t("startStudying", { count: deck.dueCards })}
                   </>
                 )}
               </Button>
@@ -480,7 +481,7 @@ export function SingleDeckViewInline({
                 className="h-12"
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Refresh Data
+                {t("refreshData")}
               </Button>
               <Button
                 variant="outline"
@@ -488,7 +489,7 @@ export function SingleDeckViewInline({
                 className="h-12"
               >
                 <BookOpen className="mr-2 h-4 w-4" />
-                Add More Cards
+                {t("addMoreCardsButton")}
               </Button>
             </div>
           </div>

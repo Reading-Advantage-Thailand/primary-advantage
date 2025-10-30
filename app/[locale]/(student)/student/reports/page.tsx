@@ -18,6 +18,7 @@ export default async function ReportsPage() {
   }
 
   const t = await getTranslations("Reports");
+
   const data = await fetchUserActivity(user.id);
 
   if (!data?.activity || !data?.xpLogs) {

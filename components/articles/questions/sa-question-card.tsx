@@ -83,13 +83,17 @@ export default async function SAQuestionCard({
             {t("SAQuestion.title")}
           </CardTitle>
           <CardDescription>
-            <p className="mt-4 text-lg font-bold">Question</p>
+            <p className="mt-4 text-lg font-bold">{t("SAQuestion.question")}</p>
             <p>{questionsData.result?.details.question}</p>
-            <p className="mt-4 text-lg font-bold">Suggested Answer</p>
+            <p className="mt-4 text-lg font-bold">
+              {t("SAQuestion.suggestedAnswer")}
+            </p>
             <p>{questionsData.result?.details.suggestedAnswer}</p>
-            <p className="mt-4 text-lg font-bold">Feedback</p>
+            <p className="mt-4 text-lg font-bold">{t("SAQuestion.feedback")}</p>
             <p>{questionsData.result?.details.feedback}</p>
-            <p className="mt-4 text-lg font-bold">Your Answer</p>
+            <p className="mt-4 text-lg font-bold">
+              {t("SAQuestion.yourAnswer")}
+            </p>
             <p className="mt-2 inline font-bold text-green-500 dark:text-green-400">
               {questionsData.result?.details.yourAnswer}
             </p>

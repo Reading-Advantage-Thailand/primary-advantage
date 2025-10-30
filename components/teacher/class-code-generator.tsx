@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations, useFormatter } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,6 +38,8 @@ export default function ClassCodeGenerator({
   buttonSize = "default",
   buttonVariant = "default",
 }: ClassCodeGeneratorProps) {
+  const t = useTranslations("Teacher.ClassCodeGenerator");
+  const formatter = useFormatter();
   const [open, setOpen] = useState(false);
   const [classCode, setClassCode] = useState(currentClassCode || "");
   const [expiresAt, setExpiresAt] = useState(codeExpiresAt || "");
@@ -62,11 +65,11 @@ export default function ClassCodeGenerator({
       const data = await response.json();
       setClassCode(data.classCode);
       setExpiresAt(data.expiresAt);
-      toast.success("Class code generated successfully!");
+      toast.success(t("toast.generateSuccess"));
       onCodeGenerated?.();
     } catch (error) {
       console.error("Error generating class code:", error);
-      toast.error("Failed to generate class code");
+      toast.error(t("toast.generateError"));
     } finally {
       setIsGenerating(false);
     }
@@ -77,34 +80,34 @@ export default function ClassCodeGenerator({
 
     try {
       await navigator.clipboard.writeText(classCode);
-      toast.success("Class code copied to clipboard!");
+      toast.success(t("toast.copyCodeSuccess"));
     } catch (error) {
       console.error("Failed to copy class code:", error);
-      toast.error("Failed to copy class code");
+      toast.error(t("toast.copyCodeError"));
     }
   };
 
   const handleCopyInstructions = async () => {
     if (!classCode) return;
 
-    const instructions = `🎓 Join ${classroomName}
-
-Use this password to join: ${classCode}
-
-Instructions:
-1. Go to the student login page
-2. Enter the password: ${classCode}
-3. Select your name from the list
-4. Start learning!
-
-⏰ This code expires: ${expiresAt ? format(new Date(expiresAt), "PPP 'at' p") : "Never"}`;
+    const dateText = expiresAt
+      ? formatter.dateTime(new Date(expiresAt), {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })
+      : t("expires.never");
+    const instructions = t("clipboard.instructions", {
+      classroomName,
+      classCode,
+      expiresAt: dateText,
+    });
 
     try {
       await navigator.clipboard.writeText(instructions);
-      toast.success("Instructions copied to clipboard!");
+      toast.success(t("toast.copyInstructionsSuccess"));
     } catch (error) {
       console.error("Failed to copy instructions:", error);
-      toast.error("Failed to copy instructions");
+      toast.error(t("toast.copyInstructionsError"));
     }
   };
 
@@ -121,7 +124,10 @@ Instructions:
     const isExpired = now > expiry;
 
     if (isExpired) {
-      return { text: "Expired", variant: "destructive" as const };
+      return {
+        text: t("expires.status.expired"),
+        variant: "destructive" as const,
+      };
     }
 
     const hoursLeft = Math.ceil(
@@ -129,11 +135,17 @@ Instructions:
     );
 
     if (hoursLeft <= 24) {
-      return { text: `${hoursLeft}h left`, variant: "secondary" as const };
+      return {
+        text: t("expires.status.hoursLeft", { count: hoursLeft }),
+        variant: "secondary" as const,
+      };
     }
 
     const daysLeft = Math.ceil(hoursLeft / 24);
-    return { text: `${daysLeft}d left`, variant: "outline" as const };
+    return {
+      text: t("expires.status.daysLeft", { count: daysLeft }),
+      variant: "outline" as const,
+    };
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -152,18 +164,17 @@ Instructions:
       <DialogTrigger asChild>
         <Button size={buttonSize} variant={buttonVariant}>
           <QrCode className="mr-1 h-4 w-4" />
-          Generate Password
+          {t("actions.open")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Password for {classroomName}
+            {t("title", { classroomName })}
           </DialogTitle>
           <DialogDescription>
-            Generate a code that students can use to join this classroom.
-            Students will use this code to login and access class materials.
+            {t("description.line1")} {t("description.line2")}
           </DialogDescription>
         </DialogHeader>
 
@@ -171,7 +182,7 @@ Instructions:
           {classCode && (
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="classCode">Password</Label>
+                <Label htmlFor="classCode">{t("fields.password.label")}</Label>
                 <div className="relative">
                   <Input
                     id="classCode"
@@ -187,7 +198,7 @@ Instructions:
                       variant="ghost"
                       className="h-6 w-6 p-0"
                       onClick={handleCopyCode}
-                      title="Copy code"
+                      title={t("fields.password.copyTitle")}
                     >
                       <Copy className="h-3 w-3" />
                     </Button>
@@ -199,7 +210,11 @@ Instructions:
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="h-4 w-4" />
-                    Expires: {format(new Date(expiresAt), "PPP 'at' p")}
+                    {t("expires.label")}{" "}
+                    {formatter.dateTime(new Date(expiresAt), {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
                   </div>
                   {expirationStatus && (
                     <Badge variant={expirationStatus.variant}>
@@ -211,16 +226,16 @@ Instructions:
 
               <div className="rounded-lg bg-blue-50 p-4">
                 <h4 className="mb-2 font-medium text-blue-900">
-                  Instructions for Students:
+                  {t("instructions.title")}
                 </h4>
                 <ol className="space-y-1 text-sm text-blue-800">
-                  <li>1. Go to the student login page</li>
+                  <li>1. {t("instructions.step1")}</li>
                   <li>
-                    2. Enter the password:{" "}
+                    2. {t("instructions.step2")}{" "}
                     <span className="font-mono font-bold">{classCode}</span>
                   </li>
-                  <li>3. Select their name from the student list</li>
-                  <li>4. Start learning!</li>
+                  <li>3. {t("instructions.step3")}</li>
+                  <li>4. {t("instructions.step4")}</li>
                 </ol>
                 <Button
                   variant="outline"
@@ -229,7 +244,7 @@ Instructions:
                   onClick={handleCopyInstructions}
                 >
                   <Copy className="mr-1 h-3 w-3" />
-                  Copy Instructions
+                  {t("instructions.copy")}
                 </Button>
               </div>
             </div>
@@ -247,16 +262,16 @@ Instructions:
               <RefreshCw className="mr-2 h-4 w-4" />
             )}
             {isGenerating
-              ? "Generating..."
+              ? t("actions.generating")
               : classCode
-                ? "Generate New Code"
-                : "Generate Password"}
+                ? t("actions.generateNew")
+                : t("actions.generate")}
           </Button>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Close
+            {t("actions.close")}
           </Button>
         </DialogFooter>
       </DialogContent>

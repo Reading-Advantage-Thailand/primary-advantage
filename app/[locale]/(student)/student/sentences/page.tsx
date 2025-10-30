@@ -6,31 +6,33 @@ import OrderWordPage from "@/components/pratice/order-words-page";
 import ManageTab from "@/components/manage-tab";
 import { getAllSentenceCards } from "@/actions/flashcard";
 import MatchingGamePage from "@/components/pratice/matching-page";
+import { getTranslations } from "next-intl/server";
 
 export default async function SentencesPage() {
   const flashcardsResult = await getAllSentenceCards();
+  const t = await getTranslations("SentencesPage");
 
   return (
     <>
       <Tabs defaultValue="flashcard">
         <TabsList className="grid h-fit w-full grid-cols-1 md:grid-cols-6">
           <TabsTrigger value="flashcard" className="text-xs sm:text-sm">
-            Sentence Card
+            {t("sentences")}
           </TabsTrigger>
           <TabsTrigger value="orderSentence" className="text-xs sm:text-sm">
-            Order Sentence
+            {t("orderSentence")}
           </TabsTrigger>
           <TabsTrigger value="clozeTest" className="text-xs sm:text-sm">
-            Cloze Test
+            {t("clozeTest")}
           </TabsTrigger>
           <TabsTrigger value="orderWord" className="text-xs sm:text-sm">
-            Order Word
+            {t("orderWord")}
           </TabsTrigger>
           <TabsTrigger value="matching" className="text-xs sm:text-sm">
-            Matching
+            {t("matching")}
           </TabsTrigger>
           <TabsTrigger value="manage" className="text-xs sm:text-sm">
-            Manage
+            {t("manage.heading")}
           </TabsTrigger>
         </TabsList>
         <TabsContent className="mt-4" value="flashcard">

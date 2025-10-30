@@ -29,6 +29,7 @@ import {
   Lightbulb,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -89,6 +90,7 @@ export default function LessonSentenceOrder({
 }: {
   articleId: string;
 }) {
+  const t = useTranslations("SentencesPage.sentenceOrder");
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userOrder, setUserOrder] = useState<DraggableSentence[]>([]);
@@ -134,7 +136,7 @@ export default function LessonSentenceOrder({
     } catch (error) {
       console.error("Error loading sentences:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to load sentences",
+        error instanceof Error ? error.message : t("loadingNextChallenge"),
       );
     }
   };
@@ -218,7 +220,7 @@ export default function LessonSentenceOrder({
         setIsCompleted(true);
         setShowResult(true);
         setScore((prev) => prev + 1);
-        toast.success("Perfect! Correct sentence order! 🎉");
+        toast.success(t("perfectCorrectOrder"));
       }
     }
   }, [
@@ -327,9 +329,9 @@ export default function LessonSentenceOrder({
 
     if (isCorrect) {
       setScore((prev) => prev + 1);
-      toast.success("Perfect! Correct sentence order! 🎉");
+      toast.success(t("perfectCorrectOrder"));
     } else {
-      toast.error("Not quite right. Try again! 💪");
+      toast.error(t("notQuiteRight"));
     }
   }, [userOrder, currentSentenceGroup?.correctOrder]);
 
@@ -344,7 +346,7 @@ export default function LessonSentenceOrder({
 
   const handleShowAnswer = useCallback(() => {
     setShowCorrectOrder(true);
-    toast.info("Correct order revealed! 📖");
+    toast.info(t("correctOrder"));
   }, []);
 
   // const handleLanguageChange = (value: string) => {
@@ -529,9 +531,9 @@ export default function LessonSentenceOrder({
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Loading your sentences...</h3>
+            <h3 className="text-lg font-semibold">{t("loading")}</h3>
             <p className="text-muted-foreground text-sm">
-              Fetching sentences from your flashcard deck
+              {t("fetchingSentences")}
             </p>
           </div>
         </div>
@@ -557,11 +559,10 @@ export default function LessonSentenceOrder({
           {/* Results Header */}
           <div className="space-y-4">
             <h1 className="gradient-text text-4xl font-bold md:text-5xl">
-              🎉 Fantastic Work!
+              🎉 {t("completedTitle")}
             </h1>
             <p className="text-muted-foreground text-xl">
-              You completed {activeSentences.length} sentence ordering
-              challenges
+              {t("completedDescription", { count: activeSentences.length })}
             </p>
           </div>
 
@@ -571,7 +572,7 @@ export default function LessonSentenceOrder({
               <CardContent className="p-6 text-center">
                 <Target className="mx-auto mb-3 h-8 w-8 text-blue-500" />
                 <div className="text-3xl font-bold text-blue-600">{score}</div>
-                <p className="text-muted-foreground text-sm">Correct Answers</p>
+                <p className="text-muted-foreground text-sm">{t("correct")}</p>
               </CardContent>
             </Card>
 
@@ -581,7 +582,7 @@ export default function LessonSentenceOrder({
                 <div className="text-3xl font-bold text-green-600">
                   {accuracy}%
                 </div>
-                <p className="text-muted-foreground text-sm">Accuracy</p>
+                <p className="text-muted-foreground text-sm">{t("accuracy")}</p>
               </CardContent>
             </Card>
 
@@ -591,7 +592,9 @@ export default function LessonSentenceOrder({
                 <div className="text-3xl font-bold text-purple-600">
                   {formatTime(timer)}
                 </div>
-                <p className="text-muted-foreground text-sm">Total Time</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("totalTime")}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -600,7 +603,7 @@ export default function LessonSentenceOrder({
           <div className="mx-auto flex max-w-md flex-col gap-4 sm:flex-row">
             <Button onClick={handleRestartGame} size="lg" className="flex-1">
               <RotateCcw className="mr-2 h-4 w-4" />
-              Play Again
+              {t("playAgain")}
             </Button>
           </div>
         </div>
@@ -612,18 +615,12 @@ export default function LessonSentenceOrder({
   if (!isPlaying) {
     return (
       <div className="container mx-auto max-w-4xl space-y-8 px-4">
-        <Header
-          heading="Order Sentences Game"
-          text="Test your reading comprehension by arranging sentences in chronological order"
-        />
+        <Header heading={t("title")} text={t("description")} />
 
         <Card className="mx-auto max-w-2xl">
           <CardHeader className="pb-6 text-center">
-            <CardTitle className="text-2xl">Ready to Start?</CardTitle>
-            <p className="text-muted-foreground">
-              Arrange 5 sentences in the correct order for each of your
-              flashcard sentences
-            </p>
+            <CardTitle className="text-2xl">{t("readyToStart")}</CardTitle>
+            <p className="text-muted-foreground">{t("arrangeSentences")}</p>
           </CardHeader>
 
           <CardContent className="space-y-8">
@@ -635,17 +632,19 @@ export default function LessonSentenceOrder({
                     {activeSentences.length}
                   </span>
                 </div>
-                <p className="text-sm font-medium">Flashcard Sentences</p>
-                <p className="text-muted-foreground text-xs">Ready to play</p>
+                <p className="text-sm font-medium">{t("sentences")}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t("readyToPlay")}
+                </p>
               </div>
 
               <div className="space-y-2 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                   <GripVertical className="h-6 w-6 text-green-600" />
                 </div>
-                <p className="text-sm font-medium">Drag & Drop</p>
+                <p className="text-sm font-medium">{t("dragAndDrop")}</p>
                 <p className="text-muted-foreground text-xs">
-                  Easy interaction
+                  {t("easyInteraction")}
                 </p>
               </div>
 
@@ -653,8 +652,12 @@ export default function LessonSentenceOrder({
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10">
                   <Clock className="h-6 w-6 text-purple-600" />
                 </div>
-                <p className="text-sm font-medium">~15 min</p>
-                <p className="text-muted-foreground text-xs">Estimated time</p>
+                <p className="text-sm font-medium">
+                  {t("playtime", { time: 15 })}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t("estimatedTime")}
+                </p>
               </div>
             </div>
 
@@ -664,14 +667,12 @@ export default function LessonSentenceOrder({
             <div className="bg-muted/50 space-y-3 rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <div className="bg-primary h-2 w-2 rounded-full" />
-                <p className="text-sm font-medium">How to Play</p>
+                <p className="text-sm font-medium">{t("howToPlay")}</p>
               </div>
               <ul className="text-muted-foreground ml-4 space-y-2 text-sm">
-                <li>
-                  • Each game shows 5 sentences around your flashcard sentence
-                </li>
-                <li>• Drag sentences to reorder them chronologically</li>
-                <li>• Complete all your due flashcard sentences</li>
+                <li>• {t("eachGameShows")}</li>
+                <li>• {t("dragSentences")}</li>
+                <li>• {t("completeAll")}</li>
               </ul>
             </div>
 
@@ -685,8 +686,8 @@ export default function LessonSentenceOrder({
             >
               <Play className="mr-2 h-5 w-5" />
               {activeSentences.length === 0
-                ? "No sentences available"
-                : "Start Game"}
+                ? t("noSentencesAvailable")
+                : t("startGame")}
             </Button>
           </CardContent>
         </Card>
@@ -707,10 +708,7 @@ export default function LessonSentenceOrder({
 
   return (
     <div className="container mx-auto max-w-4xl space-y-4 px-4">
-      <Header
-        heading="Order Sentences Game"
-        text="Arrange the sentences in chronological order"
-      />
+      <Header heading={t("title")} text={t("descriptionPlaying")} />
 
       {/* Hidden audio element for playback */}
       <audio ref={audioRef} style={{ display: "none" }} />
@@ -723,7 +721,7 @@ export default function LessonSentenceOrder({
           </span>
           <div className="flex items-center gap-4">
             <span>
-              {score}/{activeSentences.length} correct
+              {score}/{activeSentences.length} {t("correct")}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
@@ -743,7 +741,7 @@ export default function LessonSentenceOrder({
                 📖 {currentSentenceGroup.articleTitle}
               </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Arrange these 5 sentences in chronological order
+                {t("descriptionPlaying2")}
               </p>
             </div>
           </div>
@@ -755,7 +753,7 @@ export default function LessonSentenceOrder({
           <div className="bg-muted/30 flex flex-wrap items-center gap-3 rounded-lg border p-4">
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium">Hints:</span>
+              <span className="text-sm font-medium">{t("hints.title")}</span>
             </div>
 
             {/* Highlight Toggle */}
@@ -767,7 +765,7 @@ export default function LessonSentenceOrder({
                 className="h-8"
               >
                 <Target className="mr-1 h-3 w-3" />
-                Highlight
+                {t("hints.highlight")}
               </Button>
             </div>
 
@@ -780,7 +778,7 @@ export default function LessonSentenceOrder({
                 className="h-8"
               >
                 <Volume2 className="mr-1 h-3 w-3" />
-                Audio
+                {t("hints.audio")}
               </Button>
             </div>
 
@@ -798,12 +796,12 @@ export default function LessonSentenceOrder({
                   {isPlayingHintAudio ? (
                     <>
                       <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                      Playing...
+                      {t("hints.playing")}
                     </>
                   ) : (
                     <>
                       <Play className="mr-2 h-3 w-3" />
-                      Play Order
+                      {t("hints.playOrder")}
                     </>
                   )}
                 </Button>
@@ -816,8 +814,8 @@ export default function LessonSentenceOrder({
             <div className="flex items-center gap-2">
               <GripVertical className="text-muted-foreground h-4 w-4" />
               <p className="text-sm font-medium">
-                Drag to reorder sentences{" "}
-                {!hasUserInteracted && "(Start by moving a sentence!)"}
+                {t("hints.dragToReorder")}{" "}
+                {!hasUserInteracted && `(${t("hints.startByMovingASentence")})`}
               </p>
             </div>
 
@@ -825,7 +823,7 @@ export default function LessonSentenceOrder({
               {userOrder.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <p className="text-muted-foreground">
-                    Sentences will appear here...
+                    {t("hints.sentencesWillAppearHere")}
                   </p>
                 </div>
               ) : (
@@ -943,8 +941,8 @@ export default function LessonSentenceOrder({
                     )}
                     <h3 className="text-lg font-semibold">
                       {isCorrect
-                        ? "Perfect! Correct order! 🎉"
-                        : "Not quite right 💪"}
+                        ? t("perfectCorrectOrder")
+                        : t("notQuiteRight")}
                     </h3>
                   </div>
 
@@ -952,7 +950,9 @@ export default function LessonSentenceOrder({
                     <div className="space-y-3">
                       <Separator />
                       <div>
-                        <h4 className="mb-3 font-medium">Correct Order:</h4>
+                        <h4 className="mb-3 font-medium">
+                          {t("correctOrder")}:
+                        </h4>
                         <div className="space-y-2">
                           {currentSentenceGroup.correctOrder.map(
                             (sentence, index) => (
@@ -986,7 +986,9 @@ export default function LessonSentenceOrder({
               ) : (
                 <Shuffle className="mr-2 h-4 w-4" />
               )}
-              {showCorrectOrder || isCompleted ? "Play Again" : "Shuffle Again"}
+              {showCorrectOrder || isCompleted
+                ? t("playAgain")
+                : t("shuffleAgain")}
             </Button>
 
             {!isCompleted && (
@@ -997,7 +999,7 @@ export default function LessonSentenceOrder({
                 className="sm:w-auto"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Check Answer
+                {t("checkAnswer")}
               </Button>
             )}
 
@@ -1009,15 +1011,15 @@ export default function LessonSentenceOrder({
                 className="sm:w-auto"
               >
                 <XCircle className="mr-2 h-4 w-4" />
-                Show Answer
+                {t("showAnswer")}
               </Button>
             )}
 
             {isCompleted && (
               <Button onClick={handleNext} className="flex-1">
                 {currentIndex < activeSentences.length - 1
-                  ? "Next Sentence"
-                  : "Finish Game"}
+                  ? t("nextSentence")
+                  : t("finishGame")}
               </Button>
             )}
           </div>

@@ -42,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 // Function to calculate the data for the chart
 // This function takes in the articles and the number of days to go back
@@ -127,6 +127,8 @@ const chartConfig = {
 
 export function UserActivityChart({ data, xpLogs }: UserActiviryChartProps) {
   const t = useTranslations("Reports");
+  const tTime = useTranslations("Overall.time");
+  const locale = useLocale();
 
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 6)),
@@ -196,7 +198,7 @@ export function UserActivityChart({ data, xpLogs }: UserActiviryChartProps) {
                         format(date.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>Pick a date</span>
+                      <span>{tTime("selectPeriod")}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -245,15 +247,19 @@ export function UserActivityChart({ data, xpLogs }: UserActiviryChartProps) {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select" />
+                      <SelectValue placeholder={tTime("selectPeriod")} />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      <SelectItem value="0">Today</SelectItem>
-                      <SelectItem value="1">Yesterday</SelectItem>
-                      <SelectItem value="7">Last week</SelectItem>
-                      <SelectItem value="30">Last 30 days</SelectItem>
-                      <SelectItem value="thismonth">This month</SelectItem>
-                      <SelectItem value="lastmonth">Last month</SelectItem>
+                      <SelectItem value="0">{tTime("today")}</SelectItem>
+                      <SelectItem value="1">{tTime("yesterday")}</SelectItem>
+                      <SelectItem value="7">{tTime("lastweek")}</SelectItem>
+                      <SelectItem value="30">{tTime("last30days")}</SelectItem>
+                      <SelectItem value="thismonth">
+                        {tTime("thismonth")}
+                      </SelectItem>
+                      <SelectItem value="lastmonth">
+                        {tTime("lastmonth")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <Calendar

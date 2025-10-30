@@ -25,36 +25,47 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff, User, Mail, Lock, Users, UserCog } from "lucide-react";
 import { toast } from "sonner";
 
-const teacherFormSchema = z
-  .object({
-    name: z
-      .string()
-      .min(2, "Name must be at least 2 characters")
-      .max(100, "Name must be less than 100 characters"),
-    email: z.string().email("Please enter a valid email address"),
-    role: z.string().min(1, "Please select a role"),
-    password: z
-      .string()
-      .min(6, "Password must be at least 6 characters")
-      .max(100, "Password must be less than 100 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+// Schema will be created inside the component to access translations
 
-type TeacherFormData = z.infer<typeof teacherFormSchema>;
+interface TeacherFormData {
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function AddTeacherPage() {
+  const t = useTranslations("AdminTeachers.Add");
+  const tRoles = useTranslations("AdminTeachers.Table.roles");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  const teacherFormSchema = z
+    .object({
+      name: z
+        .string()
+        .min(2, t("schema.nameMin"))
+        .max(100, t("schema.nameMax")),
+      email: z.string().email(t("schema.emailInvalid")),
+      role: z.string().min(1, t("schema.roleRequired")),
+      password: z
+        .string()
+        .min(6, t("schema.passwordMin"))
+        .max(100, t("schema.passwordMax")),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("schema.passwordsDontMatch"),
+      path: ["confirmPassword"],
+    });
 
   const form = useForm<TeacherFormData>({
     resolver: zodResolver(teacherFormSchema),
@@ -86,16 +97,16 @@ export default function AddTeacherPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to create teacher");
+        throw new Error(result.error || t("toasts.createError"));
       }
 
-      toast.success("Teacher created successfully!");
+      toast.success(t("toasts.createdSuccess"));
       form.reset();
       router.push("/admin/teachers");
     } catch (error) {
       console.error("Error creating teacher:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to create teacher",
+        error instanceof Error ? error.message : t("toasts.createError"),
       );
     } finally {
       setIsSubmitting(false);
@@ -104,7 +115,7 @@ export default function AddTeacherPage() {
 
   return (
     <div className="space-y-6">
-      <Header heading="Add Teacher" text="Add a new teacher to your school" />
+      <Header heading={t("title")} text={t("subtitle")} />
       <Separator className="my-4" />
 
       <div className="mx-auto max-w-2xl">
@@ -112,7 +123,7 @@ export default function AddTeacherPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Teacher Information
+              {t("cardTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -130,11 +141,11 @@ export default function AddTeacherPage() {
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           <User className="h-4 w-4" />
-                          Full Name
+                          {t("form.name")}
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Enter teacher's full name"
+                            placeholder={t("placeholders.name")}
                             {...field}
                             className="h-11"
                           />
@@ -152,12 +163,12 @@ export default function AddTeacherPage() {
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           <Mail className="h-4 w-4" />
-                          Email Address
+                          {t("form.email")}
                         </FormLabel>
                         <FormControl>
                           <Input
                             type="email"
-                            placeholder="Enter email address"
+                            placeholder={t("placeholders.email")}
                             {...field}
                             className="h-11"
                           />
@@ -175,7 +186,7 @@ export default function AddTeacherPage() {
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           <UserCog className="h-4 w-4" />
-                          Role
+                          {t("form.role")}
                         </FormLabel>
                         <Select
                           onValueChange={field.onChange}
@@ -183,12 +194,18 @@ export default function AddTeacherPage() {
                         >
                           <FormControl>
                             <SelectTrigger className="h-11">
-                              <SelectValue placeholder="Select a role" />
+                              <SelectValue
+                                placeholder={t("placeholders.role")}
+                              />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="teacher">Teacher</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="teacher">
+                              {tRoles("teacher")}
+                            </SelectItem>
+                            <SelectItem value="admin">
+                              {tRoles("admin")}
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -206,13 +223,13 @@ export default function AddTeacherPage() {
                         <FormItem>
                           <FormLabel className="flex items-center gap-2">
                             <Lock className="h-4 w-4" />
-                            Password
+                            {t("form.password")}
                           </FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Input
                                 type={showPassword ? "text" : "password"}
-                                placeholder="Create password"
+                                placeholder={t("placeholders.password")}
                                 {...field}
                                 className="h-11 pr-10"
                               />
@@ -244,13 +261,13 @@ export default function AddTeacherPage() {
                         <FormItem>
                           <FormLabel className="flex items-center gap-2">
                             <Lock className="h-4 w-4" />
-                            Confirm Password
+                            {t("form.confirmPassword")}
                           </FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Input
                                 type={showConfirmPassword ? "text" : "password"}
-                                placeholder="Confirm password"
+                                placeholder={t("placeholders.confirmPassword")}
                                 {...field}
                                 className="h-11 pr-10"
                               />
@@ -285,7 +302,7 @@ export default function AddTeacherPage() {
                     disabled={isSubmitting}
                     className="h-11 flex-1 sm:flex-none"
                   >
-                    {isSubmitting ? "Creating Teacher..." : "Create Teacher"}
+                    {isSubmitting ? t("buttons.creating") : t("buttons.create")}
                   </Button>
                   <Button
                     type="button"
@@ -294,7 +311,7 @@ export default function AddTeacherPage() {
                     disabled={isSubmitting}
                     className="h-11 flex-1 sm:flex-none"
                   >
-                    Reset Form
+                    {t("buttons.reset")}
                   </Button>
                 </div>
               </form>

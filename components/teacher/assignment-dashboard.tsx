@@ -17,6 +17,7 @@ import {
   Check,
 } from "lucide-react";
 import { useParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 
 interface Student {
   id: string;
@@ -168,6 +169,8 @@ const SkeletonStudentsList = () => (
 );
 
 export default function AssignmentDashboard() {
+  const t = useTranslations("Teacher.AssignmentDashboard");
+  const locale = useLocale();
   const [assignment, setAssignment] = useState<Assignment>({
     meta: {
       id: "",
@@ -320,8 +323,7 @@ export default function AssignmentDashboard() {
     switch (status) {
       case 0:
         return {
-          label: `Not Started`,
-          // label: `${t("notStarted")}`,
+          label: t("notStarted"),
           color: "bg-muted text-muted-foreground border-border",
           bgColor: "bg-muted/50",
           icon: Circle,
@@ -329,8 +331,7 @@ export default function AssignmentDashboard() {
         };
       case 1:
         return {
-          label: `In Progress`,
-          // label: `${t("inProgress")}`,
+          label: t("inProgress"),
           color: "bg-primary/10 text-primary border-primary/20",
           bgColor: "bg-primary/5",
           icon: PlayCircle,
@@ -338,8 +339,7 @@ export default function AssignmentDashboard() {
         };
       case 2:
         return {
-          label: `Completed`,
-          // label: `${t("completed")}`,
+          label: t("completed"),
           color: "bg-green-600/10 text-green-600 border-secondary/20",
           bgColor: "bg-secondary/5",
           icon: CheckCircle,
@@ -347,8 +347,7 @@ export default function AssignmentDashboard() {
         };
       default:
         return {
-          label: `Unknown Status`,
-          // label: `${t("unknownStatus")}`,
+          label: t("unknownStatus"),
           color: "bg-muted text-muted-foreground border-border",
           bgColor: "bg-muted/50",
           icon: Circle,
@@ -359,7 +358,7 @@ export default function AssignmentDashboard() {
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(`en`, {
+    return date.toLocaleDateString(locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -469,15 +468,13 @@ export default function AssignmentDashboard() {
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
               <span>
-                Created On: {formatDate(assignment.meta.createdAt)}
-                {/* {t("createdOn")}: {formatDate(assignment.meta.createdAt)} */}
+                {t("createdOn")}: {formatDate(assignment.meta.createdAt)}
               </span>
             </div>
             <div className="flex items-center space-x-2">
               <Clock className="h-4 w-4" />
               <span>
-                Due Date: {formatDate(assignment.meta.dueDate)}
-                {/* {t("dueDate")}: {formatDate(assignment.meta.dueDate)} */}
+                {t("dueDate")}: {formatDate(assignment.meta.dueDate)}
               </span>
             </div>
             <div
@@ -489,19 +486,11 @@ export default function AssignmentDashboard() {
                     : "bg-secondary text-muted-foreground"
               }`}
             >
-              {/* {daysRemaining < 0
-                ? `${t("overdue")}`
-                : daysRemaining === 0
-                  ? `${t("dueToday")}`
-                  : `${t("daysRemaining", {
-                      daysRemaining: daysRemaining,
-                    })}`} */}
-
               {daysRemaining < 0
-                ? `Overdue`
+                ? t("overdue")
                 : daysRemaining === 0
-                  ? `Due Today`
-                  : `Days Remaining: ${daysRemaining}`}
+                  ? t("dueToday")
+                  : t("daysRemaining", { daysRemaining })}
             </div>
           </div>
         </div>
@@ -513,8 +502,7 @@ export default function AssignmentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted-foreground text-sm font-medium">
-                  All Students
-                  {/* {t("allStudents")} */}
+                  {t("allStudents")}
                 </p>
                 <p className="text-primary text-2xl font-bold">{stats.total}</p>
               </div>
@@ -529,8 +517,7 @@ export default function AssignmentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted-foreground text-sm font-medium">
-                  Not Started
-                  {/* {t("notStarted")} */}
+                  {t("notStarted")}
                 </p>
                 <p className="text-primary text-2xl font-bold">
                   {stats.notStarted}
@@ -547,8 +534,7 @@ export default function AssignmentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted-foreground text-sm font-medium">
-                  In Progress
-                  {/* {t("inProgress")} */}
+                  {t("inProgress")}
                 </p>
                 <p className="text-primary text-2xl font-bold">
                   {stats.inProgress}
@@ -565,8 +551,7 @@ export default function AssignmentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted-foreground text-sm font-medium">
-                  Completed
-                  {/* {t("completed")} */}
+                  {t("completed")}
                 </p>
                 <p className="text-2xl font-bold text-green-600">
                   {stats.completed}
@@ -583,8 +568,7 @@ export default function AssignmentDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-muted-foreground text-sm font-medium">
-                  Overdue
-                  {/* {t("overdue")} */}
+                  {t("overdue")}
                 </p>
                 <p className="text-destructive text-2xl font-bold">
                   {stats.overdue}
@@ -602,8 +586,7 @@ export default function AssignmentDashboard() {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-foreground flex items-center space-x-2 text-xl font-semibold">
               <Award className="text-primary h-5 w-5" />
-              <span>Overall Progress</span>
-              {/* {t("overallProgress")} */}
+              <span>{t("overallProgress")}</span>
             </h2>
             <span className="text-primary text-2xl font-bold">
               {stats.completionRate}%
@@ -624,8 +607,7 @@ export default function AssignmentDashboard() {
               <div className="text-primary mb-1 text-2xl font-bold">
                 {stats.notStarted}
               </div>
-              <div className="text-primary/80 text-sm">Not Started</div>
-              {/* {t("notStarted")} */}
+              <div className="text-primary/80 text-sm">{t("notStarted")}</div>
               <div className="text-primary/60 mt-1 text-xs">
                 {stats.total > 0
                   ? Math.round((stats.notStarted / stats.total) * 100)
@@ -637,8 +619,7 @@ export default function AssignmentDashboard() {
               <div className="text-primary mb-1 text-2xl font-bold">
                 {stats.inProgress}
               </div>
-              <div className="text-primary/80 text-sm">In Progress</div>
-              {/* {t("inProgress")} */}
+              <div className="text-primary/80 text-sm">{t("inProgress")}</div>
               <div className="text-primary/60 mt-1 text-xs">
                 {stats.total > 0
                   ? Math.round((stats.inProgress / stats.total) * 100)
@@ -650,8 +631,7 @@ export default function AssignmentDashboard() {
               <div className="text-primary mb-1 text-2xl font-bold">
                 {stats.completed}
               </div>
-              <div className="text-primary/80 text-sm">Completed</div>
-              {/* {t("completed")} */}
+              <div className="text-primary/80 text-sm">{t("completed")}</div>
               <div className="text-primary/60 mt-1 text-xs">
                 {stats.completionRate}%
               </div>
@@ -660,8 +640,7 @@ export default function AssignmentDashboard() {
               <div className="text-destructive mb-1 text-2xl font-bold">
                 {stats.overdue}
               </div>
-              <div className="text-destructive/80 text-sm">Overdue</div>
-              {/* {t("overdue")} */}
+              <div className="text-destructive/80 text-sm">{t("overdue")}</div>
               <div className="text-destructive/60 mt-1 text-xs">
                 {stats.total > 0
                   ? Math.round((stats.overdue / stats.total) * 100)
@@ -676,8 +655,7 @@ export default function AssignmentDashboard() {
         <div className="bg-card text-card-foreground border-border rounded-xl border p-6 shadow-sm">
           <div className="mb-6 flex flex-col items-center justify-between sm:flex-row">
             <h2 className="text-foreground text-xl font-semibold">
-              Student List
-              {/* {t("studentList")} */}
+              {t("studentList")}
             </h2>
             <div className="mt-2 flex items-center space-x-2">
               {/* Filter Buttons */}
@@ -690,7 +668,7 @@ export default function AssignmentDashboard() {
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
-                  All ({stats.total}){/* {t("all")} ({stats.total}) */}
+                  {t("all")} ({stats.total})
                 </button>
                 <button
                   onClick={() => setFilterStatus("0")}
@@ -700,8 +678,7 @@ export default function AssignmentDashboard() {
                       : "bg-muted/20 text-muted-foreground hover:bg-muted/30"
                   }`}
                 >
-                  Not Started ({stats.notStarted})
-                  {/* {t("notStarted")} ({stats.notStarted}) */}
+                  {t("notStarted")} ({stats.notStarted})
                 </button>
                 <button
                   onClick={() => setFilterStatus("1")}
@@ -711,8 +688,7 @@ export default function AssignmentDashboard() {
                       : "bg-muted/20 text-muted-foreground hover:bg-muted/30"
                   }`}
                 >
-                  In Progress ({stats.inProgress})
-                  {/* {t("inProgress")} ({stats.inProgress}) */}
+                  {t("inProgress")} ({stats.inProgress})
                 </button>
                 <button
                   onClick={() => setFilterStatus("2")}
@@ -722,8 +698,7 @@ export default function AssignmentDashboard() {
                       : "bg-muted/20 text-muted-foreground hover:bg-muted/30"
                   }`}
                 >
-                  Completed ({stats.completed})
-                  {/* {t("completed")} ({stats.completed}) */}
+                  {t("completed")} ({stats.completed})
                 </button>
                 <button
                   onClick={() => setFilterStatus("overdue")}
@@ -733,8 +708,7 @@ export default function AssignmentDashboard() {
                       : "bg-muted/20 text-muted-foreground hover:bg-muted/30"
                   }`}
                 >
-                  Overdue ({stats.overdue})
-                  {/* {t("overdue")} ({stats.overdue}) */}
+                  {t("overdue")} ({stats.overdue})
                 </button>
               </div>
             </div>
@@ -756,8 +730,8 @@ export default function AssignmentDashboard() {
                   <Trash2 className="h-4 w-4" />
                   <span>
                     {isDeleting
-                      ? "Deleting..."
-                      : `Delete (${selectedStudents.length})`}
+                      ? t("deleting")
+                      : t("deleteCount", { count: selectedStudents.length })}
                   </span>
                 </button>
                 <button
@@ -765,7 +739,7 @@ export default function AssignmentDashboard() {
                   className="bg-muted text-muted-foreground hover:bg-muted/80 flex items-center space-x-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 >
                   <X className="h-4 w-4" />
-                  <span>Cancel</span>
+                  <span>{t("cancel")}</span>
                 </button>
               </>
             )}
@@ -777,7 +751,7 @@ export default function AssignmentDashboard() {
                 className="bg-primary/10 text-primary hover:bg-primary/20 flex items-center space-x-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               >
                 <Edit3 className="h-4 w-4" />
-                <span>Edit</span>
+                <span>{t("edit")}</span>
               </button>
             )}
           </div>
@@ -831,8 +805,7 @@ export default function AssignmentDashboard() {
                     </div>
                     {isOverdue && (
                       <div className="bg-destructive/10 text-destructive rounded-full px-2 py-1 text-xs font-medium">
-                        Overdue
-                        {/* {t("overdue")} */}
+                        {t("overdue")}
                       </div>
                     )}
                   </div>
@@ -858,8 +831,7 @@ export default function AssignmentDashboard() {
                 <Users className="text-muted-foreground h-8 w-8" />
               </div>
               <p className="text-muted-foreground">
-                No Students In Selected Status
-                {/* {t("noStudentsInSelectedStatus")} */}
+                {t("noStudentsInSelectedStatus")}
               </p>
             </div>
           )}

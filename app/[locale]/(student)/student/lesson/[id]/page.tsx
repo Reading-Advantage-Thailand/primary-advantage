@@ -2,11 +2,21 @@ import LessonCard from "@/components/lesson/lesson-card";
 import { currentUser } from "@/lib/session";
 import { redirect, usePathname } from "next/navigation";
 import React from "react";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = {
-  title: "Lesson",
-  description: "Interactive Reading Lesson",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Lesson" });
+
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function LessonPage({
   params,

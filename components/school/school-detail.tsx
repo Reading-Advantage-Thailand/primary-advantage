@@ -43,6 +43,7 @@ import {
 import { AddAdminDialog } from "./add-admin-dialog";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface SchoolAdmin {
   id: string;
@@ -104,7 +105,7 @@ export function SchoolDetail({
   const [removingAdminId, setRemovingAdminId] = useState<string | null>(null);
   const { data: session, update } = useSession();
   const router = useRouter();
-
+  const t = useTranslations("Settings.schoolProfile");
   const isOwner = currentUser?.id === school.ownerId;
 
   const handleDelete = async () => {
@@ -173,42 +174,40 @@ export function SchoolDetail({
           <div>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
-              School Information
+              {t("schoolInformation")}
             </CardTitle>
             <CardDescription>
-              View and manage your school details
+              {t("schoolInformationDescription")}
             </CardDescription>
           </div>
           <div className="flex gap-2">
             <Button onClick={onEdit} variant="outline" size="sm">
               <Edit className="mr-2 h-4 w-4" />
-              Edit
+              {t("editSchoolButton")}
             </Button>
             {isOwner && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm" disabled={isDeleting}>
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    {t("delete")}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete School</AlertDialogTitle>
+                    <AlertDialogTitle>{t("deleteSchool")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete "{school.name}"? This
-                      action cannot be undone. All associated data including
-                      users, admins, and classrooms will be removed.
+                      {t("deleteSchoolDescription")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDelete}
                       disabled={isDeleting}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
-                      {isDeleting ? "Deleting..." : "Delete School"}
+                      {isDeleting ? t("deleting") : t("deleteSchoolButton")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -221,7 +220,7 @@ export function SchoolDetail({
             <div className="space-y-4">
               <div>
                 <label className="text-muted-foreground text-sm font-medium">
-                  School Name
+                  {t("schoolName")}
                 </label>
                 <p className="text-lg font-semibold">{school.name}</p>
               </div>
@@ -230,7 +229,7 @@ export function SchoolDetail({
                 <div>
                   <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
                     <User className="h-4 w-4" />
-                    Contact Person
+                    {t("contactName")}
                   </label>
                   <p className="text-base">{school.contactName}</p>
                 </div>
@@ -240,7 +239,7 @@ export function SchoolDetail({
                 <div>
                   <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
                     <Mail className="h-4 w-4" />
-                    Contact Email
+                    {t("contactEmail")}
                   </label>
                   <p className="text-base">{school.contactEmail}</p>
                 </div>
@@ -250,7 +249,7 @@ export function SchoolDetail({
                 <div>
                   <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
                     <Shield className="h-4 w-4" />
-                    School Owner
+                    {t("owner")}
                   </label>
                   <div className="flex items-center gap-2">
                     <p className="text-base font-medium">{school.owner.name}</p>
@@ -271,7 +270,7 @@ export function SchoolDetail({
               <div>
                 <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
                   <Calendar className="h-4 w-4" />
-                  Created
+                  {t("createdAt")}
                 </label>
                 <p className="text-base">
                   {format(new Date(school.createdAt), "PPP")}
@@ -280,7 +279,7 @@ export function SchoolDetail({
 
               <div>
                 <label className="text-muted-foreground text-sm font-medium">
-                  Last Updated
+                  {t("updatedAt")}
                 </label>
                 <p className="text-base">
                   {format(new Date(school.updatedAt), "PPP")}
@@ -292,7 +291,7 @@ export function SchoolDetail({
                   <div>
                     <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
                       <Users className="h-4 w-4" />
-                      Total Users
+                      {t("totalUsers")}
                     </label>
                     <Badge variant="secondary" className="text-base">
                       {school._count.users} users
@@ -301,7 +300,7 @@ export function SchoolDetail({
                   <div>
                     <label className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
                       <Shield className="h-4 w-4" />
-                      School Admins
+                      {t("totalAdmins")}
                     </label>
                     <Badge variant="outline" className="text-base">
                       {school._count.admins} admins
@@ -318,11 +317,9 @@ export function SchoolDetail({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Key className="h-5 w-5" />
-            License Information
+            {t("license")}
           </CardTitle>
-          <CardDescription>
-            Details about your school's license and subscription
-          </CardDescription>
+          <CardDescription>{t("licensedescription")}</CardDescription>
         </CardHeader>
         {school.license ? (
           <CardContent className="space-y-6">
@@ -476,11 +473,9 @@ export function SchoolDetail({
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                School Administrators
+                {t("schoolAdmin")}
               </CardTitle>
-              <CardDescription>
-                Users with administrative privileges for this school
-              </CardDescription>
+              <CardDescription>{t("schoolAdminDescription")}</CardDescription>
             </div>
             {isOwner && (
               <AddAdminDialog schoolId={school.id} onAdminAdded={onRefresh} />

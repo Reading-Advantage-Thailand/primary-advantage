@@ -401,10 +401,14 @@ export async function generateClassCodeController(
 
     const { id: classroomId } = await params;
 
-    // For teachers, verify they own the classroom
-    const teacherId = user.role === "teacher" ? user.id : undefined;
+    if (user.role === "user" || user.role === "student") {
+      return NextResponse.json(
+        { error: "Access denied. Insufficient permissions." },
+        { status: 403 },
+      );
+    }
 
-    const classroom = await generateClassCode(classroomId, teacherId);
+    const classroom = await generateClassCode(classroomId);
 
     if (!classroom) {
       return NextResponse.json(

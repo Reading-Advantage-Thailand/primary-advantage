@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { BookmarkIcon, VolumeXIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import AudioButton from "@/components/audio-button";
+import { useTranslations } from "next-intl";
 
 interface WordList {
   vocabulary: string;
@@ -23,6 +24,7 @@ export default function TaskVocabularyCollection({
 }: {
   article: Article;
 }) {
+  const t = useTranslations("Lesson.PreviewVocabulary");
   const [loading, setLoading] = useState(true);
   const [wordList, setWordList] = useState<WordList[]>([]);
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
@@ -68,10 +70,10 @@ export default function TaskVocabularyCollection({
           <BookmarkIcon className="h-8 w-8 text-amber-600 dark:text-amber-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Preview Vocabulary
+          {t("title")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          Preview the vocabulary of the article
+          {t("subtitle")}
         </p>
       </div>
 
@@ -124,7 +126,7 @@ export default function TaskVocabularyCollection({
                       ) : (
                         <div
                           className="rounded-full bg-gray-200 p-2 opacity-50 dark:bg-gray-700"
-                          title="Audio not available"
+                          title={t("audioNotAvailable")}
                         >
                           <VolumeXIcon className="h-5 w-5 text-gray-400" />
                         </div>
@@ -133,7 +135,7 @@ export default function TaskVocabularyCollection({
 
                     {/* Definition */}
                     <div className="min-w-0 flex-1">
-                      <p>Definition</p>
+                      <p>{t("definition")}</p>
                       {/* Always show basic definition */}
                       <div
                         className={`transition-all duration-300 ${
@@ -154,9 +156,7 @@ export default function TaskVocabularyCollection({
           ) : (
             <div className="py-12 text-center">
               <VolumeXIcon className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-600" />
-              <p className="text-gray-500 dark:text-gray-400">
-                No vocabulary words found
-              </p>
+              <p className="text-gray-500 dark:text-gray-400">{t("empty")}</p>
             </div>
           )}
         </div>
@@ -166,8 +166,8 @@ export default function TaskVocabularyCollection({
       {wordList.length > 0 && (
         <div className="rounded-xl border border-gray-200 bg-zinc-200 p-4 dark:border-gray-700 dark:bg-gray-900">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-            <span>Vocabulary Progress</span>
-            <span>{wordList.length} words to learn</span>
+            <span>{t("progress")}</span>
+            <span>{t("wordsToLearn", { count: wordList.length })}</span>
           </div>
           <div className="mt-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
             <div

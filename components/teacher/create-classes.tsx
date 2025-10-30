@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -32,19 +32,19 @@ export default function CreateNewClass({
   onClassCreated,
   buttonText,
 }: CreateNewClassProps) {
+  const t = useTranslations("TeacherCreateClass");
   const [classroomName, setClassroomName] = useState<string>("");
   const [grade, setGrade] = useState<string>("");
   const [classCode, setClassCode] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
-  const router = useRouter();
   // const { fetchClassrooms } = useClassroomStore();
   // const t = useScopedI18n("components.myClasses.createNewClass");
 
   const handleCreateClass = async () => {
     try {
       if (!classCode || !classroomName || !grade) {
-        toast.error("Attention", {
-          description: "Please fill in all fields",
+        toast.error(t("toast.attention"), {
+          description: t("toast.fillAllFields"),
           richColors: true,
         });
         return;
@@ -66,11 +66,11 @@ export default function CreateNewClass({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create class");
+        throw new Error("FAILED_CREATE");
       }
 
-      toast.success("Success", {
-        description: "Class created successfully",
+      toast.success(t("toast.success"), {
+        description: t("toast.classCreated"),
         richColors: true,
       });
 
@@ -85,8 +85,8 @@ export default function CreateNewClass({
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error", {
-        description: "Failed to create class",
+      toast.error(t("toast.error"), {
+        description: t("toast.failedCreate"),
         richColors: true,
       });
     }
@@ -110,27 +110,27 @@ export default function CreateNewClass({
         <DialogTrigger asChild>
           <Button variant="outline">
             <PlusIcon className="size-4" />
-            &nbsp; {buttonText || "New Classroom"}
+            &nbsp; {buttonText || t("button.newClassroom")}
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Class</DialogTitle>
+            <DialogTitle>{t("dialog.title")}</DialogTitle>
           </DialogHeader>
-          <DialogDescription>Create a new class</DialogDescription>
+          <DialogDescription>{t("dialog.description")}</DialogDescription>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label>Class Name</Label>
+              <Label>{t("fields.className")}</Label>
               <Input
                 type="text"
                 className="col-span-3"
-                placeholder="Class Name"
+                placeholder={t("fields.classNamePlaceholder")}
                 value={classroomName}
                 onChange={(e) => setClassroomName(e.target.value)}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label>Class Code</Label>
+              <Label>{t("fields.classCode")}</Label>
               <Input
                 type="text"
                 className="col-span-3 cursor-default"
@@ -139,16 +139,16 @@ export default function CreateNewClass({
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label>Grade</Label>
+              <Label>{t("fields.grade")}</Label>
               <Select onValueChange={(value) => setGrade(value)}>
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Grade" />
+                  <SelectValue placeholder={t("fields.gradePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: 10 }, (_, i) => i + 3).map(
                     (grade: number, index: number) => (
                       <SelectItem key={index} value={String(grade)}>
-                        Grade {grade}
+                        {t("fields.gradeItem", { grade })}
                       </SelectItem>
                     ),
                   )}
@@ -158,9 +158,9 @@ export default function CreateNewClass({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => handleCreateClass()}>
-              Create
+              {t("actions.create")}
             </Button>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleClose}>{t("actions.cancel")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

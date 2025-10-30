@@ -1,9 +1,14 @@
+"use client";
+
 import React from "react";
 import { Book } from "lucide-react";
 import { Article } from "@/types";
 import LessonMCQContent from "../pratice/lesson-task-mcq";
+import { useTranslations } from "next-intl";
 
 export default function TaskMultipleChoice({ article }: { article: Article }) {
+  const t = useTranslations("Lesson.tasks");
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header Section */}
@@ -12,10 +17,10 @@ export default function TaskMultipleChoice({ article }: { article: Article }) {
           <Book className="h-8 w-8 text-purple-600 dark:text-purple-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Task Multiple Choice
+          {t("multipleChoiceTitle")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          Task Description Topic : {article.title}
+          {t("multipleChoiceDescription", { title: article.title })}
         </p>
       </div>
 

@@ -6,6 +6,7 @@ import {
   UserXpEarned,
 } from "@/types/enum";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   GraduationCap,
@@ -60,6 +61,8 @@ export default function LessonSentenceMatching({
 }: {
   articleId: string;
 }) {
+  const t = useTranslations("SentencesPage.matchingGame");
+  const tCards = useTranslations("SentencesPage.sentencesCard");
   // Game state
   const [gameState, setGameState] = useState<GameState>(GameState.Starting);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("th");
@@ -110,12 +113,12 @@ export default function LessonSentenceMatching({
       setSelectedLeft(null);
 
       if (isCorrect) {
-        toast.success("Correct match! ✅");
+        toast.success(t("results.correctMatch"));
       } else {
-        toast.error("Incorrect match. Try again! ❌");
+        toast.error(t("results.incorrectMatch"));
       }
     },
-    [vocabularyPairs, isCompleted],
+    [vocabularyPairs, isCompleted, t],
   );
 
   const handleLeftItemClick = useCallback(
@@ -136,8 +139,8 @@ export default function LessonSentenceMatching({
 
   const handleShowAnswers = useCallback(() => {
     setShowCorrectAnswers(true);
-    toast.info("Correct matches revealed! 📖");
-  }, []);
+    toast.info(t("results.showAnswers"));
+  }, [t]);
 
   const handleComplete = useCallback(async () => {
     setGameState(GameState.Completed);
@@ -183,7 +186,7 @@ export default function LessonSentenceMatching({
       } catch (error) {
         console.error("Error loading flashcards:", error);
         setGameState(GameState.Error);
-        toast.error("Failed to load vocabulary");
+        toast.error(t("toast.failedToLoadData"));
       }
     };
 
@@ -227,10 +230,13 @@ export default function LessonSentenceMatching({
 
       if (isAllCorrect) {
         setScore((prev) => prev + 1);
-        toast.success("Perfect! All pairs matched correctly! 🎉");
+        toast.success(t("results.perfect"));
       } else {
         toast.error(
-          `${correctCount}/${vocabularyPairs.length} correct. Try again! 💪`,
+          t("results.tryAgain", {
+            correct: correctCount,
+            total: vocabularyPairs.length,
+          }),
         );
       }
     }
@@ -248,9 +254,9 @@ export default function LessonSentenceMatching({
                 <GraduationCap className="absolute inset-0 m-auto h-8 w-8 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">Loading Flashcards</h3>
+                <h3 className="text-lg font-semibold">{t("loading.title")}</h3>
                 <p className="text-muted-foreground">
-                  Preparing your vocabulary practice...
+                  {t("loading.description")}
                 </p>
               </div>
             </div>
@@ -271,13 +277,8 @@ export default function LessonSentenceMatching({
                 <GraduationCap className="h-12 w-12 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">
-                  No Vocabulary Available
-                </h3>
-                <p className="text-muted-foreground">
-                  There are no vocabulary flashcards available for this article
-                  yet.
-                </p>
+                <h3 className="text-lg font-semibold">{t("noDeck.error")}</h3>
+                <p className="text-muted-foreground">{t("noDeck.message")}</p>
               </div>
             </div>
           </CardContent>
@@ -297,9 +298,11 @@ export default function LessonSentenceMatching({
                 <XCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
               </div>
               <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">Failed to Load</h3>
+                <h3 className="text-lg font-semibold">
+                  {t("toast.failedToLoadData")}
+                </h3>
                 <p className="text-muted-foreground">
-                  There was an error loading the vocabulary. Please try again.
+                  {t("toast.failedToLoad")}
                 </p>
               </div>
               <Button
@@ -310,7 +313,7 @@ export default function LessonSentenceMatching({
                 variant="outline"
               >
                 <RotateCcw className="mr-2 h-4 w-4" />
-                Try Again
+                {t("buttons.tryAgain")}
               </Button>
             </div>
           </CardContent>
@@ -330,17 +333,17 @@ export default function LessonSentenceMatching({
               </div>
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">
-                  Starting Vocabulary Matching
+                  {t("startScreen.title")}
                 </h3>
                 <p className="text-muted-foreground">
-                  Choose your preferred language for definitions
+                  {t("startScreen.subtitle")}
                 </p>
                 <div className="flex flex-col items-center justify-center gap-4">
                   <div className="w-full max-w-md space-y-4">
                     <div className="flex items-center justify-center gap-2">
                       <Languages className="h-5 w-5 text-indigo-500" />
                       <Label className="text-base font-semibold">
-                        Definition Language
+                        {t("startScreen.language.title")}
                       </Label>
                     </div>
                     <Select
@@ -402,7 +405,7 @@ export default function LessonSentenceMatching({
                       </SelectContent>
                     </Select>
                     <p className="text-muted-foreground text-center text-xs">
-                      Word definitions will be shown in this language
+                      {t("gameplay.translations", { language: "" })}
                     </p>
                   </div>
                   <Button
@@ -411,7 +414,7 @@ export default function LessonSentenceMatching({
                     className="w-full max-w-md"
                   >
                     <Play className="mr-2 h-4 w-4" />
-                    Start Matching Game
+                    {t("startScreen.startButton")}
                   </Button>
                 </div>
               </div>
@@ -441,10 +444,10 @@ export default function LessonSentenceMatching({
                 </div>
                 <div className="space-y-2">
                   <h2 className="bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-3xl font-bold text-transparent">
-                    Vocabulary Practice Complete!
+                    {t("complete.title")}
                   </h2>
                   <p className="text-lg text-gray-600 dark:text-gray-400">
-                    Excellent work on your vocabulary practice session
+                    {t("complete.subtitle", { count: 1 })}
                   </p>
                 </div>
               </div>
@@ -458,7 +461,7 @@ export default function LessonSentenceMatching({
                     20
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    XP Earned
+                    {tCards("xpEarned")}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -466,7 +469,7 @@ export default function LessonSentenceMatching({
                     5/5
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Completed
+                    {tCards("completed")}
                   </div>
                 </div>
               </div>
@@ -486,11 +489,16 @@ export default function LessonSentenceMatching({
       <div className="space-y-2">
         <div className="text-muted-foreground flex items-center justify-between text-sm">
           <span>
-            {userMatches.length}/{vocabularyPairs.length} matched
+            {t("gameplay.pairsProgress", {
+              matched: userMatches.length,
+              total: vocabularyPairs.length,
+            })}
           </span>
           <span>
-            {userMatches.filter((m) => m.isCorrect).length}/
-            {vocabularyPairs.length} correct
+            {t("gameplay.correctCount", {
+              correct: userMatches.filter((m) => m.isCorrect).length,
+              total: vocabularyPairs.length,
+            })}
           </span>
         </div>
         <Progress value={progress} className="h-2" />
@@ -501,10 +509,10 @@ export default function LessonSentenceMatching({
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="space-y-3">
               <CardTitle className="text-xl">
-                📚 Match Words with Definitions
+                📚 {t("gameplay.title")}
               </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Click a word on the left, then click its definition on the right
+                {t("gameplay.instruction")}
               </p>
             </div>
           </div>
@@ -518,7 +526,7 @@ export default function LessonSentenceMatching({
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-blue-500" />
-                  <h3 className="font-medium">Words</h3>
+                  <h3 className="font-medium">{t("itemTypes.sentence")}</h3>
                 </div>
                 <div className="space-y-2">
                   {vocabularyPairs.map((pair) => {
@@ -571,7 +579,9 @@ export default function LessonSentenceMatching({
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 flex-shrink-0 rounded-full bg-green-500" />
-                    <h3 className="font-medium">Definitions</h3>
+                    <h3 className="font-medium">
+                      {t("itemTypes.translation")}
+                    </h3>
                   </div>
                   {selectedLanguage &&
                     languageOptions[
@@ -660,8 +670,12 @@ export default function LessonSentenceMatching({
                     )}
                     <h3 className="text-lg font-semibold">
                       {userMatches.every((m) => m.isCorrect)
-                        ? "Perfect! All pairs matched correctly! 🎉"
-                        : `${userMatches.filter((m) => m.isCorrect).length}/${vocabularyPairs.length} correct 💪`}
+                        ? t("results.allCorrect")
+                        : t("results.partialCorrect", {
+                            correct: userMatches.filter((m) => m.isCorrect)
+                              .length,
+                            total: vocabularyPairs.length,
+                          })}
                     </h3>
                   </div>
 
@@ -670,7 +684,9 @@ export default function LessonSentenceMatching({
                       <div className="space-y-3">
                         <Separator />
                         <div>
-                          <h4 className="mb-3 font-medium">Correct Matches:</h4>
+                          <h4 className="mb-3 font-medium">
+                            {t("results.correctMatches")}
+                          </h4>
                           <div className="space-y-2">
                             {vocabularyPairs.map((pair, index) => (
                               <div key={pair.id} className="flex gap-3 text-sm">
@@ -709,13 +725,13 @@ export default function LessonSentenceMatching({
                   className="sm:w-auto"
                 >
                   <Eye className="mr-2 h-4 w-4" />
-                  Show Answers
+                  {t("buttons.showAnswers")}
                 </Button>
               )}
 
             {isCompleted && userMatches.every((m) => m.isCorrect) && (
               <Button onClick={handleComplete} className="flex-1">
-                Complete Activity
+                {t("buttons.finishGame")}
               </Button>
             )}
           </div>

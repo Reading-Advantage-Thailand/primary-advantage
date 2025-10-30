@@ -13,6 +13,7 @@ import AssignForm from "./assign-form";
 import { toast } from "sonner";
 import { ClipboardCheckIcon, Loader2 } from "lucide-react";
 import { DialogFooter } from "@/components/ui/dialog";
+import { useTranslations } from "next-intl";
 
 interface article {
   title: string;
@@ -24,6 +25,8 @@ export default function AssignButton({ article }: { article: article }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const formId = "assign-form";
+  const t = useTranslations("Assignment");
+  const tComponents = useTranslations("Components");
 
   const onClose = () => {
     if (!isLoading) {
@@ -47,7 +50,7 @@ export default function AssignButton({ article }: { article: article }) {
       <DialogTrigger asChild>
         <Button>
           <ClipboardCheckIcon />
-          Assign
+          {tComponents("assignments")}
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -55,10 +58,8 @@ export default function AssignButton({ article }: { article: article }) {
         closeButtonShow={false}
       >
         <DialogHeader>
-          <DialogTitle>Create Assignment</DialogTitle>
-          <DialogDescription>
-            Create an assignment for your students
-          </DialogDescription>
+          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <div>
           <h3 className="text-lg font-semibold">{article.title}</h3>
@@ -72,16 +73,16 @@ export default function AssignButton({ article }: { article: article }) {
         />
         <DialogFooter>
           <Button onClick={onClose} disabled={isLoading}>
-            Cancel
+            {tComponents("cancelButton")}
           </Button>
           <Button type="submit" form={formId} disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Assigning...
+                {tComponents("waitingButton")}
               </>
             ) : (
-              "Assign"
+              tComponents("submitButton")
             )}
           </Button>
         </DialogFooter>

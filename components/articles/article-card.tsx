@@ -55,7 +55,7 @@ export default async function ArticleCard({ article }: Props) {
             </Badge>
             <Badge>
               <BookCheck className="h-4 w-4" />
-              Article Saved to Flashcard: {isSaved ? "Saved" : "Not Saved"}
+              {isSaved ? t("Article.saveToFlashcard") : t("Article.notSaved")}
             </Badge>
           </div>
           <CardDescription className="font-article text-lg md:text-xl">

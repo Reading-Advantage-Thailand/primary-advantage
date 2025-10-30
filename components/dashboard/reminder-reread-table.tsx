@@ -38,6 +38,8 @@ interface ReminderRecord {
 }
 
 export function ReminderRereadTable() {
+  const t = useTranslations("Student.history");
+  const tStatus = useTranslations("Overall.status");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -82,7 +84,7 @@ export function ReminderRereadTable() {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Title
+            {t("title")}
             <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -94,7 +96,7 @@ export function ReminderRereadTable() {
     {
       accessorKey: "scores",
       header: () => {
-        return <div>Score</div>;
+        return <div>{t("score")}</div>;
       },
       cell: ({ row }) => {
         return <div>{row.getValue("scores")}</div>;
@@ -102,7 +104,7 @@ export function ReminderRereadTable() {
     },
     {
       accessorKey: "updated_at",
-      header: () => <div>Date</div>,
+      header: () => <div>{t("date")}</div>,
       cell: ({ row }) => {
         const updatedAt = row.getValue("updated_at") as string;
         const date = formatDate(new Date(updatedAt));
@@ -111,7 +113,7 @@ export function ReminderRereadTable() {
     },
     {
       accessorKey: "rated",
-      header: () => <div className="text-center">Rated</div>,
+      header: () => <div className="text-center">{t("rated")}</div>,
       cell: ({ row }) => {
         const amount = parseInt(row.getValue("rated"));
         return <div className="text-center font-medium">{amount}</div>;
@@ -119,15 +121,15 @@ export function ReminderRereadTable() {
     },
     {
       accessorKey: "status",
-      header: () => <div className="text-center">Status</div>,
+      header: () => <div className="text-center">{t("status")}</div>,
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
         const map = {
-          READ: "Read",
-          COMPLETED_MCQ: "Completed MCQ",
-          COMPLETED_SAQ: "Completed SAQ",
-          COMPLETED_LAQ: "Completed LAQ",
-          UNRATED: "Unrated",
+          READ: tStatus("READ"),
+          COMPLETED_MCQ: tStatus("COMPLETED_MCQ"),
+          COMPLETED_SAQ: tStatus("COMPLETED_SAQ"),
+          COMPLETED_LAQ: tStatus("COMPLETED_LAQ"),
+          UNRATED: tStatus("UNRATED"),
         };
         return (
           <div className="text-center font-medium">
@@ -191,7 +193,7 @@ export function ReminderRereadTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Loading...
+                  {t("loading")}
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
@@ -218,7 +220,7 @@ export function ReminderRereadTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No articles need re-reading
+                  {t("noArticlesToRead")}
                 </TableCell>
               </TableRow>
             )}

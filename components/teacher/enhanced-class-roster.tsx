@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -87,6 +89,7 @@ export default function EnhancedClassRoster() {
   const router = useRouter();
   const params = useParams();
   const classroomId = params?.classroomId as string;
+  const t = useTranslations("Teacher.EnhancedClassRoster");
 
   // State management
   const [classroom, setClassroom] = useState<ClassroomData | null>(null);
@@ -114,7 +117,7 @@ export default function EnhancedClassRoster() {
       setStudents(data.studentInClass || []);
     } catch (error) {
       console.error("Error fetching classroom data:", error);
-      toast.error("Failed to load classroom data");
+      toast.error(t("toast.loadClassroomError"));
     } finally {
       setLoading(false);
     }
@@ -170,17 +173,18 @@ export default function EnhancedClassRoster() {
   };
 
   const formatLastActivity = (lastActivity: string | null) => {
-    if (!lastActivity) return "No activity";
+    if (!lastActivity) return t("activity.none");
     const date = new Date(lastActivity);
     const now = new Date();
     const diffInDays = Math.floor(
       (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
     );
 
-    if (diffInDays === 0) return "Today";
-    if (diffInDays === 1) return "Yesterday";
-    if (diffInDays < 7) return `${diffInDays} days ago`;
-    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+    if (diffInDays === 0) return t("activity.today");
+    if (diffInDays === 1) return t("activity.yesterday");
+    if (diffInDays < 7) return t("activity.daysAgo", { count: diffInDays });
+    if (diffInDays < 30)
+      return t("activity.weeksAgo", { count: Math.floor(diffInDays / 7) });
     return date.toLocaleDateString();
   };
 
@@ -206,11 +210,11 @@ export default function EnhancedClassRoster() {
         throw new Error("Failed to reset progress");
       }
 
-      toast.success("Student progress reset successfully");
+      toast.success(t("toast.resetSuccess"));
       await fetchClassroomData(); // Refresh data
     } catch (error) {
       console.error("Error resetting progress:", error);
-      toast.error("Failed to reset student progress");
+      toast.error(t("toast.resetError"));
     } finally {
       setResetLoading(false);
       setResetDialogOpen(false);
@@ -257,15 +261,12 @@ export default function EnhancedClassRoster() {
       <div className="py-12 text-center">
         <Users className="mx-auto mb-4 h-12 w-12 text-gray-400" />
         <h3 className="mb-2 text-lg font-medium text-gray-900">
-          Classroom not found
+          {t("notFound.title")}
         </h3>
-        <p className="mb-4 text-gray-500">
-          The requested classroom could not be found or you don't have access to
-          it.
-        </p>
+        <p className="mb-4 text-gray-500">{t("notFound.description")}</p>
         <Button onClick={handleBackToRoster} variant="outline">
           <ChevronLeft className="mr-2 h-4 w-4" />
-          Back to Class Roster
+          {t("actions.backToRoster")}
         </Button>
       </div>
     );
@@ -380,7 +381,7 @@ export default function EnhancedClassRoster() {
             <div>
               <div>
                 <h3 className="truncate font-medium">
-                  {student.display_name || "No name"}
+                  {student.display_name || t("labels.noName")}
                 </h3>
                 <p className="truncate text-sm text-gray-500">
                   {student.email}
@@ -500,7 +501,7 @@ export default function EnhancedClassRoster() {
               {student.level && (
                 <Badge variant="outline" className="text-xs">
                   <GraduationCap className="mr-1 h-3 w-3" />
-                  Lvl {student.level}
+                  {t("labels.level", { level: student.level })}
                 </Badge>
               )}
               {student.xp && (
@@ -541,13 +542,15 @@ export default function EnhancedClassRoster() {
                   onClick={() => handleViewProgress(student.id)}
                 >
                   <TrendingUp className="mr-1 h-4 w-4" />
-                  View Progress
+                  {t("actions.viewProgress")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <div>
                   <StudentCefrLevelSetter
                     studentId={student.id}
-                    studentName={student.display_name || "Student"}
+                    studentName={
+                      student.display_name || t("labels.studentDefault")
+                    }
                     currentCefrLevel={student.cefrLevel || "A1-"}
                     onUpdate={fetchClassroomData}
                   />
@@ -587,7 +590,7 @@ export default function EnhancedClassRoster() {
 
       {/* Quick Actions */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Students List</h2>
+        <h2 className="text-lg font-semibold">{t("students.title")}</h2>
         <div className="flex gap-2">
           <ClassCodeGenerator
             classroomId={classroom.id}
@@ -602,7 +605,7 @@ export default function EnhancedClassRoster() {
             classroomId={classroom.id}
             classroomName={classroom.classroomName}
             onStudentEnrolled={fetchClassroomData}
-            buttonText="Enroll Student"
+            buttonText={t("students.enrollButton")}
             buttonSize="sm"
           />
         </div>
@@ -614,7 +617,7 @@ export default function EnhancedClassRoster() {
         <div className="relative max-w-sm flex-1">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input
-            placeholder="Search students..."
+            placeholder={t("students.searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -628,19 +631,21 @@ export default function EnhancedClassRoster() {
           <CardContent className="py-12 text-center">
             <Users className="mx-auto mb-4 h-12 w-12 text-gray-400" />
             <h3 className="mb-2 text-lg font-medium">
-              {searchTerm ? "No students found" : "No students enrolled"}
+              {searchTerm
+                ? t("students.empty.searchTitle")
+                : t("students.empty.title")}
             </h3>
             <p className="mb-4 text-gray-500">
               {searchTerm
-                ? "Try adjusting your search terms"
-                : "Get started by enrolling students in this classroom"}
+                ? t("students.empty.searchDescription")
+                : t("students.empty.description")}
             </p>
             {!searchTerm && (
               <StudentEnrollmentButton
                 classroomId={classroom.id}
                 classroomName={classroom.classroomName}
                 onStudentEnrolled={fetchClassroomData}
-                buttonText="Enroll Your First Student"
+                buttonText={t("students.empty.enrollFirst")}
               />
             )}
           </CardContent>
@@ -657,15 +662,13 @@ export default function EnhancedClassRoster() {
       <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reset Student Progress</AlertDialogTitle>
+            <AlertDialogTitle>{t("resetDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to reset this student's progress? This
-              action will set their XP to 0, level to 0, and clear their CEFR
-              level. This action cannot be undone.
+              {t("resetDialog.description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("actions.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleResetProgress}
               disabled={resetLoading}
@@ -676,7 +679,7 @@ export default function EnhancedClassRoster() {
               ) : (
                 <RotateCcw className="mr-2 h-4 w-4" />
               )}
-              Reset Progress
+              {t("actions.resetProgress")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

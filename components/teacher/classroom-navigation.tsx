@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -44,12 +45,12 @@ export default function ClassroomNavigation({
   showBackButton = true,
 }: ClassroomNavigationProps) {
   const router = useRouter();
-  const params = useParams();
+  const t = useTranslations("Teacher.ClassroomNavigation");
   const [showPassword, setShowPassword] = useState(false);
 
   const navigationItems = [
     {
-      label: "Class Roster",
+      label: t("nav.classRoster"),
       icon: Users,
       href: `/teacher/class-roster/${classroom.id}`,
       current: true,
@@ -60,12 +61,12 @@ export default function ClassroomNavigation({
     //   href: `/teacher/class-roster/${classroom.id}/enrollment`,
     // },
     {
-      label: "Reports",
+      label: t("nav.reports"),
       icon: BarChart3,
       href: `/teacher/reports?classroomId=${classroom.id}`,
     },
     {
-      label: "Settings",
+      label: t("nav.settings"),
       icon: Settings,
       href: `/teacher/my-classes?edit=${classroom.id}`,
     },
@@ -84,10 +85,10 @@ export default function ClassroomNavigation({
 
     try {
       await navigator.clipboard.writeText(classroom.classCode);
-      toast.success("Class code copied to clipboard!");
+      toast.success(t("toast.copyClassCodeSuccess"));
     } catch (error) {
       console.error("Failed to copy class code:", error);
-      toast.error("Failed to copy class code");
+      toast.error(t("toast.copyClassCodeError"));
     }
   };
 
@@ -96,10 +97,10 @@ export default function ClassroomNavigation({
 
     try {
       await navigator.clipboard.writeText(classroom.passwordStudents);
-      toast.success("Password copied to clipboard!");
+      toast.success(t("toast.copyPasswordSuccess"));
     } catch (error) {
       console.error("Failed to copy password:", error);
-      toast.error("Failed to copy password");
+      toast.error(t("toast.copyPasswordError"));
     }
   };
 
@@ -109,7 +110,7 @@ export default function ClassroomNavigation({
 
   const getPasswordDisplay = () => {
     if (!classroom.passwordStudents) {
-      return "No password";
+      return t("password.noPassword");
     }
     return showPassword ? classroom.passwordStudents : "••••••••";
   };
@@ -140,11 +141,13 @@ export default function ClassroomNavigation({
                 {classroom.name}
               </h1>
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <span>{classroom.studentCount} students</span>
+                <span>
+                  {t("info.students", { count: classroom.studentCount })}
+                </span>
                 {classroom.grade && (
                   <>
                     <span>•</span>
-                    <span>Grade {classroom.grade}</span>
+                    <span>{t("info.grade", { grade: classroom.grade })}</span>
                   </>
                 )}
                 {classroom.classCode && (
@@ -153,12 +156,12 @@ export default function ClassroomNavigation({
                     variant="outline"
                     className="ml-2 cursor-pointer text-xs"
                   >
-                    Class Code: {classroom.classCode}
+                    {t("info.classCode")} {classroom.classCode}
                   </Badge>
                 )}
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="ml-2 text-xs">
-                    Password: {getPasswordDisplay()}
+                    {t("password.label")} {getPasswordDisplay()}
                   </Badge>
                   {classroom.passwordStudents && (
                     <>
@@ -168,7 +171,9 @@ export default function ClassroomNavigation({
                         variant="ghost"
                         className="size-6 p-0"
                         onClick={togglePasswordVisibility}
-                        title={showPassword ? "Hide password" : "Show password"}
+                        title={
+                          showPassword ? t("password.hide") : t("password.show")
+                        }
                       >
                         {showPassword ? (
                           <EyeOff className="size-3" />
@@ -182,7 +187,7 @@ export default function ClassroomNavigation({
                         variant="ghost"
                         className="size-6 p-0"
                         onClick={handleCopyPassword}
-                        title="Copy password"
+                        title={t("password.copy")}
                       >
                         <Copy className="size-3" />
                       </Button>
@@ -245,7 +250,7 @@ export default function ClassroomNavigation({
                 className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back to Classrooms
+                {t("actions.backToClassrooms")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -259,7 +264,7 @@ export default function ClassroomNavigation({
               className="hidden gap-2 sm:flex"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="hidden lg:block">Back</span>
+              <span className="hidden lg:block">{t("actions.back")}</span>
             </Button>
           )}
         </div>

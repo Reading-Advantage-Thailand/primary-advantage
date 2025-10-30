@@ -14,6 +14,7 @@ import { Button } from "../ui/button";
 import { FileTextIcon } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import AudioButton from "../audio-button";
+import { useTranslations } from "next-intl";
 
 export interface Sentence {
   sentence: string;
@@ -38,6 +39,7 @@ export default function Sentence({
 }) {
   const [loading, setLoading] = useState(false);
   const [sentenceList, setSentenceList] = useState<Sentence[]>([]);
+  const t = useTranslations("Components");
 
   useEffect(() => {
     if (sentences) {
@@ -69,7 +71,7 @@ export default function Sentence({
         <DialogTrigger asChild>
           <Button className="shadow-md transition-shadow duration-200 hover:shadow-lg">
             <FileTextIcon className="h-4 w-4" />
-            Sentence
+            {t("sentences")}
           </Button>
         </DialogTrigger>
         <DialogContent className="max-h-[80vh] gap-0 p-0 sm:max-w-[600px]">
@@ -80,7 +82,7 @@ export default function Sentence({
                   <div className="mr-3 rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
                     <FileTextIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <div className="text-lg font-semibold">Sentence</div>
+                  <div className="text-lg font-semibold">{t("sentences")}</div>
                 </div>
               </DialogTitle>
             </DialogHeader>
@@ -151,7 +153,7 @@ export default function Sentence({
                           variant="outline"
                           className="px-6"
                         >
-                          Close
+                          {t("closeButton")}
                         </Button>
                       </DialogClose>
                     </div>

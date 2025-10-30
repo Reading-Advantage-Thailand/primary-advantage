@@ -26,6 +26,7 @@ import {
 } from "../ui/select";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 const formSchema = z.object({
   classroomId: z.string().min(1, "Classroom is required"),
@@ -60,6 +61,7 @@ export default function AssignForm({
 }) {
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
+  const t = useTranslations("Assignment.assignForm");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -138,11 +140,11 @@ export default function AssignForm({
           name="classroomId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Classroom</FormLabel>
+              <FormLabel>{t("classroom")}</FormLabel>
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Classroom" />
+                    <SelectValue placeholder={t("selectedClassroom")} />
                   </SelectTrigger>
                   <SelectContent className="max-h-48">
                     {classrooms.map((classroom) => (
@@ -162,7 +164,7 @@ export default function AssignForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Assignment Name</FormLabel>
+              <FormLabel>{t("name")}</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -175,7 +177,7 @@ export default function AssignForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>{t("description")}</FormLabel>
               <FormControl>
                 <Textarea rows={3} {...field} />
               </FormControl>
@@ -189,14 +191,14 @@ export default function AssignForm({
           name="students"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Students</FormLabel>
+              <FormLabel>{t("students")}</FormLabel>
               <FormControl>
                 <div className="rounded-md border p-4">
                   {availableStudents.length === 0 ? (
                     <div className="text-muted-foreground text-sm">
                       {selectedClassroomId
-                        ? "No students in this classroom"
-                        : "Please select a classroom first"}
+                        ? t("noStudents")
+                        : t("pleaseSelectClassroom")}
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -221,7 +223,7 @@ export default function AssignForm({
                           htmlFor="select-all"
                           className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
-                          Select All Students
+                          {t("selectAllStudents")}
                         </label>
                       </div>
                       <div className="max-h-[200px] space-y-2 overflow-y-auto">
@@ -268,9 +270,9 @@ export default function AssignForm({
           name="dueDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Due Date</FormLabel>
+              <FormLabel>{t("dueDate")}</FormLabel>
               <FormDescription className="text-sm">
-                Selected Due Date:{" "}
+                {t("selectedDueDate")}
                 <span className="font-medium text-green-500">
                   {format(new Date(field.value), "PPP")}
                 </span>

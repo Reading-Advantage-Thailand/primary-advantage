@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChangeUsernameForm } from "@/components/change-username-form";
 import { UpdateUserLicenseForm } from "@/components/update-user-license";
-import { BadgeCheck } from "lucide-react";
+import { ArrowLeftIcon, BadgeCheck } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -12,9 +12,11 @@ import ChangeRole from "@/components/shared/change-role";
 import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";
 import { Role } from "@/types/enum";
+import { getTranslations } from "next-intl/server";
 
 export default async function UserProfileSettingsPage() {
   const session = await auth();
+  const t = await getTranslations("Settings.userProfile");
 
   // check if user is not logged in and redirect to signin page
   if (!session) {
@@ -23,15 +25,13 @@ export default async function UserProfileSettingsPage() {
 
   return (
     <div>
-      <Header
-        heading="Personal information"
-        text="Information about your personal profile"
-      />
+      <Header heading={t("title")} text={t("subtitle")} />
       <Link
         href="/student/read"
-        className="mb-4 inline-block text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+        className="mb-4 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
       >
-        &larr; Back to Reading Page
+        <ArrowLeftIcon className="h-4 w-4" />
+        {t("backToReading")}
       </Link>
       <Separator className="my-4" />
       <div className="mx-2 flex flex-col gap-4 md:flex-row">
@@ -41,21 +41,25 @@ export default async function UserProfileSettingsPage() {
             userId={session.user.id as string}
           />
           <DisplaySettingInfo
-            title="Email"
+            title={t("email")}
             data={session.user.email as string}
             // verified={session.user.email_verified}
             resetPassword
             showVerified
+            translations={{
+              verified: t("verified"),
+              notVerified: t("notVerified"),
+            }}
           />
           {/* <DisplaySettingInfo title="Google Classroom Link" /> */}
           {/* <GoogleClassroomButtonLink status={Boolean(googleActive)} /> */}
           <DisplaySettingInfo
-            title="Primary advantage level"
-            data={session.user.cefrLevel || "unknown"}
+            title={t("level")}
+            data={session.user.cefrLevel || t("unknown")}
           />
           <DisplaySettingInfo
-            title="Primary advantage XP"
-            desc="The XP is used to level up."
+            title={t("xp")}
+            desc={t("xpDescription")}
             data={session.user.xp?.toString() || "0"}
           />
           {/* <ResetDialog users={user.id} /> */}
@@ -85,6 +89,10 @@ interface DisplaySettingInfoProps {
   verified?: boolean;
   showVerified?: boolean;
   resetPassword?: boolean;
+  translations?: {
+    verified: string;
+    notVerified: string;
+  };
 }
 
 // const handleSendEmailVerification = async () => {
@@ -175,6 +183,7 @@ const DisplaySettingInfo: React.FC<DisplaySettingInfoProps> = ({
   verified,
   resetPassword,
   showVerified = false,
+  translations,
 }) => (
   <>
     <div className="mt-3 text-sm font-medium">
@@ -194,12 +203,12 @@ const DisplaySettingInfo: React.FC<DisplaySettingInfoProps> = ({
             {verified ? (
               <span className="flex items-center gap-1 text-green-800 dark:text-green-300">
                 <BadgeCheck size={16} />
-                Verified
+                {translations?.verified || "Verified"}
               </span>
             ) : (
               <span className="flex items-center gap-1 text-red-800 dark:text-red-300">
                 {/* <Icons.unVerified size={16} /> */}
-                Not verified
+                {translations?.notVerified || "Not verified"}
               </span>
             )}
           </div>

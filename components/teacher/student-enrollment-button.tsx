@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +53,7 @@ export default function StudentEnrollmentButton({
   buttonSize = "default",
   disabled = false,
 }: StudentEnrollmentButtonProps) {
+  const t = useTranslations("Teacher.StudentEnrollmentButton");
   const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -74,7 +76,7 @@ export default function StudentEnrollmentButton({
       setAvailableStudents(data.students || []);
     } catch (error) {
       console.error("Error fetching available students:", error);
-      toast.error("Failed to load available students");
+      toast.error(t("toast.loadAvailableError"));
     } finally {
       setIsLoadingAvailable(false);
     }
@@ -107,7 +109,9 @@ export default function StudentEnrollmentButton({
       // Remove from available students
       setAvailableStudents((prev) => prev.filter((s) => s.id !== student.id));
 
-      toast.success(`${student.name} has been enrolled successfully`);
+      toast.success(
+        t("toast.enrollSuccess", { name: student.name || t("labels.noName") }),
+      );
       onStudentEnrolled?.(student);
 
       // Close dialog if no more students available
@@ -116,7 +120,7 @@ export default function StudentEnrollmentButton({
       }
     } catch (error: any) {
       console.error("Error enrolling student:", error);
-      toast.error(error.message || "Failed to enroll student");
+      toast.error(error.message || t("toast.enrollError"));
     } finally {
       setEnrollmentLoading(null);
     }
@@ -170,15 +174,15 @@ export default function StudentEnrollmentButton({
           className="gap-2"
         >
           <UserPlus className="h-4 w-4" />
-          {buttonText}
+          {buttonText || t("actions.open")}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="flex max-h-[80vh] max-w-2xl flex-col overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Enroll Students</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
-            Select students to enroll in {classroomName}
+            {t("description", { classroomName })}
           </DialogDescription>
         </DialogHeader>
 
@@ -186,7 +190,7 @@ export default function StudentEnrollmentButton({
         <div className="relative">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
           <Input
-            placeholder="Search students by name or email..."
+            placeholder={t("search.placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -215,12 +219,12 @@ export default function StudentEnrollmentButton({
             <div className="py-12 text-center">
               <UserPlus className="mx-auto mb-4 h-12 w-12 text-gray-400" />
               <p className="mb-2 text-lg font-medium text-gray-500">
-                {searchTerm ? "No students found" : "No students available"}
+                {searchTerm ? t("empty.searchTitle") : t("empty.title")}
               </p>
               <p className="text-sm text-gray-400">
                 {searchTerm
-                  ? "Try adjusting your search terms"
-                  : "All students are already enrolled in this classroom"}
+                  ? t("empty.searchDescription")
+                  : t("empty.description")}
               </p>
             </div>
           ) : (
@@ -240,7 +244,7 @@ export default function StudentEnrollmentButton({
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">
-                      {student.name || "No name"}
+                      {student.name || t("labels.noName")}
                     </p>
                     <p className="truncate text-sm text-gray-500">
                       {student.email}
@@ -260,7 +264,7 @@ export default function StudentEnrollmentButton({
                           className="px-1.5 py-0.5 text-xs"
                         >
                           <GraduationCap className="mr-1 h-3 w-3" />
-                          Lvl {student.level}
+                          {t("labels.level", { level: student.level })}
                         </Badge>
                       )}
                       {student.xp && (
@@ -286,7 +290,7 @@ export default function StudentEnrollmentButton({
                     ) : (
                       <>
                         <UserPlus className="mr-1 h-4 w-4" />
-                        Enroll
+                        {t("actions.enroll")}
                       </>
                     )}
                   </Button>
@@ -298,7 +302,7 @@ export default function StudentEnrollmentButton({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-            Close
+            {t("actions.close")}
           </Button>
         </DialogFooter>
       </DialogContent>

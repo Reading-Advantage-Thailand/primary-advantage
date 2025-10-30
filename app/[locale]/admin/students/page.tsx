@@ -55,6 +55,7 @@ import {
   X,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 // Student interface based on the API response
 interface Student {
@@ -107,6 +108,7 @@ interface StudentsResponse {
 }
 
 export default function StudentsPage() {
+  const t = useTranslations("AdminStudents");
   // State management
   const [students, setStudents] = useState<Student[]>([]);
   const [statistics, setStatistics] = useState<Statistics>({
@@ -360,16 +362,13 @@ export default function StudentsPage() {
 
   return (
     <div>
-      <Header
-        heading="Student Management"
-        text="Manage student and their progress"
-      />
+      <Header heading={t("header.title")} text={t("header.subtitle")} />
       <Separator className="my-4" />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Students
+              {t("stats.totalStudents")}
             </CardTitle>
             <Users className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -381,13 +380,17 @@ export default function StudentsPage() {
                 statistics.totalStudents
               )}
             </div>
-            <p className="text-muted-foreground text-xs">All classrooms</p>
+            <p className="text-muted-foreground text-xs">
+              {t("stats.allClassrooms")}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average XP</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("stats.averageXp")}
+            </CardTitle>
             <TrendingUp className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -399,7 +402,7 @@ export default function StudentsPage() {
               )}
             </div>
             <p className="text-muted-foreground text-xs">
-              Experience points per student
+              {t("stats.averageXpDesc")}
             </p>
           </CardContent>
         </Card>
@@ -407,7 +410,7 @@ export default function StudentsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Most Common Level
+              {t("stats.mostCommonLevel")}
             </CardTitle>
             <BookOpen className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -420,7 +423,7 @@ export default function StudentsPage() {
               )}
             </div>
             <p className="text-muted-foreground text-xs">
-              CEFR proficiency level
+              {t("stats.mostCommonLevelDesc")}
             </p>
           </CardContent>
         </Card>
@@ -428,7 +431,7 @@ export default function StudentsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Active This Week
+              {t("stats.activeThisWeek")}
             </CardTitle>
             <Clock className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -441,7 +444,10 @@ export default function StudentsPage() {
               )}
             </div>
             <p className="text-muted-foreground text-xs">
-              {statistics.activeThisWeek} of {statistics.totalStudents} students
+              {t("stats.activeThisWeekDetail", {
+                count: statistics.activeThisWeek,
+                total: statistics.totalStudents,
+              })}
             </p>
           </CardContent>
         </Card>
@@ -450,25 +456,25 @@ export default function StudentsPage() {
         <Card>
           <CardHeader className="space-y-4">
             <div className="flex flex-row items-center justify-between">
-              <CardTitle>Students Management</CardTitle>
+              <CardTitle>{t("page.title")}</CardTitle>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={() => resetForm()}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Student
+                    {t("actions.addStudent")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
-                    <DialogTitle>Add New Student</DialogTitle>
+                    <DialogTitle>{t("dialogs.add.title")}</DialogTitle>
                     <DialogDescription>
-                      Create a new student account. Click save when you're done.
+                      {t("dialogs.add.description")}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="name" className="text-right">
-                        Name
+                        {t("form.name")}
                       </Label>
                       <Input
                         id="name"
@@ -477,12 +483,12 @@ export default function StudentsPage() {
                           handleInputChange("name", e.target.value)
                         }
                         className="col-span-3"
-                        placeholder="Enter student name"
+                        placeholder={t("form.namePlaceholder")}
                       />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="email" className="text-right">
-                        Email
+                        {t("form.email")}
                       </Label>
                       <Input
                         id="email"
@@ -492,12 +498,12 @@ export default function StudentsPage() {
                           handleInputChange("email", e.target.value)
                         }
                         className="col-span-3"
-                        placeholder="Enter email address"
+                        placeholder={t("form.emailPlaceholder")}
                       />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="cefrLevel" className="text-right">
-                        CEFR Level
+                        {t("form.cefrLevel")}
                       </Label>
                       <Select
                         value={formData.cefrLevel}
@@ -506,7 +512,9 @@ export default function StudentsPage() {
                         }
                       >
                         <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Select CEFR level" />
+                          <SelectValue
+                            placeholder={t("form.cefrPlaceholder")}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="A1-">A1-</SelectItem>
@@ -530,7 +538,7 @@ export default function StudentsPage() {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="role" className="text-right">
-                        Role
+                        {t("form.role")}
                       </Label>
                       <Select
                         value={formData.role}
@@ -539,32 +547,39 @@ export default function StudentsPage() {
                         }
                       >
                         <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Select role" />
+                          <SelectValue
+                            placeholder={t("form.rolePlaceholder")}
+                          />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="student">Student</SelectItem>
-                          <SelectItem value="teacher">Teacher</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="student">
+                            {t("roles.student")}
+                          </SelectItem>
+                          <SelectItem value="teacher">
+                            {t("roles.teacher")}
+                          </SelectItem>
+                          <SelectItem value="admin">
+                            {t("roles.admin")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                   <DialogFooter>
                     <Button type="submit" onClick={handleAddStudent}>
-                      Save Student
+                      {t("actions.saveStudent")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
             </div>
 
-            {/* Search and Filters */}
             <div className="flex flex-wrap gap-4">
               <div className="min-w-[200px] flex-1">
                 <div className="relative">
                   <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                   <Input
-                    placeholder="Search students by name or email..."
+                    placeholder={t("filters.searchPlaceholder")}
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
                     className="pl-10"
@@ -578,7 +593,9 @@ export default function StudentsPage() {
               >
                 <SelectTrigger className="w-[180px]">
                   <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Filter by classroom" />
+                  <SelectValue
+                    placeholder={t("filters.classroomPlaceholder")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {classrooms.map((classroom) => (
@@ -594,7 +611,7 @@ export default function StudentsPage() {
                 onValueChange={handleCefrLevelFilter}
               >
                 <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="CEFR Level" />
+                  <SelectValue placeholder={t("filters.cefrPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="A1-">A1-</SelectItem>
@@ -616,7 +633,6 @@ export default function StudentsPage() {
                 </SelectContent>
               </Select>
 
-              {/* Clear Filters Button */}
               {hasActiveFilters && (
                 <Button
                   variant="outline"
@@ -625,7 +641,7 @@ export default function StudentsPage() {
                   className="px-3"
                 >
                   <X className="mr-2 h-4 w-4" />
-                  Clear Filters
+                  {t("actions.clearFilters")}
                   {activeFiltersCount > 0 && (
                     <Badge
                       variant="secondary"
@@ -638,15 +654,14 @@ export default function StudentsPage() {
               )}
             </div>
 
-            {/* Active Filters Display */}
             {hasActiveFilters && (
               <div className="flex flex-wrap gap-2 border-t pt-4">
                 <span className="text-muted-foreground text-sm">
-                  Active filters:
+                  {t("filters.activeFiltersLabel")}
                 </span>
                 {searchQuery && (
                   <Badge variant="outline" className="text-xs">
-                    Search: "{searchQuery}"
+                    {t("filters.searchLabel")} "{searchQuery}"
                     <button
                       onClick={() => {
                         setSearchQuery("");
@@ -660,7 +675,7 @@ export default function StudentsPage() {
                 )}
                 {selectedClassroom && (
                   <Badge variant="outline" className="text-xs">
-                    Classroom:{" "}
+                    {t("filters.classroomLabel")} {""}
                     {classrooms.find((c) => c.id === selectedClassroom)?.name ||
                       selectedClassroom}
                     <button
@@ -676,7 +691,7 @@ export default function StudentsPage() {
                 )}
                 {selectedCefrLevel && (
                   <Badge variant="outline" className="text-xs">
-                    Level: {selectedCefrLevel}
+                    {t("filters.levelLabel")} {selectedCefrLevel}
                     <button
                       onClick={() => {
                         setSelectedCefrLevel("");
@@ -695,27 +710,29 @@ export default function StudentsPage() {
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="ml-2">Loading students...</span>
+                <span className="ml-2">{t("table.loading")}</span>
               </div>
             ) : (
               <>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Class Name</TableHead>
-                      <TableHead>CEFR Level</TableHead>
-                      <TableHead>XP</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>{t("tableHeaders.name")}</TableHead>
+                      <TableHead>{t("tableHeaders.email")}</TableHead>
+                      <TableHead>{t("tableHeaders.className")}</TableHead>
+                      <TableHead>{t("tableHeaders.cefr")}</TableHead>
+                      <TableHead>{t("tableHeaders.xp")}</TableHead>
+                      <TableHead>{t("tableHeaders.role")}</TableHead>
+                      <TableHead className="text-right">
+                        {t("tableHeaders.actions")}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {students.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={7} className="py-8 text-center">
-                          No students found matching your criteria.
+                          {t("table.empty")}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -727,7 +744,7 @@ export default function StudentsPage() {
                           <TableCell>{student.email || "N/A"}</TableCell>
                           <TableCell>
                             <Badge variant="default">
-                              {student.className || "No Class"}
+                              {student.className || t("badges.noClass")}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -757,28 +774,25 @@ export default function StudentsPage() {
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                      Are you sure?
+                                      {t("dialogs.delete.title")}
                                     </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      This action cannot be undone. This will
-                                      permanently delete{" "}
-                                      <strong>
-                                        {student.name || student.email}
-                                      </strong>
-                                      's account and remove their data from our
-                                      servers.
+                                      {t("dialogs.delete.description", {
+                                        name:
+                                          student.name || student.email || "",
+                                      })}
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>
-                                      Cancel
+                                      {t("actions.cancel")}
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() =>
                                         handleDeleteStudent(student.id)
                                       }
                                     >
-                                      Delete
+                                      {t("actions.delete")}
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
@@ -795,12 +809,14 @@ export default function StudentsPage() {
                 {pagination.totalPages > 1 && (
                   <div className="mt-4 flex items-center justify-between">
                     <div className="text-muted-foreground text-sm">
-                      Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-                      {Math.min(
-                        pagination.page * pagination.limit,
-                        pagination.total,
-                      )}{" "}
-                      of {pagination.total} students
+                      {t("pagination.showing", {
+                        from: (pagination.page - 1) * pagination.limit + 1,
+                        to: Math.min(
+                          pagination.page * pagination.limit,
+                          pagination.total,
+                        ),
+                        total: pagination.total,
+                      })}
                     </div>
                     <div className="flex gap-2">
                       <Button
@@ -809,10 +825,13 @@ export default function StudentsPage() {
                         onClick={() => handlePageChange(pagination.page - 1)}
                         disabled={pagination.page === 1}
                       >
-                        Previous
+                        {t("pagination.previous")}
                       </Button>
                       <span className="flex items-center px-3 text-sm">
-                        Page {pagination.page} of {pagination.totalPages}
+                        {t("pagination.pageOf", {
+                          page: pagination.page,
+                          totalPages: pagination.totalPages,
+                        })}
                       </span>
                       <Button
                         variant="outline"
@@ -820,7 +839,7 @@ export default function StudentsPage() {
                         onClick={() => handlePageChange(pagination.page + 1)}
                         disabled={pagination.page === pagination.totalPages}
                       >
-                        Next
+                        {t("pagination.next")}
                       </Button>
                     </div>
                   </div>
@@ -830,32 +849,30 @@ export default function StudentsPage() {
           </CardContent>
         </Card>
 
-        {/* Edit Student Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Edit Student</DialogTitle>
+              <DialogTitle>{t("dialogs.edit.title")}</DialogTitle>
               <DialogDescription>
-                Make changes to the student account. Click save when you're
-                done.
+                {t("dialogs.edit.description")}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-name" className="text-right">
-                  Name
+                  {t("form.name")}
                 </Label>
                 <Input
                   id="edit-name"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   className="col-span-3"
-                  placeholder="Enter student name"
+                  placeholder={t("form.namePlaceholder")}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-email" className="text-right">
-                  Email
+                  {t("form.email")}
                 </Label>
                 <Input
                   id="edit-email"
@@ -863,12 +880,12 @@ export default function StudentsPage() {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className="col-span-3"
-                  placeholder="Enter email address"
+                  placeholder={t("form.emailPlaceholder")}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-cefrLevel" className="text-right">
-                  CEFR Level
+                  {t("form.cefrLevel")}
                 </Label>
                 <Select
                   value={formData.cefrLevel}
@@ -877,7 +894,7 @@ export default function StudentsPage() {
                   }
                 >
                   <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select CEFR level" />
+                    <SelectValue placeholder={t("form.cefrPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="A1-">A1-</SelectItem>
@@ -901,26 +918,30 @@ export default function StudentsPage() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-role" className="text-right">
-                  Role
+                  {t("form.role")}
                 </Label>
                 <Select
                   value={formData.role}
                   onValueChange={(value) => handleInputChange("role", value)}
                 >
                   <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select role" />
+                    <SelectValue placeholder={t("form.rolePlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="student">Student</SelectItem>
-                    <SelectItem value="teacher">Teacher</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="student">
+                      {t("roles.student")}
+                    </SelectItem>
+                    <SelectItem value="teacher">
+                      {t("roles.teacher")}
+                    </SelectItem>
+                    <SelectItem value="admin">{t("roles.admin")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <DialogFooter>
               <Button type="submit" onClick={handleUpdateStudent}>
-                Save Changes
+                {t("actions.saveChanges")}
               </Button>
             </DialogFooter>
           </DialogContent>

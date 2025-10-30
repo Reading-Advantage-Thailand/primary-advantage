@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -17,7 +18,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Article, WordListTimestamp } from "@/types";
 import { getLessonSummaryData } from "@/actions/article";
 
@@ -55,6 +57,7 @@ export default function TaskLessonSummary({
   const sentenceList = article?.sentencsAndWordsForFlashcard?.[0]
     ?.sentence as Sentence[];
   const router = useRouter();
+  const t = useTranslations("Lesson.Summary");
 
   // Fetch lesson summary data
   useEffect(() => {
@@ -64,7 +67,7 @@ export default function TaskLessonSummary({
         const result = await getLessonSummaryData(article.id);
 
         if (result.error) {
-          toast.error(result.error);
+          toast.error(t("toast.failed"));
           return;
         }
 
@@ -75,7 +78,7 @@ export default function TaskLessonSummary({
         }
       } catch (error) {
         console.error("Error fetching lesson summary data:", error);
-        toast.error("Failed to load lesson summary");
+        toast.error(t("toast.failed"));
       } finally {
         setLoading(false);
       }
@@ -92,20 +95,20 @@ export default function TaskLessonSummary({
   };
 
   const mcqFeedback = {
-    1: "You need to review the material and try again. Don’t give up!",
-    2: "A small improvement, but more work is needed",
-    3: "Getting there! Keep practicing",
-    4: "Great job! Almost full score",
-    5: "Excellent! You fully understand the content",
-  };
+    1: t("feedback.mcq.1"),
+    2: t("feedback.mcq.2"),
+    3: t("feedback.mcq.3"),
+    4: t("feedback.mcq.4"),
+    5: t("feedback.mcq.5"),
+  } as const;
 
   const saqFeedback = {
-    1: "Excellent! You fully understand the content",
-    2: "Good start, but missing key details",
-    3: "Decent answer. Try to elaborate more",
-    4: "Strong answer. Just a little refinement needed",
-    5: "Excellent! Clear, complete, and well-reasoned answer",
-  };
+    1: t("feedback.saq.1"),
+    2: t("feedback.saq.2"),
+    3: t("feedback.saq.3"),
+    4: t("feedback.saq.4"),
+    5: t("feedback.saq.5"),
+  } as const;
 
   const backToReadPage = () => {
     router.push("/student/read");
@@ -192,18 +195,18 @@ export default function TaskLessonSummary({
           </div>
 
           <h1 className="mb-4 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-4xl font-bold text-transparent md:text-5xl dark:from-emerald-400 dark:via-green-400 dark:to-teal-400">
-            Lesson Summary
+            {t("title")}
           </h1>
 
           <p className="mx-auto max-w-2xl text-xl leading-relaxed text-gray-600 dark:text-gray-300">
-            Fantastic work! You have completed the lesson.
+            {t("completed")}
           </p>
 
           {/* XP Highlight */}
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-yellow-200 bg-gradient-to-r from-yellow-100 to-orange-100 px-6 py-3 dark:border-yellow-800 dark:from-yellow-900 dark:to-orange-900">
             <Zap className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             <span className="text-lg font-bold text-yellow-700 dark:text-yellow-300">
-              +{totalXp} XP Earned!
+              {t("xpEarned", { xp: totalXp })}
             </span>
           </div>
         </div>
@@ -220,7 +223,7 @@ export default function TaskLessonSummary({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Time Spent
+                  {t("stats.timeSpent")}
                 </p>
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {formatTimer(timerSpent)}
@@ -239,7 +242,7 @@ export default function TaskLessonSummary({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Words Saved
+                  {t("stats.wordsSaved")}
                 </p>
                 <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {wordList.length}
@@ -258,7 +261,7 @@ export default function TaskLessonSummary({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Sentences
+                  {t("stats.sentences")}
                 </p>
                 <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                   {sentenceList.length}
@@ -277,7 +280,7 @@ export default function TaskLessonSummary({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Total XP
+                  {t("stats.totalXp")}
                 </p>
                 <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                   {totalXp}
@@ -295,7 +298,7 @@ export default function TaskLessonSummary({
             <div className="flex items-center gap-3">
               <Target className="h-6 w-6 text-pink-600 dark:text-pink-400" />
               <CardTitle className="text-xl font-bold text-pink-700 dark:text-pink-300">
-                Quiz Performance
+                {t("quiz.title")}
               </CardTitle>
             </div>
           </CardHeader>
@@ -305,7 +308,7 @@ export default function TaskLessonSummary({
               <div className="flex items-center justify-between">
                 <h4 className="flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-gray-200">
                   <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  Multiple Choice Questions
+                  {t("quiz.mcq")}
                 </h4>
                 <Badge {...getPerformanceBadge(quizScores.mcqScore || 0)}>
                   {getPerformanceBadge(quizScores.mcqScore || 0).label}
@@ -315,11 +318,15 @@ export default function TaskLessonSummary({
               <div className="flex items-center gap-4">
                 <div className="flex-1">
                   <div className="mb-2 flex justify-between text-sm">
-                    <span>Score: {quizScores.mcqScore || 0}/5</span>
+                    <span>
+                      {t("quiz.score", { score: quizScores.mcqScore || 0 })}
+                    </span>
                     <span
                       className={getPerformanceColor(quizScores.mcqScore || 0)}
                     >
-                      {Math.round((quizScores.mcqScore || 0) * 20)}%
+                      {t("quiz.percent", {
+                        percent: Math.round((quizScores.mcqScore || 0) * 20),
+                      })}
                     </span>
                   </div>
                   <Progress
@@ -343,7 +350,7 @@ export default function TaskLessonSummary({
               <div className="flex items-center justify-between">
                 <h4 className="flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-gray-200">
                   <Brain className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  Short Answer Questions
+                  {t("quiz.saq")}
                 </h4>
                 <Badge {...getPerformanceBadge(quizScores.saqScore || 0)}>
                   {getPerformanceBadge(quizScores.saqScore || 0).label}
@@ -353,11 +360,15 @@ export default function TaskLessonSummary({
               <div className="flex items-center gap-4">
                 <div className="flex-1">
                   <div className="mb-2 flex justify-between text-sm">
-                    <span>Score: {quizScores.saqScore || 0}/5</span>
+                    <span>
+                      {t("quiz.score", { score: quizScores.saqScore || 0 })}
+                    </span>
                     <span
                       className={getPerformanceColor(quizScores.saqScore || 0)}
                     >
-                      {Math.round((quizScores.saqScore || 0) * 20)}%
+                      {t("quiz.percent", {
+                        percent: Math.round((quizScores.saqScore || 0) * 20),
+                      })}
                     </span>
                   </div>
                   <Progress
@@ -386,7 +397,7 @@ export default function TaskLessonSummary({
               <div className="flex items-center gap-3">
                 <Sparkles className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                 <CardTitle className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
-                  Vocabulary Learned : {wordList.length} words
+                  {t("vocabulary.title", { count: wordList.length })}
                 </CardTitle>
               </div>
             </CardHeader>
@@ -405,7 +416,7 @@ export default function TaskLessonSummary({
               </div>
               {wordList.length > 8 && (
                 <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                  +{wordList.length - 8} more words learned
+                  {t("vocabulary.more", { count: wordList.length - 8 })}
                 </p>
               )}
             </CardContent>
@@ -419,7 +430,7 @@ export default function TaskLessonSummary({
               <div className="flex items-center gap-3">
                 <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 <CardTitle className="text-xl font-bold text-blue-700 dark:text-blue-300">
-                  Key Sentences : {sentenceList.length} sentences
+                  {t("sentences.title", { count: sentenceList.length })}
                 </CardTitle>
               </div>
             </CardHeader>
@@ -436,7 +447,7 @@ export default function TaskLessonSummary({
               ))}
               {sentenceList.length > 3 && (
                 <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                  +{sentenceList.length - 3} more sentences saved
+                  {t("sentences.more", { count: sentenceList.length - 3 })}
                 </p>
               )}
             </CardContent>
@@ -452,7 +463,7 @@ export default function TaskLessonSummary({
           className="w-full transform rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 px-8 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-emerald-700 hover:to-green-700 hover:shadow-xl sm:w-auto"
         >
           <BookOpen className="mr-2 h-5 w-5" />
-          Back to Read Page
+          {t("actions.backToRead")}
         </Button>
       </div>
     </div>

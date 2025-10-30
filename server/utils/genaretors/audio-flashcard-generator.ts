@@ -137,6 +137,8 @@ export async function generateAudioForFlashcard({
         sentenceLocalPath,
         `audios/sentences/${articleId}.mp3`,
       );
+
+      fs.unlinkSync(sentenceLocalPath);
     }
 
     // Generate audio for words
@@ -189,6 +191,8 @@ export async function generateAudioForFlashcard({
       fs.writeFileSync(wordLocalPath, wordMP3);
 
       await uploadToBucket(wordLocalPath, `audios/words/${articleId}.mp3`);
+
+      fs.unlinkSync(wordLocalPath);
     }
 
     // Store both sentence and word data with their respective audio URLs

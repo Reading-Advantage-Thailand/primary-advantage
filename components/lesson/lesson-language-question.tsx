@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Article } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface Message {
   text: string;
@@ -26,6 +27,7 @@ export default function LessonLanguageQuestion({
 }: {
   article: Article;
 }) {
+  const t = useTranslations("LessonLanguageQuestion");
   const { data: session } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState<string>("");
@@ -64,7 +66,7 @@ export default function LessonLanguageQuestion({
       } catch (error) {
         setMessages((msgs) => [
           ...msgs,
-          { text: "Error fetching response", sender: "bot" },
+          { text: t("error.fetchResponse"), sender: "bot" },
         ]);
       } finally {
         setLoading(false);
@@ -73,8 +75,6 @@ export default function LessonLanguageQuestion({
       setUserInput(""); // clear input
     }
   }, [userInput, messages, article]);
-
-  console.log(article);
 
   useEffect(() => {
     const initBotMessage = async () => {
@@ -112,9 +112,7 @@ export default function LessonLanguageQuestion({
         };
         setMessages([initialMessage]);
       } catch (error) {
-        setMessages([
-          { text: "Error fetching initial question", sender: "bot" },
-        ]);
+        setMessages([{ text: t("error.fetchInitial"), sender: "bot" }]);
       } finally {
         setLoading(false);
       }
@@ -138,7 +136,7 @@ export default function LessonLanguageQuestion({
             <div className="flex flex-col items-center space-y-3">
               <Loader2 className="h-10 w-10 animate-spin text-indigo-600 dark:text-indigo-400" />
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Loading conversation...
+                {t("loading.conversation")}
               </p>
             </div>
           </div>
@@ -155,18 +153,20 @@ export default function LessonLanguageQuestion({
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
-                    AI Reading Assistant
+                    {t("title")}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {session?.user?.name
-                      ? `Ready to help ${(session.user.name || "").split(" ")[0]} with questions`
-                      : "Ready to help with your questions"}
+                      ? t("header.readyWithName", {
+                          name: (session.user.name || "").split(" ")[0],
+                        })
+                      : t("header.ready")}
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
                 <div className="h-2 w-2 animate-pulse rounded-full bg-green-500"></div>
-                <span>Online</span>
+                <span>{t("status.online")}</span>
               </div>
             </div>
 
@@ -179,11 +179,11 @@ export default function LessonLanguageQuestion({
                     <div>
                       <p className="font-medium text-gray-500 dark:text-gray-400">
                         {session?.user?.name
-                          ? `สวัสดี ${session.user.name}!`
-                          : "Start the conversation!"}
+                          ? t("empty.helloName", { name: session.user.name })
+                          : t("empty.start")}
                       </p>
                       <p className="text-sm text-gray-400 dark:text-gray-500">
-                        Ask me anything about the article.
+                        {t("empty.ask")}
                       </p>
                     </div>
                   </div>
@@ -255,7 +255,7 @@ export default function LessonLanguageQuestion({
                           ></div>
                         </div>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Thinking...
+                          {t("thinking")}
                         </span>
                       </div>
                     </div>
@@ -278,8 +278,10 @@ export default function LessonLanguageQuestion({
                     <Input
                       placeholder={
                         session?.user?.name
-                          ? `${session.user.name}, ask about the article...`
-                          : "Type your question about the article..."
+                          ? t("input.placeholderWithName", {
+                              name: session.user.name,
+                            })
+                          : t("input.placeholder")
                       }
                       value={userInput}
                       onChange={(e) => {
@@ -319,7 +321,7 @@ export default function LessonLanguageQuestion({
                         className="rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-3 text-white shadow-lg transition-all duration-200 hover:from-indigo-600 hover:to-purple-700 hover:shadow-xl disabled:from-gray-400 disabled:to-gray-500 disabled:shadow-none"
                       >
                         <Send className="h-5 w-5" />
-                        <span className="sr-only">Send</span>
+                        <span className="sr-only">{t("buttons.send")}</span>
                       </Button>
                     )}
 
@@ -328,7 +330,9 @@ export default function LessonLanguageQuestion({
                       variant="outline"
                       className="rounded-xl border-2 border-gray-300 px-3 py-3 transition-all duration-200 hover:border-gray-400 sm:px-4 dark:border-gray-600 dark:hover:border-gray-500"
                     >
-                      <span className="hidden sm:inline">Skip</span>
+                      <span className="hidden sm:inline">
+                        {t("buttons.skip")}
+                      </span>
                       <X className="h-4 w-4 sm:hidden" />
                     </Button>
                   </div>
@@ -337,9 +341,9 @@ export default function LessonLanguageQuestion({
                 {/* Usage Tips */}
                 <div className="mt-3 flex flex-wrap gap-1 sm:gap-2">
                   {[
-                    "Ask about vocabulary",
-                    "Discuss the main theme",
-                    "Clarify confusing parts",
+                    t("tips.askVocabulary"),
+                    t("tips.discussTheme"),
+                    t("tips.clarifyParts"),
                   ].map((tip, index) => (
                     <button
                       key={index}

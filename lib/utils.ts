@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { useTranslations } from "next-intl";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -97,19 +98,21 @@ export function convertLocaleFull(locale: string) {
 }
 
 export function formatDate(createdAt: Date): string {
+  const t = useTranslations("Overall.time");
   const now = new Date();
   const diffMs = now.getTime() - createdAt.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
-  if (diffMinutes < 1) return "Just now";
-  if (diffMinutes < 60) return `${diffMinutes}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-  if (diffDays < 365) return `${Math.ceil(diffDays / 30)} months ago`;
+  if (diffMinutes < 1) return t("justNow");
+  if (diffMinutes < 60) return t("minutesAgo", { minutes: diffMinutes });
+  if (diffHours < 24) return t("hoursAgo", { hours: diffHours });
+  if (diffDays === 1) return t("yesterday");
+  if (diffDays < 7) return t("daysAgo", { days: diffDays });
+  if (diffDays < 30) return t("weeksAgo", { weeks: Math.ceil(diffDays / 7) });
+  if (diffDays < 365)
+    return t("monthsAgo", { months: Math.ceil(diffDays / 30) });
 
   // For old items, show the actual date
   return createdAt.toLocaleDateString();

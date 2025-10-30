@@ -53,6 +53,7 @@ import {
   CreateTeacherRequest,
   UpdateTeacherRequest,
 } from "@/types/index.d";
+import { useTranslations } from "next-intl";
 
 // Updated Teacher interface to match API response
 interface Teacher extends Omit<TeacherData, "createdAt"> {
@@ -71,6 +72,7 @@ interface Classroom {
 }
 
 export function TeachersTable() {
+  const t = useTranslations("AdminTeachers.Table");
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [statistics, setStatistics] = useState({
@@ -337,7 +339,7 @@ export function TeachersTable() {
       <div className="relative max-w-sm">
         <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
         <Input
-          placeholder="Search teachers..."
+          placeholder={t("searchPlaceholder")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10"
@@ -349,7 +351,7 @@ export function TeachersTable() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Teachers
+              {t("stats.totalTeachers")}
             </CardTitle>
             <User className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -358,14 +360,14 @@ export function TeachersTable() {
               {isLoading ? "..." : statistics.totalTeachers}
             </div>
             <p className="text-muted-foreground text-xs">
-              Active in the system
+              {t("stats.totalTeachersDesc")}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Students
+              {t("stats.totalStudents")}
             </CardTitle>
             <GraduationCap className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -373,19 +375,25 @@ export function TeachersTable() {
             <div className="text-2xl font-bold">
               {isLoading ? "..." : statistics.totalStudents}
             </div>
-            <p className="text-muted-foreground text-xs">Across all teachers</p>
+            <p className="text-muted-foreground text-xs">
+              {t("stats.totalStudentsDesc")}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Classes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t("stats.totalClasses")}
+            </CardTitle>
             <Calendar className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {isLoading ? "..." : statistics.totalClasses}
             </div>
-            <p className="text-muted-foreground text-xs">Active classes</p>
+            <p className="text-muted-foreground text-xs">
+              {t("stats.totalClassesDesc")}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -393,36 +401,35 @@ export function TeachersTable() {
       {/* Teachers Table */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle>Teachers List</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
-                Add Teacher
+                {t("actions.addTeacher")}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Add New Teacher</DialogTitle>
+                <DialogTitle>{t("addDialog.title")}</DialogTitle>
                 <DialogDescription>
-                  Create a new teacher account. They will receive login
-                  credentials via email.
+                  {t("addDialog.description")}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="add-name">Full Name</Label>
+                  <Label htmlFor="add-name">{t("form.name")}</Label>
                   <Input
                     id="add-name"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    placeholder="Enter full name"
+                    placeholder={t("form.namePlaceholder")}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="add-email">Email Address</Label>
+                  <Label htmlFor="add-email">{t("form.email")}</Label>
                   <Input
                     id="add-email"
                     type="email"
@@ -430,11 +437,11 @@ export function TeachersTable() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    placeholder="Enter email address"
+                    placeholder={t("form.emailPlaceholder")}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="add-role">Role</Label>
+                  <Label htmlFor="add-role">{t("form.role")}</Label>
                   <Select
                     value={formData.role}
                     onValueChange={(value: "teacher" | "admin") =>
@@ -442,16 +449,18 @@ export function TeachersTable() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
+                      <SelectValue placeholder={t("form.rolePlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="teacher">Teacher</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="teacher">
+                        {t("roles.teacher")}
+                      </SelectItem>
+                      <SelectItem value="admin">{t("roles.admin")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="add-cefr">CEFR Level</Label>
+                  <Label htmlFor="add-cefr">{t("form.cefr")}</Label>
                   <Select
                     value={formData.cefrLevel}
                     onValueChange={(value) =>
@@ -459,22 +468,34 @@ export function TeachersTable() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select CEFR level" />
+                      <SelectValue placeholder={t("form.cefrPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="A1">A1 - Beginner</SelectItem>
-                      <SelectItem value="A2">A2 - Elementary</SelectItem>
-                      <SelectItem value="B1">B1 - Intermediate</SelectItem>
-                      <SelectItem value="B2">
-                        B2 - Upper Intermediate
+                      <SelectItem value="A1">
+                        A1 - {t("cefrLevels.A1")}
                       </SelectItem>
-                      <SelectItem value="C1">C1 - Advanced</SelectItem>
-                      <SelectItem value="C2">C2 - Proficient</SelectItem>
+                      <SelectItem value="A2">
+                        A2 - {t("cefrLevels.A2")}
+                      </SelectItem>
+                      <SelectItem value="B1">
+                        B1 - {t("cefrLevels.B1")}
+                      </SelectItem>
+                      <SelectItem value="B2">
+                        B2 - {t("cefrLevels.B2")}
+                      </SelectItem>
+                      <SelectItem value="C1">
+                        C1 - {t("cefrLevels.C1")}
+                      </SelectItem>
+                      <SelectItem value="C2">
+                        C2 - {t("cefrLevels.C2")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="add-password">Password (Optional)</Label>
+                  <Label htmlFor="add-password">
+                    {t("form.passwordOptional")}
+                  </Label>
                   <Input
                     id="add-password"
                     type="password"
@@ -482,22 +503,22 @@ export function TeachersTable() {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    placeholder="Leave empty for auto-generated password"
+                    placeholder={t("form.passwordPlaceholder")}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label>Assign Classrooms</Label>
+                  <Label>{t("form.assignClassrooms")}</Label>
                   <div className="rounded-lg border p-3">
                     {isClassroomsLoading ? (
                       <div className="flex items-center justify-center py-4">
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         <span className="text-muted-foreground text-sm">
-                          Loading classrooms...
+                          {t("classrooms.loading")}
                         </span>
                       </div>
                     ) : classrooms.length === 0 ? (
                       <p className="text-muted-foreground py-4 text-center text-sm">
-                        No classrooms available
+                        {t("classrooms.empty")}
                       </p>
                     ) : (
                       <ScrollArea className="h-32">
@@ -544,7 +565,9 @@ export function TeachersTable() {
                                   </Badge>
                                 )}
                                 <span className="text-muted-foreground">
-                                  ({classroom.studentCount} students)
+                                  {t("classrooms.studentsCount", {
+                                    count: classroom.studentCount,
+                                  })}
                                 </span>
                               </Label>
                             </div>
@@ -560,13 +583,13 @@ export function TeachersTable() {
                   variant="outline"
                   onClick={() => setIsAddDialogOpen(false)}
                 >
-                  Cancel
+                  {t("actions.cancel")}
                 </Button>
                 <Button
                   onClick={handleAddTeacher}
                   disabled={!formData.name || !formData.email}
                 >
-                  Add Teacher
+                  {t("actions.add")}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -576,15 +599,17 @@ export function TeachersTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Teacher</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>CEFR Level</TableHead>
-                <TableHead>Assigned Classrooms</TableHead>
-                <TableHead>Students</TableHead>
-                <TableHead>Classes</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("tableHeaders.teacher")}</TableHead>
+                <TableHead>{t("tableHeaders.email")}</TableHead>
+                <TableHead>{t("tableHeaders.role")}</TableHead>
+                <TableHead>{t("tableHeaders.cefr")}</TableHead>
+                <TableHead>{t("tableHeaders.assignedClassrooms")}</TableHead>
+                <TableHead>{t("tableHeaders.students")}</TableHead>
+                <TableHead>{t("tableHeaders.classes")}</TableHead>
+                <TableHead>{t("tableHeaders.joined")}</TableHead>
+                <TableHead className="text-right">
+                  {t("tableHeaders.actions")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -596,7 +621,7 @@ export function TeachersTable() {
                         <>
                           <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
                           <p className="text-muted-foreground">
-                            Loading teachers...
+                            {t("loading")}
                           </p>
                         </>
                       ) : (
@@ -604,8 +629,8 @@ export function TeachersTable() {
                           <User className="text-muted-foreground h-8 w-8" />
                           <p className="text-muted-foreground">
                             {searchTerm
-                              ? "No teachers found matching your search"
-                              : "No teachers found"}
+                              ? t("empty.search")
+                              : t("empty.default")}
                           </p>
                         </>
                       )}
@@ -703,25 +728,23 @@ export function TeachersTable() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit Teacher</DialogTitle>
-            <DialogDescription>
-              Update teacher information and permissions.
-            </DialogDescription>
+            <DialogTitle>{t("editDialog.title")}</DialogTitle>
+            <DialogDescription>{t("editDialog.description")}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="edit-name">Full Name</Label>
+              <Label htmlFor="edit-name">{t("form.name")}</Label>
               <Input
                 id="edit-name"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="Enter full name"
+                placeholder={t("form.namePlaceholder")}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="edit-email">Email Address</Label>
+              <Label htmlFor="edit-email">{t("form.email")}</Label>
               <Input
                 id="edit-email"
                 type="email"
@@ -729,11 +752,11 @@ export function TeachersTable() {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                placeholder="Enter email address"
+                placeholder={t("form.emailPlaceholder")}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="edit-role">Role</Label>
+              <Label htmlFor="edit-role">{t("form.role")}</Label>
               <Select
                 value={formData.role}
                 onValueChange={(value: "teacher" | "admin") =>
@@ -741,16 +764,16 @@ export function TeachersTable() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
+                  <SelectValue placeholder={t("form.rolePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="teacher">Teacher</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="teacher">{t("roles.teacher")}</SelectItem>
+                  <SelectItem value="admin">{t("roles.admin")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="edit-cefr">CEFR Level</Label>
+              <Label htmlFor="edit-cefr">{t("form.cefr")}</Label>
               <Select
                 value={formData.cefrLevel}
                 onValueChange={(value) =>
@@ -758,28 +781,30 @@ export function TeachersTable() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select CEFR level" />
+                  <SelectValue placeholder={t("form.cefrPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="A1">A1 - Beginner</SelectItem>
-                  <SelectItem value="A2">A2 - Elementary</SelectItem>
-                  <SelectItem value="B1">B1 - Intermediate</SelectItem>
-                  <SelectItem value="B2">B2 - Upper Intermediate</SelectItem>
-                  <SelectItem value="C1">C1 - Advanced</SelectItem>
-                  <SelectItem value="C2">C2 - Proficient</SelectItem>
+                  <SelectItem value="A1">A1 - {t("cefrLevels.A1")}</SelectItem>
+                  <SelectItem value="A2">A2 - {t("cefrLevels.A2")}</SelectItem>
+                  <SelectItem value="B1">B1 - {t("cefrLevels.B1")}</SelectItem>
+                  <SelectItem value="B2">B2 - {t("cefrLevels.B2")}</SelectItem>
+                  <SelectItem value="C1">C1 - {t("cefrLevels.C1")}</SelectItem>
+                  <SelectItem value="C2">C2 - {t("cefrLevels.C2")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label>Reset Password</Label>
+                <Label>{t("form.resetPassword")}</Label>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setShowPasswordField(!showPasswordField)}
                 >
-                  {showPasswordField ? "Cancel" : "Set New Password"}
+                  {showPasswordField
+                    ? t("actions.cancel")
+                    : t("form.setNewPassword")}
                 </Button>
               </div>
               {showPasswordField && (
@@ -790,23 +815,23 @@ export function TeachersTable() {
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  placeholder="Enter new password"
+                  placeholder={t("form.newPasswordPlaceholder")}
                 />
               )}
             </div>
             <div className="grid gap-2">
-              <Label>Assign Classrooms</Label>
+              <Label>{t("form.assignClassrooms")}</Label>
               <div className="rounded-lg border p-3">
                 {isClassroomsLoading ? (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     <span className="text-muted-foreground text-sm">
-                      Loading classrooms...
+                      {t("classrooms.loading")}
                     </span>
                   </div>
                 ) : classrooms.length === 0 ? (
                   <p className="text-muted-foreground py-4 text-center text-sm">
-                    No classrooms available
+                    {t("classrooms.empty")}
                   </p>
                 ) : (
                   <ScrollArea className="h-32">
@@ -853,7 +878,9 @@ export function TeachersTable() {
                               </Badge>
                             )}
                             <span className="text-muted-foreground">
-                              ({classroom.studentCount} students)
+                              {t("classrooms.studentsCount", {
+                                count: classroom.studentCount,
+                              })}
                             </span>
                           </Label>
                         </div>
@@ -869,13 +896,13 @@ export function TeachersTable() {
               variant="outline"
               onClick={() => setIsEditDialogOpen(false)}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
             <Button
               onClick={handleEditTeacher}
               disabled={!formData.name || !formData.email}
             >
-              Update Teacher
+              {t("actions.update")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -885,11 +912,11 @@ export function TeachersTable() {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Delete Teacher</DialogTitle>
+            <DialogTitle>{t("deleteDialog.title")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {selectedTeacher?.name}? This
-              action cannot be undone. All associated classes and student data
-              will be affected.
+              {t("deleteDialog.description", {
+                name: selectedTeacher?.name ?? "",
+              })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -897,10 +924,10 @@ export function TeachersTable() {
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteTeacher}>
-              Delete Teacher
+              {t("actions.delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

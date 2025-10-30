@@ -19,6 +19,7 @@ import { useState } from "react";
 import { Icons } from "@/components/icons";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const FormSchema = z.object({
   name: z.string().min(5, {
@@ -42,7 +43,7 @@ export function ChangeUsernameForm({
     },
   });
   const router = useRouter();
-
+  const t = useTranslations("Settings.userProfile");
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       setIsLoading(true);
@@ -86,16 +87,14 @@ export function ChangeUsernameForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 mb-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mb-3 space-y-2">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormDescription>
-                The username is used to represent themselves on the platform.
-              </FormDescription>
+              <FormLabel>{t("username")}</FormLabel>
+              <FormDescription>{t("usernameDescription")}</FormDescription>
               <FormControl>
                 <Input type="text" placeholder={username} {...field} />
               </FormControl>
@@ -114,7 +113,7 @@ export function ChangeUsernameForm({
           }
         >
           {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-          Update
+          {t("update")}
         </Button>
       </form>
     </Form>

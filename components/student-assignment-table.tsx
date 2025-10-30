@@ -30,6 +30,7 @@ import { enUS, th, zhCN, zhTW, vi } from "date-fns/locale";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { AssignmentStatus } from "@prisma/client";
+import { useTranslations } from "next-intl";
 
 interface Assignment {
   id: string;
@@ -101,6 +102,8 @@ export default function StudentAssignmentTable() {
     useState<AssignmentStudent | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const t = useTranslations("Assignment.studentAssignmentTable");
+  const tComponents = useTranslations("Components");
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -182,8 +185,7 @@ export default function StudentAssignmentTable() {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            {/* {t("assignmentTitle")} */}
-            Assignment Name
+            {t("name")}
             <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -201,11 +203,7 @@ export default function StudentAssignmentTable() {
     {
       accessorKey: "assignment.description",
       header: () => {
-        return (
-          <div className="text-center">
-            {/* {t("assignmentDescription")} */}Assignment Description
-          </div>
-        );
+        return <div className="text-center">{t("description")}</div>;
       },
       cell: ({ row }) => {
         const description: string = row.original.assignment.description || "";
@@ -230,8 +228,7 @@ export default function StudentAssignmentTable() {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              {/* {t("createAt")} */}
-              Create At
+              {t("createAt")}
               <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -290,7 +287,7 @@ export default function StudentAssignmentTable() {
     {
       accessorKey: "status",
       header: () => {
-        return <div className="text-center">{/* {t("status")} */}Status</div>;
+        return <div className="text-center">{t("status")}</div>;
       },
       cell: ({ row }) => {
         const status: AssignmentStatus = row.getValue("status");
@@ -340,11 +337,7 @@ export default function StudentAssignmentTable() {
     {
       accessorKey: "assignment.teacherName",
       header: () => {
-        return (
-          <div className="text-center">
-            {/* {t("assignedBy")} */}Assigned By
-          </div>
-        );
+        return <div className="text-center">{t("assignedBy")}</div>;
       },
       cell: ({ row }) => {
         const teacherName: string =
@@ -355,11 +348,7 @@ export default function StudentAssignmentTable() {
     {
       id: "actions",
       header: () => {
-        return (
-          <div className="text-center">
-            {/* {t("linkToAssignment")} */}Link To Assignment
-          </div>
-        );
+        return <div className="text-center">{t("linkToAssignment")}</div>;
       },
       cell: ({ row }) => {
         const assignment = row.original.assignment;
@@ -372,7 +361,7 @@ export default function StudentAssignmentTable() {
                 (window.location.href = `/student/lesson/${assignment.id}`)
               }
             >
-              {/* {t("goToLesson")} */}Go To Lesson
+              {t("goToLesson")}
             </Button>
           </div>
         );
@@ -655,7 +644,7 @@ export default function StudentAssignmentTable() {
             {/* Assigned By */}
             <div>
               <h4 className="text-muted-foreground mb-2 text-sm font-medium">
-                {/* {t("assignedBy")} */}Assigned By
+                {t("assignBy")}
               </h4>
               <p className="text-sm">
                 {selectedAssignment.assignment.teacherName || "Unknown Teacher"}
@@ -681,12 +670,10 @@ export default function StudentAssignmentTable() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* <Header heading={t("assignments")} /> */}
-      <Header heading="Assignments" />
+      <Header heading={t("title")} />
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:justify-between">
         <Input
-          //   placeholder={t("searchAssignments")}
-          placeholder="Search Assignments"
+          placeholder={t("searchPlaceholder")}
           value={searchQuery}
           onChange={(event) => handleSearchChange(event.target.value)}
           className="max-w-sm focus-visible:ring-0"
@@ -699,10 +686,10 @@ export default function StudentAssignmentTable() {
               handleStatusFilterChange(event.target.value);
             }}
           >
-            <option value="all">{/* {t("allStatus")} */}All Status</option>
-            <option value="0">{/* {t("notFinished")} */}Not Finished</option>
-            <option value="1">{/* {t("inProgress")} */}In Progress</option>
-            <option value="2">{/* {t("done")} */}Done</option>
+            <option value="all">{t("allStatus")}</option>
+            <option value="0">{t("notFinished")}</option>
+            <option value="1">{t("inProgress")}</option>
+            <option value="2">{t("done")}</option>
           </select>
           <select
             className="min-w-[120px] rounded-md border px-3 py-1 text-sm"
@@ -711,15 +698,15 @@ export default function StudentAssignmentTable() {
               handleDueDateFilterChange(event.target.value);
             }}
           >
-            <option value="all">{/* {t("allDueDates")} */}All Due Dates</option>
-            <option value="overdue">{/* {t("overdue")} */}Overdue</option>
-            <option value="today">{/* {t("dueToday")} */}Due Today</option>
-            <option value="upcoming">{/* {t("upcomming")} */}Upcoming</option>
+            <option value="all">{t("allDueDates")}</option>
+            <option value="overdue">{t("overdue")}</option>
+            <option value="today">{t("dueToday")}</option>
+            <option value="upcoming">{t("upcoming")}</option>
           </select>
         </div>
       </div>
       {searchQuery !== debouncedSearchQuery && (
-        <div className="text-muted-foreground text-sm">Searching...</div>
+        <div className="text-muted-foreground text-sm">{t("searching")}</div>
       )}
       <div className="overflow-x-auto rounded-md border">
         <Table className="min-w-full">
@@ -772,7 +759,7 @@ export default function StudentAssignmentTable() {
                   colSpan={columns.length}
                   className="h-24 text-center text-xs sm:text-sm"
                 >
-                  {loading ? "Loading assignments..." : "No assignments found"}
+                  {loading ? t("loadingAssignments") : t("noAssignmentsFound")}
                 </TableCell>
               </TableRow>
             )}
@@ -781,19 +768,6 @@ export default function StudentAssignmentTable() {
       </div>
 
       <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <div className="text-muted-foreground text-center text-xs sm:text-left sm:text-sm">
-          Showing{" "}
-          {Math.min(
-            (pagination.currentPage - 1) * pagination.limit + 1,
-            pagination.totalCount,
-          )}{" "}
-          to{" "}
-          {Math.min(
-            pagination.currentPage * pagination.limit,
-            pagination.totalCount,
-          )}{" "}
-          of {pagination.totalCount} assignments
-        </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -802,13 +776,8 @@ export default function StudentAssignmentTable() {
             disabled={!pagination.hasPrevPage || loading}
             className="text-xs sm:text-sm"
           >
-            {/* {t("previous")} */}Previous
+            {tComponents("previousButton")}
           </Button>
-          <div className="flex items-center gap-1">
-            <span className="text-xs whitespace-nowrap sm:text-sm">
-              Page {pagination.currentPage} of {pagination.totalPages}
-            </span>
-          </div>
           <Button
             variant="outline"
             size="sm"
@@ -816,7 +785,7 @@ export default function StudentAssignmentTable() {
             disabled={!pagination.hasNextPage || loading}
             className="text-xs sm:text-sm"
           >
-            {/* {t("next")} */}Next
+            {tComponents("nextButton")}
           </Button>
         </div>
       </div>

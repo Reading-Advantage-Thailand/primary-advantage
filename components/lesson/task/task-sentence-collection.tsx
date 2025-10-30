@@ -1,15 +1,19 @@
+"use client";
 import { Article, WordListTimestamp } from "@/types";
 import React, { useEffect, useState } from "react";
 import { BookmarkIcon, VolumeXIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import AudioButton from "@/components/audio-button";
 import { Sentence } from "@/components/articles/sentence";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function TaskSentenceCollection({
   article,
 }: {
   article: Article;
 }) {
+  const t = useTranslations("Lesson.SentenceCollection");
+  const locale = useLocale();
   const [loading, setLoading] = useState(true);
   const [sentenceList, setSentenceList] = useState<Sentence[]>([]);
   const [activeWordIndex, setActiveWordIndex] = useState<number | null>(null);
@@ -48,6 +52,24 @@ export default function TaskSentenceCollection({
     setActiveWordIndex(activeWordIndex === index ? null : index);
   };
 
+  const getLocalizedTranslation = (
+    translation?: Record<string, string> | null,
+    fallback?: string,
+  ) => {
+    if (!translation) return fallback ?? "";
+    if (locale === "en") return fallback ?? "";
+    if (translation[locale]) return translation[locale] as string;
+    // Fallback chain
+    return (
+      translation.th ||
+      translation.vi ||
+      translation.cn ||
+      translation.tw ||
+      fallback ||
+      ""
+    );
+  };
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header Section */}
@@ -56,10 +78,10 @@ export default function TaskSentenceCollection({
           <BookmarkIcon className="h-8 w-8 text-amber-600 dark:text-amber-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Preview Vocabulary
+          {t("title")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          Preview the vocabulary of the article
+          {t("subtitle")}
         </p>
       </div>
 
@@ -113,7 +135,7 @@ export default function TaskSentenceCollection({
                       ) : (
                         <div
                           className="rounded-full bg-gray-200 p-2 opacity-50 dark:bg-gray-700"
-                          title="Audio not available"
+                          title={t("audioNotAvailable")}
                         >
                           <VolumeXIcon className="h-5 w-5 text-gray-400" />
                         </div>
@@ -122,7 +144,7 @@ export default function TaskSentenceCollection({
 
                     {/* Definition */}
                     <div className="min-w-0 flex-1">
-                      <p>Definition</p>
+                      <p>{t("definition")}</p>
                       {/* Always show basic definition */}
                       <div
                         className={`transition-all duration-300 ${
@@ -132,7 +154,10 @@ export default function TaskSentenceCollection({
                         }`}
                       >
                         <p className="leading-relaxed text-gray-700 dark:text-gray-300">
-                          {sentence.translation?.th}
+                          {getLocalizedTranslation(
+                            (sentence as any).translation,
+                            sentence.sentence,
+                          )}
                         </p>
                       </div>
                     </div>
@@ -143,9 +168,7 @@ export default function TaskSentenceCollection({
           ) : (
             <div className="py-12 text-center">
               <VolumeXIcon className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-600" />
-              <p className="text-gray-500 dark:text-gray-400">
-                No vocabulary words found
-              </p>
+              <p className="text-gray-500 dark:text-gray-400">{t("empty")}</p>
             </div>
           )}
         </div>
@@ -155,8 +178,8 @@ export default function TaskSentenceCollection({
       {sentenceList.length > 0 && (
         <div className="rounded-xl border border-gray-200 bg-zinc-200 p-4 dark:border-gray-700 dark:bg-gray-900">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-            <span>Vocabulary Progress</span>
-            <span>{sentenceList.length} sentences to learn</span>
+            <span>{t("progress")}</span>
+            <span>{t("wordsToLearn", { count: sentenceList.length })}</span>
           </div>
           <div className="mt-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
             <div

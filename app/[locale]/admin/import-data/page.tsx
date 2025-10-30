@@ -40,8 +40,10 @@ import {
 } from "lucide-react";
 import React, { useState, useRef } from "react";
 import { parse } from "csv/sync";
+import { useTranslations } from "next-intl";
 
 export default function ImportDataPage() {
+  const t = useTranslations("ImportData");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -60,7 +62,7 @@ export default function ImportDataPage() {
 
     // Validate file type
     if (!file.name.endsWith(".csv") && file.type !== "text/csv") {
-      setUploadError("Only CSV files are allowed");
+      setUploadError(t("errors.onlyCsv"));
       return;
     }
 
@@ -68,7 +70,9 @@ export default function ImportDataPage() {
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file.size > maxSize) {
       setUploadError(
-        `File size exceeds 5MB limit. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+        t("errors.sizeExceeded", {
+          size: (file.size / 1024 / 1024).toFixed(2),
+        }),
       );
       return;
     }
@@ -86,15 +90,13 @@ export default function ImportDataPage() {
         setPreviewData(csvData);
       } catch (error) {
         console.error("CSV parsing error:", error);
-        setUploadError(
-          "Failed to parse CSV file. Please check the file format.",
-        );
+        setUploadError(t("errors.parseError"));
       }
     };
 
     reader.onerror = (e) => {
       console.error("File reading error:", e);
-      setUploadError("Failed to read the file");
+      setUploadError(t("errors.readError"));
     };
 
     reader.readAsText(file);
@@ -131,7 +133,7 @@ export default function ImportDataPage() {
       console.log("Upload result", result);
 
       if (!response.ok) {
-        throw new Error(result.details || "Upload failed");
+        throw new Error(result.details || t("errors.uploadFailed"));
       }
 
       setUploadResult(result);
@@ -141,7 +143,9 @@ export default function ImportDataPage() {
         setUploadProgress(0);
       }, 2000);
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : "Upload failed");
+      setUploadError(
+        error instanceof Error ? error.message : t("errors.uploadFailed"),
+      );
       setUploadProgress(0);
     } finally {
       setIsUploading(false);
@@ -190,45 +194,51 @@ export default function ImportDataPage() {
 
   const formatExamples = {
     students: {
-      title: "Students Data Format",
-      description:
-        "Import student information including personal details and class assignments",
-      headers: ["name", "email", "classroom_name", "role"],
+      title: t("format.students.title"),
+      description: t("format.students.description"),
+      headers: [
+        t("format.headers.name"),
+        t("format.headers.email"),
+        t("format.headers.classroomName"),
+        t("format.headers.role"),
+      ],
       example: [
         ["John Doe", "john.doe@email.com", "Classroom 1", "student"],
         ["Jane Smith", "jane.smith@email.com", "Classroom 2", "student"],
         ["Bob Johnson", "bob.johnson@email.com", "Classroom 3", "student"],
       ],
       requirements: [
-        "File name must be students.csv",
-        "Email must be unique and valid format",
-        "Role should be Student",
+        t("format.students.req1"),
+        t("format.students.req2"),
+        t("format.students.req3"),
       ],
     },
     teachers: {
-      title: "Teachers & Admins Data Format",
-      description: "Import teacher information and their assigned subjects",
-      headers: ["name", "email", "classroom_name", "role"],
+      title: t("format.teachers.title"),
+      description: t("format.teachers.description"),
+      headers: [
+        t("format.headers.name"),
+        t("format.headers.email"),
+        t("format.headers.classroomName"),
+        t("format.headers.role"),
+      ],
       example: [
         ["Alice Wilson", "alice.wilson@school.edu", "Classroom 1", "teacher"],
         ["David Brown", "david.brown@school.edu", "Classroom 2", "teacher"],
         ["Sarah Davis", "sarah.davis@school.edu", "", "admin"],
       ],
       requirements: [
-        "File name must be teachers.csv",
-        "Email must be unique and valid format",
-        "Role should be Teacher or Admin",
+        t("format.teachers.req1"),
+        t("format.teachers.req2"),
+        t("format.teachers.req3"),
       ],
     },
     classes: {
-      title: "Classes Data Format",
-      description: "Import class schedules and room assignments",
-      headers: ["classroom_name"],
+      title: t("format.classes.title"),
+      description: t("format.classes.description"),
+      headers: [t("format.headers.classroomName")],
       example: [["M1"], ["M2"], ["M3"]],
-      requirements: [
-        "File name must be classes.csv",
-        "Classroom name must be unique",
-      ],
+      requirements: [t("format.classes.req1"), t("format.classes.req2")],
     },
   };
 
@@ -237,10 +247,7 @@ export default function ImportDataPage() {
 
   return (
     <div className="space-y-6">
-      <Header
-        heading="Import Data"
-        text="Import CSV files to bulk add students, teachers, and classes to your system"
-      />
+      <Header heading={t("header.heading")} text={t("header.text")} />
       <Separator />
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -250,15 +257,15 @@ export default function ImportDataPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Upload className="h-5 w-5" />
-                Upload CSV File
+                {t("upload.cardTitle")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="file-upload">Select CSV File</Label>
+                  <Label htmlFor="file-upload">{t("upload.selectFile")}</Label>
                   <span className="text-muted-foreground text-sm">
-                    Max size: 5MB
+                    {t("upload.maxSize")}
                   </span>
                 </div>
                 <div className="flex items-center gap-4">
@@ -275,29 +282,31 @@ export default function ImportDataPage() {
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <FileText className="mr-2 h-4 w-4" />
-                    Browse
+                    {t("upload.browse")}
                   </Button>
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  Supported format: CSV files only, maximum size 5MB
+                  {t("upload.supportedFormat")}
                 </p>
               </div>
 
               {selectedFile && (
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
-                  <AlertTitle>File Selected</AlertTitle>
+                  <AlertTitle>{t("upload.fileSelected.title")}</AlertTitle>
                   <AlertDescription>
                     <div className="mt-2 space-y-1">
                       <p>
-                        <strong>Name:</strong> {selectedFile.name}
+                        <strong>{t("upload.fileSelected.name")}:</strong>{" "}
+                        {selectedFile.name}
                       </p>
                       <p>
-                        <strong>Size:</strong>{" "}
+                        <strong>{t("upload.fileSelected.size")}:</strong>{" "}
                         {(selectedFile.size / 1024).toFixed(2)} KB
                       </p>
                       <p>
-                        <strong>Type:</strong> {selectedFile.type}
+                        <strong>{t("upload.fileSelected.type")}:</strong>{" "}
+                        {selectedFile.type}
                       </p>
                     </div>
                   </AlertDescription>
@@ -307,7 +316,7 @@ export default function ImportDataPage() {
               {uploadError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Upload Failed</AlertTitle>
+                  <AlertTitle>{t("upload.failedTitle")}</AlertTitle>
                   <AlertDescription>{uploadError}</AlertDescription>
                 </Alert>
               )}
@@ -315,22 +324,23 @@ export default function ImportDataPage() {
               {uploadResult && (
                 <Alert>
                   <CheckCircle className="h-4 w-4" />
-                  <AlertTitle>Upload Successful</AlertTitle>
+                  <AlertTitle>{t("upload.successTitle")}</AlertTitle>
                   <AlertDescription>
                     <div className="mt-2 space-y-1">
                       <p>
-                        <strong>File:</strong> {uploadResult.originalName}
+                        <strong>{t("upload.success.file")}:</strong>{" "}
+                        {uploadResult.originalName}
                       </p>
                       <p>
-                        <strong>Size:</strong>{" "}
+                        <strong>{t("upload.success.size")}:</strong>{" "}
                         {(uploadResult.size / 1024).toFixed(2)} KB
                       </p>
                       <p>
-                        <strong>Saved as:</strong> {uploadResult.fileName}
+                        <strong>{t("upload.success.savedAs")}:</strong>{" "}
+                        {uploadResult.fileName}
                       </p>
                       <p className="text-muted-foreground text-sm">
-                        File is now ready for processing. You can proceed with
-                        the next steps.
+                        {t("upload.success.nextSteps")}
                       </p>
                     </div>
                   </AlertDescription>
@@ -339,10 +349,10 @@ export default function ImportDataPage() {
 
               {isUploading && (
                 <div className="space-y-2">
-                  <Label>Upload Progress</Label>
+                  <Label>{t("upload.progressLabel")}</Label>
                   <Progress value={uploadProgress} className="w-full" />
                   <p className="text-muted-foreground text-sm">
-                    {uploadProgress}% complete
+                    {t("upload.progressPercent", { percent: uploadProgress })}
                   </p>
                 </div>
               )}
@@ -356,19 +366,19 @@ export default function ImportDataPage() {
                   {isUploading ? (
                     <>
                       <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
-                      Uploading...
+                      {t("upload.uploading")}
                     </>
                   ) : (
                     <>
                       <Upload className="mr-2 h-4 w-4" />
-                      Import Data
+                      {t("upload.importButton")}
                     </>
                   )}
                 </Button>
 
                 {(selectedFile || uploadResult) && (
                   <Button variant="outline" onClick={resetUpload}>
-                    Clear
+                    {t("upload.clear")}
                   </Button>
                 )}
 
@@ -377,20 +387,22 @@ export default function ImportDataPage() {
                     <DialogTrigger asChild>
                       <Button variant="outline">
                         <Eye className="mr-2 h-4 w-4" />
-                        Preview
+                        {t("preview.button")}
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl">
                       <DialogHeader>
-                        <DialogTitle>Data Preview</DialogTitle>
+                        <DialogTitle>{t("preview.title")}</DialogTitle>
                       </DialogHeader>
                       <ScrollArea className="h-96">
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Name</TableHead>
-                              <TableHead>Email</TableHead>
-                              <TableHead>Role</TableHead>
+                              <TableHead>{t("preview.columns.name")}</TableHead>
+                              <TableHead>
+                                {t("preview.columns.email")}
+                              </TableHead>
+                              <TableHead>{t("preview.columns.role")}</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -416,7 +428,7 @@ export default function ImportDataPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Info className="h-5 w-5" />
-                CSV Format Guide
+                {t("formatGuide.title")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -427,21 +439,21 @@ export default function ImportDataPage() {
                     className="flex items-center gap-2"
                   >
                     <GraduationCap className="h-4 w-4" />
-                    Students
+                    {t("formatGuide.tabs.students")}
                   </TabsTrigger>
                   <TabsTrigger
                     value="teachers"
                     className="flex items-center gap-2"
                   >
                     <Users className="h-4 w-4" />
-                    Teachers & Admins
+                    {t("formatGuide.tabs.teachers")}
                   </TabsTrigger>
                   <TabsTrigger
                     value="classes"
                     className="flex items-center gap-2"
                   >
                     <BookOpen className="h-4 w-4" />
-                    Classes
+                    {t("formatGuide.tabs.classes")}
                   </TabsTrigger>
                 </TabsList>
 
@@ -456,7 +468,7 @@ export default function ImportDataPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Required Headers (in this exact order):</Label>
+                    <Label>{t("formatGuide.requiredHeaders")}</Label>
                     <div className="flex flex-wrap gap-2">
                       {currentFormat.headers.map((header, index) => (
                         <Badge key={index} variant="secondary">
@@ -467,7 +479,7 @@ export default function ImportDataPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Example Data:</Label>
+                    <Label>{t("formatGuide.exampleData")}</Label>
                     <ScrollArea className="h-48 rounded-md border">
                       <Table>
                         <TableHeader>
@@ -502,7 +514,7 @@ export default function ImportDataPage() {
 
                   {currentFormat.requirements.length > 0 && (
                     <div className="space-y-2">
-                      <Label>Requirements:</Label>
+                      <Label>{t("formatGuide.requirements")}</Label>
                       <ul className="space-y-1">
                         {currentFormat.requirements.map((req, index) => (
                           <li
@@ -523,7 +535,7 @@ export default function ImportDataPage() {
                     className="w-full"
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    Download {currentFormat.title.split(" ")[0]} Template
+                    {t("formatGuide.downloadTemplate", { type: activeTab })}
                   </Button>
                 </TabsContent>
               </Tabs>
@@ -535,17 +547,16 @@ export default function ImportDataPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Import Tips</CardTitle>
+              <CardTitle>{t("tips.title")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                   <div className="space-y-1">
-                    <p className="font-medium">File Size Limit</p>
+                    <p className="font-medium">{t("tips.fileSize.title")}</p>
                     <p className="text-muted-foreground text-sm">
-                      Maximum file size is 5MB. Larger files should be split
-                      into smaller chunks
+                      {t("tips.fileSize.desc")}
                     </p>
                   </div>
                 </div>
@@ -553,10 +564,9 @@ export default function ImportDataPage() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                   <div className="space-y-1">
-                    <p className="font-medium">Use UTF-8 Encoding</p>
+                    <p className="font-medium">{t("tips.encoding.title")}</p>
                     <p className="text-muted-foreground text-sm">
-                      Save your CSV with UTF-8 encoding to support special
-                      characters
+                      {t("tips.encoding.desc")}
                     </p>
                   </div>
                 </div>
@@ -564,9 +574,9 @@ export default function ImportDataPage() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                   <div className="space-y-1">
-                    <p className="font-medium">Check for Duplicates</p>
+                    <p className="font-medium">{t("tips.duplicates.title")}</p>
                     <p className="text-muted-foreground text-sm">
-                      Ensure emails and IDs are unique before importing
+                      {t("tips.duplicates.desc")}
                     </p>
                   </div>
                 </div>
@@ -574,10 +584,9 @@ export default function ImportDataPage() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                   <div className="space-y-1">
-                    <p className="font-medium">Validate Data First</p>
+                    <p className="font-medium">{t("tips.validate.title")}</p>
                     <p className="text-muted-foreground text-sm">
-                      Use the preview feature to check your data before
-                      importing
+                      {t("tips.validate.desc")}
                     </p>
                   </div>
                 </div>
@@ -585,9 +594,9 @@ export default function ImportDataPage() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                   <div className="space-y-1">
-                    <p className="font-medium">Backup First</p>
+                    <p className="font-medium">{t("tips.backup.title")}</p>
                     <p className="text-muted-foreground text-sm">
-                      Always backup your existing data before large imports
+                      {t("tips.backup.desc")}
                     </p>
                   </div>
                 </div>
@@ -597,17 +606,18 @@ export default function ImportDataPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Common Issues</CardTitle>
+              <CardTitle>{t("issues.title")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-500" />
                   <div className="space-y-1">
-                    <p className="font-medium">Wrong File Format</p>
+                    <p className="font-medium">
+                      {t("issues.wrongFormat.title")}
+                    </p>
                     <p className="text-muted-foreground text-sm">
-                      Only CSV files are accepted. Convert Excel files to CSV
-                      first
+                      {t("issues.wrongFormat.desc")}
                     </p>
                   </div>
                 </div>
@@ -615,9 +625,11 @@ export default function ImportDataPage() {
                 <div className="flex items-start gap-3">
                   <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-500" />
                   <div className="space-y-1">
-                    <p className="font-medium">Missing Headers</p>
+                    <p className="font-medium">
+                      {t("issues.missingHeaders.title")}
+                    </p>
                     <p className="text-muted-foreground text-sm">
-                      First row must contain exact header names as shown
+                      {t("issues.missingHeaders.desc")}
                     </p>
                   </div>
                 </div>
@@ -625,9 +637,11 @@ export default function ImportDataPage() {
                 <div className="flex items-start gap-3">
                   <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-500" />
                   <div className="space-y-1">
-                    <p className="font-medium">Invalid Email Format</p>
+                    <p className="font-medium">
+                      {t("issues.invalidEmail.title")}
+                    </p>
                     <p className="text-muted-foreground text-sm">
-                      Check all email addresses are properly formatted
+                      {t("issues.invalidEmail.desc")}
                     </p>
                   </div>
                 </div>

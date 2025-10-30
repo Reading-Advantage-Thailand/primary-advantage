@@ -157,26 +157,26 @@ export default function AdminArticleCreation() {
   const getLoadingTitle = () => {
     switch (loadingType) {
       case "generate":
-        return "Generating Your Article";
+        return tc("AdminArticleCreation.loading.titles.generate");
       case "save":
-        return "Saving Article Draft";
+        return tc("AdminArticleCreation.loading.titles.save");
       case "approve":
-        return "Approving & Publishing Article";
+        return tc("AdminArticleCreation.loading.titles.approve");
       default:
-        return "Processing...";
+        return tc("waitingButton");
     }
   };
 
   const getLoadingDescription = () => {
     switch (loadingType) {
       case "generate":
-        return "Please wait while AI creates your amazing content...";
+        return tc("AdminArticleCreation.loading.descriptions.generate");
       case "save":
-        return "Saving your changes as a draft...";
+        return tc("AdminArticleCreation.loading.descriptions.save");
       case "approve":
-        return "Publishing your article to the platform...";
+        return tc("AdminArticleCreation.loading.descriptions.approve");
       default:
-        return "Please wait...";
+        return tc("waitingButton");
     }
   };
 
@@ -213,7 +213,7 @@ export default function AdminArticleCreation() {
       setUserArticles(data.articles || []);
     } catch (error) {
       console.error("Error fetching user articles:", error);
-      toast.error("Failed to fetch articles", {
+      toast.error(tc("AdminArticleCreation.toasts.fetchFailed"), {
         richColors: true,
       });
     } finally {
@@ -261,15 +261,15 @@ export default function AdminArticleCreation() {
 
       // Complete the progress
       setLoadingProgress(100);
-      setCurrentMessage("🎉 Article approved and published successfully!");
+      setCurrentMessage(tc("AdminArticleCreation.toasts.approveSuccess"));
 
       // Small delay to show completion
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      toast.success("Article approved and published successfully!");
+      toast.success(tc("AdminArticleCreation.toasts.approveSuccess"));
     } catch (error) {
       console.error("Error approving article:", error);
-      toast.error("Failed to approve article");
+      toast.error(tc("AdminArticleCreation.toasts.approveFailed"));
     } finally {
       // Force reset all states immediately
       setIsGenerating(false);
@@ -342,7 +342,7 @@ export default function AdminArticleCreation() {
       const { data } = await response.json();
 
       setLoadingProgress(100);
-      setCurrentMessage("🎉 Article generated successfully!");
+      setCurrentMessage(tc("AdminArticleCreation.toasts.generateSuccess"));
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -352,7 +352,7 @@ export default function AdminArticleCreation() {
       setCurrentTab("preview");
       setIsEditMode(true);
 
-      toast.success("Article generated successfully!", {
+      toast.success(tc("AdminArticleCreation.toasts.generateSuccess"), {
         richColors: true,
       });
     } catch (error) {
@@ -401,7 +401,6 @@ export default function AdminArticleCreation() {
 
   const handleSaveArticle = async () => {
     if (!generatedData) return;
-    console.log(generatedData, articleType, genre, subGenre, topic);
     try {
       setLoadingType("save");
       setIsGenerating(true);
@@ -430,12 +429,12 @@ export default function AdminArticleCreation() {
 
       // Complete the progress
       setLoadingProgress(100);
-      setCurrentMessage("💾 Article saved successfully!");
+      setCurrentMessage(tc("AdminArticleCreation.toasts.saveSuccess"));
 
       // Small delay to show completion
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      toast.success("Article saved as draft successfully!");
+      toast.success(tc("AdminArticleCreation.toasts.saveSuccess"));
 
       // Refresh the articles list
       // await fetchUserArticles();
@@ -449,7 +448,7 @@ export default function AdminArticleCreation() {
       setOriginalContent(generatedData);
     } catch (error) {
       console.error("Error saving article:", error);
-      toast.error("Failed to save article");
+      toast.error(tc("AdminArticleCreation.toasts.saveFailed"));
     } finally {
       // Force reset loading states immediately
       setIsGenerating(false);
@@ -506,12 +505,12 @@ export default function AdminArticleCreation() {
 
       // Complete the progress
       setLoadingProgress(100);
-      setCurrentMessage("🎉 Article approved and published successfully!");
+      setCurrentMessage(tc("AdminArticleCreation.toasts.approveSuccess"));
 
       // Small delay to show completion
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      toast.success("Article approved and published successfully!");
+      toast.success(tc("AdminArticleCreation.toasts.approveSuccess"));
 
       // Go back to manage tab
       if (currentTab === "preview") {
@@ -519,7 +518,7 @@ export default function AdminArticleCreation() {
       }
     } catch (error) {
       console.error("Error approving article:", error);
-      toast.error("Failed to approve article");
+      toast.error(tc("AdminArticleCreation.toasts.approveFailed"));
     } finally {
       // Force reset all states immediately
       setIsGenerating(false);
@@ -553,17 +552,17 @@ export default function AdminArticleCreation() {
     try {
       const result = await getDeleteArticleById(articleId);
       if (result.success) {
-        toast.success("Article deleted successfully", {
+        toast.success(tc("AdminArticleCreation.toasts.deleteSuccess"), {
           richColors: true,
         });
         setUserArticles(userArticles.filter((a) => a.id !== articleId));
       } else {
-        toast.error("Failed to delete article", {
+        toast.error(tc("AdminArticleCreation.toasts.deleteFailed"), {
           richColors: true,
         });
       }
     } catch (error) {
-      toast.error("An error occurred while deleting the article", {
+      toast.error(tc("AdminArticleCreation.toasts.deleteError"), {
         richColors: true,
       });
     } finally {
@@ -582,27 +581,21 @@ export default function AdminArticleCreation() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-sm sm:text-base">
               <AlertTriangle className="h-4 w-4 text-green-500 sm:h-5 sm:w-5" />
-              {/* {t("confirmApprovalTitle")} */}
-              Confirm Approval
+              {tc("AdminArticleCreation.dialog.approval.title")}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-2 text-sm">
-              {/* <p>{t("confirmApprovalMessage")}</p> */}
-              Are you sure you want to approve and publish this article?
-              {/* {t("confirmApprovalMessage")} */}
-              This action will publish the article to the platform.
+              {tc("AdminArticleCreation.dialog.approval.description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={cancelApproval}>
-              {/* {t("cancel")} */}
-              Cancel
+              {tc("AdminArticleCreation.dialog.common.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               className={buttonVariants({ variant: "accept" })}
               onClick={confirmApproval}
             >
-              {/* {t("confirmPublish")} */}
-              Confirm
+              {tc("AdminArticleCreation.dialog.common.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -617,27 +610,26 @@ export default function AdminArticleCreation() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-sm sm:text-base">
               <CheckCircle2 className="h-4 w-4 text-green-500 sm:h-5 sm:w-5" />
-              Are you sure to Back to Create?
+              {tc("AdminArticleCreation.dialog.backToCreate.title")}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-3 text-sm">
-              If you Back to Create, the changes will be lost.
+              {tc("AdminArticleCreation.dialog.backToCreate.description")}
               <div className="rounded-md border border-orange-200 bg-orange-50 p-3">
                 <p className="text-sm font-medium text-orange-800">
-                  This action will reset the article to the initial state.
+                  {tc("AdminArticleCreation.dialog.backToCreate.warning")}
                 </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col gap-2 sm:flex-row sm:gap-0">
             <AlertDialogCancel className="w-full sm:w-auto">
-              {/* {t("cancel")} */}
-              Cancel
+              {tc("AdminArticleCreation.dialog.common.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBackToCreate}
               className="w-full bg-orange-600 hover:bg-orange-700 sm:w-auto"
             >
-              OK
+              {tc("AdminArticleCreation.dialog.common.ok")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -764,14 +756,15 @@ export default function AdminArticleCreation() {
       {/* Main Content */}
       <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
-          <TabsTrigger value="create">Create Article</TabsTrigger>
-          <TabsTrigger value="preview" disabled={!generatedData}>
-            Preview Edit
+          <TabsTrigger value="create">
+            {tc("AdminArticleCreation.tabs.createArticle")}
           </TabsTrigger>
-          <TabsTrigger value="manage">Manage Articles</TabsTrigger>
-          {/* <TabsTrigger value="create">{t("createArticle")}</TabsTrigger> */}
-          {/* <TabsTrigger value="preview">{t("previewEdit")}</TabsTrigger> */}
-          {/* <TabsTrigger value="manage">{t("manageArticles")}</TabsTrigger> */}
+          <TabsTrigger value="preview" disabled={!generatedData}>
+            {tc("AdminArticleCreation.tabs.previewEdit")}
+          </TabsTrigger>
+          <TabsTrigger value="manage">
+            {tc("AdminArticleCreation.tabs.manageArticles")}
+          </TabsTrigger>
         </TabsList>
 
         {/* Create Article Tab */}
@@ -780,12 +773,10 @@ export default function AdminArticleCreation() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                 <Sparkles className="h-4 w-4 text-blue-500 sm:h-5 sm:w-5" />
-                {/* {t("aiArticleGenerator")} */}
-                AI Article Generator
+                {tc("AdminArticleCreation.aiArticleGenerator")}
               </CardTitle>
               <CardDescription className="text-sm">
-                {/* {t("aiArticleGeneratorDesc")} */}
-                Generate an article with AI
+                {tc("AdminArticleCreation.aiArticleGeneratorDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -793,8 +784,7 @@ export default function AdminArticleCreation() {
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="type" className="text-sm sm:text-base">
-                      {/* {t("articleType")} */}
-                      Article Type
+                      {tc("AdminArticleCreation.articleType")}
                     </Label>
                     <RadioGroup
                       value={articleType}
@@ -811,8 +801,7 @@ export default function AdminArticleCreation() {
                           htmlFor="fiction"
                           className="text-sm sm:text-base"
                         >
-                          {/* {t("fiction")} */}
-                          Fiction
+                          {tc("AdminArticleCreation.fiction")}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -821,8 +810,7 @@ export default function AdminArticleCreation() {
                           htmlFor="nonfiction"
                           className="text-sm sm:text-base"
                         >
-                          {/* {t("nonFiction")} */}
-                          Non-Fiction
+                          {tc("AdminArticleCreation.nonFiction")}
                         </Label>
                       </div>
                     </RadioGroup>
@@ -830,8 +818,7 @@ export default function AdminArticleCreation() {
 
                   <div>
                     <Label htmlFor="genre" className="text-sm sm:text-base">
-                      {/* {t("genre")} */}
-                      Genre
+                      {tc("AdminArticleCreation.genre")}
                     </Label>
                     <Select
                       value={genre}
@@ -843,12 +830,9 @@ export default function AdminArticleCreation() {
                     >
                       <SelectTrigger className="text-sm">
                         <SelectValue
-                          // placeholder={
-                          //   isLoadingGenres
-                          //     ? "Loading genres..."
-                          //     : "Select a genre"
-                          // }
-                          placeholder="Select a genre"
+                          placeholder={tc(
+                            "AdminArticleCreation.placeholder.genre",
+                          )}
                         />
                       </SelectTrigger>
                       <SelectContent>
@@ -867,8 +851,7 @@ export default function AdminArticleCreation() {
 
                   <div>
                     <Label htmlFor="subgenre" className="text-sm sm:text-base">
-                      {/* {t("subgenre")} */}
-                      Subgenre
+                      {tc("AdminArticleCreation.subgenre")}
                     </Label>
                     <Select
                       value={subGenre}
@@ -876,7 +859,11 @@ export default function AdminArticleCreation() {
                       disabled={!genre}
                     >
                       <SelectTrigger className="text-sm">
-                        <SelectValue placeholder="Select a subgenre" />
+                        <SelectValue
+                          placeholder={tc(
+                            "AdminArticleCreation.placeholder.subgenre",
+                          )}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {currentSubgenres.map((sg) => (
@@ -892,37 +879,34 @@ export default function AdminArticleCreation() {
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="cefr" className="text-sm sm:text-base">
-                      {/* {t("cefrLevel")} */}
-                      CEFR Level
+                      {tc("AdminArticleCreation.cefrLevel")}
                     </Label>
                     <Select value={cefrLevel} onValueChange={setCefrLevel}>
                       <SelectTrigger className="text-sm">
-                        <SelectValue placeholder="Select CEFR level" />
+                        <SelectValue
+                          placeholder={tc(
+                            "AdminArticleCreation.placeholder.cefr",
+                          )}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="A1" className="text-sm">
-                          {/* {t("cefrLevels.0")} */}
-                          A1 - Beginner
+                          {tc("AdminArticleCreation.cefrLevels.A1")}
                         </SelectItem>
                         <SelectItem value="A2" className="text-sm">
-                          {/* {t("cefrLevels.1")} */}
-                          A2 - Elementary
+                          {tc("AdminArticleCreation.cefrLevels.A2")}
                         </SelectItem>
                         <SelectItem value="B1" className="text-sm">
-                          {/* {t("cefrLevels.2")} */}
-                          B1 - Intermediate
+                          {tc("AdminArticleCreation.cefrLevels.B1")}
                         </SelectItem>
                         <SelectItem value="B2" className="text-sm">
-                          {/* {t("cefrLevels.3")} */}
-                          B2 - Upper Intermediate
+                          {tc("AdminArticleCreation.cefrLevels.B2")}
                         </SelectItem>
                         <SelectItem value="C1" className="text-sm">
-                          {/* {t("cefrLevels.4")} */}
-                          C1 - Advanced
+                          {tc("AdminArticleCreation.cefrLevels.C1")}
                         </SelectItem>
                         <SelectItem value="C2" className="text-sm">
-                          {/* {t("cefrLevels.5")} */}
-                          C2 - Proficient
+                          {tc("AdminArticleCreation.cefrLevels.C2")}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -932,11 +916,10 @@ export default function AdminArticleCreation() {
 
               <div>
                 <Label htmlFor="topic" className="text-sm sm:text-base">
-                  {/* {t("articleTopic")} */}
-                  Article Topic
+                  {tc("AdminArticleCreation.articleTopic")}
                 </Label>
                 <Textarea
-                  placeholder="Describe the specific topic or theme you want the article to cover..."
+                  placeholder={tc("AdminArticleCreation.placeholder.topic")}
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   rows={3}
@@ -946,7 +929,7 @@ export default function AdminArticleCreation() {
 
               {error && (
                 <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600">
-                  Error: {error}
+                  {tc("AdminArticleCreation.error")}: {error}
                 </div>
               )}
 
@@ -959,8 +942,7 @@ export default function AdminArticleCreation() {
                 size="lg"
               >
                 <Sparkles className="mr-2 h-4 w-4" />
-                {/* {t("generateWithAI")} */}
-                Generate with AI
+                {tc("AdminArticleCreation.generateWithAI")}
               </Button>
             </CardContent>
           </Card>
@@ -972,40 +954,38 @@ export default function AdminArticleCreation() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                 <Eye className="h-4 w-4 text-green-500 sm:h-5 sm:w-5" />
-                {isPreviewMode ? "Article Preview" : "Article Editor"}
+                {isPreviewMode
+                  ? tc("AdminArticleCreation.preview.title")
+                  : tc("AdminArticleCreation.editor.title")}
                 {/* เพิ่ม indicator สำหรับการเปลี่ยนแปลง */}
                 {hasContentChanged && !isPreviewMode && (
                   <Badge variant="secondary" className="ml-2 text-xs">
                     <Edit3 className="mr-1 h-3 w-3" />
-                    {/* {t("modified")} */}
-                    Modified
+                    {tc("AdminArticleCreation.modified")}
                   </Badge>
                 )}
               </CardTitle>
               <CardDescription className="text-sm">
                 {isPreviewMode
-                  ? "Review the article content (read-only)"
-                  : "Review and edit the generated content before approval"}
+                  ? tc("AdminArticleCreation.preview.description")
+                  : tc("AdminArticleCreation.editor.description")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div className="mb-4 flex flex-wrap gap-2">
                   <Badge variant="outline" className="text-xs">
-                    {/* {t("type")}: {selectedArticleForEdit?.type || articleType} */}
-                    type: {articleType}
+                    {tc("AdminArticleCreation.badges.type")}: {articleType}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {/* {t("genre")}: {selectedArticleForEdit?.genre || genre} */}
-                    genre: {genre}
+                    {tc("AdminArticleCreation.badges.genre")}: {genre}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {/* {t("subgenre")}: {selectedArticleForEdit?.subGenre || subGenre} */}
-                    subgenre: {subGenre}
+                    {tc("AdminArticleCreation.badges.subgenre")}: {subGenre}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {/* {t("level")}:{" "} */}
-                    cefrLevel: {selectedArticleForEdit?.cefrLevel || cefrLevel}
+                    {tc("AdminArticleCreation.badges.cefrLevel")}:{" "}
+                    {selectedArticleForEdit?.cefrLevel || cefrLevel}
                   </Badge>
                   {isPreviewMode && (
                     <Badge variant="secondary" className="text-xs">
@@ -1020,8 +1000,7 @@ export default function AdminArticleCreation() {
                       htmlFor="article-title"
                       className="text-sm font-medium sm:text-base"
                     >
-                      {/* {t("articleTitle")} */}
-                      Article Title
+                      {tc("AdminArticleCreation.fields.title")}
                     </Label>
                     <Input
                       id="article-title"
@@ -1032,7 +1011,9 @@ export default function AdminArticleCreation() {
                           prev ? { ...prev, title: e.target.value } : null,
                         )
                       }
-                      placeholder="Enter article title..."
+                      placeholder={tc(
+                        "AdminArticleCreation.placeholders.title",
+                      )}
                       className={`text-sm font-semibold sm:text-lg ${
                         isPreviewMode ? "text-gray-400" : ""
                       }`}
@@ -1044,8 +1025,7 @@ export default function AdminArticleCreation() {
                       htmlFor="article-content"
                       className="text-sm font-medium sm:text-base"
                     >
-                      {/* {t("articleContent")} */}
-                      Article Content
+                      {tc("AdminArticleCreation.fields.content")}
                     </Label>
                     <Textarea
                       id="article-content"
@@ -1056,7 +1036,9 @@ export default function AdminArticleCreation() {
                           prev ? { ...prev, passage: e.target.value } : null,
                         )
                       }
-                      placeholder="Enter the main article content..."
+                      placeholder={tc(
+                        "AdminArticleCreation.placeholders.content",
+                      )}
                       rows={12}
                       className={`text-sm leading-relaxed ${
                         isPreviewMode ? "text-gray-400" : ""
@@ -1069,8 +1051,7 @@ export default function AdminArticleCreation() {
                       htmlFor="article-summary"
                       className="text-sm font-medium sm:text-base"
                     >
-                      {/* {t("summary")} */}
-                      Article Summary
+                      {tc("AdminArticleCreation.fields.summary")}
                     </Label>
                     <Textarea
                       id="article-summary"
@@ -1081,7 +1062,9 @@ export default function AdminArticleCreation() {
                           prev ? { ...prev, summary: e.target.value } : null,
                         )
                       }
-                      placeholder="Enter article summary..."
+                      placeholder={tc(
+                        "AdminArticleCreation.placeholders.summary",
+                      )}
                       rows={4}
                       className={`text-sm ${
                         isPreviewMode ? "text-gray-400" : ""
@@ -1101,8 +1084,7 @@ export default function AdminArticleCreation() {
                           onClick={() => setShowBackToCreateDialog(true)}
                           className="w-full text-sm sm:w-auto"
                         >
-                          {/* {t("backToManage")} */}
-                          Back to Create
+                          {tc("AdminArticleCreation.buttons.backToCreate")}
                         </Button>
                       )}
                       <Button
@@ -1117,8 +1099,7 @@ export default function AdminArticleCreation() {
                         ) : (
                           <CheckCircle2 className="mr-2 h-4 w-4" />
                         )}
-                        {/* {t("approveAndPublish")} */}
-                        Approve and Publish
+                        {tc("AdminArticleCreation.buttons.approveAndPublish")}
                       </Button>
                       <Button
                         onClick={handleSaveArticle}
@@ -1131,8 +1112,7 @@ export default function AdminArticleCreation() {
                         ) : (
                           <Save className="mr-2 h-4 w-4" />
                         )}
-                        {/* {t("saveAsDraft")} */}
-                        Save as Draft
+                        {tc("AdminArticleCreation.buttons.saveAsDraft")}
                       </Button>
                     </>
                   )}
@@ -1143,7 +1123,7 @@ export default function AdminArticleCreation() {
                         onClick={() => setCurrentTab("manage")}
                         className="w-full text-sm sm:w-auto"
                       >
-                        Back to Manage
+                        {tc("AdminArticleCreation.buttons.backToManage")}
                       </Button>
                       <Button
                         onClick={() => {
@@ -1153,8 +1133,7 @@ export default function AdminArticleCreation() {
                         className="w-full text-sm sm:w-auto"
                       >
                         <Edit3 className="mr-2 h-4 w-4" />
-                        {/* {t("switchToEdit")} */}
-                        Switch to Edit
+                        {tc("AdminArticleCreation.buttons.switchToEdit")}
                       </Button>
                     </>
                   )}
@@ -1171,12 +1150,10 @@ export default function AdminArticleCreation() {
               <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                   <CardTitle className="text-lg sm:text-xl">
-                    {/* {t("articleManagement")} */}
-                    Article Management
+                    {tc("AdminArticleCreation.manage.title")}
                   </CardTitle>
                   <CardDescription className="text-sm">
-                    {/* {t("manageDesc")} */}
-                    Manage your articles
+                    {tc("AdminArticleCreation.manage.description")}
                   </CardDescription>
                 </div>
                 <Button
@@ -1191,8 +1168,7 @@ export default function AdminArticleCreation() {
                       isLoading ? "animate-spin" : ""
                     }`}
                   />
-                  {/* {t("refresh")} */}
-                  Refresh
+                  {tc("AdminArticleCreation.buttons.refresh")}
                 </Button>
               </div>
             </CardHeader>
@@ -1201,15 +1177,13 @@ export default function AdminArticleCreation() {
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="mr-2 h-6 w-6 animate-spin" />
                   <span className="text-sm">
-                    {/* {t("loadingArticles")} */}
-                    Loading articless
+                    {tc("AdminArticleCreation.manage.loading")}
                   </span>
                 </div>
               ) : userArticles.length === 0 ? (
                 <div className="py-12 text-center">
                   <p className="text-sm text-gray-500">
-                    {/* {t("noArticlesFound")} */}
-                    No articles found
+                    {tc("AdminArticleCreation.manage.empty")}
                   </p>
                 </div>
               ) : (
@@ -1226,21 +1200,28 @@ export default function AdminArticleCreation() {
                         {/* {getStatusBadge(article.status as ArticleStatus)} */}
                         <Badge variant={article.isDraft ? "default" : "active"}>
                           {article.isDraft ? <Edit3 /> : <CheckCircle2 />}
-                          {article.isDraft ? "Draft" : "Published"}
+                          {article.isDraft
+                            ? tc("AdminArticleCreation.status.draft")
+                            : tc("AdminArticleCreation.status.published")}
                         </Badge>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-col gap-2">
-                          <div>Topic: {article.topic}</div>
+                          <div>
+                            {tc("AdminArticleCreation.list.topic")}:{" "}
+                            {article.topic}
+                          </div>
                           <div className="text-muted-foreground flex flex-col items-start gap-2 text-xs font-medium sm:flex-row sm:items-center sm:gap-4 sm:text-sm">
-                            <span>CEFR : {article.cefrLevel}</span>
                             <span>
-                              {/* {t("rating")}: {article.rating}/5 */}
-                              Rating : {article.rating}/5
+                              {tc("AdminArticleCreation.list.cefr")}:{" "}
+                              {article.cefrLevel}
                             </span>
                             <span>
-                              {/* {t("created")}:{" "} */}
-                              Created :{" "}
+                              {tc("AdminArticleCreation.list.rating")}:{" "}
+                              {article.rating}/5
+                            </span>
+                            <span>
+                              {tc("AdminArticleCreation.list.created")}:{" "}
                               {new Date(article.createdAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -1253,8 +1234,7 @@ export default function AdminArticleCreation() {
                           className="w-full cursor-pointer text-xs sm:w-auto sm:text-sm"
                         >
                           <Eye className="mr-1 h-3 w-3" />
-                          {/* {t("preview")} */}
-                          Preview
+                          {tc("AdminArticleCreation.buttons.preview")}
                         </Button>
                         {!article.isPublished && (
                           <Button
@@ -1263,8 +1243,7 @@ export default function AdminArticleCreation() {
                             className="w-full cursor-pointer text-xs sm:w-auto sm:text-sm"
                           >
                             <Edit3 className="mr-1 h-3 w-3" />
-                            {/* {t("edit")} */}
-                            Edit
+                            {tc("AdminArticleCreation.buttons.edit")}
                           </Button>
                         )}
                         {article.isDraft && (
@@ -1283,8 +1262,9 @@ export default function AdminArticleCreation() {
                             ) : (
                               <CheckCircle2 className="mr-1 h-3 w-3" />
                             )}
-                            {/* {t("approveText")} */}
-                            Approve and Publish
+                            {tc(
+                              "AdminArticleCreation.buttons.approveAndPublish",
+                            )}
                           </Button>
                         )}
                         <Button
@@ -1300,8 +1280,8 @@ export default function AdminArticleCreation() {
                             <Trash className="mr-1 h-3 w-3" />
                           )}
                           {deletingArticleId === article.id
-                            ? "Deleting..."
-                            : "Delete"}
+                            ? tc("AdminArticleCreation.buttons.deleting")
+                            : tc("AdminArticleCreation.buttons.delete")}
                         </Button>
                       </CardFooter>
                     </Card>

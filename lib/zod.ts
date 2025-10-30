@@ -38,7 +38,9 @@ export const signUpSchema = z
 
 export const classCodeSchema = z.object({
   classroomCode: z
-    .string({ required_error: "Classroom code is required" })
+    .string({
+      required_error: "Classroom code is required",
+    })
     .min(1, "Classroom code is required"),
 });
 
