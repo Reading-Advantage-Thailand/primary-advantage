@@ -745,14 +745,14 @@ export const generateClassCode = async (
 ) => {
   try {
     // Verify classroom exists and teacher has access (if teacherId provided)
-    const whereClause: any = { id: classroomId };
-    if (teacherId) {
-      whereClause.teachers = {
-        some: {
-          userId: teacherId,
-        },
-      };
-    }
+    // const whereClause: any = { id: classroomId };
+    // if (teacherId) {
+    //   whereClause.teachers = {
+    //     some: {
+    //       userId: teacherId,
+    //     },
+    //   };
+    // }
 
     const classroom = await prisma.classroom.findUnique({
       where: { id: classroomId },
@@ -780,13 +780,16 @@ export const generateClassCode = async (
     let attempts = 0;
     const maxAttempts = 10;
 
+    console.log("newCode", newCode);
+
     while (codeExists && attempts < maxAttempts) {
-      const existingCode = await prisma.classroom.findUnique({
-        where: { id: classroomId },
-        select: { passwordStudents: true },
+      const existingCode = await prisma.classroom.findMany({
+        where: { passwordStudents: { equals: "UD0EMPPT" } },
       });
 
-      if (!existingCode?.passwordStudents) {
+      console.log("existingCode", Boolean(!existingCode));
+
+      if (!existingCode) {
         codeExists = false;
       } else {
         newCode = generateCode();
@@ -818,6 +821,7 @@ export const generateClassCode = async (
 
     return updatedClassroom;
   } catch (error) {
+    console.log("error", error);
     console.error("Error generating class code:", error);
     throw new Error("Failed to generate class code");
   }

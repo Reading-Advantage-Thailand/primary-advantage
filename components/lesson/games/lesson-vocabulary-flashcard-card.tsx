@@ -39,7 +39,7 @@ import {
   RefreshCcwIcon,
   Loader2,
 } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Card as FsrsCard,
   Rating,
@@ -113,6 +113,7 @@ function LessonVocabularyFlashcardCardContent({
 }: {
   articleId: string;
 }) {
+  const t = useTranslations("Lesson.VocabularyFlashcards");
   // State management
   const [gameState, setGameState] = useState<GameState>(GameState.LOADING);
   const [words, setWords] = useState<FlashcardWord[]>([]);
@@ -282,10 +283,10 @@ function LessonVocabularyFlashcardCardContent({
                 </div>
                 <div className="space-y-2">
                   <h2 className="bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-3xl font-bold text-transparent">
-                    Vocabulary Practice Complete!
+                    {t("completion.title")}
                   </h2>
                   <p className="text-lg text-gray-600 dark:text-gray-400">
-                    Excellent work on your vocabulary practice session
+                    {t("completion.subtitle")}
                   </p>
                 </div>
               </div>
@@ -299,7 +300,7 @@ function LessonVocabularyFlashcardCardContent({
                     {UserXpEarned.VOCABULARY_FLASHCARDS}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    XP Earned
+                    {t("completion.xpEarned")}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -307,7 +308,7 @@ function LessonVocabularyFlashcardCardContent({
                     {formatTime(timer)}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Time Taken
+                    {t("completion.timeTaken")}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -315,7 +316,7 @@ function LessonVocabularyFlashcardCardContent({
                     {completedCards}/{words.length}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Completed
+                    {t("completion.completed")}
                   </div>
                 </div>
               </div>
@@ -341,10 +342,10 @@ function LessonVocabularyFlashcardCardContent({
               </div>
               <div className="space-y-2 text-center">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  Loading Flashcards
+                  {t("loading.title")}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Preparing your vocabulary practice...
+                  {t("loading.description")}
                 </p>
               </div>
             </div>
@@ -364,15 +365,15 @@ function LessonVocabularyFlashcardCardContent({
               <AlertTriangle className="mx-auto h-16 w-16 text-red-500" />
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  Something went wrong
+                  {t("error.title")}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Failed to load flashcards. Please try again.
+                  {t("error.description")}
                 </p>
               </div>
               <Button onClick={loadGameData} size="lg" variant="outline">
                 <RotateCcw className="mr-2 h-4 w-4" />
-                Try Again
+                {t("common.tryAgain")}
               </Button>
             </div>
           </CardContent>
@@ -391,10 +392,10 @@ function LessonVocabularyFlashcardCardContent({
               <AlertTriangle className="mx-auto h-12 w-12 text-orange-500" />
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  No Card Available
+                  {t("empty.title")}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  There are no cards to study at this time.
+                  {t("empty.description")}
                 </p>
               </div>
             </div>
@@ -419,16 +420,14 @@ function LessonVocabularyFlashcardCardContent({
                 <GraduationCap className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-semibold">
-                  Starting Vocabulary Practice
-                </h3>
-                <p>Preparing your vocabulary practice session...</p>
+                <h3 className="text-xl font-semibold">{t("start.title")}</h3>
+                <p>{t("start.description")}</p>
                 <div className="flex flex-col items-center justify-center gap-4">
                   <div className="w-full max-w-md space-y-4">
                     <div className="flex items-center justify-center gap-2">
                       <Languages className="h-5 w-5 text-indigo-500" />
                       <Label className="text-base font-semibold">
-                        Translation Language
+                        {t("start.translationLanguage")}
                       </Label>
                     </div>
                     <Select
@@ -487,11 +486,11 @@ function LessonVocabularyFlashcardCardContent({
                       </SelectContent>
                     </Select>
                     <p className="text-muted-foreground text-xs">
-                      "Definitions will be shown in this language"
+                      {t("start.translationHint")}
                     </p>
                   </div>
                   <Button onClick={() => setGameState(GameState.PLAYING)}>
-                    Start Game
+                    {t("start.startButton")}
                   </Button>
                 </div>
               </div>
@@ -511,10 +510,13 @@ function LessonVocabularyFlashcardCardContent({
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <CardTitle className="text-xl font-bold text-emerald-800 dark:text-emerald-200">
-                Vocabulary Flashcards
+                {t("playing.header")}
               </CardTitle>
               <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                Card {currentCardIndex + 1} of {words.length}
+                {t("playing.cardOf", {
+                  current: currentCardIndex + 1,
+                  total: words.length,
+                })}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -535,10 +537,12 @@ function LessonVocabularyFlashcardCardContent({
             <Progress value={progress} className="h-3" />
             <div className="flex items-center justify-between text-sm">
               <span className="text-emerald-700 dark:text-emerald-300">
-                Progress
+                {t("playing.progress")}
               </span>
               <span className="font-medium text-emerald-800 dark:text-emerald-200">
-                {Math.round(progress)}% Complete
+                {t("playing.percentComplete", {
+                  percent: Math.round(progress),
+                })}
               </span>
             </div>
           </div>
@@ -556,7 +560,7 @@ function LessonVocabularyFlashcardCardContent({
                 className="bg-emerald-600 px-3 py-1 text-sm font-medium text-white hover:bg-emerald-700"
               >
                 <GraduationCap className="mr-2 h-4 w-4" />
-                VOCABULARY
+                {t("playing.badgeVocabulary")}
               </Badge>
               <Badge
                 variant="outline"
@@ -565,26 +569,26 @@ function LessonVocabularyFlashcardCardContent({
                 {currentCard.state === "NEW" && (
                   <>
                     <Lightbulb className="mr-2 h-4 w-4 text-yellow-500" />
-                    NEW
+                    {t("playing.state.new")}
                   </>
                 )}
 
                 {currentCard.state === "LEARNING" && (
                   <>
                     <Brain className="mr-2 h-4 w-4 text-blue-500" />
-                    LEARNING
+                    {t("playing.state.learning")}
                   </>
                 )}
                 {currentCard.state === "REVIEW" && (
                   <>
                     <Target className="mr-2 h-4 w-4 text-green-500" />
-                    REVIEW
+                    {t("playing.state.review")}
                   </>
                 )}
                 {currentCard.state === "RELEARNING" && (
                   <>
                     <RefreshCcwIcon className="mr-2 h-4 w-4 text-green-500" />
-                    RELEARNING
+                    {t("playing.state.relearning")}
                   </>
                 )}
               </Badge>
@@ -623,7 +627,7 @@ function LessonVocabularyFlashcardCardContent({
                 <div className="space-y-6">
                   <div className="text-center">
                     <p className="text-lg text-gray-600 dark:text-gray-400">
-                      How well did you know this word?
+                      {t("playing.rating.prompt")}
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -634,7 +638,9 @@ function LessonVocabularyFlashcardCardContent({
                       className="h-20 flex-col border-red-200 transition-all duration-200 hover:border-red-300 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/20"
                     >
                       <ThumbsDown className="mb-2 h-6 w-6 text-red-500" />
-                      <span className="text-sm font-medium">Again</span>
+                      <span className="text-sm font-medium">
+                        {t("playing.rating.again")}
+                      </span>
                     </Button>
                     <Button
                       onClick={() => handleCardRating(Rating.Hard)}
@@ -643,7 +649,9 @@ function LessonVocabularyFlashcardCardContent({
                       className="h-20 flex-col border-orange-200 transition-all duration-200 hover:border-orange-300 hover:bg-orange-50 dark:border-orange-800 dark:hover:bg-orange-950/20"
                     >
                       <AlertTriangle className="mb-2 h-6 w-6 text-orange-500" />
-                      <span className="text-sm font-medium">Hard</span>
+                      <span className="text-sm font-medium">
+                        {t("playing.rating.hard")}
+                      </span>
                     </Button>
                     <Button
                       onClick={() => handleCardRating(Rating.Good)}
@@ -652,7 +660,9 @@ function LessonVocabularyFlashcardCardContent({
                       className="h-20 flex-col border-green-200 transition-all duration-200 hover:border-green-300 hover:bg-green-50 dark:border-green-800 dark:hover:bg-green-950/20"
                     >
                       <ThumbsUp className="mb-2 h-6 w-6 text-green-500" />
-                      <span className="text-sm font-medium">Good</span>
+                      <span className="text-sm font-medium">
+                        {t("playing.rating.good")}
+                      </span>
                     </Button>
                     <Button
                       onClick={() => handleCardRating(Rating.Easy)}
@@ -661,7 +671,9 @@ function LessonVocabularyFlashcardCardContent({
                       className="h-20 flex-col border-blue-200 transition-all duration-200 hover:border-blue-300 hover:bg-blue-50 dark:border-blue-800 dark:hover:bg-blue-950/20"
                     >
                       <Zap className="mb-2 h-6 w-6 text-blue-500" />
-                      <span className="text-sm font-medium">Easy</span>
+                      <span className="text-sm font-medium">
+                        {t("playing.rating.easy")}
+                      </span>
                     </Button>
                   </div>
                 </div>
@@ -670,8 +682,7 @@ function LessonVocabularyFlashcardCardContent({
               <div className="space-y-8 text-center">
                 <div className="space-y-6">
                   <p className="text-lg text-gray-600 dark:text-gray-400">
-                    Think about the meaning of this word, then reveal the
-                    answer.
+                    {t("playing.thinkPrompt")}
                   </p>
                   <Button
                     onClick={handleShowAnswer}
@@ -679,7 +690,7 @@ function LessonVocabularyFlashcardCardContent({
                     className="h-16 bg-gradient-to-r from-emerald-600 to-emerald-700 px-12 text-lg text-white shadow-lg hover:from-emerald-700 hover:to-emerald-800"
                   >
                     <Eye className="mr-3 h-6 w-6" />
-                    Show Answer
+                    {t("playing.showAnswer")}
                   </Button>
                 </div>
               </div>
@@ -696,19 +707,21 @@ function LessonVocabularyFlashcardCardContent({
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-green-500"></div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Completed: {completedCards}
+                  {t("stats.completed", { count: completedCards })}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-blue-500"></div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Remaining: {words.length - completedCards - 1}
+                  {t("stats.remaining", {
+                    count: words.length - completedCards - 1,
+                  })}
                 </span>
               </div>
             </div>
             <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Total Cards: {words.length}
+              {t("stats.total", { count: words.length })}
             </div>
           </div>
         </CardContent>

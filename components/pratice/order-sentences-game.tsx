@@ -31,6 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface OrderSentenceData {
   id: string;
@@ -104,6 +105,7 @@ export function OrderSentenceGame({
 
   const [highlightHintsEnabled, setHighlightHintsEnabled] = useState(false);
   const [audioHintsEnabled, setAudioHintsEnabled] = useState(false);
+  const t = useTranslations("SentencesPage.sentenceOrder");
 
   const [activeSentences, setActiveSentences] =
     useState<OrderSentenceData[]>(sentences);
@@ -418,8 +420,6 @@ export function OrderSentenceGame({
         )
         .filter(Boolean);
 
-      console.log("correctOrderSentences", correctOrderSentences);
-
       if (correctOrderSentences.length === 0) {
         toast.error("No sentences found for audio playback");
         return;
@@ -429,20 +429,6 @@ export function OrderSentenceGame({
       const firstSentence = correctOrderSentences[0];
       const lastSentence =
         correctOrderSentences[correctOrderSentences.length - 1];
-
-      console.log(`📊 Debug - Playing continuous audio:`, {
-        firstSentence: {
-          text: firstSentence?.text,
-          startTime: firstSentence?.startTime,
-          audioUrl: firstSentence?.audioUrl,
-        },
-        lastSentence: {
-          text: lastSentence?.text,
-          endTime: lastSentence?.endTime,
-          audioUrl: lastSentence?.audioUrl,
-        },
-        totalSentences: correctOrderSentences.length,
-      });
 
       // Check if we have valid audio data
       if (
@@ -526,9 +512,9 @@ export function OrderSentenceGame({
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Loading your sentences...</h3>
+            <h3 className="text-lg font-semibold">{t("loading")}</h3>
             <p className="text-muted-foreground text-sm">
-              Fetching sentences from your flashcard deck
+              {t("fetchingSentences")}
             </p>
           </div>
         </div>
@@ -554,11 +540,10 @@ export function OrderSentenceGame({
           {/* Results Header */}
           <div className="space-y-4">
             <h1 className="gradient-text text-4xl font-bold md:text-5xl">
-              🎉 Fantastic Work!
+              🎉 {t("completedTitle")}
             </h1>
             <p className="text-muted-foreground text-xl">
-              You completed {activeSentences.length} sentence ordering
-              challenges
+              {t("completedDescription", { count: activeSentences.length })}
             </p>
           </div>
 
@@ -568,7 +553,7 @@ export function OrderSentenceGame({
               <CardContent className="p-6 text-center">
                 <Target className="mx-auto mb-3 h-8 w-8 text-blue-500" />
                 <div className="text-3xl font-bold text-blue-600">{score}</div>
-                <p className="text-muted-foreground text-sm">Correct Answers</p>
+                <p className="text-muted-foreground text-sm">{t("correct")}</p>
               </CardContent>
             </Card>
 
@@ -578,7 +563,7 @@ export function OrderSentenceGame({
                 <div className="text-3xl font-bold text-green-600">
                   {accuracy}%
                 </div>
-                <p className="text-muted-foreground text-sm">Accuracy</p>
+                <p className="text-muted-foreground text-sm">{t("accuracy")}</p>
               </CardContent>
             </Card>
 
@@ -588,7 +573,9 @@ export function OrderSentenceGame({
                 <div className="text-3xl font-bold text-purple-600">
                   {formatTime(timer)}
                 </div>
-                <p className="text-muted-foreground text-sm">Total Time</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("totalTime")}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -602,11 +589,11 @@ export function OrderSentenceGame({
               className="flex-1"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Menu
+              {t("backToMenu")}
             </Button>
             <Button onClick={handleRestartGame} size="lg" className="flex-1">
               <RotateCcw className="mr-2 h-4 w-4" />
-              Play Again
+              {t("playAgain")}
             </Button>
           </div>
         </div>
@@ -618,18 +605,12 @@ export function OrderSentenceGame({
   if (!isPlaying) {
     return (
       <div className="container mx-auto max-w-4xl space-y-8 px-4">
-        <Header
-          heading="Order Sentences Game"
-          text="Test your reading comprehension by arranging sentences in chronological order"
-        />
+        <Header heading={t("title")} text={t("description")} />
 
         <Card className="mx-auto max-w-2xl">
           <CardHeader className="pb-6 text-center">
-            <CardTitle className="text-2xl">Ready to Start?</CardTitle>
-            <p className="text-muted-foreground">
-              Arrange 5 sentences in the correct order for each of your
-              flashcard sentences
-            </p>
+            <CardTitle className="text-2xl">{t("readyToStart")}</CardTitle>
+            <p className="text-muted-foreground">{t("arrangeSentences")}</p>
           </CardHeader>
 
           <CardContent className="space-y-8">
@@ -641,17 +622,19 @@ export function OrderSentenceGame({
                     {activeSentences.length}
                   </span>
                 </div>
-                <p className="text-sm font-medium">Flashcard Sentences</p>
-                <p className="text-muted-foreground text-xs">Ready to play</p>
+                <p className="text-sm font-medium">{t("sentences")}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t("readyToPlay")}
+                </p>
               </div>
 
               <div className="space-y-2 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                   <GripVertical className="h-6 w-6 text-green-600" />
                 </div>
-                <p className="text-sm font-medium">Drag & Drop</p>
+                <p className="text-sm font-medium">{t("dragAndDrop")}</p>
                 <p className="text-muted-foreground text-xs">
-                  Easy interaction
+                  {t("easyInteraction")}
                 </p>
               </div>
 
@@ -659,8 +642,12 @@ export function OrderSentenceGame({
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10">
                   <Clock className="h-6 w-6 text-purple-600" />
                 </div>
-                <p className="text-sm font-medium">~15 min</p>
-                <p className="text-muted-foreground text-xs">Estimated time</p>
+                <p className="text-sm font-medium">
+                  {t("playtime", { time: 15 })}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t("estimatedTime")}
+                </p>
               </div>
             </div>
 
@@ -670,14 +657,12 @@ export function OrderSentenceGame({
             <div className="bg-muted/50 space-y-3 rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <div className="bg-primary h-2 w-2 rounded-full" />
-                <p className="text-sm font-medium">How to Play</p>
+                <p className="text-sm font-medium">{t("howToPlay")}</p>
               </div>
               <ul className="text-muted-foreground ml-4 space-y-2 text-sm">
-                <li>
-                  • Each game shows 5 sentences around your flashcard sentence
-                </li>
-                <li>• Drag sentences to reorder them chronologically</li>
-                <li>• Complete all your due flashcard sentences</li>
+                <li>• {t("eachGameShows")}</li>
+                <li>• {t("dragSentences")}</li>
+                <li>• {t("completeAll")}</li>
               </ul>
             </div>
 
@@ -691,8 +676,8 @@ export function OrderSentenceGame({
             >
               <Play className="mr-2 h-5 w-5" />
               {activeSentences.length === 0
-                ? "No sentences available"
-                : "Start Game"}
+                ? t("noSentencesAvailable")
+                : t("startGame")}
             </Button>
           </CardContent>
         </Card>
@@ -705,7 +690,7 @@ export function OrderSentenceGame({
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
-          <p className="text-muted-foreground">Loading next challenge...</p>
+          <p className="text-muted-foreground">{t("loadingNextChallenge")}</p>
         </div>
       </div>
     );
@@ -713,10 +698,7 @@ export function OrderSentenceGame({
 
   return (
     <div className="container mx-auto max-w-4xl space-y-4 px-4">
-      <Header
-        heading="Order Sentences Game"
-        text="Arrange the sentences in chronological order"
-      />
+      <Header heading={t("title")} text={t("descriptionPlaying")} />
 
       {/* Hidden audio element for playback */}
       <audio ref={audioRef} style={{ display: "none" }} />
@@ -749,7 +731,7 @@ export function OrderSentenceGame({
                 📖 {currentSentenceGroup.articleTitle}
               </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Arrange these 5 sentences in chronological order
+                {t("descriptionPlaying2")}
               </p>
             </div>
           </div>
@@ -761,7 +743,7 @@ export function OrderSentenceGame({
           <div className="bg-muted/30 flex flex-wrap items-center gap-3 rounded-lg border p-4">
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium">Hints:</span>
+              <span className="text-sm font-medium">{t("hints.title")}:</span>
             </div>
 
             {/* Highlight Toggle */}
@@ -773,7 +755,7 @@ export function OrderSentenceGame({
                 className="h-8"
               >
                 <Target className="mr-1 h-3 w-3" />
-                Highlight
+                {t("hints.highlight")}
               </Button>
             </div>
 
@@ -786,7 +768,7 @@ export function OrderSentenceGame({
                 className="h-8"
               >
                 <Volume2 className="mr-1 h-3 w-3" />
-                Audio
+                {t("hints.audio")}
               </Button>
             </div>
 
@@ -804,12 +786,12 @@ export function OrderSentenceGame({
                   {isPlayingHintAudio ? (
                     <>
                       <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                      Playing...
+                      {t("hints.playing")}
                     </>
                   ) : (
                     <>
                       <Play className="mr-2 h-3 w-3" />
-                      Play Order
+                      {t("hints.playOrder")}
                     </>
                   )}
                 </Button>
@@ -822,8 +804,8 @@ export function OrderSentenceGame({
             <div className="flex items-center gap-2">
               <GripVertical className="text-muted-foreground h-4 w-4" />
               <p className="text-sm font-medium">
-                Drag to reorder sentences{" "}
-                {!hasUserInteracted && "(Start by moving a sentence!)"}
+                {t("hints.dragToReorder")}{" "}
+                {!hasUserInteracted && `(${t("hints.startByMovingASentence")})`}
               </p>
             </div>
 
@@ -831,7 +813,7 @@ export function OrderSentenceGame({
               {userOrder.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <p className="text-muted-foreground">
-                    Sentences will appear here...
+                    {t("hints.sentencesWillAppearHere")}
                   </p>
                 </div>
               ) : (
@@ -915,7 +897,7 @@ export function OrderSentenceGame({
                                     variant="secondary"
                                     className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                                   >
-                                    ✓ Correct
+                                    ✓ {t("correctAnswer")}
                                   </Badge>
                                 )}
                             </div>
@@ -949,8 +931,8 @@ export function OrderSentenceGame({
                     )}
                     <h3 className="text-lg font-semibold">
                       {isCorrect
-                        ? "Perfect! Correct order! 🎉"
-                        : "Not quite right 💪"}
+                        ? t("perfectCorrectOrder")
+                        : t("notQuiteRight")}
                     </h3>
                   </div>
 
@@ -958,7 +940,9 @@ export function OrderSentenceGame({
                     <div className="space-y-3">
                       <Separator />
                       <div>
-                        <h4 className="mb-3 font-medium">Correct Order:</h4>
+                        <h4 className="mb-3 font-medium">
+                          {t("correctOrder")}:
+                        </h4>
                         <div className="space-y-2">
                           {currentSentenceGroup.correctOrder.map(
                             (sentence, index) => (
@@ -992,7 +976,9 @@ export function OrderSentenceGame({
               ) : (
                 <Shuffle className="mr-2 h-4 w-4" />
               )}
-              {showCorrectOrder || isCompleted ? "Play Again" : "Shuffle Again"}
+              {showCorrectOrder || isCompleted
+                ? t("playAgain")
+                : t("shuffleAgain")}
             </Button>
 
             {!isCompleted && (
@@ -1003,7 +989,7 @@ export function OrderSentenceGame({
                 className="sm:w-auto"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Check Answer
+                {t("checkAnswer")}
               </Button>
             )}
 
@@ -1015,15 +1001,15 @@ export function OrderSentenceGame({
                 className="sm:w-auto"
               >
                 <XCircle className="mr-2 h-4 w-4" />
-                Show Answer
+                {t("showAnswer")}
               </Button>
             )}
 
             {isCompleted && (
               <Button onClick={handleNext} className="flex-1">
                 {currentIndex < activeSentences.length - 1
-                  ? "Next Sentence"
-                  : "Finish Game"}
+                  ? t("nextSentence")
+                  : t("finishGame")}
               </Button>
             )}
           </div>

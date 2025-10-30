@@ -102,7 +102,6 @@ const ReadingStatsChart = ({ data }: UserActiviryChartProps) => {
   };
 
   const getData = formatData(data, seletedValue);
-  console.log(getData);
 
   const handleSeletedChange = (value: string) => {
     setSeletedValue(value);

@@ -75,10 +75,10 @@ export default async function RootLayout({
             disableTransitionOnChange
             enableColorScheme
           >
-            <LayoutProvider>
-              <NextIntlClientProvider>{children}</NextIntlClientProvider>
-              <Toaster />
-            </LayoutProvider>
+            {/* <LayoutProvider> */}
+            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+            <Toaster />
+            {/* </LayoutProvider> */}
           </ThemeProvider>
         </body>
       </html>

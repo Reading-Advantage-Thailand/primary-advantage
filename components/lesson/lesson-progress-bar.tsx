@@ -10,6 +10,7 @@ import React, {
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Timer, ArrowLeft } from "lucide-react";
 import { QuizContext } from "@/contexts/question-context";
+import { useTranslations } from "next-intl";
 import {
   TaskIntroduction,
   TaskPreviewVocabulary,
@@ -51,6 +52,7 @@ export default function LessonProgressBar({
 }: {
   assignment: LessonAssignmentProps;
 }) {
+  const t = useTranslations("Lesson");
   const [isExpanded, setIsExpanded] = useState(false);
   const [maxHeight, setMaxHeight] = useState("0px");
   const contentRef = useRef<HTMLDivElement>(null);
@@ -449,33 +451,45 @@ export default function LessonProgressBar({
   const getTaskDisplayName = (taskNum: number) => {
     switch (taskNum) {
       case 1:
-        return "Introduction";
+        return t("tasks.introduction", { default: "Introduction" });
       case 2:
-        return "Preview Vocabulary";
+        return t("tasks.previewVocabulary", { default: "Preview Vocabulary" });
       case 3:
-        return "First Reading";
+        return t("tasks.firstReading", { default: "First Reading" });
       case 4:
-        return "Vocabulary Collection";
+        return t("tasks.vocabularyCollection", {
+          default: "Vocabulary Collection",
+        });
       case 5:
-        return "Deep Reading";
+        return t("tasks.deepReading", { default: "Deep Reading" });
       case 6:
-        return "Sentence Collection";
+        return t("tasks.sentenceCollection", {
+          default: "Sentence Collection",
+        });
       case 7:
-        return "Multiple Choice";
+        return t("tasks.multipleChoice", { default: "Multiple Choice" });
       case 8:
-        return "Short Answer";
+        return t("tasks.shortAnswer", { default: "Short Answer" });
       case 9:
-        return "Vocabulary Flashcards";
+        return t("tasks.vocabularyFlashcards", {
+          default: "Vocabulary Flashcards",
+        });
       case 10:
-        return "Vocabulary Matching";
+        return t("tasks.vocabularyMatching", {
+          default: "Vocabulary Matching",
+        });
       case 11:
-        return "Sentence Flashcards";
+        return t("tasks.sentenceFlashcards", {
+          default: "Sentence Flashcards",
+        });
       case 12:
-        return "Sentence Activities";
+        return t("tasks.sentenceActivities", {
+          default: "Sentence Activities",
+        });
       case 13:
-        return "Language Questions";
+        return t("tasks.languageQuestions", { default: "Language Questions" });
       case 14:
-        return "Lesson Summary";
+        return t("tasks.lessonSummary", { default: "Lesson Summary" });
       default:
         return "";
     }
@@ -579,12 +593,16 @@ export default function LessonProgressBar({
                       {phaseLoading || isTransitioning ? (
                         <>
                           <div className="mr-3 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                          <span>Starting...</span>
+                          <span>
+                            {t("actions.starting", { default: "Starting..." })}
+                          </span>
                         </>
                       ) : (
                         <>
                           {/* <span>{t("startLesson")}</span> */}
-                          Start Lesson
+                          {t("actions.startLesson", {
+                            default: "Start Lesson",
+                          })}
                           <ArrowLeft className="ml-3 h-5 w-5 rotate-180 transition-transform group-hover:translate-x-1" />
                         </>
                       )}
@@ -610,13 +628,19 @@ export default function LessonProgressBar({
                           {phaseLoading || isTransitioning ? (
                             <>
                               <div className="mr-3 h-5 w-5 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" />
-                              <span>Processing...</span>
+                              <span>
+                                {t("actions.processing", {
+                                  default: "Processing...",
+                                })}
+                              </span>
                             </>
                           ) : (
                             <>
                               <ArrowLeft className="mr-3 h-5 w-5 transition-transform group-hover:-translate-x-1" />
                               {/* <span>{t("previousPhase")}</span> */}
-                              Previous Task
+                              {t("actions.previousTask", {
+                                default: "Previous Task",
+                              })}
                             </>
                           )}
                         </div>
@@ -637,12 +661,16 @@ export default function LessonProgressBar({
                         {phaseLoading || isTransitioning ? (
                           <>
                             <div className="mr-3 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                            <span>Processing...</span>
+                            <span>
+                              {t("actions.processing", {
+                                default: "Processing...",
+                              })}
+                            </span>
                           </>
                         ) : (
                           <>
                             {/* <span>{t("nextPhase")}</span> */}
-                            Next Task
+                            {t("actions.nextTask", { default: "Next Task" })}
                             <ArrowLeft className="ml-3 h-5 w-5 rotate-180 transition-transform group-hover:translate-x-1" />
                           </>
                         )}
@@ -664,8 +692,16 @@ export default function LessonProgressBar({
             <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6">
               <div className="flex items-center justify-between text-white">
                 <div>
-                  <h3 className="font-semibold">Progress</h3>
-                  <p className="text-sm opacity-90">Task {currentTask} of 14</p>
+                  <h3 className="font-semibold">
+                    {t("progress.title", { default: "Progress" })}
+                  </h3>
+                  <p className="text-sm opacity-90">
+                    {t("progress.taskOfTotal", {
+                      task: currentTask,
+                      total: 14,
+                      default: `Task ${currentTask} of 14`,
+                    })}
+                  </p>
                 </div>
                 {currentTask >= 2 && currentTask < 14 && (
                   <div className="flex items-center gap-2 rounded-lg bg-white/20 px-3 py-1">
@@ -690,7 +726,10 @@ export default function LessonProgressBar({
               <div className="xl:hidden">
                 <div className="mb-4 flex items-center justify-between">
                   <span className="font-semibold text-gray-900 dark:text-white">
-                    Current: Task {currentTask}
+                    {t("progress.currentTask", {
+                      task: currentTask,
+                      default: `Current: Task ${currentTask}`,
+                    })}
                   </span>
                   <Button
                     variant="ghost"

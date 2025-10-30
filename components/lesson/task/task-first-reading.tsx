@@ -18,8 +18,10 @@ import {
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { getArticleImageUrl, getAudioUrl } from "@/lib/storage-config";
+import { useTranslations } from "next-intl";
 
 export default function TaskFirstReading({ article }: { article: Article }) {
+  const t = useTranslations("Lesson.Reading");
   const [readingSpeed, setReadingSpeed] = useState("1");
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(-1);
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState<number>(-1);
@@ -189,10 +191,10 @@ export default function TaskFirstReading({ article }: { article: Article }) {
           <Book className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          First Reading
+          {t("firstTitle")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          Read the article and highlight the important words and sentences
+          {t("subtitle")}
         </p>
       </div>
 
@@ -221,17 +223,17 @@ export default function TaskFirstReading({ article }: { article: Article }) {
               <PlayIcon className="mr-2 h-5 w-5" />
             )}
             {isPlaying
-              ? "Pause Reading"
+              ? t("controls.pause")
               : isAudioLoaded
-                ? "Start Reading"
-                : "Loading Audio"}
+                ? t("controls.play")
+                : t("controls.loading")}
           </Button>
 
           {/* Reading Speed Control */}
           <div className="flex items-center gap-3">
             <Settings className="h-4 w-4 text-gray-500" />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              Speed
+              {t("controls.speed")}
             </span>
             <Select value={readingSpeed} onValueChange={setReadingSpeed}>
               <SelectTrigger className="w-20">
@@ -501,28 +503,28 @@ export default function TaskFirstReading({ article }: { article: Article }) {
       {/* Reading Tips */}
       <div className="rounded-xl border border-blue-200 bg-gradient-to-r from-blue-300 to-indigo-300 p-6 dark:border-blue-800 dark:from-blue-950 dark:to-indigo-950">
         <h3 className="mb-3 font-semibold text-blue-800 dark:text-blue-200">
-          First Reading Tips
+          {t("tips.firstTitle")}
         </h3>
         <ul className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
           <li className="flex items-center">
             <span className="mr-3 h-2 w-2 rounded-full bg-blue-500"></span>
-            Read the entire article
+            {t("tips.readEntire")}
           </li>
           <li className="flex items-center">
             <span className="mr-3 h-2 w-2 rounded-full bg-blue-500"></span>
-            Click start reading
+            {t("tips.clickStart")}
           </li>
           <li className="flex items-center">
             <span className="mr-3 h-2 w-2 rounded-full bg-blue-500"></span>
-            Click sentence jump
+            {t("tips.sentenceJump")}
           </li>
           <li className="flex items-center">
             <span className="mr-3 h-2 w-2 rounded-full bg-blue-500"></span>
-            Use highlight mode
+            {t("tips.useHighlight")}
           </li>
           <li className="flex items-center">
             <span className="mr-3 h-2 w-2 rounded-full bg-blue-500"></span>
-            Listen to the complete audio
+            {t("tips.listenComplete")}
           </li>
         </ul>
       </div>

@@ -19,6 +19,7 @@ import { useState } from "react";
 import { Icons } from "@/components/icons";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const FormSchema = z.object({
   license: z.string().uuid({ message: "Invalid UUID format" }),
@@ -40,6 +41,7 @@ export function UpdateUserLicenseForm({
       license: "",
     },
   });
+  const t = useTranslations("Settings.userProfile");
   //   const { update } = useSession();
   const router = useRouter();
   //   const date = new Date(expired);
@@ -89,16 +91,14 @@ export function UpdateUserLicenseForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 mb-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mb-3 space-y-2">
         <FormField
           control={form.control}
           name="license"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>License</FormLabel>
-              <FormDescription>
-                Enter the new license for the user
-              </FormDescription>
+              <FormLabel>{t("license")}</FormLabel>
+              <FormDescription>{t("licenseDescription")}</FormDescription>
               <FormControl>
                 <Input type="text" {...field} />
               </FormControl>
@@ -118,7 +118,7 @@ export function UpdateUserLicenseForm({
           disabled={isLoading || !form.formState.isValid}
         >
           {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-          Activate
+          {t("activate")}
         </Button>
       </form>
     </Form>

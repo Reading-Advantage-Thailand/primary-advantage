@@ -15,6 +15,7 @@ import { Badge } from "../ui/badge";
 import { Role } from "@/types/enum";
 import { User } from "next-auth";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useTranslations } from "next-intl";
 
 interface UserAccountNavProps {
   user: User;
@@ -22,13 +23,15 @@ interface UserAccountNavProps {
 
 export function UserAccountNav({ user }: UserAccountNavProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const t = useTranslations("MainNav.usernav");
+  const tr = useTranslations("Overall.roles");
 
   const roles = {
-    system: { label: "system", color: "bg-[#FFC107]" },
-    admin: { label: "admin", color: "bg-[#DC3545]" },
-    teacher: { label: "teacher", color: "bg-[#007BFF]" },
-    student: { label: "student", color: "bg-[#28A745]" },
-    user: { label: "user", color: "bg-[#6C757D]" },
+    system: { label: tr("system"), color: "bg-[#FFC107]" },
+    admin: { label: tr("admin"), color: "bg-[#DC3545]" },
+    teacher: { label: tr("teacher"), color: "bg-[#007BFF]" },
+    student: { label: tr("student"), color: "bg-[#28A745]" },
+    user: { label: tr("user"), color: "bg-[#6C757D]" },
   };
 
   const { label, color } = roles[(user?.role as keyof typeof roles) || "user"];
@@ -80,11 +83,11 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         <DropdownMenuSeparator />
         {/* Role-based menu items */}
         <div className="text-muted-foreground px-2 py-1.5 text-sm font-semibold">
-          Navigation
+          {t("navigation")}
         </div>
         <DropdownMenuItem asChild>
           <Link href="/student/read" className="flex items-center">
-            <span>Student Dashboard</span>
+            <span>{t("studentDashboard")}</span>
           </Link>
         </DropdownMenuItem>
         {/* {user?.cefrLevel !== "" ? (
@@ -105,14 +108,14 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
           user?.role === Role.system) && (
           <DropdownMenuItem asChild>
             <Link href="/teacher/my-classes" className="flex items-center">
-              <span>Teacher Dashboard</span>
+              <span>{t("teacherDashboard")}</span>
             </Link>
           </DropdownMenuItem>
         )}
         {(user?.role === Role.admin || user?.role === Role.system) && (
           <DropdownMenuItem asChild>
             <Link href="/admin" className="flex items-center">
-              <span>Admin Dashboard</span>
+              <span>{t("adminDashboard")}</span>
             </Link>
           </DropdownMenuItem>
         )}
@@ -120,14 +123,14 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
           <>
             <DropdownMenuItem asChild>
               <Link href="/system/dashboard" className="flex items-center">
-                <span>System Dashboard</span>
+                <span>{t("systemDashboard")}</span>
               </Link>
             </DropdownMenuItem>
           </>
         )}
         <DropdownMenuSeparator />
         <div className="text-muted-foreground px-2 py-1.5 text-sm font-semibold">
-          Account
+          {t("account")}
         </div>
         <DropdownMenuItem asChild>
           <Link
@@ -135,13 +138,13 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
             href="https://docs.google.com/forms/d/e/1FAIpQLSe_Ew100kef6j4O4IuiHm4ZeGhOj5FN6JRyJ7-0gvZV9eFgjQ/viewform?usp=sf_link"
             className="flex items-center"
           >
-            <span>Contact Us</span>
+            <span>{t("contactUs")}</span>
           </Link>
         </DropdownMenuItem>
         {user?.role !== Role.student && (
           <DropdownMenuItem asChild>
             <Link href="/settings/user-profile" className="flex items-center">
-              <span>Settings</span>
+              <span>{t("settings")}</span>
             </Link>
           </DropdownMenuItem>
         )}
@@ -157,7 +160,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {!isLoading && <LogOutIcon className="h-4 w-4" color="red" />}
-          Sign Out
+          {t("logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

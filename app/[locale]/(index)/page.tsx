@@ -30,101 +30,88 @@ import {
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { getTranslations } from "next-intl/server";
 
-const features = [
-  {
-    title: "Fun Story Adventures",
-    description:
-      "Discover exciting stories and articles just for kids your age, always something new to read!",
-    icon: Book,
-  },
-  {
-    title: "Understand the Story",
-    description:
-      "Answer fun questions about what you read to help you remember and understand better.",
-    icon: BrainCircuit,
-  },
-  {
-    title: "Just Right Reading Levels",
-    description:
-      "Read stories that are perfect for how you read, making it easy and enjoyable.",
-    icon: GitBranch, // Keep GitBranch but description is adapted
-  },
-  {
-    title: "Learn New Words",
-    description:
-      "Find new and interesting words in the stories and learn what they mean with fun tools.",
-    icon: BookOpen,
-  },
-  {
-    title: "Listen Along",
-    description:
-      "Hear the stories read aloud to you, great for listening and following along.",
-    icon: Volume2,
-  },
-  {
-    title: "See How You're Growing",
-    description:
-      "Check out your reading progress and see all the cool things you're learning!",
-    icon: BarChart4,
-  },
-  {
-    title: "Make It Yours",
-    description:
-      "Pick stories you like and set goals for reading, creating your own reading adventure.",
-    icon: Settings, // Keep Settings but description is adapted
-  },
-  {
-    title: "Help for Teachers",
-    description:
-      "Tools for teachers to see how the class is doing and help everyone learn.",
-    icon: Users,
-  },
-];
+export default async function Home() {
+  const t = await getTranslations("HomePage");
 
-const benefits = [
-  {
-    title: "Become a Super Reader",
-    description:
-      "Read lots of exciting stories and play games to boost your reading skills!",
-  },
-  {
-    title: "Your Own Reading Path",
-    description:
-      "Read stories that match your reading level and interests, made just for you.",
-  },
-  {
-    title: "Stories You'll Love",
-    description:
-      "Enjoy different kinds of stories with pictures and sounds that make reading fun.",
-  },
-  {
-    title: "Watch Your Reading Power Grow",
-    description:
-      "See your progress and how you're becoming a better reader every day.",
-  },
-  {
-    title: "Learn Lots of New Words",
-    description:
-      "Discover fun words in stories and remember them with cool activities.",
-  },
-  {
-    title: "Easy to Use Anywhere",
-    description: "Read and learn at school or at home, whenever you want!",
-  },
-  {
-    title: "Great for Schools",
-    description:
-      "A smart way for schools to help all students become great readers.",
-  },
-  {
-    title: "More Time for Teaching Fun",
-    description:
-      "Our tools help teachers find great stories and see student progress easily.",
-  },
-];
+  const features = [
+    {
+      title: t("features.funStory.title"),
+      description: t("features.funStory.description"),
+      icon: Book,
+    },
+    {
+      title: t("features.understand.title"),
+      description: t("features.understand.description"),
+      icon: BrainCircuit,
+    },
+    {
+      title: t("features.readingLevels.title"),
+      description: t("features.readingLevels.description"),
+      icon: GitBranch,
+    },
+    {
+      title: t("features.learnWords.title"),
+      description: t("features.learnWords.description"),
+      icon: BookOpen,
+    },
+    {
+      title: t("features.listenAlong.title"),
+      description: t("features.listenAlong.description"),
+      icon: Volume2,
+    },
+    {
+      title: t("features.seeProgress.title"),
+      description: t("features.seeProgress.description"),
+      icon: BarChart4,
+    },
+    {
+      title: t("features.makeYours.title"),
+      description: t("features.makeYours.description"),
+      icon: Settings,
+    },
+    {
+      title: t("features.helpTeachers.title"),
+      description: t("features.helpTeachers.description"),
+      icon: Users,
+    },
+  ];
 
-export default function Home() {
+  const benefits = [
+    {
+      title: t("benefits.superReader.title"),
+      description: t("benefits.superReader.description"),
+    },
+    {
+      title: t("benefits.ownPath.title"),
+      description: t("benefits.ownPath.description"),
+    },
+    {
+      title: t("benefits.storiesLove.title"),
+      description: t("benefits.storiesLove.description"),
+    },
+    {
+      title: t("benefits.watchGrow.title"),
+      description: t("benefits.watchGrow.description"),
+    },
+    {
+      title: t("benefits.learnWords.title"),
+      description: t("benefits.learnWords.description"),
+    },
+    {
+      title: t("benefits.easyUse.title"),
+      description: t("benefits.easyUse.description"),
+    },
+    {
+      title: t("benefits.greatSchools.title"),
+      description: t("benefits.greatSchools.description"),
+    },
+    {
+      title: t("benefits.moreTime.title"),
+      description: t("benefits.moreTime.description"),
+    },
+  ];
   return (
     <div>
       <section className="space-y-6 pt-6 pb-8 md:pt-10 md:pb-12 lg:py-3">
@@ -136,17 +123,15 @@ export default function Home() {
             {siteConfig.name}
           </h1>
           <h2 className="font-logo text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
-            <span>Help Young Students Become</span>
-            <span className="text-green-500"> Amazing Readers </span>
-            <span>with AI-Powered Fun!</span>
+            {t("hero.title")}
           </h2>
           <p className="font-logo text-muted-foreground max-w-[42rem] leading-normal sm:text-xl sm:leading-8">
-            Reading adventures tailored for ages 8-12 (Grades 3-6).
+            {t("hero.subtitle")}
           </p>
           <div className="relative">
             <div className="absolute -inset-2 rounded-lg bg-[conic-gradient(at_top,_var(--tw-gradient-stops))] from-gray-600 via-purple-600 to-zinc-600 opacity-50 blur-2xl"></div>
             <div className="font-logo relative flex h-14 w-60 cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-[#172554] text-xl text-white transition-transform duration-300 ease-in-out hover:scale-105 dark:bg-white dark:text-black">
-              <Link href={"/auth/signin"}>Get Started Now!</Link>
+              <Link href={"/auth/signin"}>{t("hero.getStarted")}</Link>
             </div>
           </div>
         </div>
@@ -166,11 +151,10 @@ export default function Home() {
         >
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
             <h2 className="font-logo animate-glow text-3xl leading-[1.1] text-white sm:text-3xl md:text-6xl">
-              Cool Features
+              {t("features.title")}
             </h2>
             <p className="max-w-[85%] leading-normal text-gray-400 sm:text-lg sm:leading-7">
-              Discover how Primary Advantage makes reading fun and helps you
-              learn!
+              {t("features.description")}
             </p>
           </div>
           <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
@@ -185,11 +169,10 @@ export default function Home() {
         >
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
             <h2 className="font-logo animate-glow text-3xl leading-[1.1] text-white sm:text-3xl md:text-6xl">
-              Why Schools Love Primary Advantage
+              {t("benefits.title")}
             </h2>
             <p className="max-w-[85%] leading-normal text-gray-400 sm:text-lg sm:leading-7">
-              See how Primary Advantage can help teachers and students in
-              schools!
+              {t("benefits.description")}
             </p>
           </div>
           <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
@@ -210,58 +193,70 @@ export default function Home() {
       <section id="contact-us" className="container py-8 md:py-12 lg:py-24">
         <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
           <h2 className="font-logo animate-glow text-3xl leading-[1.1] text-white sm:text-3xl md:text-6xl">
-            Let&apos;s Get in Touch
+            {t("contact.title")}
           </h2>
           <p className="text-muted-foreground max-w-[85%] leading-normal sm:text-lg sm:leading-7">
-            Have a question or need more information? Contact us today to learn
-            more about our platform.
+            {t("contact.description")}
           </p>
           <Card className="mt-10 w-full text-start">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl text-black dark:text-white">
-                Contact Us
+                {t("contact.formTitle")}
               </CardTitle>
-              <CardDescription>
-                Get in touch with us to learn more about our platform
-              </CardDescription>
+              <CardDescription>{t("contact.formDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" placeholder="John Doe" />
+                <Label htmlFor="name">{t("contact.name")}</Label>
+                <Input id="name" placeholder={t("contact.namePlaceholder")} />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="institution">Institution</Label>
-                <Input id="institution" placeholder="University of Example" />
+                <Label htmlFor="institution">{t("contact.institution")}</Label>
+                <Input
+                  id="institution"
+                  placeholder={t("contact.institutionPlaceholder")}
+                />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" />
+                <Label htmlFor="email">{t("contact.email")}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder={t("contact.emailPlaceholder")}
+                />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="inquiry">Inquiry</Label>
+                <Label htmlFor="inquiry">{t("contact.inquiry")}</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an option" />
+                    <SelectValue
+                      placeholder={t("contact.inquiryPlaceholder")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="sales">Sales</SelectItem>
-                    <SelectItem value="support">Support</SelectItem>
-                    <SelectItem value="partnerships">Partnerships</SelectItem>
+                    <SelectItem value="sales">
+                      {t("contact.inquiryOptions.sales")}
+                    </SelectItem>
+                    <SelectItem value="support">
+                      {t("contact.inquiryOptions.support")}
+                    </SelectItem>
+                    <SelectItem value="partnerships">
+                      {t("contact.inquiryOptions.partnerships")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{t("contact.message")}</Label>
                 <Textarea
-                  placeholder="Type your message here."
+                  placeholder={t("contact.messagePlaceholder")}
                   id="message"
                   className="h-40"
                 />
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">Send Message</Button>
+              <Button className="w-full">{t("contact.sendMessage")}</Button>
             </CardFooter>
           </Card>
         </div>
@@ -272,20 +267,18 @@ export default function Home() {
       >
         <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
           <h2 className="font-logo animate-glow text-3xl leading-[1.1] text-white sm:text-3xl md:text-6xl">
-            Ready for a Primary Adventure?
+            {t("cta.title")}
           </h2>
           <p className="text-muted-foreground max-w-[85%] leading-normal sm:text-lg sm:leading-7">
-            Start your free trial and see how fun reading can be with Primary
-            Advantage!{" "}
+            {t("cta.description")}{" "}
             <Link
               href="/auth/signin"
               target="_blank"
               rel="noreferrer"
               className="underline underline-offset-4"
             >
-              Get Started Now!
-            </Link>{" "}
-            It's perfect for students aged 8-12.
+              {t("hero.getStarted")}
+            </Link>
           </p>
         </div>
       </section>

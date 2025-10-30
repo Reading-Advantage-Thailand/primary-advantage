@@ -28,7 +28,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
-import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { Header } from "@/components/header";
 import { toast } from "sonner";
 import {
@@ -76,6 +77,7 @@ interface Classroom {
 }
 
 export default function Assignments() {
+  const t = useTranslations("Teacher.Assignments");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -125,8 +127,7 @@ export default function Assignments() {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          {/* {ta("assignment")} */}
-          Assignment
+          {t("table.headers.assignment")}
           <ChevronDownIcon className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -135,7 +136,7 @@ export default function Assignments() {
     {
       accessorKey: "meta.createdAt",
       header: () => (
-        <div className="text-center">{/* {ta("createdOn")} */}Created On</div>
+        <div className="text-center">{t("table.headers.createdOn")}</div>
       ),
       cell: ({ row }) => (
         <div className="text-center">
@@ -146,7 +147,7 @@ export default function Assignments() {
     {
       accessorKey: "meta.dueDate",
       header: () => (
-        <div className="text-center">{/* {ta("dueDate")} */}Due Date</div>
+        <div className="text-center">{t("table.headers.dueDate")}</div>
       ),
       cell: ({ row }) => (
         <div className="text-center">
@@ -157,7 +158,7 @@ export default function Assignments() {
     {
       accessorKey: "students",
       header: () => (
-        <div className="text-center">{/* {ta("students")} */}Students</div>
+        <div className="text-center">{t("table.headers.students")}</div>
       ),
       cell: ({ row }) => (
         <div className="text-center">{row.original.students.length}</div>
@@ -166,14 +167,14 @@ export default function Assignments() {
     {
       accessorKey: "action",
       header: () => (
-        <div className="text-center">{/* {ta("actions")} */}Actions</div>
+        <div className="text-center">{t("table.headers.actions")}</div>
       ),
       cell: ({ row }) => (
         <div className="text-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="default" className="ml-auto">
-                {/* {ta("actions")} */}Actions{" "}
+                {t("table.actions.actions")}{" "}
                 <ChevronDownIcon className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -183,7 +184,7 @@ export default function Assignments() {
                   router.push(`assignments/${row.original.meta.id}`);
                 }}
               >
-                {/* {ta("details")} */}Details
+                {t("table.actions.details")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -248,7 +249,7 @@ export default function Assignments() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to fetch assignments", {
+      toast.error(t("toast.fetchError"), {
         richColors: true,
       });
 
@@ -274,7 +275,7 @@ export default function Assignments() {
       await fetchAssignments(value, 1);
     } catch (error) {
       console.error("Error fetching assignments:", error);
-      toast.error("Failed to fetch assignments", {
+      toast.error(t("toast.fetchError"), {
         richColors: true,
       });
     }
@@ -337,10 +338,10 @@ export default function Assignments() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <Header heading="Assignment" />
+        <Header heading={t("heading")} />
         <Select value={selectedClassroom} onValueChange={handleClassChange}>
           <SelectTrigger className="mt-4 h-auto w-[180px]">
-            <SelectValue placeholder="Select a Classroom" />
+            <SelectValue placeholder={t("selectors.selectClassroom")} />
           </SelectTrigger>
           <SelectContent className="max-h-48 overflow-y-auto">
             {classrooms?.map((classroom) => (
@@ -354,7 +355,7 @@ export default function Assignments() {
 
       <div className="flex items-center justify-between">
         <Input
-          placeholder="Search assignments..."
+          placeholder={t("search.placeholder")}
           value={searchQuery}
           onChange={(event) => handleSearchChange(event.target.value)}
           className="max-w-sm"
@@ -362,7 +363,9 @@ export default function Assignments() {
         />
 
         {searchQuery !== debouncedSearchQuery && (
-          <div className="text-muted-foreground text-sm">Searching...</div>
+          <div className="text-muted-foreground text-sm">
+            {t("search.searching")}
+          </div>
         )}
       </div>
 
@@ -430,8 +433,7 @@ export default function Assignments() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="default" className="ml-auto">
-                              {/* {ta("actions")} */}
-                              Actions{" "}
+                              {t("table.actions.actions")}
                               <ChevronDownIcon className="ml-2 h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -441,8 +443,7 @@ export default function Assignments() {
                                 router.push(`assignments/${row.meta.id}`);
                               }}
                             >
-                              {/* {ta("details")} */}
-                              Details
+                              {t("table.actions.details")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -456,7 +457,7 @@ export default function Assignments() {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No assignments found
+                    {t("empty.noAssignments")}
                   </TableCell>
                 </TableRow>
               )
@@ -466,7 +467,7 @@ export default function Assignments() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Please select a classroom to view assignments
+                  {t("empty.selectClassroom")}
                 </TableCell>
               </TableRow>
             )}
@@ -477,17 +478,17 @@ export default function Assignments() {
       {/* Custom pagination */}
       <div className="flex items-center justify-between">
         <div className="text-muted-foreground text-sm">
-          Showing{" "}
-          {Math.min(
-            (pagination.currentPage - 1) * pagination.limit + 1,
-            pagination.totalCount,
-          )}{" "}
-          to{" "}
-          {Math.min(
-            pagination.currentPage * pagination.limit,
-            pagination.totalCount,
-          )}{" "}
-          of {pagination.totalCount} assignments
+          {t("pagination.showing", {
+            from: Math.min(
+              (pagination.currentPage - 1) * pagination.limit + 1,
+              pagination.totalCount,
+            ),
+            to: Math.min(
+              pagination.currentPage * pagination.limit,
+              pagination.totalCount,
+            ),
+            total: pagination.totalCount,
+          })}
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -496,12 +497,14 @@ export default function Assignments() {
             onClick={handlePrevPage}
             disabled={!pagination.hasPrevPage || isLoading}
           >
-            {/* {t("previous")} */}
-            Previous
+            {t("pagination.previous")}
           </Button>
           <div className="flex items-center gap-1">
             <span className="text-sm">
-              Page {pagination.currentPage} of {pagination.totalPages}
+              {t("pagination.pageOf", {
+                page: pagination.currentPage,
+                totalPages: pagination.totalPages,
+              })}
             </span>
           </div>
           <Button
@@ -510,8 +513,7 @@ export default function Assignments() {
             onClick={handleNextPage}
             disabled={!pagination.hasNextPage || isLoading}
           >
-            {/* {t("next")} */}
-            Next
+            {t("pagination.next")}
           </Button>
         </div>
       </div>

@@ -1,8 +1,13 @@
+"use client";
+
 import { Book } from "lucide-react";
 import LessonSAQ from "../pratice/lesson-task-saq";
 import { Article } from "@/types";
+import { useTranslations } from "next-intl";
 
 export default function TaskShortAnswer({ article }: { article: Article }) {
+  const t = useTranslations("Lesson.tasks");
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header Section */}
@@ -11,10 +16,10 @@ export default function TaskShortAnswer({ article }: { article: Article }) {
           <Book className="h-8 w-8 text-blue-600 dark:text-blue-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Task Short Answer
+          {t("shortAnswerTitle")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          Task Description Topic : {article.title}
+          {t("shortAnswerDescription", { title: article.title })}
         </p>
       </div>
 

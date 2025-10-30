@@ -1,12 +1,17 @@
+"use client";
+
 import React from "react";
 import LessonVocabularyFlashcardGame from "../games/lesson-vocabulary-flashcard-card";
 import { Book } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function TaskVocabularyFlashcards({
   articleId,
 }: {
   articleId: string;
 }) {
+  const t = useTranslations("Lesson.tasks");
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header Section */}
@@ -15,12 +20,10 @@ export default function TaskVocabularyFlashcards({
           <Book className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {/* {t("phase9Title")} */}
-          Vocabulary Flashcards
+          {t("vocabularyFlashcardsTitle")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          {/* {t("phase9Description")} */}
-          Vocabulary Flashcards
+          {t("vocabularyFlashcardsDescription")}
         </p>
       </div>
 

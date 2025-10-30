@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Table,
   TableBody,
@@ -73,6 +74,7 @@ type MyStudentProps = {
 };
 
 export default function MyStudents() {
+  const t = useTranslations("teacher.myStudents");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -128,12 +130,12 @@ export default function MyStudents() {
       });
 
       if (response.status === 400) {
-        toast("XP reset failed.");
+        toast(t("toast.reset.error"));
         return;
       }
 
       if (response.status === 200) {
-        toast("XP reset successfully.");
+        toast(t("toast.reset.success"));
         // Refresh the students list
         const updatedResponse = await fetch("/api/classroom/students");
         if (updatedResponse.ok) {
@@ -143,7 +145,7 @@ export default function MyStudents() {
       }
     } catch (error) {
       console.error("Error resetting progress:", error);
-      toast("XP reset failed.");
+      toast(t("toast.reset.error"));
     } finally {
       setIsResetModalOpen(false);
     }
@@ -158,7 +160,7 @@ export default function MyStudents() {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Name
+            {t("table.name")}
             <ChevronsUpDownIcon className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -167,7 +169,7 @@ export default function MyStudents() {
         const studentName: string = row.getValue("display_name");
         return (
           <div className="captoliza ml-4">
-            {studentName ? studentName : "Anonymous"}
+            {studentName ? studentName : t("unknown.student")}
           </div>
         );
       },
@@ -175,13 +177,13 @@ export default function MyStudents() {
     {
       accessorKey: "email",
       header: () => {
-        return <div>Email</div>;
+        return <div>{t("table.email")}</div>;
       },
       cell: ({ row }) => {
         const studentEmail: string = row.getValue("email");
         return (
           <div className="captoliza">
-            {studentEmail ? studentEmail : "Unknown"}
+            {studentEmail ? studentEmail : t("unknown.email")}
           </div>
         );
       },
@@ -192,7 +194,7 @@ export default function MyStudents() {
           {
             accessorKey: "classrooms",
             header: () => {
-              return <div className="text-center">Classrooms</div>;
+              return <div className="text-center">{t("table.classrooms")}</div>;
             },
             cell: ({ row }: any) => {
               const classrooms: Array<{
@@ -219,12 +221,16 @@ export default function MyStudents() {
                       ))}
                       {classrooms.length > 2 && (
                         <span className="text-xs text-gray-500">
-                          +{classrooms.length - 2} more
+                          {t("classrooms.more", {
+                            count: classrooms.length - 2,
+                          })}
                         </span>
                       )}
                     </div>
                   ) : (
-                    <span className="text-gray-400">No classes</span>
+                    <span className="text-gray-400">
+                      {t("classrooms.none")}
+                    </span>
                   )}
                 </div>
               );
@@ -235,7 +241,7 @@ export default function MyStudents() {
     {
       accessorKey: "action",
       header: () => {
-        return <div className="text-center">Actions</div>;
+        return <div className="text-center">{t("table.actions")}</div>;
       },
       cell: ({ row }) => {
         const payment = row.original;
@@ -255,7 +261,7 @@ export default function MyStudents() {
                   }
                 >
                   <TrendingUp className="mr-1 size-4" />
-                  Progress
+                  {t("actions.progress")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <div>
@@ -275,7 +281,7 @@ export default function MyStudents() {
                   className="text-red-600"
                 >
                   <RotateCcw className="mr-1 size-4" />
-                  Reset Progress
+                  {t("actions.resetProgress")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -308,7 +314,7 @@ export default function MyStudents() {
     <>
       <div className="flex flex-col gap-4">
         <Input
-          placeholder="Search Name"
+          placeholder={t("search.placeholder")}
           value={
             (table.getColumn("display_name")?.getFilterValue() as string) ?? ""
           }
@@ -360,7 +366,7 @@ export default function MyStudents() {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    Empty
+                    {t("table.empty")}
                   </TableCell>
                 </TableRow>
               )}
@@ -375,7 +381,7 @@ export default function MyStudents() {
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              Previous
+              {t("pagination.previous")}
             </Button>
             <Button
               variant="outline"
@@ -383,7 +389,7 @@ export default function MyStudents() {
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Next
+              {t("pagination.next")}
             </Button>
           </div>
         </div>
@@ -394,22 +400,22 @@ export default function MyStudents() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reset Progress</DialogTitle>
+            <DialogTitle>{t("dialog.reset.title")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to reset the progress of this student?
+              {t("dialog.reset.description")}
             </DialogDescription>
             <DialogFooter>
               <Button
                 variant="outline"
                 onClick={() => setIsResetModalOpen(false)}
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => handleResetProgress(selectedStudentId)}
               >
-                Reset
+                {t("actions.reset")}
               </Button>
             </DialogFooter>
           </DialogHeader>

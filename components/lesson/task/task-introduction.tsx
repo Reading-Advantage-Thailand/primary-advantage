@@ -10,6 +10,7 @@ import {
   LightbulbIcon,
 } from "lucide-react";
 import { getArticleImageUrl } from "@/lib/storage-config";
+import { useTranslations, useLocale } from "next-intl";
 
 interface Article {
   id: string;
@@ -19,7 +20,10 @@ interface Article {
   raLevel: number;
   passage: string;
   translatedSummary: {
-    th: string;
+    th?: string;
+    vi?: string;
+    cn?: string;
+    tw?: string;
   } | null;
 }
 
@@ -32,6 +36,8 @@ export default function TaskIntroduction({
   article,
   onCompleteChange,
 }: TaskIntroductionProps) {
+  const t = useTranslations("Lesson.Introduction");
+  const locale = useLocale();
   useEffect(() => {
     onCompleteChange(true);
   }, [onCompleteChange]);
@@ -44,12 +50,10 @@ export default function TaskIntroduction({
           <BookOpenIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {/* {t("phase1Title")} */}
-          Introduction
+          {t("phase1Title")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          {/* {t("phase1Description", { topic: article.title })} */}
-          In this lesson, you will read an article about : {article.title}
+          {t("phase1Description", { title: article.title })}
         </p>
       </div>
 
@@ -78,21 +82,17 @@ export default function TaskIntroduction({
             <div className="flex flex-wrap gap-3">
               <Badge className="bg-blue-200 text-blue-800 hover:bg-blue-300 dark:bg-blue-900 dark:text-blue-200">
                 <GlobeIcon className="mr-1 h-4 w-4" />
-                {/* {tc("cefrLevel", { cefrLevel: article.cefr_level })} */}
-                CEFR Level : {article.cefrLevel}
+                {t("cefrLevel", { level: article.cefrLevel })}
               </Badge>
               <Badge className="bg-green-200 text-green-800 hover:bg-green-300 dark:bg-green-900 dark:text-green-200">
                 <LightbulbIcon className="mr-1 h-4 w-4" />
-                {/* {tc("raLevel", { raLevel: article.ra_level })} */}
-                RA Level : {article.raLevel}
+                {t("raLevel", { level: article.raLevel })}
               </Badge>
               <Badge className="bg-purple-200 text-purple-800 hover:bg-purple-300 dark:bg-purple-900 dark:text-purple-200">
                 <ClockIcon className="mr-1 h-4 w-4" />
-                {/* {t("estimatedReadTime", {
+                {t("estimatedReadTime", {
                   time: Math.ceil(article.passage.split(" ").length / 20),
-                })} */}
-                Estimated Read Time :{" "}
-                {Math.ceil(article.passage.split(" ").length / 20)}
+                })}
               </Badge>
             </div>
 
@@ -100,12 +100,12 @@ export default function TaskIntroduction({
             {article.translatedSummary && (
               <div className="rounded-xl border-l-4 border-blue-500 bg-gray-100 p-4 dark:bg-gray-800">
                 <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">
-                  {/* {t("articleSummary")} */}
-                  Article Summary : {article.summary}
+                  {t("articleSummary")}
                 </h3>
                 <p className="leading-relaxed text-gray-700 dark:text-gray-300">
-                  {/* {article.translatedSummary[locale]} */}
-                  {article.translatedSummary?.th}
+                  {article.translatedSummary?.[
+                    locale as "th" | "vi" | "cn" | "tw"
+                  ] ?? article.summary}
                 </p>
               </div>
             )}
@@ -115,24 +115,20 @@ export default function TaskIntroduction({
           <div className="rounded-xl border border-green-200 bg-gradient-to-r from-green-300 to-emerald-300 p-4 dark:border-green-800 dark:from-green-950 dark:to-emerald-950">
             <h3 className="mb-3 flex items-center font-semibold text-green-800 dark:text-green-200">
               <LightbulbIcon className="mr-2 h-5 w-5" />
-              {/* {t("learningObjectives")} */}
-              Learning Objectives
+              {t("learningObjectives")}
             </h3>
             <ul className="space-y-2 text-sm text-green-700 dark:text-green-300">
               <li className="flex items-center">
                 <span className="mr-3 h-2 w-2 rounded-full bg-green-500"></span>
-                {/* {t("understandMainIdeas")} */}
-                Understand Main Ideas :
+                {t("understandMainIdeas")}
               </li>
               <li className="flex items-center">
                 <span className="mr-3 h-2 w-2 rounded-full bg-green-500"></span>
-                {/* {t("learnVocabulary")} */}
-                Learn Vocabulary :
+                {t("learnVocabulary")}
               </li>
               <li className="flex items-center">
                 <span className="mr-3 h-2 w-2 rounded-full bg-green-500"></span>
-                {/* {t("improveComprehension")} */}
-                Improve Comprehension :
+                {t("improveComprehension")}
               </li>
             </ul>
           </div>

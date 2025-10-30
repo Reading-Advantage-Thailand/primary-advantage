@@ -20,12 +20,14 @@ import { cn } from "@/lib/utils";
 import { ActivityType, AnswerStatus, QuestionState } from "@/types/enum";
 import { Article, MCQuestion } from "@/types";
 import { finishQuiz, retakeQuiz } from "@/actions/question";
+import { useTranslations } from "next-intl";
 
 interface LessonMCQProps {
   article: Article;
 }
 
 function LessonMCQContent({ article }: { article: Article }) {
+  const t = useTranslations("LessonMCQ");
   const [state, setState] = useState(QuestionState.LOADING);
   //     results: [],
   //     progress: [],
@@ -262,11 +264,11 @@ function LessonMCQContent({ article }: { article: Article }) {
             <div className="space-y-2">
               <CardTitle className="flex items-center justify-center gap-2 text-2xl font-bold text-green-800 dark:text-green-200">
                 <span>🎉</span>
-                Quiz Completed
+                {t("completed.title")}
                 <span>🎉</span>
               </CardTitle>
               <div className="text-green-700 dark:text-green-300">
-                Quiz Completed Description
+                {t("completed.description")}
               </div>
             </div>
 
@@ -283,7 +285,7 @@ function LessonMCQContent({ article }: { article: Article }) {
                     /{questions.length}
                   </div>
                   <div className="text-sm text-green-700 dark:text-green-300">
-                    Correct Answers
+                    {t("completed.correctAnswers")}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -298,7 +300,7 @@ function LessonMCQContent({ article }: { article: Article }) {
                     %
                   </div>
                   <div className="text-sm text-blue-700 dark:text-blue-300">
-                    Accuracy
+                    {t("completed.accuracy")}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -309,7 +311,7 @@ function LessonMCQContent({ article }: { article: Article }) {
                     ).length * 2}
                   </div>
                   <div className="text-sm text-purple-700 dark:text-purple-300">
-                    MCQ XP Earned
+                    {t("completed.xpEarned")}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -318,7 +320,7 @@ function LessonMCQContent({ article }: { article: Article }) {
                     {String(timer % 60).padStart(2, "0")}
                   </div>
                   <div className="text-sm text-orange-700 dark:text-orange-300">
-                    Total Time
+                    {t("completed.totalTime")}
                   </div>
                 </div>
               </div>
@@ -345,7 +347,7 @@ function LessonMCQContent({ article }: { article: Article }) {
                 className="flex min-w-32 items-center space-x-2 border-green-300 bg-white/80 hover:bg-white dark:border-green-700 dark:bg-gray-800/80 dark:hover:bg-gray-800"
               >
                 <RefreshCw className="h-4 w-4" />
-                <span>Retake</span>
+                <span>{t("actions.retake")}</span>
               </Button>
             </div>
           </CardHeader>
@@ -367,12 +369,12 @@ function LessonMCQContent({ article }: { article: Article }) {
               <Brain className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </div>
             <span className="font-semibold text-blue-900 dark:text-blue-100">
-              Multiple Choice Quiz
+              {t("header.title")}
             </span>
           </div>
           <Badge variant="secondary" className="flex items-center space-x-1">
             <Clock className="h-3 w-3" />
-            <span>{timer}s</span>
+            <span>{t("timer.seconds", { seconds: timer })}</span>
           </Badge>
         </div>
 
@@ -380,15 +382,20 @@ function LessonMCQContent({ article }: { article: Article }) {
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-blue-700 dark:text-blue-300">
             <span>
-              Question {currentIndex + 1} of {questions.length}
+              {t("header.questionOf", {
+                current: currentIndex + 1,
+                total: questions.length,
+              })}
             </span>
             <span>
-              {Math.round(
-                (progress.filter((p) => p !== AnswerStatus.UNANSWERED).length /
-                  questions.length) *
-                  100,
-              )}
-              % Complete
+              {t("header.completePercent", {
+                percent: Math.round(
+                  (progress.filter((p) => p !== AnswerStatus.UNANSWERED)
+                    .length /
+                    questions.length) *
+                    100,
+                ),
+              })}
             </span>
           </div>
           <Progress
@@ -511,13 +518,13 @@ function LessonMCQContent({ article }: { article: Article }) {
                 >
                   {currentIndex < questions.length - 1 ? (
                     <span className="flex items-center gap-2">
-                      Next Question
+                      {t("actions.nextQuestion")}
                       <ChevronRight className="ml-1 h-4 w-4" />
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <Trophy className="mr-2 h-4 w-4" />
-                      Finish Quiz
+                      {t("actions.finishQuiz")}
                     </span>
                   )}
                 </Button>

@@ -8,6 +8,7 @@ import { getDashboardData } from "@/actions/flashcard";
 import { SingleDeckViewInline } from "./deck-view";
 import { EmptyDashboard } from "./empty-deck";
 import { Header } from "../header";
+import { getTranslations } from "next-intl/server";
 
 interface FlashcardDashboardProps {
   type?: "VOCABULARY" | "SENTENCE";
@@ -17,13 +18,15 @@ export default async function FlashcardDashboard({
   type,
 }: FlashcardDashboardProps) {
   const { success, decks, error, deckType } = await getDashboardData(type);
+  const t = await getTranslations("SentencesPage.sentencesCard");
+  const tVocabulary = await getTranslations("VocabularyPage");
 
   // Get appropriate header text based on deck type
   const getHeaderText = () => {
     if (deckType === "VOCABULARY") {
-      return "Review vocabulary words and expand your language skills with spaced repetition";
+      return tVocabulary("description");
     } else if (deckType === "SENTENCE") {
-      return "Practice sentence comprehension and translation skills";
+      return t("description");
     }
     return "Master vocabulary and sentences with personalized flashcard decks";
   };
@@ -31,11 +34,7 @@ export default async function FlashcardDashboard({
   if (!success) {
     return (
       <div className="space-y-6">
-        <Header
-          heading="Flashcard Dashboard"
-          text={getHeaderText()}
-          variant="warning"
-        />
+        <Header heading={t("title")} text={getHeaderText()} variant="warning" />
 
         <div className="container mx-auto max-w-4xl px-4 py-12">
           <div className="space-y-8 text-center">
@@ -96,7 +95,7 @@ export default async function FlashcardDashboard({
   if (decks.length === 0) {
     return (
       <div className="space-y-6">
-        <Header heading="Flashcard Dashboard" text={getHeaderText()} />
+        <Header heading={t("title")} text={getHeaderText()} />
         <EmptyDashboard deckType={deckType} />
       </div>
     );
@@ -108,7 +107,7 @@ export default async function FlashcardDashboard({
 
     return (
       <div className="space-y-6">
-        <Header heading="Flashcard Dashboard" text={getHeaderText()} />
+        <Header heading={t("title")} text={getHeaderText()} />
         <SingleDeckViewInline
           deck={targetDeck}
           deckType={deckType}
@@ -127,7 +126,7 @@ export default async function FlashcardDashboard({
   if (singleDeck) {
     return (
       <div className="space-y-6">
-        <Header heading="Flashcard Dashboard" text={getHeaderText()} />
+        <Header heading={t("title")} text={getHeaderText()} />
         <SingleDeckViewInline deck={singleDeck} showHeader={false} />
       </div>
     );
@@ -135,7 +134,7 @@ export default async function FlashcardDashboard({
 
   return (
     <div className="space-y-6">
-      <Header heading="Flashcard Dashboard" text={getHeaderText()} />
+      <Header heading={t("title")} text={getHeaderText()} />
       <EmptyDashboard />
     </div>
   );

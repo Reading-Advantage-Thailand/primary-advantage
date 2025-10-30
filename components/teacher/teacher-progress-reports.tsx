@@ -167,10 +167,12 @@ export default function TeacherProgressReports({
               onValueChange={setSelectedClassroom}
             >
               <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Select Classroom" />
+                <SelectValue placeholder={t("progress.selectClassroom")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Classrooms</SelectItem>
+                <SelectItem value="all">
+                  {t("progress.allClassrooms")}
+                </SelectItem>
                 {classrooms.map((classroom) => (
                   <SelectItem key={classroom.id} value={classroom.id}>
                     {classroom.name} ({classroom.classCode})
@@ -180,7 +182,7 @@ export default function TeacherProgressReports({
             </Select>
 
             <Input
-              placeholder="Search students..."
+              placeholder={t("progress.searchStudentsPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full md:w-[200px]"
@@ -190,7 +192,7 @@ export default function TeacherProgressReports({
 
         {selectedStudent && (
           <Button variant="outline" onClick={() => setSelectedStudent(null)}>
-            Back to Overview
+            {t("progress.backToOverview")}
           </Button>
         )}
       </div>
@@ -235,7 +237,7 @@ export default function TeacherProgressReports({
 
           {loading && (
             <div className="flex items-center justify-center p-8">
-              <div className="text-lg">Loading student data...</div>
+              <div className="text-lg">{t("progress.loadingStudentData")}</div>
             </div>
           )}
         </div>
@@ -246,7 +248,7 @@ export default function TeacherProgressReports({
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Total Students
+                  {t("progress.totalStudents")}
                 </CardTitle>
                 <Users className="text-muted-foreground h-4 w-4" />
               </CardHeader>
@@ -256,8 +258,8 @@ export default function TeacherProgressReports({
                 </div>
                 <p className="text-muted-foreground text-xs">
                   {selectedClassroom === "all"
-                    ? "All classrooms"
-                    : "Selected classroom"}
+                    ? t("progress.allClassroomsLabel")
+                    : t("progress.selectedClassroomLabel")}
                 </p>
               </CardContent>
             </Card>
@@ -265,14 +267,14 @@ export default function TeacherProgressReports({
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Average XP
+                  {t("progress.averageXp")}
                 </CardTitle>
                 <TrendingUp className="text-muted-foreground h-4 w-4" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{classroomStats.avgXp}</div>
                 <p className="text-muted-foreground text-xs">
-                  Experience points per student
+                  {t("progress.averageXpDescription")}
                 </p>
               </CardContent>
             </Card>
@@ -280,7 +282,7 @@ export default function TeacherProgressReports({
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Most Common Level
+                  {t("progress.mostCommonLevel")}
                 </CardTitle>
                 <BookOpen className="text-muted-foreground h-4 w-4" />
               </CardHeader>
@@ -289,7 +291,7 @@ export default function TeacherProgressReports({
                   {classroomStats.mostCommonLevel}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  CEFR proficiency level
+                  {t("progress.mostCommonLevelDescription")}
                 </p>
               </CardContent>
             </Card>
@@ -297,7 +299,7 @@ export default function TeacherProgressReports({
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Active This Week
+                  {t("progress.activeThisWeek")}
                 </CardTitle>
                 <Clock className="text-muted-foreground h-4 w-4" />
               </CardHeader>
@@ -306,8 +308,10 @@ export default function TeacherProgressReports({
                   {classroomStats.activeRate}%
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {classroomStats.recentlyActive} of{" "}
-                  {classroomStats.totalStudents} students
+                  {t("progress.activeThisWeekDescription", {
+                    count: classroomStats.recentlyActive,
+                    total: classroomStats.totalStudents,
+                  })}
                 </p>
               </CardContent>
             </Card>
@@ -316,7 +320,7 @@ export default function TeacherProgressReports({
           <div className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Student List</CardTitle>
+                <CardTitle>{t("progress.studentList")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -341,7 +345,7 @@ export default function TeacherProgressReports({
                           {student.cefrLevel || "A0"}
                         </Badge>
                         <div className="text-muted-foreground text-sm">
-                          {student.xp || 0} XP
+                          {t("progress.xpLabel", { xp: student.xp || 0 })}
                         </div>
                       </div>
                     </div>

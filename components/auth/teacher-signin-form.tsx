@@ -21,6 +21,7 @@ import { useState, useTransition } from "react";
 import { signInAction } from "@/actions/singinAction";
 import { FormError } from "../form-error";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function TeacherSignInForm({
   className,
@@ -33,6 +34,7 @@ export function TeacherSignInForm({
       ? "Email already exists"
       : "";
   const [error, setError] = useState<string | undefined>("");
+  const t = useTranslations("AuthPage.signin");
   const [isPanding, startTransition] = useTransition();
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),

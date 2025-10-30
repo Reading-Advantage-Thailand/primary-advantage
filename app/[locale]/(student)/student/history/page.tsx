@@ -5,15 +5,19 @@ import { ArticleRecordsTable } from "@/components/dashboard/article-records-tabl
 import { ReminderRereadTable } from "@/components/dashboard/reminder-reread-table";
 
 export default async function HistoryPage() {
+  const t = await getTranslations("Student.history");
   return (
     <>
       <Header
-        heading="Reminder to Reread"
-        text="Reminder to Reread Description"
+        heading={t("reminderToReread.title")}
+        text={t("reminderToReread.description")}
         variant="warning"
       />
       <ReminderRereadTable />
-      <Header heading="Article Records" text="Article Records Description" />
+      <Header
+        heading={t("articleRecords.title")}
+        text={t("articleRecords.description")}
+      />
       <ArticleRecordsTable />
     </>
   );

@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/form";
 import { FormError } from "../form-error";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function StudentSignInForm({
   className,
@@ -49,6 +50,7 @@ export function StudentSignInForm({
   >([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const t = useTranslations("AuthPage.signin");
 
   const form = useForm<z.infer<typeof classCodeSchema>>({
     resolver: zodResolver(classCodeSchema),
@@ -134,11 +136,9 @@ export function StudentSignInForm({
             {...props}
           >
             <div className="flex flex-col items-center gap-2 text-center">
-              <h1 className="text-2xl font-bold">
-                Welcome to Primary Advantage
-              </h1>
+              <h1 className="text-2xl font-bold">{t("welcome")}</h1>
               <p className="text-muted-foreground text-sm text-balance">
-                Enter your Classroom Code
+                {t("enterClassroomCode")}
               </p>
             </div>
             <FormField
@@ -146,7 +146,7 @@ export function StudentSignInForm({
               name="classroomCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Classroom Code</FormLabel>
+                  <FormLabel>{t("classroomCode")}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -164,7 +164,7 @@ export function StudentSignInForm({
             <FormError message={error} />
             <div className="grid gap-4">
               <Button type="submit" className="w-full">
-                Next
+                {t("next")}
               </Button>
             </div>
           </form>
@@ -174,16 +174,16 @@ export function StudentSignInForm({
       {step === "select" && (
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Welcome to Primary Advantage</h1>
+            <h1 className="text-2xl font-bold">{t("welcome")}</h1>
             <p className="text-muted-foreground text-sm text-balance">
-              Select Your Name below to login to your account
+              {t("selectYourName")}
             </p>
           </div>
           <div className="grid gap-2">
-            <Label>Select Your Name</Label>
+            <Label>{t("selectYourNameLabel")}</Label>
             <Select onValueChange={setSelectedStudentId}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a student" />
+                <SelectValue placeholder={t("selectYourNamePlaceholder")} />
               </SelectTrigger>
               <SelectContent className="max-h-48 overflow-y-auto">
                 <SelectGroup>
@@ -202,7 +202,7 @@ export function StudentSignInForm({
             disabled={!selectedStudentId}
             onClick={handleLogin}
           >
-            Login
+            {t("login")}
           </Button>
         </div>
       )}

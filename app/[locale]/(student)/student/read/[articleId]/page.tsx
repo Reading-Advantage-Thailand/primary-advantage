@@ -13,11 +13,21 @@ import { currentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { saveArticleToFlashcard } from "@/actions/flashcard";
 import AssignButton from "@/components/teacher/assign-button";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = {
-  title: "Article",
-  description: "Article",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; articleId: string }>;
+}) {
+  const { locale, articleId } = await params;
+  const t = await getTranslations({ locale, namespace: "Article" });
+
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 type Params = Promise<{ articleId: string }>;
 

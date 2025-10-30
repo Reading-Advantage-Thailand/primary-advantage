@@ -38,6 +38,7 @@ import { useRouter } from "next/navigation";
 import { getLessonClozeTestSentences } from "@/actions/flashcard";
 import { ActivityType, UserXpEarned } from "@/types/enum";
 import { updateUserActivity } from "@/actions/user";
+import { useTranslations } from "next-intl";
 
 interface ClozeTestData {
   id: string;
@@ -101,6 +102,7 @@ export default function LessonSentenceClozeTest({
 }: {
   articleId: string;
 }) {
+  const t = useTranslations("LessonCloze");
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
@@ -781,9 +783,9 @@ export default function LessonSentenceClozeTest({
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Loading your sentences...</h3>
+            <h3 className="text-lg font-semibold">{t("loading.title")}</h3>
             <p className="text-muted-foreground text-sm">
-              Fetching sentences from your flashcard deck
+              {t("loading.subtitle")}
             </p>
           </div>
         </div>
@@ -809,10 +811,10 @@ export default function LessonSentenceClozeTest({
           {/* Results Header */}
           <div className="space-y-4">
             <h1 className="gradient-text text-4xl font-bold md:text-5xl">
-              🎉 Fantastic Work!
+              {t("complete.title")}
             </h1>
             <p className="text-muted-foreground text-xl">
-              You completed {activeSentences.length} cloze test challenges
+              {t("complete.subtitle", { count: activeSentences.length })}
             </p>
           </div>
 
@@ -822,7 +824,9 @@ export default function LessonSentenceClozeTest({
               <CardContent className="p-6 text-center">
                 <Target className="mx-auto mb-3 h-8 w-8 text-blue-500" />
                 <div className="text-3xl font-bold text-blue-600">{score}</div>
-                <p className="text-muted-foreground text-sm">Perfect Scores</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.perfect")}
+                </p>
               </CardContent>
             </Card>
 
@@ -832,7 +836,9 @@ export default function LessonSentenceClozeTest({
                 <div className="text-3xl font-bold text-green-600">
                   {accuracy}%
                 </div>
-                <p className="text-muted-foreground text-sm">Accuracy</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.accuracy")}
+                </p>
               </CardContent>
             </Card>
 
@@ -842,7 +848,9 @@ export default function LessonSentenceClozeTest({
                 <div className="text-3xl font-bold text-purple-600">
                   {formatTime(timer)}
                 </div>
-                <p className="text-muted-foreground text-sm">Total Time</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.time")}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -856,11 +864,11 @@ export default function LessonSentenceClozeTest({
               className="flex-1"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Menu
+              {t("buttons.back")}
             </Button>
             <Button onClick={handleRestartGame} size="lg" className="flex-1">
               <RotateCcw className="mr-2 h-4 w-4" />
-              Play Again
+              {t("buttons.playAgain")}
             </Button>
           </div>
         </div>
@@ -874,10 +882,8 @@ export default function LessonSentenceClozeTest({
       <div className="container mx-auto max-w-4xl space-y-8 px-4">
         <Card className="mx-auto max-w-2xl">
           <CardHeader className="pb-6 text-center">
-            <CardTitle className="text-2xl">Ready to Start?</CardTitle>
-            <p className="text-muted-foreground">
-              Fill in the blanks in sentences from your flashcard deck
-            </p>
+            <CardTitle className="text-2xl">{t("start.title")}</CardTitle>
+            <p className="text-muted-foreground">{t("start.subtitle")}</p>
           </CardHeader>
 
           <CardContent className="space-y-8">
@@ -889,19 +895,25 @@ export default function LessonSentenceClozeTest({
                     {activeSentences.length}
                   </span>
                 </div>
-                <p className="text-sm font-medium">Cloze Tests</p>
-                <p className="text-muted-foreground text-xs">Ready to play</p>
+                <p className="text-sm font-medium">{t("start.stats.tests")}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t("common.ready")}
+                </p>
               </div>
 
               <div className="space-y-2 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                   <Target className="h-6 w-6 text-green-600" />
                 </div>
-                <p className="text-sm font-medium">Fill Blanks</p>
+                <p className="text-sm font-medium">
+                  {t("start.stats.fillBlanks")}
+                </p>
                 <p className="text-muted-foreground text-xs">
-                  {selectedDifficulty === "easy" && "1 blank each"}
-                  {selectedDifficulty === "medium" && "2 blanks each"}
-                  {selectedDifficulty === "hard" && "3 blanks each"}
+                  {selectedDifficulty === "easy" && t("start.stats.oneBlank")}
+                  {selectedDifficulty === "medium" &&
+                    t("start.stats.twoBlanks")}
+                  {selectedDifficulty === "hard" &&
+                    t("start.stats.threeBlanks")}
                 </p>
               </div>
 
@@ -916,9 +928,11 @@ export default function LessonSentenceClozeTest({
                     : selectedDifficulty === "medium"
                       ? "10"
                       : "15"}{" "}
-                  min
+                  {t("common.min")}
                 </p>
-                <p className="text-muted-foreground text-xs">Estimated time</p>
+                <p className="text-muted-foreground text-xs">
+                  {t("start.stats.estimated")}
+                </p>
               </div>
             </div>
 
@@ -928,14 +942,12 @@ export default function LessonSentenceClozeTest({
             <div className="bg-muted/50 space-y-3 rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <div className="bg-primary h-2 w-2 rounded-full" />
-                <p className="text-sm font-medium">How to Play</p>
+                <p className="text-sm font-medium">{t("instructions.title")}</p>
               </div>
               <ul className="text-muted-foreground ml-4 space-y-2 text-sm">
-                <li>
-                  • Each sentence has missing words that you need to fill in
-                </li>
-                <li>• Select the correct option from the dropdown menus</li>
-                <li>• Complete all blanks to finish each sentence</li>
+                <li>• {t("instructions.item1")}</li>
+                <li>• {t("instructions.item2")}</li>
+                <li>• {t("instructions.item3")}</li>
               </ul>
             </div>
 
@@ -945,7 +957,7 @@ export default function LessonSentenceClozeTest({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="difficulty" className="text-sm font-medium">
-                  Choose Difficulty Level
+                  {t("difficulty.choose")}
                 </Label>
                 <Select
                   value={selectedDifficulty}
@@ -955,25 +967,27 @@ export default function LessonSentenceClozeTest({
                   }}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select difficulty" />
+                    <SelectValue
+                      placeholder={t("difficulty.select") as string}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="easy">
                       <div className="flex items-center gap-2">
                         <span className="text-green-600">🟢</span>
-                        <span>Easy</span>
+                        <span>{t("difficulty.easy")}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="medium">
                       <div className="flex items-center gap-2">
                         <span className="text-yellow-600">🟡</span>
-                        <span>Medium</span>
+                        <span>{t("difficulty.medium")}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="hard">
                       <div className="flex items-center gap-2">
                         <span className="text-red-600">🔴</span>
-                        <span>Hard</span>
+                        <span>{t("difficulty.hard")}</span>
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -997,12 +1011,10 @@ export default function LessonSentenceClozeTest({
                   </span>
                 </div>
                 <p className="text-muted-foreground text-sm">
-                  {selectedDifficulty === "easy" &&
-                    "Perfect for beginners. One word will be missing from each sentence."}
+                  {selectedDifficulty === "easy" && t("difficulty.desc.easy")}
                   {selectedDifficulty === "medium" &&
-                    "Moderate challenge. Two words will be missing from each sentence."}
-                  {selectedDifficulty === "hard" &&
-                    "Maximum challenge. Three words will be missing from each sentence."}
+                    t("difficulty.desc.medium")}
+                  {selectedDifficulty === "hard" && t("difficulty.desc.hard")}
                 </p>
               </div>
             </div>
@@ -1033,15 +1045,12 @@ export default function LessonSentenceClozeTest({
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading {selectedDifficulty} sentences...
+                  {t("buttons.loading", { difficulty: selectedDifficulty })}
                 </>
               ) : (
                 <>
                   <Play className="mr-2 h-5 w-5" />
-                  Start{" "}
-                  {selectedDifficulty.charAt(0).toUpperCase() +
-                    selectedDifficulty.slice(1)}{" "}
-                  Game
+                  {t("buttons.startGame")}
                 </>
               )}
             </Button>
@@ -1056,7 +1065,7 @@ export default function LessonSentenceClozeTest({
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
-          <p className="text-muted-foreground">Loading next challenge...</p>
+          <p className="text-muted-foreground">{t("loading.nextChallenge")}</p>
         </div>
       </div>
     );
@@ -1072,7 +1081,7 @@ export default function LessonSentenceClozeTest({
           </span>
           <div className="flex items-center gap-4">
             <span>
-              {score}/{activeSentences.length} perfect
+              {t("progress.perfect", { score, total: activeSentences.length })}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
@@ -1092,7 +1101,7 @@ export default function LessonSentenceClozeTest({
                 📖 {currentSentence.articleTitle}
               </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Fill in the missing words by selecting from the dropdown menus
+                {t("game.subtitle")}
               </p>
             </div>
           </div>
@@ -1104,7 +1113,7 @@ export default function LessonSentenceClozeTest({
           <div className="bg-muted/30 flex flex-wrap items-center gap-3 rounded-lg border p-4">
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium">Hints:</span>
+              <span className="text-sm font-medium">{t("hints.label")}</span>
             </div>
 
             {/* Audio Toggle */}
@@ -1116,7 +1125,7 @@ export default function LessonSentenceClozeTest({
                 className="h-8"
               >
                 <Volume2 className="mr-1 h-3 w-3" />
-                Audio
+                {t("hints.audio")}
               </Button>
             </div>
 
@@ -1139,7 +1148,7 @@ export default function LessonSentenceClozeTest({
                   ) : (
                     <>
                       <Play className="mr-2 h-3 w-3" />
-                      Play Order
+                      {t("hints.play")}
                     </>
                   )}
                 </Button>
@@ -1154,7 +1163,7 @@ export default function LessonSentenceClozeTest({
                 <div className="flex items-center gap-2">
                   <Target className="text-primary h-5 w-5" />
                   <p className="text-sm font-medium">
-                    Complete the sentence by filling in the blanks:
+                    {t("sentence.instructions")}
                   </p>
                 </div>
 
@@ -1168,13 +1177,17 @@ export default function LessonSentenceClozeTest({
           {/* Progress indicator for current sentence */}
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              Progress: {userAnswers.length}/{currentSentence.blanks.length}{" "}
-              blanks filled
+              {t("progress.sentence", {
+                answered: userAnswers.length,
+                total: currentSentence.blanks.length,
+              })}
             </span>
             {userAnswers.length > 0 && (
               <span className="text-muted-foreground">
-                Correct: {userAnswers.filter((a) => a.isCorrect).length}/
-                {userAnswers.length}
+                {t("progress.correct", {
+                  correct: userAnswers.filter((a) => a.isCorrect).length,
+                  answered: userAnswers.length,
+                })}
               </span>
             )}
           </div>
@@ -1199,8 +1212,12 @@ export default function LessonSentenceClozeTest({
                     )}
                     <h3 className="text-lg font-semibold">
                       {userAnswers.every((a) => a.isCorrect)
-                        ? "Perfect! All blanks correct! 🎉"
-                        : `${userAnswers.filter((a) => a.isCorrect).length}/${currentSentence.blanks.length} correct 💪`}
+                        ? t("result.perfect")
+                        : t("result.tryAgain", {
+                            correct: userAnswers.filter((a) => a.isCorrect)
+                              .length,
+                            total: currentSentence.blanks.length,
+                          })}
                     </h3>
                   </div>
 
@@ -1209,7 +1226,9 @@ export default function LessonSentenceClozeTest({
                       <div className="space-y-3">
                         <Separator />
                         <div>
-                          <h4 className="mb-3 font-medium">Correct Answers:</h4>
+                          <h4 className="mb-3 font-medium">
+                            {t("result.correctAnswers")}
+                          </h4>
                           <div className="space-y-2">
                             {currentSentence.blanks.map((blank, index) => (
                               <div
@@ -1249,7 +1268,7 @@ export default function LessonSentenceClozeTest({
               className="sm:w-auto"
             >
               <RotateCcw className="mr-2 h-4 w-4" />
-              Reset Answers
+              {t("buttons.reset")}
             </Button>
 
             {!isCompleted && userAnswers.length > 0 && (
@@ -1260,7 +1279,7 @@ export default function LessonSentenceClozeTest({
                 className="sm:w-auto"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Check Answers
+                {t("buttons.check")}
               </Button>
             )}
 
@@ -1274,15 +1293,15 @@ export default function LessonSentenceClozeTest({
                   className="sm:w-auto"
                 >
                   <Eye className="mr-2 h-4 w-4" />
-                  Show Answers
+                  {t("buttons.showAnswers")}
                 </Button>
               )}
 
             {isCompleted && (
               <Button onClick={handleNext} className="flex-1">
                 {currentIndex < activeSentences.length - 1
-                  ? "Next Sentence"
-                  : "Finish Game"}
+                  ? t("buttons.next")
+                  : t("buttons.finish")}
               </Button>
             )}
           </div>

@@ -1,12 +1,17 @@
+"use client";
+
 import { Book } from "lucide-react";
 import React from "react";
 import LessonVocabularyMatching from "../games/lesson-vocabulary-matching";
+import { useTranslations } from "next-intl";
 
 export default function TaskVocabularyMatching({
   articleId,
 }: {
   articleId: string;
 }) {
+  const t = useTranslations("Lesson.tasks");
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header Section */}
@@ -15,10 +20,10 @@ export default function TaskVocabularyMatching({
           <Book className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Vocabulary Matching
+          {t("vocabularyMatchingTitle")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          Vocabulary Matching
+          {t("vocabularyMatchingDescription")}
         </p>
       </div>
 

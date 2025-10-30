@@ -38,6 +38,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { updateUserActivity } from "@/actions/user";
+import { useTranslations } from "next-intl";
 
 // Type definitions
 interface VocabularyPair {
@@ -60,6 +61,7 @@ export default function LessonVocabularyMatching({
 }: {
   articleId: string;
 }) {
+  const t = useTranslations("Lesson.VocabularyMatching");
   // Game state
   const [gameState, setGameState] = useState<GameState>(GameState.Starting);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
@@ -110,9 +112,9 @@ export default function LessonVocabularyMatching({
       setSelectedLeft(null);
 
       if (isCorrect) {
-        toast.success("Correct match! ✅");
+        toast.success(t("results.correctMatch"));
       } else {
-        toast.error("Incorrect match. Try again! ❌");
+        toast.error(t("results.incorrectMatch"));
       }
     },
     [vocabularyPairs, isCompleted],
@@ -136,7 +138,7 @@ export default function LessonVocabularyMatching({
 
   const handleShowAnswers = useCallback(() => {
     setShowCorrectAnswers(true);
-    toast.info("Correct matches revealed! 📖");
+    toast.info(t("results.showAnswers"));
   }, []);
 
   const handleComplete = useCallback(() => {
@@ -183,7 +185,7 @@ export default function LessonVocabularyMatching({
       } catch (error) {
         console.error("Error loading flashcards:", error);
         setGameState(GameState.Error);
-        toast.error("Failed to load vocabulary");
+        toast.error(t("toast.failedToLoad"));
       }
     };
 
@@ -227,11 +229,13 @@ export default function LessonVocabularyMatching({
 
       if (isAllCorrect) {
         setScore((prev) => prev + 1);
-
-        toast.success("Perfect! All pairs matched correctly! 🎉");
+        toast.success(t("results.perfect"));
       } else {
         toast.error(
-          `${correctCount}/${vocabularyPairs.length} correct. Try again! 💪`,
+          t("results.tryAgain", {
+            correct: correctCount,
+            total: vocabularyPairs.length,
+          }),
         );
       }
     }
@@ -249,9 +253,9 @@ export default function LessonVocabularyMatching({
                 <GraduationCap className="absolute inset-0 m-auto h-8 w-8 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">Loading Flashcards</h3>
+                <h3 className="text-lg font-semibold">{t("loading.title")}</h3>
                 <p className="text-muted-foreground">
-                  Preparing your vocabulary practice...
+                  {t("loading.description")}
                 </p>
               </div>
             </div>
@@ -272,12 +276,9 @@ export default function LessonVocabularyMatching({
                 <GraduationCap className="h-12 w-12 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">
-                  No Vocabulary Available
-                </h3>
+                <h3 className="text-lg font-semibold">{t("noCards.title")}</h3>
                 <p className="text-muted-foreground">
-                  There are no vocabulary flashcards available for this article
-                  yet.
+                  {t("noCards.description")}
                 </p>
               </div>
             </div>
@@ -298,9 +299,9 @@ export default function LessonVocabularyMatching({
                 <XCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
               </div>
               <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">Failed to Load</h3>
+                <h3 className="text-lg font-semibold">{t("error.title")}</h3>
                 <p className="text-muted-foreground">
-                  There was an error loading the vocabulary. Please try again.
+                  {t("error.description")}
                 </p>
               </div>
               <Button
@@ -311,7 +312,7 @@ export default function LessonVocabularyMatching({
                 variant="outline"
               >
                 <RotateCcw className="mr-2 h-4 w-4" />
-                Try Again
+                {t("buttons.tryAgain")}
               </Button>
             </div>
           </CardContent>
@@ -330,18 +331,14 @@ export default function LessonVocabularyMatching({
                 <GraduationCap className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold">
-                  Starting Vocabulary Matching
-                </h3>
-                <p className="text-muted-foreground">
-                  Choose your preferred language for definitions
-                </p>
+                <h3 className="text-xl font-semibold">{t("start.title")}</h3>
+                <p className="text-muted-foreground">{t("start.subtitle")}</p>
                 <div className="flex flex-col items-center justify-center gap-4">
                   <div className="w-full max-w-md space-y-4">
                     <div className="flex items-center justify-center gap-2">
                       <Languages className="h-5 w-5 text-indigo-500" />
                       <Label className="text-base font-semibold">
-                        Definition Language
+                        {t("start.languageLabel")}
                       </Label>
                     </div>
                     <Select
@@ -403,7 +400,7 @@ export default function LessonVocabularyMatching({
                       </SelectContent>
                     </Select>
                     <p className="text-muted-foreground text-center text-xs">
-                      Word definitions will be shown in this language
+                      {t("start.languageHint")}
                     </p>
                   </div>
                   <Button
@@ -412,7 +409,7 @@ export default function LessonVocabularyMatching({
                     className="w-full max-w-md"
                   >
                     <Play className="mr-2 h-4 w-4" />
-                    Start Matching Game
+                    {t("start.startButton")}
                   </Button>
                 </div>
               </div>
@@ -442,10 +439,10 @@ export default function LessonVocabularyMatching({
                 </div>
                 <div className="space-y-2">
                   <h2 className="bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-3xl font-bold text-transparent">
-                    Vocabulary Practice Complete!
+                    {t("completed.title")}
                   </h2>
                   <p className="text-lg text-gray-600 dark:text-gray-400">
-                    Excellent work on your vocabulary practice session
+                    {t("completed.subtitle")}
                   </p>
                 </div>
               </div>
@@ -459,7 +456,7 @@ export default function LessonVocabularyMatching({
                     20
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    XP Earned
+                    {t("completed.xpEarned")}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -467,7 +464,7 @@ export default function LessonVocabularyMatching({
                     5/5
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Completed
+                    {t("completed.completed")}
                   </div>
                 </div>
               </div>
@@ -501,11 +498,9 @@ export default function LessonVocabularyMatching({
         <CardHeader>
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="space-y-3">
-              <CardTitle className="text-xl">
-                📚 Match Words with Definitions
-              </CardTitle>
+              <CardTitle className="text-xl">{t("game.title")}</CardTitle>
               <p className="text-muted-foreground text-sm">
-                Click a word on the left, then click its definition on the right
+                {t("game.instruction")}
               </p>
             </div>
           </div>
@@ -519,7 +514,7 @@ export default function LessonVocabularyMatching({
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-blue-500" />
-                  <h3 className="font-medium">Words</h3>
+                  <h3 className="font-medium">{t("game.columns.words")}</h3>
                 </div>
                 <div className="space-y-2">
                   {vocabularyPairs.map((pair) => {
@@ -572,7 +567,9 @@ export default function LessonVocabularyMatching({
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 flex-shrink-0 rounded-full bg-green-500" />
-                    <h3 className="font-medium">Definitions</h3>
+                    <h3 className="font-medium">
+                      {t("game.columns.definitions")}
+                    </h3>
                   </div>
                   {selectedLanguage &&
                     languageOptions[
@@ -661,8 +658,12 @@ export default function LessonVocabularyMatching({
                     )}
                     <h3 className="text-lg font-semibold">
                       {userMatches.every((m) => m.isCorrect)
-                        ? "Perfect! All pairs matched correctly! 🎉"
-                        : `${userMatches.filter((m) => m.isCorrect).length}/${vocabularyPairs.length} correct 💪`}
+                        ? t("results.perfect")
+                        : t("results.partialCorrect", {
+                            correct: userMatches.filter((m) => m.isCorrect)
+                              .length,
+                            total: vocabularyPairs.length,
+                          })}
                     </h3>
                   </div>
 
@@ -671,7 +672,9 @@ export default function LessonVocabularyMatching({
                       <div className="space-y-3">
                         <Separator />
                         <div>
-                          <h4 className="mb-3 font-medium">Correct Matches:</h4>
+                          <h4 className="mb-3 font-medium">
+                            {t("results.correctMatches")}
+                          </h4>
                           <div className="space-y-2">
                             {vocabularyPairs.map((pair, index) => (
                               <div key={pair.id} className="flex gap-3 text-sm">
@@ -710,13 +713,13 @@ export default function LessonVocabularyMatching({
                   className="sm:w-auto"
                 >
                   <Eye className="mr-2 h-4 w-4" />
-                  Show Answers
+                  {t("buttons.showAnswers")}
                 </Button>
               )}
 
             {isCompleted && userMatches.every((m) => m.isCorrect) && (
               <Button onClick={handleComplete} className="flex-1">
-                Complete Activity
+                {t("buttons.completeActivity")}
               </Button>
             )}
           </div>

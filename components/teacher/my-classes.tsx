@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Table,
   TableBody,
@@ -121,6 +122,7 @@ type CourseWithCount = Schema$Course & {
 };
 
 export default function MyClasses() {
+  const t = useTranslations("TeacherMyClasses");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -166,8 +168,8 @@ export default function MyClasses() {
   ) => {
     try {
       if (!classroomName || !grade) {
-        toast.error("Attention", {
-          description: "Please fill in all fields",
+        toast.error(t("toast.attention"), {
+          description: t("toast.fillAllFields"),
           richColors: true,
         });
         return;
@@ -188,8 +190,8 @@ export default function MyClasses() {
         throw new Error("Failed to update class");
       }
 
-      toast.success("Success", {
-        description: "Class updated successfully",
+      toast.success(t("toast.success"), {
+        description: t("toast.classUpdated"),
         richColors: true,
       });
 
@@ -197,8 +199,8 @@ export default function MyClasses() {
       fetchClassrooms();
     } catch (error) {
       console.error(error);
-      toast.error("Error", {
-        description: "Failed to update class",
+      toast.error(t("toast.error"), {
+        description: t("toast.failedUpdate"),
         richColors: true,
       });
     }
@@ -210,21 +212,21 @@ export default function MyClasses() {
         method: "DELETE",
       });
       if (res.status === 200) {
-        toast.success("Success", {
-          description: "Class deleted successfully",
+        toast.success(t("toast.success"), {
+          description: t("toast.classDeleted"),
           richColors: true,
         });
         fetchClassrooms();
       } else {
-        toast.error("Error", {
-          description: "Failed to delete class",
+        toast.error(t("toast.error"), {
+          description: t("toast.failedDelete"),
           richColors: true,
         });
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error", {
-        description: "Failed to delete class",
+      toast.error(t("toast.error"), {
+        description: t("toast.failedDelete"),
         richColors: true,
       });
     } finally {
@@ -255,7 +257,7 @@ export default function MyClasses() {
       //   );
       // },
       header: () => {
-        return <div>Class Name</div>;
+        return <div>{t("table.headers.className")}</div>;
       },
       cell: ({ row }) => {
         const classroomName: string = row.getValue("name");
@@ -280,7 +282,9 @@ export default function MyClasses() {
     {
       accessorKey: "classCode",
       header: () => {
-        return <div className="text-center"> Class Code</div>;
+        return (
+          <div className="text-center">{t("table.headers.classCode")}</div>
+        );
       },
       cell: ({ row }) => (
         <div className="captoliza text-center">{row.getValue("classCode")}</div>
@@ -289,7 +293,9 @@ export default function MyClasses() {
     {
       accessorKey: "students.length",
       header: () => {
-        return <div className="text-center">Student Count</div>;
+        return (
+          <div className="text-center">{t("table.headers.studentCount")}</div>
+        );
       },
       cell: ({ row }) => (
         <div className="captoliza text-center">
@@ -300,7 +306,7 @@ export default function MyClasses() {
     {
       accessorKey: "grade",
       header: () => {
-        return <div className="text-center">Grade</div>;
+        return <div className="text-center">{t("table.headers.grade")}</div>;
       },
       cell: ({ row }) => (
         <div className="captoliza text-center">{row.getValue("grade")}</div>
@@ -310,7 +316,7 @@ export default function MyClasses() {
       id: "actions",
       enableHiding: false,
       header: () => {
-        return <div className="text-center">Actions</div>;
+        return <div className="text-center">{t("table.headers.actions")}</div>;
       },
       cell: ({ row }) => {
         const payment = row.original;
@@ -330,13 +336,13 @@ export default function MyClasses() {
                   }
                 >
                   <ClipboardListIcon className="size-4" />
-                  Roster
+                  {t("actions.roster")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => router.push(`/teacher/reports/${payment.id}`)}
                 >
                   <ChartColumnBigIcon className="size-4" />
-                  Reports
+                  {t("actions.reports")}
                 </DropdownMenuItem>
                 {payment.importedFromGoogle ? null : (
                   <DropdownMenuItem
@@ -348,12 +354,12 @@ export default function MyClasses() {
                     }}
                   >
                     <PencilIcon className="size-4" />
-                    Edit
+                    {t("actions.edit")}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem>
                   <ArchiveIcon className="size-4" />
-                  Archive
+                  {t("actions.archive")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -363,7 +369,7 @@ export default function MyClasses() {
                   }}
                 >
                   <TrashIcon className="size-4" />
-                  Delete
+                  {t("actions.delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -449,7 +455,7 @@ export default function MyClasses() {
       <div className="flex flex-col gap-4">
         <div className="flex items-end justify-between">
           <Input
-            placeholder="Search"
+            placeholder={t("search.placeholder")}
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("name")?.setFilterValue(event.target.value)
@@ -458,7 +464,7 @@ export default function MyClasses() {
           />
           <div className="flex items-end space-x-2">
             <div className="flex-col space-y-2">
-              <p className="text-xs opacity-70">Import a new class from</p>
+              <p className="text-xs opacity-70">{t("import.fromLabel")}</p>
               <Button
                 onClick={() => {
                   // syncClassroom();
@@ -468,7 +474,7 @@ export default function MyClasses() {
                 {loading ? (
                   <>
                     <Loader2Icon className="mr-2 size-4 animate-spin" />
-                    Google Classroom
+                    {t("import.googleClassroom")}
                   </>
                 ) : (
                   <>
@@ -479,7 +485,7 @@ export default function MyClasses() {
                       width={20}
                       height={20}
                     />
-                    Google Classroom
+                    {t("import.googleClassroom")}
                   </>
                 )}
               </Button>
@@ -530,7 +536,7 @@ export default function MyClasses() {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    Empty
+                    {t("table.empty")}
                   </TableCell>
                 </TableRow>
               )}
@@ -545,8 +551,7 @@ export default function MyClasses() {
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              {/* {t("previous")} */}
-              Previous
+              {t("pagination.previous")}
             </Button>
             <Button
               variant="outline"
@@ -554,8 +559,7 @@ export default function MyClasses() {
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              {/* {t("next")} */}
-              Next
+              {t("pagination.next")}
             </Button>
           </div>
         </div>
@@ -565,7 +569,7 @@ export default function MyClasses() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              <h1 className="text-2xl">Import Your Google Classroom</h1>
+              <h1 className="text-2xl">{t("import.dialog.title")}</h1>
             </DialogTitle>
           </DialogHeader>
           <ImportStateSlider currentLevel={importState} />
@@ -574,15 +578,12 @@ export default function MyClasses() {
             {importState === 0 && (
               <div className="p-6">
                 <h2 className="mb-4 text-xl font-semibold">
-                  Select a Google Classroom Class
+                  {t("import.dialog.selectClass")}
                 </h2>
-                <p className="mb-6">
-                  Choose a class to sync with Reading Advantage. All students
-                  will be imported and added to your account.
-                </p>
+                <p className="mb-6">{t("import.dialog.description")}</p>
                 <div className="mb-6">
                   <label className="mb-1 block text-sm font-medium">
-                    Your Google Classroom Classes
+                    {t("import.dialog.yourClasses")}
                   </label>
                   {/* {courses.length ? (
                     <ScrollArea className="h-52">
@@ -621,13 +622,13 @@ export default function MyClasses() {
                     <RefreshCcwIcon
                       className={cn("size-4", loading ? "animate-spin" : "")}
                     />
-                    Refresh
+                    {t("import.dialog.refresh")}
                   </Button>
                   <Button
                     // onClick={() => handleImportCourses()}
                     disabled={!selected}
                   >
-                    Continue
+                    {t("import.dialog.continue")}
                   </Button>
                 </div>
               </div>
@@ -635,10 +636,11 @@ export default function MyClasses() {
             {importState === 1 && (
               <div className="flex flex-col items-center justify-center p-6 py-12">
                 <div className="mb-4 h-12 w-12 animate-spin rounded-full border-t-2 border-b-2 border-blue-600"></div>
-                <h2 className="mb-2 text-xl font-semibold">Syncing Class...</h2>
+                <h2 className="mb-2 text-xl font-semibold">
+                  {t("import.dialog.syncing")}
+                </h2>
                 <p className="max-w-md text-center text-gray-600">
-                  Importing students from Google Classroom. This may take a
-                  moment.
+                  {t("import.dialog.syncingDescription")}
                 </p>
               </div>
             )}
@@ -650,7 +652,7 @@ export default function MyClasses() {
                   </div>
                 </div>
                 <h2 className="mb-2 text-center text-xl font-semibold">
-                  Sync Completed!
+                  {t("import.dialog.syncCompleted")}
                 </h2>
                 {/* {selectedCourses.map((course: CourseWithCount) => (
                   <>
@@ -696,7 +698,7 @@ export default function MyClasses() {
                     {loading ? (
                       <Icons.spinner className="h-4 w-4 animate-spin" />
                     ) : null}
-                    Sync Another Class
+                    {t("import.dialog.syncAnother")}
                   </Button>
                   <Button
                     onClick={() => {
@@ -705,7 +707,7 @@ export default function MyClasses() {
                       setCoursesOpen(false);
                     }}
                   >
-                    Go to Class
+                    {t("import.dialog.goToClass")}
                   </Button>
                 </div>
               </div>
@@ -714,14 +716,10 @@ export default function MyClasses() {
           <DialogFooter>
             <div className="rounded-md border p-4">
               <h3 className="mb-1 flex items-center gap-2 font-medium">
-                <CircleAlertIcon className="size-4" /> About Google Classroom
-                Sync
+                <CircleAlertIcon className="size-4" />{" "}
+                {t("import.dialog.aboutTitle")}
               </h3>
-              <p className="text-sm">
-                This feature allows teachers to easily import their Google
-                Classroom students into Reading Advantage. Students will be
-                automatically enrolled in your class.
-              </p>
+              <p className="text-sm">{t("import.dialog.aboutDescription")}</p>
             </div>
           </DialogFooter>
         </DialogContent>
@@ -733,34 +731,34 @@ export default function MyClasses() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Class</DialogTitle>
+            <DialogTitle>{t("edit.title")}</DialogTitle>
           </DialogHeader>
           <DialogDescription>
-            Are you sure you want to edit the class?
+            {t("edit.description")}
             {/* <span className="font-bold">{payment.name}</span> */}
           </DialogDescription>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label>Class Name</Label>
+              <Label>{t("edit.className")}</Label>
               <Input
                 type="text"
                 className="col-span-3"
-                placeholder="Class Name"
+                placeholder={t("edit.classNamePlaceholder")}
                 value={nameChange}
                 onChange={handleChangeName}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label>Grade</Label>
+              <Label>{t("edit.grade")}</Label>
               <Select value={grade} onValueChange={(value) => setGrade(value)}>
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Grade" />
+                  <SelectValue placeholder={t("edit.gradePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: 10 }, (_, i) => i + 3).map(
                     (grade, index) => (
                       <SelectItem key={index} value={String(grade)}>
-                        Grade {grade}
+                        {t("edit.gradeItem", { grade })}
                       </SelectItem>
                     ),
                   )}
@@ -776,7 +774,7 @@ export default function MyClasses() {
                 handleEditClass(classroomId, nameChange, grade);
               }}
             >
-              Edit
+              {t("edit.submit")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -787,10 +785,10 @@ export default function MyClasses() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Class</DialogTitle>
+            <DialogTitle>{t("delete.title")}</DialogTitle>
           </DialogHeader>
           <DialogDescription>
-            Are you sure you want to delete the class?
+            {t("delete.description")}
             {/* <span className="font-bold">{classroomName}</span> */}
           </DialogDescription>
           <DialogFooter>
@@ -798,9 +796,11 @@ export default function MyClasses() {
               variant="destructive"
               onClick={() => handleDeleteClass(classroomId)}
             >
-              Delete
+              {t("delete.submit")}
             </Button>
-            <Button onClick={() => setDialogOpen("")}>Cancel</Button>
+            <Button onClick={() => setDialogOpen("")}>
+              {t("delete.cancel")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

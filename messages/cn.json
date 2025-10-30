@@ -9,25 +9,52 @@
     "goBack": "返回",
     "returnToWebsite": "返回网站"
   },
+  "common": {
+    "tryAgain": "再试一次"
+  },
   "MainNav": {
     "home": "主页",
     "about": "关于",
     "contact": "联系",
-    "authors": "作者"
+    "authors": "作者",
+    "login": "登录",
+    "usernav": {
+      "settings": "设置",
+      "logout": "退出",
+      "contactUs": "联系我们",
+      "account": "账户",
+      "navigation": "导航",
+      "studentDashboard": "学生仪表板",
+      "teacherDashboard": "教师仪表板",
+      "adminDashboard": "管理员仪表板",
+      "systemDashboard": "系统仪表板"
+    }
   },
   "Sidebar": {
     "read": "阅读",
+    "assignments": "作业",
     "sentences": "句子",
-    "vocabulary": "单词",
+    "vocabulary": "词汇",
     "testing": "测试",
     "systemdashboard": "系统仪表板",
+    "licenses": "许可证仪表板",
+    "schools": "学校仪表板",
     "teacherdashboard": "教师仪表板",
     "reports": "报告",
+    "history": "历史",
     "myClasses": "我的班级",
     "myStudents": "我的学生",
-    "classRoster": "班级名册",
+    "classRoster": "班级花名册",
     "adminDashboard": "管理员仪表板",
+    "dashboard": "仪表板",
+    "admin": "管理员",
+    "teachers": "教师",
     "importdata": "导入数据",
+    "userProfile": "用户资料",
+    "schoolProfile": "学校资料",
+    "studentsandclasses": "学生和班级",
+    "articlecreation": "文章创建",
+    "back": "返回",
     "subItem": {
       "admin": "管理员",
       "teachers": "教师",
@@ -36,8 +63,8 @@
       "addTeacher": "添加教师",
       "allStudents": "所有学生",
       "addStudent": "添加学生",
-      "classrooms": "教室",
-      "classRoster": "班级名册",
+      "classrooms": "班级",
+      "classRoster": "班级花名册",
       "studentProgress": "学生进度",
       "overviewReports": "概览报告",
       "performanceAnalytics": "性能分析",
@@ -47,7 +74,14 @@
   "Question": {
     "SAQuestion": {
       "title": "简答题",
-      "description": "用几句话回答问题"
+      "description": "用几句话回答问题",
+      "question": "问题",
+      "suggestedAnswer": "建议答案",
+      "feedback": "反馈",
+      "yourAnswer": "您的答案",
+      "feedbackAndYourScore": "反馈和您的分数",
+      "score": "分数是 {score}",
+      "anwserError": "请输入您的答案"
     },
     "LAQuestion": {
       "title": "长答题",
@@ -82,6 +116,28 @@
     "descriptionError": "获取问题时发生错误",
     "descriptionLoading": "正在获取问题，请稍候"
   },
+  "Student": {
+    "history": {
+      "titleOfHistory": "阅读记录 - {name}",
+      "reminderToReread": {
+        "title": "提醒重新阅读",
+        "description": "您可能想要尝试重新阅读这些文章之一，看看您是否有所进步。"
+      },
+      "articleRecords": {
+        "title": "文章记录",
+        "description": "您的阅读记录将显示在这里。"
+      },
+      "title": "文章标题",
+      "score": "分数",
+      "date": "日期",
+      "rated": "评分",
+      "status": "状态",
+      "searchPlaceholder": "搜索文章...",
+      "loading": "加载中...",
+      "noArticles": "未找到文章",
+      "noArticlesToRead": "没有需要重新阅读的文章"
+    }
+  },
   "Admin": {
     "Classrooms": {
       "classrooms": "教室",
@@ -98,6 +154,7 @@
       "namePlaceholder": "输入教室名称",
       "grade": "年级",
       "gradePlaceholder": "输入年级",
+      "selectGrade": "选择年级",
       "classCode": "班级代码",
       "studentPassword": "学生密码",
       "studentPasswordPlaceholder": "输入学生密码",
@@ -115,22 +172,374 @@
       "updating": "更新中...",
       "deleting": "删除中...",
       "noClassrooms": "未找到教室",
-      "loading": "正在加载教室..."
+      "loading": "正在加载教室...",
+      "toast": {
+        "invalidData": "收到无效的数据格式",
+        "loadFailed": "加载教室失败",
+        "createFailed": "创建教室失败",
+        "updateFailed": "更新教室失败",
+        "deleteFailed": "删除教室失败"
+      }
+    },
+    "Students": {
+      "Add": {
+        "heading": "添加学生",
+        "subtext": "为您的学校添加一名新学生",
+        "cardTitle": "学生信息",
+        "nameLabel": "姓名",
+        "namePlaceholder": "输入学生的姓名",
+        "emailLabel": "电子邮箱",
+        "emailPlaceholder": "输入电子邮箱地址",
+        "submit": "创建学生",
+        "submitting": "正在创建学生...",
+        "reset": "重置表单",
+        "toastSuccess": "学生创建成功！",
+        "errorGeneric": "创建学生失败",
+        "errors": {
+          "nameMin": "姓名至少需要 2 个字符",
+          "nameMax": "姓名不能超过 100 个字符",
+          "emailInvalid": "请输入有效的电子邮箱地址"
+        }
+      }
+    }
+  },
+  "ImportData": {
+    "header": {
+      "heading": "导入数据",
+      "text": "导入 CSV 文件，以批量将学生、教师和班级添加到系统"
+    },
+    "errors": {
+      "onlyCsv": "仅允许 CSV 文件",
+      "sizeExceeded": "文件大小超过 5MB 限制。当前大小：{size}MB",
+      "parseError": "无法解析 CSV 文件。请检查文件格式",
+      "readError": "无法读取文件",
+      "uploadFailed": "上传失败"
+    },
+    "upload": {
+      "cardTitle": "上传 CSV 文件",
+      "selectFile": "选择 CSV 文件",
+      "maxSize": "最大大小：5MB",
+      "browse": "浏览",
+      "supportedFormat": "支持格式：仅 CSV 文件，最大 5MB",
+      "fileSelected": {
+        "title": "已选择文件",
+        "name": "名称",
+        "size": "大小",
+        "type": "类型"
+      },
+      "failedTitle": "上传失败",
+      "successTitle": "上传成功",
+      "success": {
+        "file": "文件",
+        "size": "大小",
+        "savedAs": "保存为",
+        "nextSteps": "文件已准备好处理。您可以继续下一步。"
+      },
+      "progressLabel": "上传进度",
+      "progressPercent": "已完成 {percent}%",
+      "uploading": "正在上传...",
+      "importButton": "导入数据",
+      "clear": "清除"
+    },
+    "preview": {
+      "button": "预览",
+      "title": "数据预览",
+      "columns": { "name": "姓名", "email": "邮箱", "role": "角色" }
+    },
+    "formatGuide": {
+      "title": "CSV 格式指南",
+      "tabs": {
+        "students": "学生",
+        "teachers": "教师与管理员",
+        "classes": "班级"
+      },
+      "requiredHeaders": "必填表头（严格按此顺序）：",
+      "exampleData": "示例数据：",
+      "requirements": "要求：",
+      "downloadTemplate": "下载{type, select, students {学生} teachers {教师} classes {班级} other {数据}}模板"
+    },
+    "format": {
+      "headers": {
+        "name": "name",
+        "email": "email",
+        "classroomName": "classroom_name",
+        "role": "role"
+      },
+      "students": {
+        "title": "学生数据格式",
+        "description": "导入学生信息（个人信息与班级分配）",
+        "req1": "文件名必须是 students.csv",
+        "req2": "邮箱需唯一且格式有效",
+        "req3": "角色应为 Student"
+      },
+      "teachers": {
+        "title": "教师与管理员数据格式",
+        "description": "导入教师信息及其分配的科目/班级",
+        "req1": "文件名必须是 teachers.csv",
+        "req2": "邮箱需唯一且格式有效",
+        "req3": "角色应为 Teacher 或 Admin"
+      },
+      "classes": {
+        "title": "班级数据格式",
+        "description": "导入班级与教室信息",
+        "req1": "文件名必须是 classes.csv",
+        "req2": "班级名称需唯一"
+      }
+    },
+    "tips": {
+      "title": "导入提示",
+      "fileSize": {
+        "title": "文件大小限制",
+        "desc": "最大 5MB。体积较大的文件请拆分后导入"
+      },
+      "encoding": {
+        "title": "使用 UTF-8 编码",
+        "desc": "以 UTF-8 保存 CSV 以支持特殊字符"
+      },
+      "duplicates": {
+        "title": "检查重复",
+        "desc": "导入前请确保邮箱与编号不重复"
+      },
+      "validate": {
+        "title": "先校验数据",
+        "desc": "导入前使用预览功能检查数据"
+      },
+      "backup": {
+        "title": "先备份",
+        "desc": "大规模导入前请先备份现有数据"
+      }
+    },
+    "issues": {
+      "title": "常见问题",
+      "wrongFormat": {
+        "title": "文件格式错误",
+        "desc": "仅接受 CSV 文件。请先将 Excel 转为 CSV"
+      },
+      "missingHeaders": {
+        "title": "缺少表头",
+        "desc": "第一行必须包含与示例一致的表头名称"
+      },
+      "invalidEmail": {
+        "title": "邮箱格式无效",
+        "desc": "请检查所有邮箱地址格式是否正确"
+      }
+    }
+  },
+  "AdminDashboard": {
+    "title": "管理员仪表板",
+    "subtitle": "管理您的学校教育平台",
+    "actions": {
+      "importData": "导入数据",
+      "addTeacher": "添加教师"
+    },
+    "stats": {
+      "teachers": "教师",
+      "teachersDesc": "您的学校中的活跃教师",
+      "students": "学生",
+      "studentsDesc": "注册学生",
+      "articles": "文章",
+      "articlesDesc": "可用的阅读材料",
+      "growth": "每月增长",
+      "growthDesc": "学生入学增长"
+    },
+    "quickActions": {
+      "title": "快速操作",
+      "addTeacher": "添加教师",
+      "addTeacherDesc": "注册新的教师账户",
+      "addStudent": "添加学生",
+      "addStudentDesc": "创建新的学生资料",
+      "createArticle": "创建文章",
+      "createArticleDesc": "生成新的阅读内容",
+      "importData": "导入数据",
+      "importDataDesc": "批量导入用户和内容",
+      "viewReports": "查看报告",
+      "viewReportsDesc": "访问分析和洞察",
+      "manageClassrooms": "管理班级",
+      "manageClassroomsDesc": "组织班级和作业"
+    },
+    "recentActivity": {
+      "title": "最近活动",
+      "empty": "没有最近的活动要显示",
+      "viewAll": "查看所有活动"
+    },
+    "systemStatus": {
+      "title": "系统状态",
+      "serverHealth": "服务器健康",
+      "database": "数据库",
+      "aiServices": "AI 服务",
+      "healthy": "健康",
+      "connected": "连接",
+      "operational": "运行中"
+    },
+    "alerts": {
+      "title": "系统警报",
+      "lowStorage": {
+        "title": "存储空间低",
+        "description": "考虑升级您的存储计划"
+      },
+      "newRegistrations": {
+        "title": "新教师注册",
+        "description": "5 教师等待批准"
+      }
+    },
+    "charts": {
+      "title": "分析概览",
+      "userGrowth": "用户增长",
+      "topArticles": "最受欢迎的文章",
+      "activityByLevel": "CEFR 等级活动",
+      "performance": "性能指标"
+    }
+  },
+  "AdminArticleCreationPage": {
+    "header": {
+      "heading": "文章创建与管理",
+      "text": "为 Primary Advantage 创建、用 AI 生成并审批文章"
     }
   },
   "Components": {
     "submitButton": "提交",
     "closeButton": "关闭",
     "cancelButton": "取消",
+    "previousButton": "上一题",
+    "retakeButton": "重新测试",
     "nextButton": "下一题",
     "finishButton": "完成",
+    "waitingButton": "请稍候...",
     "startQuiz": "开始测试",
     "getFeedback": "获取反馈",
     "audioButton": "听和读",
     "saveToFlashcard": "保存到闪卡",
     "translate": "翻译",
     "timer": "已用时 {elapsed} 秒",
-    "resetFilter": "重置过滤器"
+    "resetFilter": "重置过滤器",
+    "assignments": "作业",
+    "sentences": "句子",
+    "confirmRetake": "确认重新测试",
+    "areYouSureYouWantToRetakeThisQuiz": "您确定要重新测试吗？您的答案将被清除。",
+    "AdminArticleCreation": {
+      "tabs": {
+        "createArticle": "创建文章",
+        "previewEdit": "预览与编辑",
+        "manageArticles": "管理文章"
+      },
+      "aiArticleGenerator": "AI 文章生成器",
+      "aiArticleGeneratorDesc": "使用 AI 按您的设置生成高质量文章",
+      "articleType": "文章类型",
+      "fiction": "小说",
+      "nonFiction": "非小说",
+      "genre": "类型",
+      "subgenre": "子类型",
+      "cefrLevel": "CEFR 等级",
+      "articleTopic": "文章主题",
+      "placeholder": {
+        "genre": "选择类型",
+        "subgenre": "选择子类型",
+        "cefr": "选择 CEFR 等级",
+        "topic": "描述主题、主旨或关键要点"
+      },
+      "cefrLevels": {
+        "A1": "A1",
+        "A2": "A2",
+        "B1": "B1",
+        "B2": "B2",
+        "C1": "C1",
+        "C2": "C2"
+      },
+      "error": "错误",
+      "generateWithAI": "使用 AI 生成",
+      "dialog": {
+        "approval": {
+          "title": "确认审批",
+          "description": "你确定要审批并发布此文章吗？此操作将把文章发布到平台。"
+        },
+        "backToCreate": {
+          "title": "返回创建?",
+          "description": "如果返回创建，修改将会丢失。",
+          "warning": "此操作会将文章重置为初始状态。"
+        },
+        "common": {
+          "cancel": "取消",
+          "confirm": "确认",
+          "ok": "确定"
+        }
+      },
+      "loading": {
+        "titles": {
+          "generate": "正在生成文章",
+          "save": "正在保存草稿",
+          "approve": "正在审批并发布"
+        },
+        "descriptions": {
+          "generate": "请稍候，AI 正在创建内容...",
+          "save": "正在将修改保存为草稿...",
+          "approve": "正在将文章发布到平台..."
+        }
+      },
+      "preview": {
+        "title": "文章预览",
+        "description": "查看文章内容（只读）"
+      },
+      "editor": {
+        "title": "文章编辑器",
+        "description": "在审批前查看并编辑生成内容"
+      },
+      "modified": "已修改",
+      "badges": {
+        "type": "类型",
+        "genre": "类别",
+        "subgenre": "子类别",
+        "cefrLevel": "CEFR 等级"
+      },
+      "fields": {
+        "title": "文章标题",
+        "content": "文章内容",
+        "summary": "文章摘要"
+      },
+      "placeholders": {
+        "title": "输入文章标题...",
+        "content": "输入文章主要内容...",
+        "summary": "输入文章摘要..."
+      },
+      "buttons": {
+        "backToCreate": "返回创建",
+        "approveAndPublish": "审批并发布",
+        "saveAsDraft": "保存为草稿",
+        "backToManage": "返回管理",
+        "switchToEdit": "切换到编辑",
+        "refresh": "刷新",
+        "preview": "预览",
+        "edit": "编辑",
+        "delete": "删除",
+        "deleting": "正在删除..."
+      },
+      "manage": {
+        "title": "文章管理",
+        "description": "管理你的文章",
+        "loading": "正在加载文章...",
+        "empty": "未找到文章"
+      },
+      "status": {
+        "draft": "草稿",
+        "published": "已发布"
+      },
+      "list": {
+        "topic": "主题",
+        "cefr": "CEFR",
+        "rating": "评分",
+        "created": "创建时间"
+      },
+      "toasts": {
+        "fetchFailed": "获取文章失败",
+        "generateSuccess": "生成文章成功！",
+        "saveSuccess": "已成功保存为草稿！",
+        "saveFailed": "保存文章失败",
+        "approveSuccess": "审批并发布成功！",
+        "approveFailed": "审批文章失败",
+        "deleteSuccess": "删除文章成功",
+        "deleteFailed": "删除文章失败",
+        "deleteError": "删除文章时发生错误"
+      }
+    }
   },
   "WordList": {
     "title": "单词列表",
@@ -150,6 +559,8 @@
     "rating": "评分",
     "createdAt": "创建时间",
     "updatedAt": "更新时间",
+    "saveToFlashcard": "闪卡: 已保存",
+    "notSaved": "闪卡: 未保存",
     "selection": {
       "title": "文章选择",
       "description": "请选择您想要阅读的 {selection}",
@@ -272,6 +683,1943 @@
   },
   "Reports": {
     "title": "报告",
-    "description": "查看学生进度和课堂分析"
+    "description": "查看学生进度和课堂分析",
+    "activityprogress": "活动进度",
+    "recentactivity": "最近活动",
+    "activityheatmap": "活动热图",
+    "xpoverall": "XP 总体",
+    "readingstatschart": "阅读统计图",
+    "xpearned": "XP 获得",
+    "completed": "已完成",
+    "inProgress": "进行中",
+    "dateRange": "日期范围",
+    "activityType": {
+      "MC_QUESTION": "多选问题",
+      "SA_QUESTION": "短答问题",
+      "LA_QUESTION": "长答问题",
+      "ARTICLE_READ": "文章阅读"
+    },
+    "level": {
+      "title": "CEFR 等级",
+      "yourlevel": "您的等级",
+      "description": {
+        "A0": "您可以识别您以前见过的单词和名称，尤其是在有图片帮助的情况下。您可以理解您周围的真实简单的标志和基本信息，如在哪里和什么时候发生什么事情。",
+        "A1-": "您开始识别更多的单词和简单的短语，超越了最基本的词汇。您可以遵循短、简单的方向，并理解基本的短语和句子，关于您需要的事情。",
+        "A1": "您可以理解非常短和简单的文本。您可以识别足够的单词来发现它们在通知和简单指南中的位置。您可以使用您知道的单词谈论简单、日常的事情。",
+        "A1+": "您开始理解对您重要的句子表达。阅读不仅仅是识别熟悉的单词；您开始理解简单的文本中的整个信息。",
+        "A2-": "您在理解简单文本方面做得更好，可以在日常材料中找到特定信息，如广告或时间表，尽管您可能仍然对不熟悉的主题感到困惑。",
+        "A2": "您可以理解短、简单的文本，在日常材料中找到您需要的信息，如广告或菜单，并遵循基本指令。您知道足够的单词来在日常情况下沟通。",
+        "A2+": "您可以理解常规写作和短新闻故事或描述的主要观点。您的词汇量在增长，因此您可以谈论对您重要的事情，并处理日常情况。",
+        "B1-": "您可以理解熟悉主题的直接文本的主要观点。您正在发展处理介绍新主题或稍微更复杂语言的文本的能力，尽管您可能仍然需要一些帮助。",
+        "B1": "您可以阅读您喜欢的主题的文本，并理解主要观点。故事和个人信息对您来说很容易理解。您知道足够的单词用于日常主题，并且可以谈论您阅读的内容，不会遇到太多困难。",
+        "B1+": "您可以理解关于熟悉主题的清晰写作，并且处理稍微更复杂的语言的能力有所提高。您可以轻松找到您需要的信息，并且可以享受一本不太困难的书籍。",
+        "B2-": "您可以理解关于熟悉主题的详细文本。您开始识别语言的微妙部分，并且可以轻松讨论您感兴趣的主题，尽管非常复杂的想法可能仍然具有挑战性。",
+        "B2": "您可以独立阅读并判断文本是正式还是非正式。您可以根据您正在阅读的内容调整阅读速度。您喜欢关于当前事件的好书和文章。您知道很多单词，即使有时您会感到困惑，您通常也能弄清楚。",
+        "B2+": "您可以理解更具挑战性文本的主要观点，如科学文章或更复杂的故事。您开始更多地独立阅读，并且可以处理抽象或技术性主题，特别是您熟悉的主题。",
+        "C1-": "您可以通过一些努力理解复杂文本。您的词汇量使您可以阅读许多不同的主题，并且您可以弄清楚不太明显的细节，尽管有时您可能需要重新阅读某些部分。",
+        "C1": "您可以阅读长而具有挑战性的文本并理解大部分发生的事情。您喜欢让您思考的故事和文章，并且可以使用良好的词汇谈论它们，而无需太费力地查找正确的单词。",
+        "C1+": "您是一个超级读者，可以处理具有挑战性的文本并理解不同的写作风格。您非常擅长弄清楚故事和文章中不太明显的部分，并且通常知道单词的意思，而无需查找它们。",
+        "C2": "您可以阅读和理解几乎任何事情。您可以理解复杂文本的主要观点，并且喜欢阅读更具挑战性的书籍和文章。您可以谈论几乎任何事情，并且使用语言充满信心。"
+      }
+    },
+    "progress": {
+      "selectClassroom": "选择班级",
+      "allClassrooms": "所有班级",
+      "searchStudentsPlaceholder": "搜索学生...",
+      "backToOverview": "返回总览",
+      "loadingStudentData": "正在加载学生数据...",
+      "totalStudents": "学生总数",
+      "allClassroomsLabel": "所有班级",
+      "selectedClassroomLabel": "已选择的班级",
+      "averageXp": "平均 XP",
+      "averageXpDescription": "每位学生的经验值",
+      "mostCommonLevel": "最常见等级",
+      "mostCommonLevelDescription": "CEFR 能力等级",
+      "activeThisWeek": "本周活跃",
+      "activeThisWeekDescription": "{count} / {total} 名学生",
+      "studentList": "学生列表",
+      "xpLabel": "{xp} XP"
+    }
+  },
+  "Overall": {
+    "roles": {
+      "user": "用户",
+      "student": "学生",
+      "teacher": "教师",
+      "admin": "管理员",
+      "system": "系统"
+    },
+    "status": {
+      "READ": "已读",
+      "COMPLETED_MCQ": "完成 MCQ",
+      "COMPLETED_SAQ": "完成 SAQ",
+      "COMPLETED_LAQ": "完成 LAQ",
+      "UNRATED": "未评分"
+    },
+    "time": {
+      "justNow": "刚刚",
+      "minutesAgo": "{minutes} 分钟前",
+      "hoursAgo": "{hours} 小时前",
+      "yesterday": "昨天",
+      "daysAgo": "{days} 天前",
+      "weeksAgo": "{weeks} 周前",
+      "monthsAgo": "{months} 月前",
+      "today": "今天",
+      "lastweek": "上周",
+      "last30days": "最近30天",
+      "thismonth": "本月",
+      "lastmonth": "上个月",
+      "selectPeriod": "选择时间段"
+    },
+    "days": {
+      "sunday": "星期日",
+      "monday": "星期一",
+      "tuesday": "星期二",
+      "wednesday": "星期三",
+      "thursday": "星期四",
+      "friday": "星期五",
+      "saturday": "星期六"
+    },
+    "months": {
+      "january": "一月",
+      "february": "二月",
+      "march": "三月",
+      "april": "四月",
+      "may": "五月",
+      "june": "六月",
+      "july": "七月",
+      "august": "八月",
+      "september": "九月",
+      "october": "十月",
+      "november": "十一月",
+      "december": "十二月"
+    }
+  },
+  "Assignment": {
+    "title": "创建作业",
+    "description": "创建作业给您的学生",
+    "assignForm": {
+      "classroom": "班级",
+      "selectedClassroom": "选择的班级",
+      "name": "作业名称",
+      "description": "作业描述",
+      "students": "学生",
+      "article": "文章",
+      "dueDate": "截止日期",
+      "noStudents": "没有学生在这个班级",
+      "pleaseSelectClassroom": "请先选择一个班级",
+      "selectAllStudents": "选择所有学生",
+      "selectedDueDate": "选择截止日期 : "
+    },
+    "studentAssignmentTable": {
+      "title": "作业",
+      "name": "作业名称",
+      "description": "作业描述",
+      "createAt": "创建时间",
+      "dueDate": "截止日期",
+      "status": "状态",
+      "assignedBy": "分配者",
+      "linkToAssignment": "作业链接",
+      "goToLesson": "前往课程",
+      "searchPlaceholder": "搜索作业...",
+      "searching": "搜索中...",
+      "loadingAssignments": "正在加载作业...",
+      "noAssignmentsFound": "未找到作业",
+      "allDueDates": "所有截止日期",
+      "overdue": "逾期",
+      "dueToday": "今日截止",
+      "upcoming": "即将到来",
+      "allStatus": "所有状态",
+      "notFinished": "未完成",
+      "inProgress": "进行中",
+      "done": "已完成"
+    }
+  },
+  "SentencesPage": {
+    "sentences": "句子卡片",
+    "orderSentence": "排列句子",
+    "clozeTest": "填空测试",
+    "orderWord": "排列单词",
+    "matching": "匹配",
+
+    "matchingGame": {
+      "title": "翻译配对游戏",
+      "description": "练习将单词与其含义从您的抽认卡集合中配对！",
+      "descriptionShort": "将句子与您选择的语言翻译配对",
+      "descriptionLong": "将英语句子与翻译配对",
+      "noDeck": {
+        "error": "没有可用的抽认卡组",
+        "message": "开始阅读文章并将句子保存为抽认卡以解锁此游戏！"
+      },
+      "loading": {
+        "title": "正在加载您的配对...",
+        "description": "正在从您的抽认卡组生成配对",
+        "nextSet": "正在加载下一组配对..."
+      },
+      "startScreen": {
+        "title": "准备好配对了吗？",
+        "subtitle": "将英语句子与翻译配对",
+        "howToPlay": "游戏玩法",
+        "instructions": {
+          "step1": "点击左栏中的句子进行选择",
+          "step2": "然后点击右栏中的翻译",
+          "step3": "正确配对所有句子-翻译对以完成每组"
+        },
+        "language": {
+          "title": "选择翻译语言",
+          "thai": "泰语",
+          "vietnamese": "越南语",
+          "chineseSimplified": "中文（简体）",
+          "chineseTraditional": "中文（繁体）",
+          "selected": "翻译"
+        },
+        "stats": {
+          "matchingSets": "配对组",
+          "readyToPlay": "准备游戏",
+          "translation": "翻译",
+          "estimatedTime": "约{time}分钟",
+          "estimatedTimeLabel": "预计时间"
+        },
+        "startButton": "开始翻译游戏",
+        "loadingButton": "正在加载翻译对...",
+        "noSentences": "没有可用的句子"
+      },
+      "gameplay": {
+        "title": "将句子与翻译配对",
+        "instruction": "点击左侧的句子，然后点击右侧的翻译",
+        "englishSentences": "英语句子",
+        "translations": "{language}翻译",
+        "progress": "{current} / {total}",
+        "score": "{score}/{total}完美",
+        "pairsProgress": "进度：{matched}/{total}对已配对",
+        "correctCount": "正确：{correct}/{total}",
+        "articleFrom": "来自：{title}"
+      },
+      "hints": {
+        "title": "提示：",
+        "audio": "音频",
+        "playAudio": "播放音频",
+        "playing": "播放中...",
+        "enabled": "提示已启用！💡\n• 不正确的配对将被突出显示\n• 选择项目以听音频",
+        "disabled": "提示已禁用",
+        "audioCompleted": "音频播放完成！🎵",
+        "audioFailed": "无法播放音频",
+        "playingAudio": "正在播放音频提示 🔊"
+      },
+      "results": {
+        "perfect": "完美！所有配对都正确！🎉",
+        "tryAgain": "{correct}/{total}正确。再试一次！💪",
+        "allCorrect": "完美！所有配对都正确！🎉",
+        "partialCorrect": "{correct}/{total}正确 💪",
+        "correctMatches": "正确的配对：",
+        "showAnswers": "已显示正确配对！📖",
+        "correctMatch": "配对正确！✅",
+        "incorrectMatch": "配对不正确。再试一次！❌"
+      },
+      "buttons": {
+        "resetMatches": "重置配对",
+        "checkMatches": "检查配对",
+        "showAnswers": "显示答案",
+        "nextSet": "下一组",
+        "finishGame": "完成游戏",
+        "tryAgain": "重试"
+      },
+      "complete": {
+        "title": "🎉 太棒了！",
+        "subtitle": "您完成了{count}个配对挑战",
+        "stats": {
+          "perfectScores": "完美分数",
+          "accuracy": "准确率",
+          "totalTime": "总时间"
+        },
+        "backToMenu": "返回菜单",
+        "playAgain": "再玩一次"
+      },
+      "toast": {
+        "failedToLoad": "无法从抽认卡组加载配对数据",
+        "failedToLoadData": "无法加载配对数据"
+      },
+      "itemTypes": {
+        "word": "单词",
+        "phrase": "短语",
+        "sentence": "句子",
+        "definition": "定义",
+        "translation": "翻译",
+        "meaning": "含义"
+      }
+    },
+    "clozeTestGame": {
+      "title": "填空测试游戏",
+      "description": "练习填写您的抽认卡句子中缺失的单词！",
+      "descriptionShort": "填写每个句子中缺失的单词",
+      "descriptionLong": "通过填写缺失的单词来测试您的词汇和理解能力",
+      "noDeck": {
+        "error": "没有抽认卡组",
+        "message": "开始阅读文章并将句子保存为抽认卡以解锁此游戏！"
+      },
+      "loading": {
+        "title": "正在加载您的句子...",
+        "description": "正在从您的抽认卡组中获取句子",
+        "nextChallenge": "正在加载下一个挑战..."
+      },
+      "startScreen": {
+        "title": "准备开始了吗？",
+        "subtitle": "填写您抽认卡组中句子的空白处",
+        "howToPlay": "游戏玩法",
+        "instructions": {
+          "step1": "每个句子都有需要填写的缺失单词",
+          "step2": "从下拉菜单中选择正确的选项",
+          "step3": "完成所有空白以完成每个句子"
+        },
+        "difficulty": {
+          "title": "选择难度等级",
+          "easy": "简单",
+          "medium": "中等",
+          "hard": "困难",
+          "easyDescription": "非常适合初学者。每个句子将缺少一个单词。",
+          "mediumDescription": "中等挑战。每个句子将缺少两个单词。",
+          "hardDescription": "最大挑战。每个句子将缺少三个单词。"
+        },
+        "stats": {
+          "clozeTests": "填空测试",
+          "readyToPlay": "准备开始",
+          "fillBlanks": "填空",
+          "blanksEach": "每个{count}个空白",
+          "estimatedTime": "约{time}分钟",
+          "estimatedTimeLabel": "预计时间"
+        },
+        "startButton": "开始{difficulty}游戏",
+        "loadingButton": "正在加载{difficulty}句子...",
+        "noSentences": "没有可用的句子"
+      },
+      "gameplay": {
+        "articleTitle": "📖 {title}",
+        "instruction": "通过从下拉菜单中选择来填写缺失的单词",
+        "completeSentence": "通过填空来完成句子：",
+        "progress": "{current}/{total}",
+        "score": "{score}/{total}完美",
+        "blanksProgress": "进度：{filled}/{total}个空白已填写",
+        "correctCount": "正确：{correct}/{total}",
+        "placeholder": "___"
+      },
+      "hints": {
+        "title": "提示：",
+        "audio": "音频",
+        "playOrder": "播放音频",
+        "playing": "正在播放...",
+        "enabled": "提示已启用！💡\n• 错误答案将被突出显示\n• 使用音频按钮听发音",
+        "disabled": "提示已禁用"
+      },
+      "results": {
+        "perfect": "完美！所有空白都正确！🎉",
+        "tryAgain": "{correct}/{total}正确。再试一次！💪",
+        "allCorrect": "完美！所有空白都填写正确！🎉",
+        "partialCorrect": "{correct}/{total}正确 💪",
+        "correctAnswers": "正确答案：",
+        "showAnswers": "已显示正确答案！📖"
+      },
+      "buttons": {
+        "resetAnswers": "重置答案",
+        "checkAnswers": "检查答案",
+        "showAnswers": "显示答案",
+        "nextSentence": "下一个句子",
+        "finishGame": "完成游戏"
+      },
+      "complete": {
+        "title": "🎉 太棒了！",
+        "subtitle": "您完成了{count}个填空挑战",
+        "stats": {
+          "perfectScores": "完美分数",
+          "accuracy": "准确率",
+          "totalTime": "总时间"
+        },
+        "backToMenu": "返回菜单",
+        "playAgain": "再玩一次"
+      },
+      "toast": {
+        "failedToLoad": "无法从抽认卡组加载句子",
+        "failedToLoadSentences": "无法加载句子",
+        "audioCompleted": "音频完成！🎵",
+        "audioFailed": "无法播放音频",
+        "playingAudio": "正在播放句子音频 🔊"
+      }
+    },
+    "sentencesCard": {
+      "title": "闪卡仪表板",
+      "description": "练习句子理解和翻译技能",
+      "needMoreCards": "需要更多卡片才能开始学习",
+      "addMoreCards": "从文章添加 {count} 张卡片以解锁学习。",
+      "allCaughtUp": "全部完成！",
+      "allCardsUpToDate": "所有卡片都是最新的。稍后再来查看更多复习内容。",
+      "readyToStudy": "准备学习！",
+      "cardsReadyForReview": "{count} 张卡片可供复习。",
+      "learningProgress": "学习进度",
+      "complete": "完成",
+      "mastered": "{count} 已掌握",
+      "toReview": "{count} 待复习",
+      "back": "返回",
+      "current": "当前",
+      "completed": "完成",
+      "remaining": "剩余",
+      "studySessionProgress": "学习会话进度",
+      "showAnswer": "显示答案",
+      "question": "问题",
+      "answers": "答案",
+      "flipCard": "点击显示",
+      "definition": "定义",
+      "translation": "翻译",
+      "definitionNotAvailable": "定义不可用",
+      "translationNotAvailable": "翻译不可用",
+      "again": "再次",
+      "hard": "困难",
+      "good": "好",
+      "easy": "容易",
+      "sentences": "句子",
+      "vocabulary": "词汇",
+      "studySessionComplete": "学习会话完成！",
+      "youCompleted": "你完成了 {count} 张卡片",
+      "cardsReviewed": "卡片复习",
+      "xpEarned": "XP 获得",
+      "greatWork": "做得很好！你已经成功完成了这个学习会话。你的进度已经保存！",
+      "backToDashboard": "返回仪表盘",
+      "studyAgain": "再次学习",
+      "cardStatusBreakdown": {
+        "title": "卡片状态细分",
+        "new": "新卡片",
+        "newDescription": "新学习的卡片",
+        "learning": "学习中",
+        "learningDescription": "进行中",
+        "review": "复习",
+        "reviewDescription": "复习时间"
+      },
+      "translationLanguage": "翻译语言",
+      "translationLanguageDescription": "翻译将以此语言显示",
+      "startStudying": "开始学习 ({count} 张卡片)",
+      "loadingCards": "正在加载卡片...",
+      "noCardsDueForReview": "现在没有卡片需要复习！⏰",
+      "failedToLoadCards": "无法加载卡片",
+      "refreshData": "刷新数据",
+      "addMoreCardsButton": "添加更多卡片"
+    },
+    "manage": {
+      "heading": "管理",
+      "description": "管理您的闪卡文章和句子",
+      "searchPlaceholder": "搜索...",
+      "noResults": "没有结果。",
+      "tableHeaders": {
+        "sentence": "句子",
+        "createdAt": "创建时间",
+        "due": "到期",
+        "action": "操作"
+      },
+      "pagination": {
+        "previous": "上一页",
+        "next": "下一页"
+      },
+      "deleteDialog": {
+        "title": "删除闪卡",
+        "description": "您确定要删除此闪卡吗？",
+        "warning": "此操作无法撤销。",
+        "cancel": "取消",
+        "delete": "删除"
+      },
+      "dueStatus": {
+        "oneDayLate": "逾期 1 天",
+        "daysLate": "逾期 {count} 天",
+        "dueToday": "今天到期",
+        "dueTomorrow": "明天到期",
+        "dueInDays": "{count} 天后到期",
+        "dueInWeeks": "{count} 周后到期"
+      }
+    },
+    "sentenceOrder": {
+      "title": "排列句子游戏",
+      "descriptionNodeck": "练习从你的闪卡文章中排列句子！",
+      "descriptionPlaying": "按时间顺序排列句子。",
+      "descriptionPlaying2": "将这5个句子按时间顺序排列。",
+      "description": "通过按时间顺序排列句子来测试你的阅读理解能力。",
+      "contentNoDeck": "开始阅读文章并保存句子作为闪卡以解锁这个游戏！",
+      "loading": "加载你的句子...",
+      "fetchingSentences": "从你的闪卡deck中获取句子",
+      "readyToStart": "准备开始？",
+      "arrangeSentences": "将5个句子按正确的顺序排列，每个闪卡句子",
+      "startGame": "开始游戏",
+      "noSentencesAvailable": "没有句子可用",
+      "howToPlay": "如何玩",
+      "eachGameShows": "每个游戏显示5个句子，围绕你的闪卡句子",
+      "dragSentences": "拖动句子按时间顺序排列",
+      "completeAll": "完成你所有的闪卡句子",
+      "sentences": "句子",
+      "readyToPlay": "准备玩",
+      "dragAndDrop": "拖动 & 排列",
+      "playtime": "~{time} min",
+      "estimatedTime": "估计时间",
+      "easyInteraction": "简单互动",
+      "completedTitle": "很棒的工作！",
+      "completedDescription": "你完成了 {count} 句子排列挑战",
+      "correct": "正确答案",
+      "accuracy": "准确性",
+      "totalTime": "总时间",
+      "backToMenu": "返回菜单",
+      "playAgain": "再玩一次",
+      "loadingNextChallenge": "加载下一个挑战...",
+      "correctAnswer": "正确",
+      "checkAnswer": "检查答案",
+      "shuffleAgain": "打乱顺序",
+      "showAnswer": "显示答案",
+      "nextSentence": "下一句话",
+      "finishGame": "完成游戏",
+      "perfectCorrectOrder": "完美！正确顺序！🎉",
+      "notQuiteRight": "不正确！💪",
+      "correctOrder": "正确顺序",
+      "hints": {
+        "title": "提示",
+        "description": "使用提示帮助你完成挑战",
+        "highlight": "高亮",
+        "audio": "音频",
+        "playOrder": "播放顺序",
+        "playing": "播放中...",
+        "dragToReorder": "拖动重新排列句子",
+        "startByMovingASentence": "开始移动句子！",
+        "sentencesWillAppearHere": "句子将在这里出现..."
+      }
+    },
+    "orderWordGame": {
+      "title": "排列单词游戏",
+      "description": "练习排列单词以从你的闪卡文章中组成正确的句子！",
+      "descriptionShort": "按正确顺序点击单词以组成有意义的句子",
+      "noDeck": {
+        "error": "没有闪卡牌组",
+        "message": "开始阅读文章并将句子保存为闪卡以解锁此游戏！"
+      },
+      "loading": {
+        "title": "正在加载你的句子...",
+        "description": "正在从你的闪卡牌组获取句子"
+      },
+      "startScreen": {
+        "title": "准备开始了吗？",
+        "subtitle": "按正确顺序点击单词以组成有意义的句子",
+        "howToPlay": "如何游戏",
+        "instructions": {
+          "step1": "点击底部的单词将它们添加到你的句子中",
+          "step2": "点击句子中的单词以删除它们",
+          "step3": "翻译将显示在每个单词下方",
+          "step4": "组成语法正确且有意义的句子",
+          "step5": "如果遇到困难，使用提示"
+        },
+        "stats": {
+          "sentences": "句子",
+          "readyToPlay": "准备解决",
+          "clickToOrder": "点击排序",
+          "withTranslations": "带翻译",
+          "estimatedTime": "约{time}分钟",
+          "estimatedTimeLabel": "预计时间"
+        },
+        "language": {
+          "title": "选择翻译语言",
+          "thai": "🇹🇭 泰语",
+          "vietnamese": "🇻🇳 越南语",
+          "chineseSimplified": "🇨🇳 中文（简体）",
+          "chineseTraditional": "🇹🇼 中文（繁体）",
+          "selected": "翻译语言",
+          "description": "单词翻译将在整个游戏中显示为{language}"
+        },
+        "startButton": "开始游戏，使用{language}翻译",
+        "noSentences": "没有可用句子"
+      },
+      "gameplay": {
+        "title": "排列单词游戏",
+        "instruction": "点击单词以组成正确的句子 • {language}翻译",
+        "progress": "{current}/{total}",
+        "score": "{score}/{total}正确",
+        "articleFrom": "📖 {title}",
+        "subtitle": "点击下面的单词以组成正确的句子",
+        "targetTranslation": "目标翻译：",
+        "yourSentence": "你的句子：",
+        "buildingSentence": "正在构建句子...",
+        "startByClicking": "点击下面的单词开始构建你的句子...",
+        "translationLabel": "{language}翻译：",
+        "allWordsUsed": "所有单词已使用！",
+        "checkSentence": "检查你上面的句子。",
+        "clickWordsToAdd": "点击单词将它们添加到你的句子中",
+        "startByClickingWord": "（通过点击单词开始！）"
+      },
+      "hints": {
+        "title": "提示：",
+        "highlight": "高亮",
+        "audio": "音频",
+        "playOrder": "播放顺序",
+        "playing": "播放中..."
+      },
+      "buttons": {
+        "shuffleWords": "打乱单词",
+        "tryAgain": "重试",
+        "checkAnswer": "检查答案",
+        "showAnswer": "显示答案",
+        "nextSentence": "下一句",
+        "finishGame": "完成游戏"
+      },
+      "results": {
+        "perfect": "完美！单词顺序正确！🎉",
+        "notQuiteRight": "不太对。再试一次！💪",
+        "correctOrder": "正确句子：",
+        "correctOrderRevealed": "已显示正确顺序！📖"
+      },
+      "complete": {
+        "title": "🎉 太棒了！",
+        "subtitle": "你完成了{count}个单词排序挑战",
+        "usingTranslations": "使用{language}翻译",
+        "stats": {
+          "correctAnswers": "正确答案",
+          "accuracy": "准确率",
+          "totalTime": "总时间"
+        },
+        "backToMenu": "返回菜单",
+        "playAgain": "再玩一次"
+      },
+      "toast": {
+        "gameStarted": "游戏已开始，使用{language}翻译！🎮",
+        "languageSet": "翻译语言已设置为{language}",
+        "failedToLoad": "从闪卡牌组加载句子失败",
+        "failedToLoadSentences": "加载句子失败"
+      },
+      "loadingNextChallenge": "正在加载下一个挑战..."
+    }
+  },
+  "VocabularyPage": {
+    "vocabularyCard": "词汇卡",
+    "description": "使用间隔重复法复习词汇并扩展语言技能",
+    "translationLanguageDescription": "定义将以此语言显示"
+  },
+  "HomePage": {
+    "hero": {
+      "title": "帮助年轻学生通过AI驱动的乐趣成为出色的读者！",
+      "subtitle": "专为8-12岁（3-6年级）量身定制的阅读冒险。",
+      "getStarted": "立即开始！"
+    },
+    "features": {
+      "title": "酷炫功能",
+      "description": "探索Primary Advantage如何让阅读变得有趣并帮助您学习！",
+      "funStory": {
+        "title": "有趣的故事冒险",
+        "description": "发现专为您年龄段的孩子准备的精彩故事和文章，总有新内容可读！"
+      },
+      "understand": {
+        "title": "理解故事",
+        "description": "回答有关您所读内容的有趣问题，帮助您记忆和更好地理解。"
+      },
+      "readingLevels": {
+        "title": "恰到好处的阅读水平",
+        "description": "阅读适合您阅读方式的故事，使其既简单又愉快。"
+      },
+      "learnWords": {
+        "title": "学习新词",
+        "description": "在故事中找到新的有趣词汇，并通过有趣的工具学习它们的意思。"
+      },
+      "listenAlong": {
+        "title": "一起听",
+        "description": "聆听为您朗读的故事，非常适合听和跟随。"
+      },
+      "seeProgress": {
+        "title": "看看你的成长",
+        "description": "查看您的阅读进度，看看您正在学习的所有酷炫内容！"
+      },
+      "makeYours": {
+        "title": "让它成为您的",
+        "description": "选择您喜欢的故事并设定阅读目标，创建您自己的阅读冒险。"
+      },
+      "helpTeachers": {
+        "title": "帮助教师",
+        "description": "教师工具，用于查看课堂表现并帮助每个人学习。"
+      }
+    },
+    "benefits": {
+      "title": "为什么学校喜欢Primary Advantage",
+      "description": "看看Primary Advantage如何帮助学校的教师和学生！",
+      "superReader": {
+        "title": "成为超级读者",
+        "description": "阅读大量精彩故事并玩游戏来提升您的阅读技能！"
+      },
+      "ownPath": {
+        "title": "您自己的阅读路径",
+        "description": "阅读与您的阅读水平和兴趣相匹配的故事，专为您量身定制。"
+      },
+      "storiesLove": {
+        "title": "你会喜欢的故事",
+        "description": "享受不同类型的故事，配有图片和声音，让阅读变得有趣。"
+      },
+      "watchGrow": {
+        "title": "观察您的阅读能力增长",
+        "description": "看看您的进步以及您每天如何成为更好的读者。"
+      },
+      "learnWords": {
+        "title": "学习大量新词",
+        "description": "在故事中发现有趣的词汇，并通过酷炫的活动记住它们。"
+      },
+      "easyUse": {
+        "title": "随时随地轻松使用",
+        "description": "在学校或家里阅读和学习，随时随地！"
+      },
+      "greatSchools": {
+        "title": "非常适合学校",
+        "description": "学校帮助所有学生成为出色读者的明智方式。"
+      },
+      "moreTime": {
+        "title": "更多教学乐趣的时间",
+        "description": "我们的工具帮助教师轻松找到优秀的故事并查看学生进度。"
+      }
+    },
+    "contact": {
+      "title": "让我们保持联系",
+      "description": "有问题或需要更多信息？今天联系我们以了解更多关于我们平台的信息。",
+      "formTitle": "联系我们",
+      "formDescription": "与我们联系以了解更多关于我们平台的信息",
+      "name": "姓名",
+      "namePlaceholder": "张三",
+      "institution": "机构",
+      "institutionPlaceholder": "示例大学",
+      "email": "电子邮件",
+      "emailPlaceholder": "m@example.com",
+      "inquiry": "咨询",
+      "inquiryPlaceholder": "选择一个选项",
+      "inquiryOptions": {
+        "sales": "销售",
+        "support": "支持",
+        "partnerships": "合作伙伴关系"
+      },
+      "message": "消息",
+      "messagePlaceholder": "在此输入您的消息。",
+      "sendMessage": "发送消息"
+    },
+    "cta": {
+      "title": "准备好开始主要冒险了吗？",
+      "description": "开始免费试用，看看使用Primary Advantage阅读有多有趣！非常适合8-12岁的学生。"
+    }
+  },
+  "AboutPage": {
+    "title": "关于我们",
+    "description": "了解更多关于Primary Advantage和我们的使命"
+  },
+  "AuthPage": {
+    "signin": {
+      "title": "登录",
+      "student": "学生",
+      "teacher": "教师",
+      "welcome": "欢迎来到 Primary Advantage",
+      "enterClassroomCode": "输入您的班级代码",
+      "classroomCode": "班级代码",
+      "next": "下一步",
+      "selectYourNameLabel": "选择您的名字",
+      "selectYourName": "选择您的名字下方以登录您的账户",
+      "selectYourNamePlaceholder": "选择一个学生",
+      "login": "登录",
+      "classroomCodeRequired": "请输入您的班级代码"
+    },
+    "signup": {
+      "title": "注册"
+    }
+  },
+  "Settings": {
+    "userProfile": {
+      "title": "个人信息",
+      "subtitle": "关于您个人资料的信息",
+      "backToReading": "返回阅读页面",
+      "username": "用户名",
+      "usernameDescription": "用户名用于代表自己在平台上的身份。",
+      "email": "电子邮件",
+      "level": "Primary Advantage 等级",
+      "xp": "Primary Advantage 经验值",
+      "xpDescription": "经验值用于升级。",
+      "verified": "已验证",
+      "notVerified": "未验证",
+      "resetPassword": "重置密码",
+      "resendVerification": "重新发送验证邮件",
+      "unknown": "未知",
+      "update": "更新",
+      "activate": "激活",
+      "license": "许可证",
+      "licenseDescription": "输入新的许可证用户"
+    },
+    "schoolProfile": {
+      "title": "学校资料",
+      "subtitle": "管理您的学校信息",
+      "loading": "加载中...",
+      "noSchool": "没有学校信息",
+      "createSchool": "创建学校资料",
+      "createSchoolDescription": "设置您的学校信息以开始。创建学校将自动授予您管理学校功能的管理员访问权限。",
+      "editSchool": "编辑学校信息",
+      "editSchoolDescription": "更新您的学校详情如下。",
+      "schoolName": "学校名称",
+      "contactName": "联系人姓名",
+      "contactEmail": "联系人邮箱",
+      "createdAt": "创建于",
+      "updatedAt": "更新于",
+      "totalUsers": "总用户数",
+      "totalAdmins": "总管理员数",
+      "owner": "所有者",
+      "license": "许可证信息",
+      "licensedescription": "关于您的学校许可证和订阅的详细信息",
+      "licenseStatus": "许可证状态",
+      "maxUsers": "最大用户数",
+      "expiryDate": "到期日期",
+      "save": "保存",
+      "cancel": "取消",
+      "updateSchoolButton": "更新学校",
+      "delete": "删除",
+      "creating": "创建中...",
+      "updating": "更新中...",
+      "success": "成功更新学校资料",
+      "error": "无法更新学校资料",
+      "loadError": "无法加载学校信息",
+      "tryAgainLater": "请稍后再试。",
+      "schoolNameDescription": "学校的官方名称或机构名称。",
+      "contactNameDescription": "联系人名称",
+      "contactEmailDescription": "联系人邮箱",
+      "schoolNamePlaceholder": "输入学校名称",
+      "contactNamePlaceholder": "输入联系人名称 (可选)",
+      "contactEmailPlaceholder": "输入联系人邮箱 (可选)",
+      "createSchoolButton": "创建学校",
+      "editSchoolButton": "编辑学校",
+      "schoolInformation": "学校信息",
+      "schoolInformationDescription": "查看和管理您的学校详情。",
+      "deleteSchool": "删除学校",
+      "deleting": "删除中...",
+      "deleteSchoolDescription": "您确定要删除这个学校吗？此操作无法撤销。所有关联数据包括用户、管理员和班级将被删除。",
+      "deleteSchoolButton": "删除学校",
+      "schoolAdmin": "学校管理员",
+      "schoolAdminDescription": "具有管理员权限的用户",
+      "addsAdmins": "添加管理员",
+      "addAdminHeader": "添加学校管理员",
+      "addsAdminsDescription": "搜索用户并添加为学校管理员。",
+      "searchUsers": "搜索用户",
+      "searchUsersPlaceholder": "输入名称或电子邮件...",
+      "createSchoolcard": {
+        "title": "没有学校关联",
+        "description": "您还没有与您的账户关联的学校。创建一个以开始并获得管理学校功能的管理员访问权限。",
+        "createSchool": "创建学校"
+      }
+    }
+  },
+  "Lesson": {
+    "Reading": {
+      "firstTitle": "首次阅读",
+      "deepTitle": "深度阅读",
+      "subtitle": "阅读文章并标记重要的单词和句子",
+      "controls": {
+        "speed": "速度",
+        "play": "开始阅读",
+        "pause": "暂停阅读",
+        "loading": "正在加载音频"
+      },
+      "translation": {
+        "button": "翻译",
+        "on": "开启翻译",
+        "off": "关闭翻译",
+        "title": "翻译："
+      },
+      "tips": {
+        "firstTitle": "首次阅读提示",
+        "deepTitle": "深度阅读提示",
+        "readEntire": "完整阅读整篇文章",
+        "clickStart": "点击开始阅读",
+        "sentenceJump": "点击跳转到句子",
+        "useHighlight": "使用高亮模式",
+        "listenComplete": "将音频听完"
+      }
+    },
+    "title": "课程",
+    "description": "互动阅读课程",
+    "loading": "加载课程中...",
+    "error": "无法加载课程",
+    "header": {
+      "title": "课程",
+      "subtitle": "互动阅读体验",
+      "mode": "学习模式",
+      "cta": "从这篇文章开始你的互动阅读之旅"
+    },
+    "actions": {
+      "starting": "正在开始...",
+      "startLesson": "开始课程",
+      "processing": "处理中...",
+      "previousTask": "上一步",
+      "nextTask": "下一步"
+    },
+    "progress": {
+      "title": "进度",
+      "taskOfTotal": "第 {task} 项，共 {total} 项",
+      "currentTask": "当前：第 {task} 项"
+    },
+    "tasks": {
+      "introduction": "课程介绍",
+      "previewVocabulary": "预览词汇",
+      "firstReading": "首次阅读",
+      "vocabularyCollection": "词汇收集",
+      "deepReading": "深度阅读",
+      "sentenceCollection": "句子收集",
+      "multipleChoice": "选择题",
+      "shortAnswer": "简答题",
+      "vocabularyFlashcards": "词汇闪卡",
+      "vocabularyMatching": "词汇配对",
+      "sentenceFlashcards": "句子闪卡",
+      "sentenceActivities": "句子活动",
+      "languageQuestions": "语言问题",
+      "lessonSummary": "课程总结",
+      "shortAnswerTitle": "任务简答题",
+      "shortAnswerDescription": "任务描述主题 : {title}",
+      "multipleChoiceTitle": "任务选择题",
+      "multipleChoiceDescription": "任务描述主题 : {title}",
+      "vocabularyFlashcardsTitle": "任务词汇闪卡",
+      "vocabularyFlashcardsDescription": "使用互动闪卡复习关键词汇。",
+      "vocabularyMatchingTitle": "任务词汇配对",
+      "vocabularyMatchingDescription": "将单词与其含义配对以建立理解。",
+      "sentenceFlashcardsTitle": "任务句子闪卡",
+      "sentenceFlashcardsDescription": "练习句子并通过闪卡加强上下文理解。"
+    },
+    "PreviewVocabulary": {
+      "title": "预览词汇",
+      "subtitle": "预览本文的词汇",
+      "definition": "定义",
+      "audioNotAvailable": "无可用音频",
+      "empty": "未找到词汇",
+      "progress": "词汇进度",
+      "wordsToLearn": "还有 {count} 个词需要学习"
+    },
+    "SentenceCollection": {
+      "title": "句子收集",
+      "subtitle": "预览本文的句子",
+      "definition": "翻译",
+      "audioNotAvailable": "无可用音频",
+      "empty": "未找到句子",
+      "progress": "句子进度",
+      "wordsToLearn": "还有 {count} 个句子需要学习"
+    },
+    "SentenceActivities": {
+      "title": "句子活动",
+      "description": "练习句子活动以提高你的技能。",
+      "loading": "正在加载活动...",
+      "completed": "已完成",
+      "review": "复习",
+      "orderSentences": {
+        "title": "句子排序",
+        "description": "练习句子排序以提高你的技能。",
+        "button": "句子排序"
+      },
+      "clozeTest": {
+        "title": "完形填空",
+        "description": "练习完形填空以提高你的技能。",
+        "button": "完形填空"
+      },
+      "orderWords": {
+        "title": "词语排序",
+        "description": "练习词语排序以提高你的技能。",
+        "button": "词语排序"
+      },
+      "matching": {
+        "title": "配对",
+        "description": "练习配对以提高你的技能。",
+        "button": "配对"
+      }
+    },
+    "Summary": {
+      "title": "课程总结",
+      "completed": "太棒了！你已完成本课。",
+      "xpEarned": "+{xp} XP 获得！",
+      "stats": {
+        "timeSpent": "用时",
+        "wordsSaved": "已保存词汇",
+        "sentences": "句子",
+        "totalXp": "总 XP"
+      },
+      "quiz": {
+        "title": "测验表现",
+        "mcq": "多选题",
+        "saq": "简答题",
+        "score": "分数：{score}/5",
+        "percent": "{percent}%"
+      },
+      "feedback": {
+        "mcq": {
+          "1": "需要复习内容并再试一次。不要放弃！",
+          "2": "有一点进步，但仍需努力",
+          "3": "正在进步！继续练习",
+          "4": "很好！接近满分",
+          "5": "优秀！你完全理解了内容"
+        },
+        "saq": {
+          "1": "优秀！你完全理解了内容",
+          "2": "开始不错，但缺少关键细节",
+          "3": "尚可。试着多阐述一些",
+          "4": "很不错。稍作润色即可",
+          "5": "优秀！清晰、完整、有理有据"
+        }
+      },
+      "vocabulary": {
+        "title": "学到的词汇：{count} 个",
+        "more": "+{count} 个词汇已学到"
+      },
+      "sentences": {
+        "title": "关键句子：{count} 句",
+        "more": "+{count} 句已保存"
+      },
+      "actions": { "backToRead": "返回阅读页面" },
+      "toast": { "failed": "无法加载课程总结" }
+    },
+    "VocabularyFlashcards": {
+      "loading": {
+        "title": "正在加载闪卡",
+        "description": "正在准备您的词汇练习..."
+      },
+      "error": {
+        "title": "发生错误",
+        "description": "无法加载闪卡，请再试一次。"
+      },
+      "empty": {
+        "title": "无可用卡片",
+        "description": "目前没有可以学习的卡片。"
+      },
+      "start": {
+        "title": "开始词汇练习",
+        "description": "正在准备您的词汇练习阶段...",
+        "translationLanguage": "翻译语言",
+        "translationHint": "定义将以此语言显示",
+        "startButton": "开始游戏"
+      },
+      "playing": {
+        "header": "词汇闪卡",
+        "cardOf": "卡片 {current} / {total}",
+        "progress": "进度",
+        "percentComplete": "完成 {percent}%",
+        "badgeVocabulary": "词汇",
+        "state": {
+          "new": "新的",
+          "learning": "学习中",
+          "review": "复习",
+          "relearning": "重新学习"
+        },
+        "thinkPrompt": "思考这个词的意思，然后显示答案。",
+        "showAnswer": "显示答案",
+        "rating": {
+          "prompt": "您对这个词的记忆程度如何？",
+          "again": "再来一次",
+          "hard": "困难",
+          "good": "好",
+          "easy": "容易"
+        }
+      },
+      "stats": {
+        "completed": "已完成：{count}",
+        "remaining": "剩余：{count}",
+        "total": "总卡片数：{count}"
+      },
+      "completion": {
+        "title": "词汇练习完成！",
+        "subtitle": "您的词汇练习做得很好",
+        "xpEarned": "获得 XP",
+        "timeTaken": "花费时间",
+        "completed": "已完成"
+      }
+    }
+  },
+  "LessonLanguageQuestion": {
+    "title": "AI 阅读助手",
+    "loading": { "conversation": "正在加载对话..." },
+    "status": { "online": "在线" },
+    "header": {
+      "readyWithName": "已准备好帮助 {name} 解答问题",
+      "ready": "已准备好帮助你解答问题"
+    },
+    "empty": {
+      "helloName": "你好，{name}！",
+      "start": "开始对话吧！",
+      "ask": "关于这篇文章，尽管向我提问。"
+    },
+    "thinking": "思考中...",
+    "input": {
+      "placeholderWithName": "{name}，问一问关于这篇文章的问题...",
+      "placeholder": "输入你关于这篇文章的问题..."
+    },
+    "buttons": { "send": "发送", "skip": "跳过" },
+    "tips": {
+      "askVocabulary": "询问词汇",
+      "discussTheme": "讨论主题思想",
+      "clarifyParts": "澄清难以理解的部分"
+    },
+    "error": {
+      "fetchResponse": "获取回复时出错",
+      "fetchInitial": "获取初始问题时出错"
+    }
+  },
+  "LessonMCQ": {
+    "header": {
+      "title": "多项选择测验",
+      "questionOf": "第 {current} 题 / 共 {total} 题",
+      "completePercent": "完成 {percent}%"
+    },
+    "timer": { "seconds": "{seconds}秒" },
+    "completed": {
+      "title": "测验完成",
+      "description": "做得好！你已完成测验",
+      "correctAnswers": "答对题数",
+      "accuracy": "准确率",
+      "xpEarned": "MCQ XP 获得",
+      "totalTime": "总时间"
+    },
+    "actions": {
+      "retake": "重新测试",
+      "nextQuestion": "下一题",
+      "finishQuiz": "完成测验"
+    }
+  },
+  "LessonSAQ": {
+    "completed": { "title": "测验完成" },
+    "labels": {
+      "question": "问题：",
+      "yourAnswer": "你的答案：",
+      "suggestedAnswer": "建议答案：",
+      "feedback": "反馈：",
+      "score": "分数："
+    },
+    "timer": { "elapsed": "用时：{time}" },
+    "form": {
+      "placeholder": { "answer": "在此输入你的答案..." },
+      "help": { "detailedResponse": "写下详细回答以展示你的理解" },
+      "validation": { "answerRequired": "请输入您的答案" }
+    },
+    "actions": { "submit": "提交" }
+  },
+  "LessonCloze": {
+    "loading": {
+      "title": "正在加载您的句子...",
+      "subtitle": "正在从您的闪卡组获取句子",
+      "nextChallenge": "正在加载下一个挑战..."
+    },
+    "common": {
+      "ready": "准备开始",
+      "min": "分钟"
+    },
+    "start": {
+      "title": "准备开始了吗？",
+      "subtitle": "填写您闪卡组中句子的空白处",
+      "stats": {
+        "tests": "填空测试",
+        "fillBlanks": "填空",
+        "oneBlank": "每个1个空白",
+        "twoBlanks": "每个2个空白",
+        "threeBlanks": "每个3个空白",
+        "estimated": "预计时间"
+      }
+    },
+    "instructions": {
+      "title": "游戏玩法",
+      "item1": "每个句子都有需要填写的缺失单词",
+      "item2": "从下拉菜单中选择正确的选项",
+      "item3": "完成所有空白以完成每个句子"
+    },
+    "difficulty": {
+      "choose": "选择难度等级",
+      "select": "选择难度",
+      "easy": "简单",
+      "medium": "中等",
+      "hard": "困难",
+      "desc": {
+        "easy": "非常适合初学者。每个句子将缺少一个单词。",
+        "medium": "中等挑战。每个句子将缺少两个单词。",
+        "hard": "最大挑战。每个句子将缺少三个单词。"
+      }
+    },
+    "buttons": {
+      "loading": "正在加载{difficulty}句子...",
+      "startGame": "开始游戏",
+      "back": "返回菜单",
+      "playAgain": "再玩一次",
+      "reset": "重置答案",
+      "check": "检查答案",
+      "showAnswers": "显示答案",
+      "next": "下一个句子",
+      "finish": "完成游戏"
+    },
+    "complete": {
+      "title": "🎉 太棒了！",
+      "subtitle": "您完成了{count}个填空挑战",
+      "stats": {
+        "perfect": "完美分数",
+        "accuracy": "准确率",
+        "time": "总时间"
+      }
+    },
+    "game": {
+      "subtitle": "通过从下拉菜单中选择来填写缺失的单词"
+    },
+    "hints": {
+      "label": "提示：",
+      "audio": "音频",
+      "play": "播放顺序"
+    },
+    "sentence": {
+      "instructions": "通过填空来完成句子："
+    },
+    "progress": {
+      "perfect": "{score}/{total}完美",
+      "sentence": "进度：{answered}/{total}个空白已填写",
+      "correct": "正确：{correct}/{answered}"
+    },
+    "result": {
+      "perfect": "完美！所有空白都正确！🎉",
+      "tryAgain": "{correct}/{total}正确 💪",
+      "correctAnswers": "正确答案："
+    }
+  },
+  "SentenceFlashcards": {
+    "loading": {
+      "title": "正在加载闪卡",
+      "subtitle": "正在准备您的句子练习..."
+    },
+    "error": {
+      "title": "发生错误",
+      "description": "无法加载闪卡。请再试一次。",
+      "retry": "再试一次"
+    },
+    "empty": {
+      "title": "无可用卡片",
+      "description": "目前没有可以学习的卡片。"
+    },
+    "start": {
+      "title": "开始句子练习",
+      "subtitle": "正在准备您的句子练习阶段...",
+      "language": "翻译语言",
+      "languageNote": "定义将以此语言显示",
+      "startButton": "开始游戏"
+    },
+    "header": {
+      "title": "句子闪卡",
+      "progress": "卡片 {current} / {total}",
+      "progressLabel": "进度",
+      "percentComplete": "完成 {percent}%"
+    },
+    "badge": {
+      "typeSentence": "句子",
+      "new": "新的",
+      "learning": "学习中",
+      "review": "复习",
+      "relearning": "重新学习"
+    },
+    "prompt": {
+      "thinkAndReveal": "思考这个句子的意思，然后显示答案。"
+    },
+    "buttons": { "showAnswer": "显示答案" },
+    "rating": {
+      "prompt": "您对这个句子的记忆程度如何？",
+      "again": "再来一次",
+      "hard": "困难",
+      "good": "好",
+      "easy": "容易"
+    },
+    "stats": {
+      "completed": "已完成：{count}",
+      "remaining": "剩余：{count}",
+      "total": "总卡片数：{count}"
+    },
+    "complete": {
+      "title": "句子练习完成！",
+      "subtitle": "您的句子练习做得很好",
+      "xpEarned": "获得 XP",
+      "timeTaken": "花费时间",
+      "completedLabel": "已完成"
+    }
+  },
+  "VocabularyMatching": {
+    "loading": {
+      "title": "正在加载闪卡",
+      "description": "正在准备您的词汇练习..."
+    },
+    "noCards": {
+      "title": "无可用词汇",
+      "description": "此文章尚无可用的词汇闪卡。"
+    },
+    "error": {
+      "title": "加载失败",
+      "description": "加载词汇时出错。请再试一次。"
+    },
+    "buttons": {
+      "tryAgain": "再试一次",
+      "showAnswers": "显示答案",
+      "completeActivity": "完成活动"
+    },
+    "start": {
+      "title": "开始词汇配对",
+      "subtitle": "选择您喜欢的定义语言",
+      "languageLabel": "定义语言",
+      "languageHint": "单词定义将以此语言显示",
+      "startButton": "开始配对游戏"
+    },
+    "completed": {
+      "title": "词汇练习完成！",
+      "subtitle": "您的词汇练习做得很好",
+      "xpEarned": "获得 XP",
+      "completed": "已完成"
+    },
+    "game": {
+      "title": "📚 将单词与定义配对",
+      "instruction": "点击左侧的单词，然后点击右侧的定义",
+      "columns": {
+        "words": "单词",
+        "definitions": "定义"
+      }
+    },
+    "progress": {
+      "matched": "{matched}/{total} 已配对",
+      "correct": "{correct}/{total} 正确"
+    },
+    "results": {
+      "perfect": "完美！所有配对都正确！🎉",
+      "partialCorrect": "{correct}/{total} 正确 💪",
+      "correctMatches": "正确的配对：",
+      "showAnswers": "已显示正确配对！📖",
+      "correctMatch": "配对正确！✅",
+      "incorrectMatch": "配对不正确。再试一次！❌",
+      "tryAgain": "{correct}/{total} 正确。再试一次！💪"
+    },
+    "toast": {
+      "failedToLoad": "无法加载词汇"
+    }
+  },
+  "Introduction": {
+    "phase1Title": "课程介绍",
+    "phase1Description": "在本课中，您将阅读一篇关于「{title}」的文章",
+    "cefrLevel": "CEFR 等级：{level}",
+    "raLevel": "RA 等级：{level}",
+    "estimatedReadTime": "预计阅读时间：{time}",
+    "articleSummary": "文章摘要",
+    "learningObjectives": "学习目标",
+    "understandMainIdeas": "理解主要思想：",
+    "learnVocabulary": "学习词汇：",
+    "improveComprehension": "提高阅读理解："
+  },
+  "TaskLanguageQuestions": {
+    "title": "语言问题",
+    "subtitle": "通过回答关于文章的问题来练习您的语言技能",
+    "badges": {
+      "aiPowered": "AI 驱动",
+      "interactive": "互动",
+      "askQuestions": "提问"
+    }
+  },
+  "TeacherMyClasses": {
+    "page": {
+      "title": "我的班级",
+      "description": "管理并查看您的班级"
+    },
+    "table": {
+      "headers": {
+        "className": "班级名称",
+        "classCode": "班级代码",
+        "studentCount": "学生人数",
+        "grade": "年级",
+        "actions": "操作"
+      },
+      "empty": "空"
+    },
+    "actions": {
+      "roster": "花名册",
+      "reports": "报告",
+      "edit": "编辑",
+      "archive": "归档",
+      "delete": "删除"
+    },
+    "search": { "placeholder": "搜索" },
+    "import": {
+      "fromLabel": "从以下导入新班级",
+      "googleClassroom": "Google Classroom",
+      "dialog": {
+        "title": "导入您的 Google Classroom",
+        "selectClass": "选择一个 Google Classroom 班级",
+        "description": "选择一个班级进行同步。所有学生将被导入并添加到您的账户。",
+        "yourClasses": "您的 Google Classroom 班级",
+        "refresh": "刷新",
+        "continue": "继续",
+        "syncing": "正在同步班级...",
+        "syncingDescription": "正在从 Google Classroom 导入学生，这可能需要一点时间。",
+        "syncCompleted": "同步完成！",
+        "syncAnother": "同步另一个班级",
+        "goToClass": "前往班级",
+        "aboutTitle": "关于 Google Classroom 同步",
+        "aboutDescription": "此功能允许导入 Google Classroom 学生。学生将自动加入您的班级。"
+      }
+    },
+    "pagination": { "previous": "上一页", "next": "下一页" },
+    "edit": {
+      "title": "编辑班级",
+      "description": "您确定要编辑此班级吗？",
+      "className": "班级名称",
+      "classNamePlaceholder": "班级名称",
+      "grade": "年级",
+      "gradePlaceholder": "年级",
+      "gradeItem": "年级 {grade}",
+      "submit": "编辑"
+    },
+    "delete": {
+      "title": "删除班级",
+      "description": "您确定要删除此班级吗？",
+      "submit": "删除",
+      "cancel": "取消"
+    },
+    "toast": {
+      "attention": "提示",
+      "fillAllFields": "请填写所有字段",
+      "success": "成功",
+      "classUpdated": "班级更新成功",
+      "error": "错误",
+      "failedUpdate": "更新班级失败",
+      "classDeleted": "班级删除成功",
+      "failedDelete": "删除班级失败"
+    }
+  },
+  "TeacherCreateClass": {
+    "button": { "newClassroom": "新建班级" },
+    "dialog": { "title": "创建班级", "description": "创建一个新班级" },
+    "fields": {
+      "className": "班级名称",
+      "classNamePlaceholder": "班级名称",
+      "classCode": "班级代码",
+      "grade": "年级",
+      "gradePlaceholder": "年级",
+      "gradeItem": "年级 {grade}"
+    },
+    "actions": { "create": "创建", "cancel": "取消" },
+    "toast": {
+      "attention": "提示",
+      "fillAllFields": "请填写所有字段",
+      "success": "成功",
+      "classCreated": "班级创建成功",
+      "error": "错误",
+      "failedCreate": "创建班级失败"
+    }
+  },
+  "teacher": {
+    "myStudents": {
+      "title": "我的学生",
+      "description": "查看并管理您的学生",
+      "table": {
+        "name": "姓名",
+        "email": "邮箱",
+        "classrooms": "班级",
+        "actions": "操作",
+        "empty": "空"
+      },
+      "actions": {
+        "progress": "进度",
+        "resetProgress": "重置进度",
+        "cancel": "取消",
+        "reset": "重置"
+      },
+      "search": {
+        "placeholder": "按姓名搜索"
+      },
+      "pagination": {
+        "previous": "上一页",
+        "next": "下一页"
+      },
+      "unknown": {
+        "student": "匿名",
+        "email": "未知"
+      },
+      "classrooms": {
+        "none": "无班级",
+        "more": "+{count} 更多"
+      },
+      "dialog": {
+        "reset": {
+          "title": "重置进度",
+          "description": "确定要重置该学生的学习进度吗？"
+        }
+      },
+      "toast": {
+        "reset": {
+          "success": "XP 重置成功。",
+          "error": "XP 重置失败。"
+        }
+      }
+    },
+    "cefrSetter": {
+      "button": { "setLevel": "设置等级" },
+      "dialog": {
+        "title": "为 {name} 设置 CEFR 等级",
+        "description": "为该学生选择合适的 CEFR 等级，同时会更新其阅读等级（RA）。"
+      },
+      "labels": {
+        "currentLevel": "当前等级",
+        "newLevel": "新等级"
+      },
+      "select": { "placeholder": "选择 CEFR 等级" },
+      "preview": {
+        "title": "预览：",
+        "cefr": "CEFR 等级：",
+        "ra": "RA 等级："
+      },
+      "actions": {
+        "cancel": "取消",
+        "update": "更新等级",
+        "updating": "更新中..."
+      },
+      "toast": {
+        "noChanges": "没有可保存的更改",
+        "success": "已将 {name} 的 CEFR 等级更新为 {level}",
+        "error": "更新 CEFR 等级失败"
+      }
+    }
+  },
+  "Teacher": {
+    "Assignments": {
+      "heading": "作业",
+      "selectors": {
+        "selectClassroom": "选择班级"
+      },
+      "search": {
+        "placeholder": "搜索作业...",
+        "searching": "搜索中..."
+      },
+      "table": {
+        "headers": {
+          "assignment": "作业",
+          "createdOn": "创建时间",
+          "dueDate": "截止日期",
+          "students": "学生",
+          "actions": "操作"
+        },
+        "actions": {
+          "actions": "操作",
+          "details": "详情"
+        }
+      },
+      "empty": {
+        "noAssignments": "未找到作业",
+        "selectClassroom": "请选择班级以查看作业"
+      },
+      "pagination": {
+        "previous": "上一页",
+        "next": "下一页",
+        "pageOf": "第 {page} 页，共 {totalPages} 页",
+        "showing": "显示第 {from} 到第 {to} 条，共 {total} 个作业"
+      },
+      "toast": {
+        "fetchError": "获取作业失败"
+      }
+    },
+    "ClassCodeGenerator": {
+      "title": "{classroomName} 的密码",
+      "description": {
+        "line1": "生成一个供学生加入此课堂的密码。",
+        "line2": "学生将使用此密码登录并访问课堂资料。"
+      },
+      "fields": {
+        "password": {
+          "label": "密码",
+          "copyTitle": "复制密码"
+        }
+      },
+      "expires": {
+        "label": "过期时间：",
+        "never": "永不过期",
+        "status": {
+          "expired": "已过期",
+          "hoursLeft": "剩余 {count} 小时",
+          "daysLeft": "剩余 {count} 天"
+        }
+      },
+      "instructions": {
+        "title": "学生使用说明：",
+        "step1": "前往学生登录页面",
+        "step2": "输入密码：",
+        "step3": "在学生名单中选择自己的名字",
+        "step4": "开始学习！",
+        "copy": "复制说明"
+      },
+      "actions": {
+        "open": "生成密码",
+        "generate": "生成密码",
+        "generateNew": "生成新密码",
+        "generating": "正在生成...",
+        "close": "关闭"
+      },
+      "toast": {
+        "generateSuccess": "课堂密码生成成功",
+        "generateError": "生成课堂密码失败",
+        "copyCodeSuccess": "已复制课堂密码",
+        "copyCodeError": "复制课堂密码失败",
+        "copyInstructionsSuccess": "已复制说明",
+        "copyInstructionsError": "复制说明失败"
+      },
+      "clipboard": {
+        "instructions": "🎓 加入 {classroomName}\n\n使用此密码加入：{classCode}\n\n说明：\n1. 前往学生登录页面\n2. 输入密码：{classCode}\n3. 在名单中选择你的名字\n4. 开始学习！\n\n⏰ 此密码过期时间：{expiresAt}"
+      }
+    },
+    "StudentEnrollmentButton": {
+      "title": "为学生注册",
+      "description": "选择学生注册到 {classroomName}",
+      "search": {
+        "placeholder": "按姓名或邮箱搜索学生..."
+      },
+      "empty": {
+        "title": "没有可注册的学生",
+        "description": "所有学生都已注册到此课堂",
+        "searchTitle": "未找到学生",
+        "searchDescription": "请尝试调整搜索关键词"
+      },
+      "labels": {
+        "noName": "无姓名",
+        "level": "等级 {level}"
+      },
+      "actions": {
+        "open": "注册学生",
+        "enroll": "注册",
+        "close": "关闭"
+      },
+      "toast": {
+        "loadAvailableError": "无法加载可注册学生",
+        "enrollSuccess": "{name} 注册成功",
+        "enrollError": "注册学生失败"
+      }
+    },
+    "ClassroomNavigation": {
+      "nav": {
+        "classRoster": "班级花名册",
+        "reports": "报告",
+        "settings": "设置"
+      },
+      "info": {
+        "students": "{count, plural, one {# 名学生} other {# 名学生}}",
+        "grade": "年级 {grade}",
+        "classCode": "班级代码:"
+      },
+      "password": {
+        "label": "密码:",
+        "noPassword": "无密码",
+        "show": "显示密码",
+        "hide": "隐藏密码",
+        "copy": "复制密码"
+      },
+      "actions": {
+        "back": "返回",
+        "backToClassrooms": "返回班级花名册"
+      },
+      "toast": {
+        "copyClassCodeSuccess": "班级代码已复制！",
+        "copyClassCodeError": "复制班级代码失败",
+        "copyPasswordSuccess": "密码已复制！",
+        "copyPasswordError": "复制密码失败"
+      }
+    },
+    "ClassRoster": {
+      "title": "班级花名册",
+      "description": "管理学生、查看进度并组织你的班级。"
+    },
+    "ClassroomSelector": {
+      "title": "选择班级",
+      "actions": {
+        "newClassroom": "新建班级",
+        "viewRoster": "查看花名册"
+      },
+      "empty": {
+        "title": "未找到班级",
+        "description": "创建你的第一个班级以管理学生并跟踪他们的进度。",
+        "createFirst": "创建第一个班级"
+      },
+      "grade": "年级 {grade}",
+      "studentsCount": "{count, plural, one {# 名学生} other {# 名学生}}",
+      "createdAt": "创建于 {date}",
+      "toast": {
+        "loadError": "加载班级失败"
+      }
+    },
+    "EnhancedClassRoster": {
+      "toast": {
+        "loadClassroomError": "无法加载班级数据",
+        "resetSuccess": "学生进度已成功重置",
+        "resetError": "重置学生进度失败"
+      },
+      "notFound": {
+        "title": "未找到班级",
+        "description": "无法找到请求的班级，或者你没有访问权限。"
+      },
+      "actions": {
+        "backToRoster": "返回班级花名册",
+        "cancel": "取消",
+        "resetProgress": "重置进度",
+        "viewProgress": "查看进度"
+      },
+      "labels": {
+        "noName": "无姓名",
+        "level": "等级 {level}",
+        "studentDefault": "学生"
+      },
+      "students": {
+        "title": "学生列表",
+        "enrollButton": "添加学生",
+        "searchPlaceholder": "搜索学生...",
+        "empty": {
+          "title": "尚无学生加入",
+          "description": "先在此班级中添加学生以开始",
+          "enrollFirst": "添加第一位学生",
+          "searchTitle": "未找到学生",
+          "searchDescription": "请尝试调整搜索关键词"
+        }
+      },
+      "activity": {
+        "none": "暂无活动",
+        "today": "今天",
+        "yesterday": "昨天",
+        "daysAgo": "{count} 天前",
+        "weeksAgo": "{count} 周前"
+      },
+      "resetDialog": {
+        "title": "重置学生进度",
+        "description": "确定要重置该学生的进度吗？此操作将把 XP 设为 0、等级设为 0，并清除 CEFR 等级。此操作无法撤销。"
+      }
+    },
+    "Enrollment": {
+      "toast": {
+        "loadError": "无法加载班级信息"
+      },
+      "notFound": {
+        "title": "未找到班级",
+        "description": "无法找到请求的班级，或者你没有访问权限。"
+      },
+      "actions": {
+        "back": "返回",
+        "backToRoster": "返回班级花名册"
+      },
+      "header": {
+        "title": "学生加入",
+        "subtitle": "管理学生加入："
+      }
+    },
+    "AssignmentDashboard": {
+      "notStarted": "未开始",
+      "inProgress": "进行中",
+      "completed": "已完成",
+      "unknownStatus": "未知状态",
+      "createdOn": "创建时间",
+      "dueDate": "截止日期",
+      "overdue": "逾期",
+      "dueToday": "今日截止",
+      "daysRemaining": "剩余天数：{daysRemaining}",
+      "allStudents": "全部学生",
+      "overallProgress": "总体进度",
+      "studentList": "学生列表",
+      "all": "全部",
+      "deleting": "正在删除...",
+      "deleteCount": "删除（{count}）",
+      "cancel": "取消",
+      "edit": "编辑",
+      "noStudentsInSelectedStatus": "所选状态下没有学生"
+    }
+  },
+  "AdminTeachers": {
+    "page": {
+      "title": "教师管理",
+      "description": "管理教师及其系统访问权限"
+    },
+    "Add": {
+      "title": "添加教师",
+      "subtitle": "为您的学校添加新教师",
+      "cardTitle": "教师信息",
+      "form": {
+        "name": "姓名",
+        "email": "邮箱",
+        "role": "角色",
+        "password": "密码",
+        "confirmPassword": "确认密码"
+      },
+      "placeholders": {
+        "name": "请输入教师姓名",
+        "email": "请输入邮箱",
+        "role": "选择角色",
+        "password": "创建密码",
+        "confirmPassword": "确认密码"
+      },
+      "buttons": {
+        "create": "创建教师",
+        "creating": "正在创建教师...",
+        "reset": "重置表单"
+      },
+      "toasts": {
+        "createdSuccess": "创建教师成功！",
+        "createError": "创建教师失败"
+      },
+      "schema": {
+        "nameMin": "姓名至少需要 2 个字符",
+        "nameMax": "姓名不能超过 100 个字符",
+        "emailInvalid": "请输入有效的邮箱地址",
+        "roleRequired": "请选择角色",
+        "passwordMin": "密码至少需要 6 个字符",
+        "passwordMax": "密码不能超过 100 个字符",
+        "passwordsDontMatch": "两次输入的密码不一致"
+      }
+    },
+    "Table": {
+      "title": "教师列表",
+      "searchPlaceholder": "搜索教师...",
+      "stats": {
+        "totalTeachers": "教师总数",
+        "totalTeachersDesc": "系统内活跃",
+        "totalStudents": "学生总数",
+        "totalStudentsDesc": "所有教师合计",
+        "totalClasses": "班级总数",
+        "totalClassesDesc": "活跃班级"
+      },
+      "actions": {
+        "addTeacher": "添加教师",
+        "add": "添加教师",
+        "update": "更新教师",
+        "delete": "删除教师",
+        "cancel": "取消"
+      },
+      "addDialog": {
+        "title": "新增教师",
+        "description": "创建新的教师账户。教师将通过邮箱收到登录信息。"
+      },
+      "editDialog": {
+        "title": "编辑教师",
+        "description": "更新教师信息和访问权限。"
+      },
+      "deleteDialog": {
+        "title": "删除教师",
+        "description": "确定要删除 {name} 吗？该操作无法撤销，所有相关班级与学生数据将受到影响。"
+      },
+      "form": {
+        "name": "姓名",
+        "namePlaceholder": "请输入姓名",
+        "email": "邮箱",
+        "emailPlaceholder": "请输入邮箱",
+        "role": "角色",
+        "rolePlaceholder": "选择角色",
+        "cefr": "CEFR 等级",
+        "cefrPlaceholder": "选择 CEFR 等级",
+        "passwordOptional": "密码（可选）",
+        "passwordPlaceholder": "留空以自动生成密码",
+        "assignClassrooms": "分配班级",
+        "resetPassword": "重置密码",
+        "setNewPassword": "设置新密码",
+        "newPasswordPlaceholder": "请输入新密码"
+      },
+      "roles": {
+        "teacher": "教师",
+        "admin": "管理员"
+      },
+      "cefrLevels": {
+        "A1": "初级",
+        "A2": "基础",
+        "B1": "中级",
+        "B2": "中高级",
+        "C1": "高级",
+        "C2": "精通"
+      },
+      "classrooms": {
+        "loading": "正在加载班级...",
+        "empty": "暂无班级",
+        "studentsCount": "（{count} 名学生）"
+      },
+      "tableHeaders": {
+        "teacher": "教师",
+        "email": "邮箱",
+        "role": "角色",
+        "cefr": "CEFR 等级",
+        "assignedClassrooms": "已分配班级",
+        "students": "学生",
+        "classes": "班级",
+        "joined": "加入日期",
+        "actions": "操作"
+      },
+      "loading": "正在加载教师...",
+      "empty": {
+        "search": "未找到符合搜索条件的教师",
+        "default": "暂无教师"
+      }
+    }
+  },
+  "AdminStudents": {
+    "header": {
+      "title": "学生管理",
+      "subtitle": "管理学生及其学习进度"
+    },
+    "page": { "title": "学生管理" },
+    "stats": {
+      "totalStudents": "学生总数",
+      "allClassrooms": "所有班级",
+      "averageXp": "平均 XP",
+      "averageXpDesc": "每位学生的经验值",
+      "mostCommonLevel": "最常见等级",
+      "mostCommonLevelDesc": "CEFR 能力等级",
+      "activeThisWeek": "本周活跃",
+      "activeThisWeekDetail": "{count} / {total} 名学生"
+    },
+    "actions": {
+      "addStudent": "添加学生",
+      "saveStudent": "保存学生",
+      "saveChanges": "保存更改",
+      "clearFilters": "清除筛选",
+      "cancel": "取消",
+      "delete": "删除",
+      "previous": "上一页",
+      "next": "下一页"
+    },
+    "dialogs": {
+      "add": {
+        "title": "添加新学生",
+        "description": "创建一个新的学生账号。完成后点击保存。"
+      },
+      "edit": {
+        "title": "编辑学生",
+        "description": "修改学生账号信息。完成后点击保存。"
+      },
+      "delete": {
+        "title": "确定要删除吗？",
+        "description": "此操作无法撤销。这将永久删除 {name} 的账号并移除其在我们的服务器上的数据。"
+      }
+    },
+    "form": {
+      "name": "姓名",
+      "email": "邮箱",
+      "cefrLevel": "CEFR 等级",
+      "role": "角色",
+      "namePlaceholder": "输入学生姓名",
+      "emailPlaceholder": "输入邮箱地址",
+      "cefrPlaceholder": "选择 CEFR 等级",
+      "rolePlaceholder": "选择角色"
+    },
+    "roles": {
+      "student": "学生",
+      "teacher": "教师",
+      "admin": "管理员"
+    },
+    "filters": {
+      "searchPlaceholder": "按姓名或邮箱搜索学生...",
+      "classroomPlaceholder": "按班级筛选",
+      "cefrPlaceholder": "CEFR 等级",
+      "activeFiltersLabel": "已启用的筛选:",
+      "searchLabel": "搜索:",
+      "classroomLabel": "班级:",
+      "levelLabel": "等级:"
+    },
+    "tableHeaders": {
+      "name": "姓名",
+      "email": "邮箱",
+      "className": "班级名称",
+      "cefr": "CEFR 等级",
+      "xp": "XP",
+      "role": "角色",
+      "actions": "操作"
+    },
+    "table": {
+      "loading": "正在加载学生...",
+      "empty": "没有找到符合条件的学生。"
+    },
+    "badges": { "noClass": "无班级" },
+    "pagination": {
+      "showing": "显示第 {from} 到第 {to} 条，共 {total} 名学生",
+      "previous": "上一页",
+      "next": "下一页",
+      "pageOf": "第 {page} 页，共 {totalPages} 页"
+    }
   }
 }

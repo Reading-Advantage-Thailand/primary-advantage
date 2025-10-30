@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import {
   Book,
@@ -12,6 +13,7 @@ import LessonSentenceOrder from "../games/lesson-sentence-order";
 import LessonSentenceClozeTest from "../games/lesson-sentence-cloze-test";
 import LessonSentenceOrderWord from "../games/lesson-sentence-order-word";
 import LessonSentenceMatching from "../games/lesson-sentence-matching";
+import { useTranslations } from "next-intl";
 
 interface AssignmentActivity {
   isSentenceMatchingCompleted: boolean;
@@ -25,6 +27,7 @@ export default function TaskSentenceActivities({
 }: {
   articleId: string;
 }) {
+  const t = useTranslations("Lesson.SentenceActivities");
   const [completedActivities, setCompletedActivities] =
     useState<AssignmentActivity | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,10 +55,10 @@ export default function TaskSentenceActivities({
             <Book className="h-8 w-8 text-orange-600 dark:text-orange-400" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Order Sentences
+            {t("orderSentences.title")}
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-            Practice ordering sentences to improve your skills.
+            {t("orderSentences.description")}
           </p>
         </div>
 
@@ -76,10 +79,10 @@ export default function TaskSentenceActivities({
             <Book className="h-8 w-8 text-orange-600 dark:text-orange-400" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Cloze Test
+            {t("clozeTest.title")}
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-            Practice cloze test to improve your skills.
+            {t("clozeTest.description")}
           </p>
         </div>
 
@@ -99,10 +102,10 @@ export default function TaskSentenceActivities({
             <Book className="h-8 w-8 text-orange-600 dark:text-orange-400" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Order Words
+            {t("orderWords.title")}
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-            Practice ordering words to improve your skills.
+            {t("orderWords.description")}
           </p>
         </div>
 
@@ -123,10 +126,10 @@ export default function TaskSentenceActivities({
             <Book className="h-8 w-8 text-orange-600 dark:text-orange-400" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Matching
+            {t("matching.title")}
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-            Practice matching to improve your skills.
+            {t("matching.description")}
           </p>
         </div>
 
@@ -148,10 +151,10 @@ export default function TaskSentenceActivities({
             <Book className="h-8 w-8 text-orange-600 dark:text-orange-400" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Sentence Activities
+            {t("title")}
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-            Loading activities...
+            {t("loading")}
           </p>
         </div>
       </div>
@@ -166,10 +169,10 @@ export default function TaskSentenceActivities({
           <Book className="h-8 w-8 text-orange-600 dark:text-orange-400" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Sentence Activities
+          {t("title")}
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-          Practice sentence activities to improve your skills.
+          {t("description")}
         </p>
       </div>
 
@@ -197,16 +200,16 @@ export default function TaskSentenceActivities({
                 <ListOrdered className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Order Sentences
+                {t("orderSentences.title")}
                 {completedActivities?.isSentenceOrderingCompleted && (
                   <span className="ml-2 text-sm text-green-600 dark:text-green-400">
-                    Completed
+                    {t("completed")}
                   </span>
                 )}
               </h3>
             </div>
             <p className="mb-6 flex-grow text-gray-600 dark:text-gray-300">
-              Practice ordering sentences to improve your skills.
+              {t("orderSentences.description")}
             </p>
             <Button
               onClick={() => setSelectedActivity("order-sentences")}
@@ -214,8 +217,8 @@ export default function TaskSentenceActivities({
             >
               <span className="flex items-center justify-center">
                 {completedActivities?.isSentenceOrderingCompleted
-                  ? "Review"
-                  : "Order Sentences"}
+                  ? t("review")
+                  : t("orderSentences.button")}
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </span>
             </Button>
@@ -244,16 +247,16 @@ export default function TaskSentenceActivities({
                 <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Cloze Test
+                {t("clozeTest.title")}
                 {completedActivities?.isSentenceClozeTestCompleted && (
                   <span className="ml-2 text-sm text-green-600 dark:text-green-400">
-                    Completed
+                    {t("completed")}
                   </span>
                 )}
               </h3>
             </div>
             <p className="mb-6 flex-grow text-gray-600 dark:text-gray-300">
-              Practice cloze test to improve your skills.
+              {t("clozeTest.description")}
             </p>
             <Button
               onClick={() => setSelectedActivity("cloze-test")}
@@ -261,8 +264,8 @@ export default function TaskSentenceActivities({
             >
               <span className="flex items-center justify-center">
                 {completedActivities?.isSentenceClozeTestCompleted
-                  ? "Review"
-                  : "Cloze Test"}
+                  ? t("review")
+                  : t("clozeTest.button")}
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </span>
             </Button>
@@ -291,16 +294,16 @@ export default function TaskSentenceActivities({
                 <Shuffle className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Order Words
+                {t("orderWords.title")}
                 {completedActivities?.isSentenceWordOrderingCompleted && (
                   <span className="ml-2 text-sm text-green-600 dark:text-green-400">
-                    Completed
+                    {t("completed")}
                   </span>
                 )}
               </h3>
             </div>
             <p className="mb-6 flex-grow text-gray-600 dark:text-gray-300">
-              Practice ordering words to improve your skills.
+              {t("orderWords.description")}
             </p>
             <Button
               onClick={() => setSelectedActivity("order-words")}
@@ -308,8 +311,8 @@ export default function TaskSentenceActivities({
             >
               <span className="flex items-center justify-center">
                 {completedActivities?.isSentenceWordOrderingCompleted
-                  ? "Review"
-                  : "Order Words"}
+                  ? t("review")
+                  : t("orderWords.button")}
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </span>
             </Button>
@@ -338,16 +341,16 @@ export default function TaskSentenceActivities({
                 <GitBranch className="h-6 w-6 text-rose-600 dark:text-rose-400" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Matching
+                {t("matching.title")}
                 {completedActivities?.isSentenceMatchingCompleted && (
                   <span className="ml-2 text-sm text-green-600 dark:text-green-400">
-                    Completed
+                    {t("completed")}
                   </span>
                 )}
               </h3>
             </div>
             <p className="mb-6 flex-grow text-gray-600 dark:text-gray-300">
-              Practice matching to improve your skills.
+              {t("matching.description")}
             </p>
             <Button
               onClick={() => setSelectedActivity("matching")}
@@ -355,8 +358,8 @@ export default function TaskSentenceActivities({
             >
               <span className="flex items-center justify-center">
                 {completedActivities?.isSentenceMatchingCompleted
-                  ? "Review"
-                  : "Matching"}
+                  ? t("review")
+                  : t("matching.button")}
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </span>
             </Button>

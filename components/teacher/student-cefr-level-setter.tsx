@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -117,13 +118,14 @@ export default function StudentCefrLevelSetter({
   currentCefrLevel,
   onUpdate,
 }: StudentCefrLevelSetterProps) {
+  const t = useTranslations("teacher.cefrSetter");
   const [selectedLevel, setSelectedLevel] = useState(currentCefrLevel);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleUpdateLevel = async () => {
     if (selectedLevel === currentCefrLevel) {
-      toast.info("No changes to save");
+      toast.info(t("toast.noChanges"));
       setIsOpen(false);
       return;
     }
@@ -144,15 +146,17 @@ export default function StudentCefrLevelSetter({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update CEFR level");
+        throw new Error("FAILED");
       }
 
-      toast.success(`${studentName}'s CEFR level updated to ${selectedLevel}`);
+      toast.success(
+        t("toast.success", { name: studentName, level: selectedLevel }),
+      );
       setIsOpen(false);
       onUpdate?.();
     } catch (error) {
       console.error("Error updating CEFR level:", error);
-      toast.error("Failed to update CEFR level");
+      toast.error(t("toast.error"));
     } finally {
       setIsLoading(false);
     }
@@ -170,21 +174,18 @@ export default function StudentCefrLevelSetter({
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="w-full justify-start">
           <Settings className="text-muted-foreground mr-1 size-4" />
-          Set Level
+          {t("button.setLevel")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Set CEFR Level for {studentName}</DialogTitle>
-          <DialogDescription>
-            Choose the appropriate CEFR level for this student. This will also
-            update their reading level (RA level).
-          </DialogDescription>
+          <DialogTitle>{t("dialog.title", { name: studentName })}</DialogTitle>
+          <DialogDescription>{t("dialog.description")}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="current-level">Current Level</Label>
+            <Label htmlFor="current-level">{t("labels.currentLevel")}</Label>
             <div className="bg-muted rounded p-2 text-sm">
               <strong>{currentLevelInfo?.label}</strong>
               {currentLevelInfo?.description && (
@@ -196,10 +197,10 @@ export default function StudentCefrLevelSetter({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="new-level">New Level</Label>
+            <Label htmlFor="new-level">{t("labels.newLevel")}</Label>
             <Select value={selectedLevel} onValueChange={setSelectedLevel}>
               <SelectTrigger>
-                <SelectValue placeholder="Select CEFR Level" />
+                <SelectValue placeholder={t("select.placeholder")} />
               </SelectTrigger>
               <SelectContent>
                 {CEFR_LEVELS.map((level) => (
@@ -218,12 +219,15 @@ export default function StudentCefrLevelSetter({
 
           {selectedLevel && selectedLevel !== currentCefrLevel && (
             <div className="rounded border border-blue-200 bg-blue-50 p-2 text-sm">
-              <div className="font-medium text-blue-900">Preview:</div>
-              <div className="text-blue-700">
-                <strong>CEFR Level:</strong> {selectedLevelInfo?.label}
+              <div className="font-medium text-blue-900">
+                {t("preview.title")}
               </div>
               <div className="text-blue-700">
-                <strong>RA Level:</strong> {convertCefrLevel(selectedLevel)}
+                <strong>{t("preview.cefr")}</strong> {selectedLevelInfo?.label}
+              </div>
+              <div className="text-blue-700">
+                <strong>{t("preview.ra")}</strong>{" "}
+                {convertCefrLevel(selectedLevel)}
               </div>
             </div>
           )}
@@ -235,13 +239,13 @@ export default function StudentCefrLevelSetter({
             onClick={() => setIsOpen(false)}
             disabled={isLoading}
           >
-            Cancel
+            {t("actions.cancel")}
           </Button>
           <Button
             onClick={handleUpdateLevel}
             disabled={isLoading || selectedLevel === currentCefrLevel}
           >
-            {isLoading ? "Updating..." : "Update Level"}
+            {isLoading ? t("actions.updating") : t("actions.update")}
           </Button>
         </DialogFooter>
       </DialogContent>

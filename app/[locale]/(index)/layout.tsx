@@ -6,11 +6,13 @@ import { buttonVariants } from "@/components/ui/button";
 import { indexPageConfig } from "@/configs/index-page-config";
 import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { ReactNode } from "react";
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const session = await auth();
+  const t = await getTranslations("MainNav");
 
   // return (
   //   <div className="bg-background relative z-10 flex min-h-svh flex-col">
@@ -34,7 +36,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
                   "px-4",
                 )}
               >
-                Login
+                {t("login")}
               </Link>
             </nav>
           </div>

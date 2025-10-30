@@ -55,12 +55,15 @@ export default function SAQuestionContent({
   const [feedback, setFeedback] = useState<SAQFeedback | null>(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isPanding, startTransition] = useTransition();
-  const t = useTranslations("Question.SAQuestion");
+  const t = useTranslations("Question");
   const tc = useTranslations("Components");
   const router = useRouter();
 
   const formSchema = z.object({
-    answer: z.string().trim().min(1, { message: "Please enter your answer" }),
+    answer: z
+      .string()
+      .trim()
+      .min(1, { message: t("SAQuestion.anwserError") }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -102,11 +105,13 @@ export default function SAQuestionContent({
       await finishQuiz(articleId, data, ActivityType.SA_QUESTION).then(
         (res) => {
           if (res.success) {
-            toast.success("Quiz finished");
+            toast.success(t("descriptionSuccess"), {
+              richColors: true,
+            });
             setIsOpenModal(false);
             router.refresh();
           } else {
-            toast.error(res.error);
+            toast.error(res.error, { richColors: true });
           }
         },
       );
@@ -126,7 +131,7 @@ export default function SAQuestionContent({
             </Badge>
           </div>
           <CardTitle className="text-3xl font-bold md:text-2xl">
-            {t("title")}
+            {t("SAQuestion.title")}
           </CardTitle>
           <CardDescription className="md:text-1xl text-2xl">
             {questions?.question}
@@ -160,23 +165,23 @@ export default function SAQuestionContent({
             <AlertDialogContent className="sm:max-w-[425px]">
               <AlertDialogHeader className="text-left">
                 <AlertDialogTitle className="text-2xl font-bold">
-                  Feedback and your score
+                  {t("SAQuestion.feedbackAndYourScore")}
                 </AlertDialogTitle>
                 <div className="flex flex-col gap-2">
                   <p className="text-muted-foreground mt-4 text-lg font-bold">
-                    Question
+                    {t("SAQuestion.question")}
                   </p>
                   <p className="text-muted-foreground">{questions.question}</p>
                   <p className="text-muted-foreground mt-4 text-lg font-bold">
-                    Suggested Answer
+                    {t("SAQuestion.suggestedAnswer")}
                   </p>
                   <p className="text-muted-foreground">{questions.answer}</p>
                   <p className="text-muted-foreground mt-4 text-lg font-bold">
-                    Feedback
+                    {t("SAQuestion.feedback")}
                   </p>
                   <p className="text-muted-foreground">{feedback?.feedback}</p>
                   <p className="text-muted-foreground mt-4 text-lg font-bold">
-                    Your Answer
+                    {t("SAQuestion.yourAnswer")}
                   </p>
                   <p className="mt-2 inline font-bold text-green-500 dark:text-green-400">
                     {form.getValues("answer")}
@@ -185,7 +190,7 @@ export default function SAQuestionContent({
               </AlertDialogHeader>
               <div className="flex items-center">
                 <p className="mt-4 text-lg font-bold">
-                  Score : {feedback?.score}
+                  {t("SAQuestion.score", { score: feedback?.score ?? 0 })}
                 </p>
               </div>
               <AlertDialogFooter>

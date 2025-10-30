@@ -35,6 +35,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface OrderWordData {
   id: string;
@@ -87,15 +88,24 @@ interface ClickableWord {
   partOfSpeech?: string;
 }
 
-const SUPPORTED_LANGUAGES = {
-  th: "🇹🇭 Thai",
-  vi: "🇻🇳 Vietnamese",
-  cn: "🇨🇳 Chinese (Simplified)",
-  tw: "🇹🇼 Chinese (Traditional)",
-};
-
 export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
   const router = useRouter();
+  const t = useTranslations("SentencesPage.orderWordGame");
+
+  // Helper to get translated language name
+  const getLanguageName = useCallback(
+    (code: string) => {
+      const languageMap: Record<string, string> = {
+        th: t("startScreen.language.thai"),
+        vi: t("startScreen.language.vietnamese"),
+        cn: t("startScreen.language.chineseSimplified"),
+        tw: t("startScreen.language.chineseTraditional"),
+      };
+      return languageMap[code] || code;
+    },
+    [t],
+  );
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedWords, setSelectedWords] = useState<ClickableWord[]>([]);
   const [availableWords, setAvailableWords] = useState<ClickableWord[]>([]);
@@ -137,11 +147,11 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
         const data = await response.json();
         setActiveSentences(data.sentences || []);
       } else {
-        toast.error("Failed to load sentences from flashcard deck");
+        toast.error(t("toast.failedToLoad"));
       }
     } catch (error) {
       console.error("Error loading sentences:", error);
-      toast.error("Failed to load sentences");
+      toast.error(t("toast.failedToLoadSentences"));
     } finally {
       setIsLoading(false);
     }
@@ -254,9 +264,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
   const handleStartGame = useCallback(() => {
     setIsPlaying(true);
     toast.success(
-      `Game started with ${SUPPORTED_LANGUAGES[selectedLanguage as keyof typeof SUPPORTED_LANGUAGES]} translations! 🎮`,
+      t("toast.gameStarted", { language: getLanguageName(selectedLanguage) }),
     );
-  }, [selectedLanguage]);
+  }, [selectedLanguage, t, getLanguageName]);
 
   const handleNext = useCallback(async () => {
     if (currentIndex < activeSentences.length - 1) {
@@ -302,11 +312,11 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
 
     if (isCorrect) {
       setScore((prev) => prev + 1);
-      toast.success("Perfect! Correct word order! 🎉");
+      toast.success(t("results.perfect"));
     } else {
-      toast.error("Not quite right. Try again! 💪");
+      toast.error(t("results.notQuiteRight"));
     }
-  }, [selectedWords, currentSentence?.correctOrder]);
+  }, [selectedWords, currentSentence?.correctOrder, t]);
 
   const handleRestartGame = useCallback(() => {
     setCurrentIndex(0);
@@ -319,19 +329,22 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
 
   const handleShowAnswer = useCallback(() => {
     setShowCorrectOrder(true);
-    toast.info("Correct order revealed! 📖");
-  }, []);
+    toast.info(t("results.correctOrderRevealed"));
+  }, [t]);
 
   const handleBack = useCallback(() => {
     router.back();
   }, [router]);
 
-  const handleLanguageChange = useCallback((value: string) => {
-    setSelectedLanguage(value);
-    const language =
-      SUPPORTED_LANGUAGES[value as keyof typeof SUPPORTED_LANGUAGES];
-    toast.success(`Translation language set to ${language}`);
-  }, []);
+  const handleLanguageChange = useCallback(
+    (value: string) => {
+      setSelectedLanguage(value);
+      toast.success(
+        t("toast.languageSet", { language: getLanguageName(value) }),
+      );
+    },
+    [t, getLanguageName],
+  );
 
   const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -494,9 +507,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Loading your sentences...</h3>
+            <h3 className="text-lg font-semibold">{t("loading.title")}</h3>
             <p className="text-muted-foreground text-sm">
-              Fetching sentences from your flashcard deck
+              {t("loading.description")}
             </p>
           </div>
         </div>
@@ -522,19 +535,15 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
           {/* Results Header */}
           <div className="space-y-4">
             <h1 className="gradient-text text-4xl font-bold md:text-5xl">
-              🎉 Amazing Work!
+              {t("complete.title")}
             </h1>
             <p className="text-muted-foreground text-xl">
-              You completed {activeSentences.length} word ordering challenges
+              {t("complete.subtitle", { count: activeSentences.length })}
             </p>
             <p className="text-muted-foreground text-sm">
-              Using{" "}
-              {
-                SUPPORTED_LANGUAGES[
-                  selectedLanguage as keyof typeof SUPPORTED_LANGUAGES
-                ]
-              }{" "}
-              translations
+              {t("complete.usingTranslations", {
+                language: getLanguageName(selectedLanguage),
+              })}
             </p>
           </div>
 
@@ -544,7 +553,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
               <CardContent className="p-6 text-center">
                 <Target className="mx-auto mb-3 h-8 w-8 text-blue-500" />
                 <div className="text-3xl font-bold text-blue-600">{score}</div>
-                <p className="text-muted-foreground text-sm">Correct Answers</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.correctAnswers")}
+                </p>
               </CardContent>
             </Card>
 
@@ -554,7 +565,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                 <div className="text-3xl font-bold text-green-600">
                   {accuracy}%
                 </div>
-                <p className="text-muted-foreground text-sm">Accuracy</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.accuracy")}
+                </p>
               </CardContent>
             </Card>
 
@@ -564,7 +577,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                 <div className="text-3xl font-bold text-purple-600">
                   {formatTime(timer)}
                 </div>
-                <p className="text-muted-foreground text-sm">Total Time</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.totalTime")}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -578,11 +593,11 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
               className="flex-1"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Menu
+              {t("complete.backToMenu")}
             </Button>
             <Button onClick={handleRestartGame} size="lg" className="flex-1">
               <RotateCcw className="mr-2 h-4 w-4" />
-              Play Again
+              {t("complete.playAgain")}
             </Button>
           </div>
         </div>
@@ -594,17 +609,12 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
   if (!isPlaying) {
     return (
       <div className="container mx-auto max-w-4xl space-y-8 px-4">
-        <Header
-          heading="Order Words Game"
-          text="Test your language skills by clicking words to form correct sentences"
-        />
+        <Header heading={t("title")} text={t("descriptionShort")} />
 
         <Card className="mx-auto max-w-2xl">
           <CardHeader className="pb-6 text-center">
-            <CardTitle className="text-2xl">Ready to Start?</CardTitle>
-            <p className="text-muted-foreground">
-              Click words in the correct order to form meaningful sentences
-            </p>
+            <CardTitle className="text-2xl">{t("startScreen.title")}</CardTitle>
+            <p className="text-muted-foreground">{t("startScreen.subtitle")}</p>
           </CardHeader>
 
           <CardContent className="space-y-8">
@@ -616,17 +626,23 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                     {activeSentences.length}
                   </span>
                 </div>
-                <p className="text-sm font-medium">Sentences</p>
-                <p className="text-muted-foreground text-xs">Ready to solve</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.stats.sentences")}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t("startScreen.stats.readyToPlay")}
+                </p>
               </div>
 
               <div className="space-y-2 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                   <Type className="h-6 w-6 text-green-600" />
                 </div>
-                <p className="text-sm font-medium">Click to Order</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.stats.clickToOrder")}
+                </p>
                 <p className="text-muted-foreground text-xs">
-                  With translations
+                  {t("startScreen.stats.withTranslations")}
                 </p>
               </div>
 
@@ -634,8 +650,12 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10">
                   <Clock className="h-6 w-6 text-purple-600" />
                 </div>
-                <p className="text-sm font-medium">~10 min</p>
-                <p className="text-muted-foreground text-xs">Estimated time</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.stats.estimatedTime", { time: 10 })}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t("startScreen.stats.estimatedTimeLabel")}
+                </p>
               </div>
             </div>
 
@@ -645,16 +665,16 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
             <div className="bg-muted/50 space-y-3 rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <div className="bg-primary h-2 w-2 rounded-full" />
-                <p className="text-sm font-medium">How to Play</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.howToPlay")}
+                </p>
               </div>
               <ul className="text-muted-foreground ml-4 space-y-2 text-sm">
-                <li>
-                  • Click words from the bottom to add them to your sentence
-                </li>
-                <li>• Click words in your sentence to remove them</li>
-                <li>• Translations will be shown below each word</li>
-                <li>• Form grammatically correct and meaningful sentences</li>
-                <li>• Use hints if you get stuck</li>
+                <li>• {t("startScreen.instructions.step1")}</li>
+                <li>• {t("startScreen.instructions.step2")}</li>
+                <li>• {t("startScreen.instructions.step3")}</li>
+                <li>• {t("startScreen.instructions.step4")}</li>
+                <li>• {t("startScreen.instructions.step5")}</li>
               </ul>
             </div>
 
@@ -664,7 +684,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <Languages className="h-5 w-5 text-blue-500" />
-                <h3 className="font-semibold">Choose Translation Language</h3>
+                <h3 className="font-semibold">
+                  {t("startScreen.language.title")}
+                </h3>
               </div>
               <Select
                 value={selectedLanguage}
@@ -673,27 +695,25 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                 <SelectTrigger className="h-12">
                   <div className="flex items-center gap-3">
                     <Languages className="h-4 w-4" />
-                    <SelectValue placeholder="Select translation language" />
+                    <SelectValue
+                      placeholder={t("startScreen.language.selected")}
+                    />
                   </div>
                 </SelectTrigger>
                 <SelectContent position="popper" className="max-h-60">
-                  {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
+                  {(["th", "vi", "cn", "tw"] as const).map((code) => (
                     <SelectItem key={code} value={code}>
                       <div className="flex items-center gap-2">
-                        <span>{name}</span>
+                        <span>{getLanguageName(code)}</span>
                       </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <p className="text-muted-foreground text-sm">
-                Word translations will be shown in{" "}
-                {
-                  SUPPORTED_LANGUAGES[
-                    selectedLanguage as keyof typeof SUPPORTED_LANGUAGES
-                  ]
-                }{" "}
-                throughout the game
+                {t("startScreen.language.description", {
+                  language: getLanguageName(selectedLanguage),
+                })}
               </p>
             </div>
 
@@ -707,8 +727,10 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
             >
               <Play className="mr-2 h-5 w-5" />
               {activeSentences.length === 0
-                ? "No sentences available"
-                : `Start Game with ${SUPPORTED_LANGUAGES[selectedLanguage as keyof typeof SUPPORTED_LANGUAGES]} Translations`}
+                ? t("startScreen.noSentences")
+                : t("startScreen.startButton", {
+                    language: getLanguageName(selectedLanguage),
+                  })}
             </Button>
           </CardContent>
         </Card>
@@ -721,7 +743,7 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="space-y-4 text-center">
           <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
-          <p className="text-muted-foreground">Loading next challenge...</p>
+          <p className="text-muted-foreground">{t("loadingNextChallenge")}</p>
         </div>
       </div>
     );
@@ -730,19 +752,24 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
   return (
     <div className="container mx-auto max-w-4xl space-y-4 px-4">
       <Header
-        heading="Order Words Game"
-        text={`Click words to form the correct sentence • ${SUPPORTED_LANGUAGES[selectedLanguage as keyof typeof SUPPORTED_LANGUAGES]} translations`}
+        heading={t("gameplay.title")}
+        text={t("gameplay.instruction", {
+          language: getLanguageName(selectedLanguage),
+        })}
       />
 
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="text-muted-foreground flex items-center justify-between text-sm">
           <span>
-            {currentIndex + 1} of {activeSentences.length}
+            {t("gameplay.progress", {
+              current: currentIndex + 1,
+              total: activeSentences.length,
+            })}
           </span>
           <div className="flex items-center gap-4">
             <span>
-              {score}/{activeSentences.length} correct
+              {t("gameplay.score", { score, total: activeSentences.length })}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
@@ -759,10 +786,12 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="space-y-3">
               <CardTitle className="text-xl">
-                📖 {currentSentence.articleTitle}
+                {t("gameplay.articleFrom", {
+                  title: currentSentence.articleTitle,
+                })}
               </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Click words below to form the correct sentence
+                {t("gameplay.subtitle")}
               </p>
             </div>
           </div>
@@ -783,14 +812,14 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
               <div className="flex items-center gap-2">
                 <Type className="h-4 w-4 text-blue-600" />
                 <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                  Your sentence:
+                  {t("gameplay.yourSentence")}
                 </p>
               </div>
 
               {selectedWords.length === 0 ? (
                 <div className="flex min-h-[80px] items-center justify-center">
                   <p className="text-muted-foreground text-center italic">
-                    Click words below to start forming your sentence...
+                    {t("gameplay.startByClicking")}
                   </p>
                 </div>
               ) : (
@@ -854,12 +883,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                 <div className="mb-2 flex items-center gap-2">
                   <Languages className="h-4 w-4 text-green-600" />
                   <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                    {
-                      SUPPORTED_LANGUAGES[
-                        selectedLanguage as keyof typeof SUPPORTED_LANGUAGES
-                      ]
-                    }{" "}
-                    Translation:
+                    {t("gameplay.translationLabel", {
+                      language: getLanguageName(selectedLanguage),
+                    })}
                   </span>
                 </div>
                 <p className="font-medium text-green-700 dark:text-green-300">
@@ -873,7 +899,7 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
           <div className="bg-muted/30 flex flex-wrap items-center gap-3 rounded-lg border p-4">
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium">Hints:</span>
+              <span className="text-sm font-medium">{t("hints.title")}</span>
             </div>
 
             {/* <Button
@@ -893,7 +919,7 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
               className="h-8"
             >
               <Volume2 className="mr-1 h-3 w-3" />
-              Audio
+              {t("hints.audio")}
             </Button>
 
             {audioHintsEnabled && (
@@ -909,12 +935,12 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                   {isPlayingHintAudio ? (
                     <>
                       <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                      Playing...
+                      {t("hints.playing")}
                     </>
                   ) : (
                     <>
                       <Play className="mr-2 h-3 w-3" />
-                      Play Order
+                      {t("hints.playOrder")}
                     </>
                   )}
                 </Button>
@@ -927,8 +953,8 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
             <div className="flex items-center gap-2">
               <Plus className="text-muted-foreground h-4 w-4" />
               <p className="text-sm font-medium">
-                Click words to add them to your sentence{" "}
-                {!hasUserInteracted && "(Start by clicking a word!)"}
+                {t("gameplay.clickWordsToAdd")}{" "}
+                {!hasUserInteracted && t("gameplay.startByClickingWord")}
               </p>
             </div>
 
@@ -936,9 +962,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
               {availableWords.length === 0 ? (
                 <div className="flex h-full min-h-[100px] items-center justify-center">
                   <p className="text-muted-foreground">
-                    All words used!{" "}
+                    {t("gameplay.allWordsUsed")}{" "}
                     {selectedWords.length === currentSentence.words.length
-                      ? "Check your sentence above."
+                      ? t("gameplay.checkSentence")
                       : ""}
                   </p>
                 </div>
@@ -1012,8 +1038,8 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                     )}
                     <h3 className="text-lg font-semibold">
                       {isCorrect
-                        ? "Perfect! Correct sentence! 🎉"
-                        : "Not quite right 💪"}
+                        ? t("results.perfect")
+                        : t("results.notQuiteRight")}
                     </h3>
                   </div>
 
@@ -1021,7 +1047,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                     <div className="space-y-3">
                       <Separator />
                       <div>
-                        <h4 className="mb-3 font-medium">Correct sentence:</h4>
+                        <h4 className="mb-3 font-medium">
+                          {t("results.correctOrder")}
+                        </h4>
                         <p className="text-lg leading-relaxed">
                           {currentSentence.correctOrder.join(" ")}
                         </p>
@@ -1046,7 +1074,9 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
               ) : (
                 <Shuffle className="mr-2 h-4 w-4" />
               )}
-              {showCorrectOrder || isCompleted ? "Try Again" : "Shuffle Words"}
+              {showCorrectOrder || isCompleted
+                ? t("buttons.tryAgain")
+                : t("buttons.shuffleWords")}
             </Button>
 
             {!isCompleted && selectedWords.length > 0 && (
@@ -1057,7 +1087,7 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                 className="sm:w-auto"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Check Answer
+                {t("buttons.checkAnswer")}
               </Button>
             )}
 
@@ -1069,15 +1099,15 @@ export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
                 className="sm:w-auto"
               >
                 <XCircle className="mr-2 h-4 w-4" />
-                Show Answer
+                {t("buttons.showAnswer")}
               </Button>
             )}
 
             {isCompleted && (
               <Button onClick={handleNext} className="flex-1">
                 {currentIndex < activeSentences.length - 1
-                  ? "Next Sentence"
-                  : "Finish Game"}
+                  ? t("buttons.nextSentence")
+                  : t("buttons.finishGame")}
               </Button>
             )}
           </div>

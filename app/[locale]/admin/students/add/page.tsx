@@ -25,23 +25,22 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { Eye, EyeOff, User, Mail, Lock, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
-
-const studentFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name must be less than 100 characters"),
-  email: z.string().email("Please enter a valid email address"),
-});
-
-type StudentFormData = z.infer<typeof studentFormSchema>;
+import { useTranslations } from "next-intl";
 
 export default function AddStudentPage() {
+  const t = useTranslations("Admin.Students.Add");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  const studentFormSchema = z.object({
+    name: z.string().min(2, t("errors.nameMin")).max(100, t("errors.nameMax")),
+    email: z.string().email(t("errors.emailInvalid")),
+  });
+
+  type StudentFormData = z.infer<typeof studentFormSchema>;
 
   const form = useForm<StudentFormData>({
     resolver: zodResolver(studentFormSchema),
@@ -71,14 +70,12 @@ export default function AddStudentPage() {
         throw new Error(result.error || "Failed to create student");
       }
 
-      toast.success("Student created successfully!");
+      toast.success(t("toastSuccess"));
       form.reset();
       router.push("/admin/students");
     } catch (error) {
       console.error("Error creating student:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create student",
-      );
+      toast.error(error instanceof Error ? error.message : t("errorGeneric"));
     } finally {
       setIsSubmitting(false);
     }
@@ -86,7 +83,7 @@ export default function AddStudentPage() {
 
   return (
     <div className="space-y-6">
-      <Header heading="Add Student" text="Add a new student to your school" />
+      <Header heading={t("heading")} text={t("subtext")} />
       <Separator className="my-4" />
 
       <div className="mx-auto max-w-2xl">
@@ -94,7 +91,7 @@ export default function AddStudentPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Student Information
+              {t("cardTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -113,11 +110,11 @@ export default function AddStudentPage() {
                         <FormItem>
                           <FormLabel className="flex items-center gap-2">
                             <User className="h-4 w-4" />
-                            Full Name
+                            {t("nameLabel")}
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter student's full name"
+                              placeholder={t("namePlaceholder")}
                               {...field}
                               className="h-11"
                             />
@@ -137,12 +134,12 @@ export default function AddStudentPage() {
                         <FormItem>
                           <FormLabel className="flex items-center gap-2">
                             <Mail className="h-4 w-4" />
-                            Email Address
+                            {t("emailLabel")}
                           </FormLabel>
                           <FormControl>
                             <Input
                               type="email"
-                              placeholder="Enter email address"
+                              placeholder={t("emailPlaceholder")}
                               {...field}
                               className="h-11"
                             />
@@ -161,7 +158,7 @@ export default function AddStudentPage() {
                     disabled={isSubmitting}
                     className="h-11 flex-1 sm:flex-none"
                   >
-                    {isSubmitting ? "Creating Student..." : "Create Student"}
+                    {isSubmitting ? t("submitting") : t("submit")}
                   </Button>
                   <Button
                     type="button"
@@ -170,7 +167,7 @@ export default function AddStudentPage() {
                     disabled={isSubmitting}
                     className="h-11 flex-1 sm:flex-none"
                   >
-                    Reset Form
+                    {t("reset")}
                   </Button>
                 </div>
               </form>

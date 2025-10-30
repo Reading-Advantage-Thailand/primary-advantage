@@ -25,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
 
 const schoolFormSchema = z.object({
   name: z
@@ -71,6 +72,7 @@ export function EditSchoolForm({
   onCancel,
 }: EditSchoolFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations("Settings.schoolProfile");
 
   const form = useForm<SchoolFormData>({
     resolver: zodResolver(schoolFormSchema),
@@ -129,9 +131,9 @@ export function EditSchoolForm({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Building2 className="h-5 w-5" />
-          Edit School Information
+          {t("editSchool")}
         </CardTitle>
-        <CardDescription>Update your school details below.</CardDescription>
+        <CardDescription>{t("editSchoolDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -143,17 +145,17 @@ export function EditSchoolForm({
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
                     <Building2 className="h-4 w-4" />
-                    School Name
+                    {t("schoolName")}
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter school name"
+                      placeholder={t("schoolNamePlaceholder")}
                       {...field}
                       disabled={isLoading}
                     />
                   </FormControl>
                   <FormDescription>
-                    The official name of the school or institution.
+                    {t("schoolNameDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -167,17 +169,17 @@ export function EditSchoolForm({
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Contact Name
+                    {t("contactName")}
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter contact person's name (optional)"
+                      placeholder={t("contactNamePlaceholder")}
                       {...field}
                       disabled={isLoading}
                     />
                   </FormControl>
                   <FormDescription>
-                    The name of the primary contact person for this school.
+                    {t("contactNameDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -191,18 +193,18 @@ export function EditSchoolForm({
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    Contact Email
+                    {t("contactEmail")}
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="Enter contact email (optional)"
+                      placeholder={t("contactEmailPlaceholder")}
                       {...field}
                       disabled={isLoading}
                     />
                   </FormControl>
                   <FormDescription>
-                    The email address of the primary contact person.
+                    {t("contactEmailDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -216,13 +218,13 @@ export function EditSchoolForm({
                 onClick={onCancel}
                 disabled={isLoading}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button type="submit" disabled={isLoading}>
                 {isLoading && (
                   <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Update School
+                {t("updateSchoolButton")}
               </Button>
             </div>
           </form>

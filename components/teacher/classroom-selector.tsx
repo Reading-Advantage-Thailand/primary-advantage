@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -42,6 +43,7 @@ interface Classroom {
 
 export default function ClassroomSelector() {
   const router = useRouter();
+  const t = useTranslations("Teacher.ClassroomSelector");
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,7 +62,7 @@ export default function ClassroomSelector() {
       setClassrooms(data.classrooms || []);
     } catch (error) {
       console.error("Error fetching classrooms:", error);
-      toast.error("Failed to load classrooms");
+      toast.error(t("toast.loadError"));
     } finally {
       setLoading(false);
     }
@@ -103,14 +105,11 @@ export default function ClassroomSelector() {
         <CardContent className="py-12 text-center">
           <BookOpen className="mx-auto mb-4 h-12 w-12 text-gray-400" />
           <h3 className="mb-2 text-lg font-medium text-gray-900">
-            No classrooms found
+            {t("empty.title")}
           </h3>
-          <p className="mb-4 text-gray-500">
-            Get started by creating your first classroom to manage students and
-            track their progress.
-          </p>
+          <p className="mb-4 text-gray-500">{t("empty.description")}</p>
           <CreateNewClass
-            buttonText="Create Your First Classroom"
+            buttonText={t("empty.createFirst")}
             onClassCreated={fetchClassrooms}
           />
         </CardContent>
@@ -121,9 +120,9 @@ export default function ClassroomSelector() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Select a Classroom</h2>
+        <h2 className="text-xl font-semibold">{t("title")}</h2>
         <CreateNewClass
-          buttonText="New Classroom"
+          buttonText={t("actions.newClassroom")}
           onClassCreated={fetchClassrooms}
         />
       </div>
@@ -143,7 +142,7 @@ export default function ClassroomSelector() {
                   </CardTitle>
                   {classroom.grade && (
                     <CardDescription className="mt-1">
-                      Grade {classroom.grade}
+                      {t("grade", { grade: classroom.grade })}
                     </CardDescription>
                   )}
                 </div>
@@ -157,8 +156,7 @@ export default function ClassroomSelector() {
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Users className="h-4 w-4" />
                   <span>
-                    {classroom.students.length}{" "}
-                    {classroom.students.length === 1 ? "student" : "students"}
+                    {t("studentsCount", { count: classroom.students.length })}
                   </span>
                 </div>
 
@@ -175,7 +173,7 @@ export default function ClassroomSelector() {
                 {/* Creation date */}
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Calendar className="h-3 w-3" />
-                  Created {formatDate(classroom.createdAt)}
+                  {t("createdAt", { date: formatDate(classroom.createdAt) })}
                 </div>
 
                 {/* Quick stats */}
@@ -189,7 +187,7 @@ export default function ClassroomSelector() {
                       handleClassroomClick(classroom.id);
                     }}
                   >
-                    View Class Roster
+                    {t("actions.viewRoster")}
                     <ArrowRight className="ml-auto h-4 w-4" />
                   </Button>
                 </div>

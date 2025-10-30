@@ -122,11 +122,11 @@ export function ClassroomsTable() {
       } else {
         console.error("Invalid classrooms data format:", data);
         setClassrooms([]);
-        toast.error("Invalid data format received");
+        toast.error(t("toast.invalidData"));
       }
     } catch (error) {
       console.error("Error fetching classrooms:", error);
-      toast.error("Failed to load classrooms data");
+      toast.error(t("toast.loadFailed"));
       setClassrooms([]);
     } finally {
       setIsLoading(false);
@@ -158,6 +158,7 @@ export function ClassroomsTable() {
       }
     } catch (error) {
       console.error("Error creating classroom:", error);
+      toast.error(t("toast.createFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -182,6 +183,7 @@ export function ClassroomsTable() {
       }
     } catch (error) {
       console.error("Error updating classroom:", error);
+      toast.error(t("toast.updateFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -203,6 +205,7 @@ export function ClassroomsTable() {
       }
     } catch (error) {
       console.error("Error deleting classroom:", error);
+      toast.error(t("toast.deleteFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -258,20 +261,20 @@ export function ClassroomsTable() {
               <DialogTrigger asChild>
                 <Button onClick={() => resetForm()}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Classroom
+                  {t("createClassroom")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle>Add New Classroom</DialogTitle>
+                  <DialogTitle>{t("createClassroom")}</DialogTitle>
                   <DialogDescription>
-                    Create a new classroom. Click save when you're done.
+                    {t("createClassroomDescription")}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="name" className="text-right">
-                      Name
+                      {t("name")}
                     </Label>
                     <Input
                       id="name"
@@ -280,12 +283,12 @@ export function ClassroomsTable() {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       className="col-span-3"
-                      placeholder="Enter classroom name"
+                      placeholder={t("namePlaceholder")}
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="grade" className="text-right">
-                      Grade
+                      {t("grade")}
                     </Label>
                     <Select
                       value={formData.grade}
@@ -294,7 +297,7 @@ export function ClassroomsTable() {
                       }
                     >
                       <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Select grade" />
+                        <SelectValue placeholder={t("selectGrade")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="A1-">A1-</SelectItem>
@@ -319,7 +322,7 @@ export function ClassroomsTable() {
                 </div>
                 <DialogFooter>
                   <Button type="submit" onClick={handleCreateClassroom}>
-                    Save Classroom
+                    {t("create")}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -331,7 +334,7 @@ export function ClassroomsTable() {
               <div className="relative">
                 <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                 <Input
-                  placeholder="Search classrooms by name"
+                  placeholder={t("searchPlaceholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"

@@ -24,6 +24,7 @@ import { reviewCard } from "@/actions/flashcard";
 import AudioButton from "../audio-button";
 import { Rating } from "ts-fsrs";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface FlashcardGameInlineProps {
   deck: {
@@ -54,6 +55,7 @@ export function FlashcardGameInline({
   const [cardRating, setCardRating] = useState<{ [cardId: string]: Rating }>(
     {},
   );
+  const t = useTranslations("SentencesPage.sentencesCard");
 
   const currentCard = cards[currentIndex];
   const progress = cards.length > 0 ? (completedCards / cards.length) * 100 : 0;
@@ -134,10 +136,10 @@ export function FlashcardGameInline({
           {/* Results Header */}
           <div className="space-y-4">
             <h1 className="gradient-text text-4xl font-bold md:text-5xl">
-              🎉 Study Session Complete!
+              🎉 {t("studySessionComplete")}
             </h1>
             <p className="text-muted-foreground text-xl">
-              You completed {completedCards} flashcards
+              {t("youCompleted", { count: completedCards })}
             </p>
           </div>
 
@@ -149,7 +151,9 @@ export function FlashcardGameInline({
                 <div className="text-3xl font-bold text-blue-600">
                   {completedCards}
                 </div>
-                <p className="text-muted-foreground text-sm">Cards Reviewed</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("cardsReviewed")}
+                </p>
               </CardContent>
             </Card>
 
@@ -169,7 +173,7 @@ export function FlashcardGameInline({
                 <div className="text-3xl font-bold text-purple-600">
                   +{completedCards * 3}
                 </div>
-                <p className="text-muted-foreground text-sm">XP Earned</p>
+                <p className="text-muted-foreground text-sm">{t("xpEarned")}</p>
               </CardContent>
             </Card>
           </div>
@@ -178,8 +182,7 @@ export function FlashcardGameInline({
           <Alert className="border-green-200 bg-green-50 dark:bg-green-950/20">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800 dark:text-green-200">
-              Great work! You've successfully completed this study session. Your
-              progress has been saved!
+              {t("greatWork")}
             </AlertDescription>
           </Alert>
 
@@ -192,11 +195,11 @@ export function FlashcardGameInline({
               className="flex-1"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              {t("backToDashboard")}
             </Button>
             <Button onClick={handleRestart} size="lg" className="flex-1">
               <RotateCcw className="mr-2 h-4 w-4" />
-              Study Again
+              {t("studyAgain")}
             </Button>
           </div>
         </div>
@@ -210,11 +213,13 @@ export function FlashcardGameInline({
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={onBack} className="h-10">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          {t("back")}
         </Button>
         <div className="flex items-center gap-2">
           <Badge variant={deck.type === "VOCABULARY" ? "default" : "secondary"}>
-            {deck.type === "VOCABULARY" ? "📚" : "📝"} {deck.type}
+            {deck.type === "VOCABULARY"
+              ? `📚 ${t("vocabulary")}`
+              : `📝 ${t("sentences")}`}
           </Badge>
         </div>
       </div>
@@ -222,15 +227,15 @@ export function FlashcardGameInline({
       {/* Progress Section */}
       <div className="space-y-2">
         <div className="text-muted-foreground flex items-center justify-between text-sm">
-          <span>Study Session Progress</span>
+          <span>{t("studySessionProgress")}</span>
           <span>
-            {completedCards} / {cards.length} completed
+            {completedCards} / {cards.length} {t("completed")}
           </span>
         </div>
         <Progress value={progress} className="h-2" />
         <div className="text-center">
           <Badge variant="outline" className="text-xs">
-            {cards.length - completedCards - 1} remaining
+            {cards.length - completedCards - 1} {t("remaining")}
           </Badge>
         </div>
       </div>
@@ -259,7 +264,7 @@ export function FlashcardGameInline({
                     variant="secondary"
                     className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                   >
-                    Question
+                    {t("question")}
                   </Badge>
 
                   <div className="space-y-4">
@@ -285,10 +290,10 @@ export function FlashcardGameInline({
 
                   <div className="mx-auto max-w-sm rounded-lg bg-white/80 p-4 dark:bg-gray-900/80">
                     <p className="text-muted-foreground text-sm font-medium">
-                      💡 Click to reveal{" "}
+                      💡 {t("flipCard")}{" "}
                       {deck.type === "VOCABULARY"
-                        ? "definition"
-                        : "translation"}
+                        ? t("definition")
+                        : t("translation")}
                     </p>
                   </div>
                 </div>
@@ -301,7 +306,7 @@ export function FlashcardGameInline({
                     variant="secondary"
                     className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                   >
-                    Answer
+                    {t("answers")}
                   </Badge>
 
                   <div className="space-y-4">
@@ -317,10 +322,10 @@ export function FlashcardGameInline({
                       {deck.type === "VOCABULARY"
                         ? currentCard?.definition?.[
                             selectedLanguage as "en" | "th" | "cn" | "tw" | "vi"
-                          ] || "Definition not available"
+                          ] || t("definitionNotAvailable")
                         : currentCard?.translation?.[
                             selectedLanguage as "th" | "cn" | "tw" | "vi"
-                          ] || "Translation not available"}
+                          ] || t("translationNotAvailable")}
                     </div>
 
                     {currentCard?.audioUrl && (
@@ -351,22 +356,22 @@ export function FlashcardGameInline({
               {[
                 {
                   rating: Rating.Again,
-                  label: "Again",
+                  label: t("again"),
                   color: "bg-red-500 hover:bg-red-600 text-white",
                 },
                 {
                   rating: Rating.Hard,
-                  label: "Hard",
+                  label: t("hard"),
                   color: "bg-orange-500 hover:bg-orange-600 text-white",
                 },
                 {
                   rating: Rating.Good,
-                  label: "Good",
+                  label: t("good"),
                   color: "bg-blue-500 hover:bg-blue-600 text-white",
                 },
                 {
                   rating: Rating.Easy,
-                  label: "Easy",
+                  label: t("easy"),
                   color: "bg-green-500 hover:bg-green-600 text-white",
                 },
               ].map(({ rating, label, color }) => (
@@ -396,7 +401,7 @@ export function FlashcardGameInline({
           size="lg"
         >
           <Play className="mr-2 h-5 w-5" />
-          Show Answer
+          {t("showAnswer")}
         </Button>
       )}
 
@@ -408,19 +413,25 @@ export function FlashcardGameInline({
               <div className="text-2xl font-bold text-blue-600">
                 {currentIndex + 1}
               </div>
-              <div className="text-muted-foreground text-xs">Current</div>
+              <div className="text-muted-foreground text-xs">
+                {t("current")}
+              </div>
             </div>
             <div className="space-y-1">
               <div className="text-2xl font-bold text-green-600">
                 {completedCards}
               </div>
-              <div className="text-muted-foreground text-xs">Completed</div>
+              <div className="text-muted-foreground text-xs">
+                {t("completed")}
+              </div>
             </div>
             <div className="space-y-1">
               <div className="text-2xl font-bold text-purple-600">
                 {cards.length - completedCards - 1}
               </div>
-              <div className="text-muted-foreground text-xs">Remaining</div>
+              <div className="text-muted-foreground text-xs">
+                {t("remaining")}
+              </div>
             </div>
           </div>
         </CardContent>

@@ -52,28 +52,14 @@ export function SidebarNav({ items, user }: SidebarNavProps) {
   };
 
   const isItemActive = (href: string) => {
-    // Remove query parameters from current path for comparison
-    const currentPathBase = pathWithoutLocale.split("?")[0];
-    const hrefBase = href.split("?")[0];
-
     // Exact match for the current path
-    if (currentPathBase === hrefBase) {
-      return true;
-    }
-
-    // Check if current path starts with href (for dynamic routes like /class-roaster/[id])
-    // This handles cases where href is /class-roaster and current path is /class-roaster/123
-    return currentPathBase.startsWith(hrefBase + "/");
+    return pathWithoutLocale === href;
   };
 
   const isParentActive = (href: string) => {
-    // Remove query parameters from both paths for comparison
-    const currentPathBase = pathWithoutLocale.split("?")[0];
-    const hrefBase = href.split("?")[0];
-
     // For parent paths, check if current path starts with the href followed by a slash
     // This prevents false positives like /teacher/my-students matching /teacher/my-students-archive
-    return currentPathBase.startsWith(hrefBase + "/");
+    return pathWithoutLocale.startsWith(href + "/");
   };
 
   const isAnyChildActive = (items: any[]) => {
@@ -122,7 +108,7 @@ export function SidebarNav({ items, user }: SidebarNavProps) {
           onClick={() => window.history.back()}
         >
           <ChevronLeft width={16} height={16} />
-          Back
+          {t("back")}
         </button>
       )}
       <nav className="mb-4 flex flex-col gap-1 lg:mb-0">

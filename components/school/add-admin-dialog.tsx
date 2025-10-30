@@ -16,6 +16,7 @@ import { UserPlus, Search, User, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { Icons } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 interface User {
   id: string;
@@ -42,6 +43,7 @@ export function AddAdminDialog({
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isAdding, setIsAdding] = useState<string | null>(null);
+  const t = useTranslations("Settings.schoolProfile");
 
   const searchUsers = async () => {
     if (!searchQuery.trim()) {
@@ -111,24 +113,22 @@ export function AddAdminDialog({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <UserPlus className="mr-2 h-4 w-4" />
-          Add Admin
+          {t("addsAdmins")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add School Administrator</DialogTitle>
-          <DialogDescription>
-            Search for users and add them as school administrators.
-          </DialogDescription>
+          <DialogTitle>{t("addAdminHeader")}</DialogTitle>
+          <DialogDescription>{t("addsAdminsDescription")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="search">Search Users</Label>
+            <Label htmlFor="search">{t("searchUsers")}</Label>
             <div className="flex gap-2">
               <Input
                 id="search"
-                placeholder="Enter name or email..."
+                placeholder={t("searchUsersPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={handleKeyPress}
