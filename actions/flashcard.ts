@@ -204,10 +204,14 @@ export async function saveFlashcard(
       });
     }
 
-    // Check for existing cards to avoid duplicates
-    const existingWords = deck.cards
-      .filter((card) => card.type === type)
-      .map((card) => (type === "VOCABULARY" ? card.word : card.sentence));
+    // Check for existing cards to avoid duplicates based on articleId, type, and word/sentence
+    const existingCards = deck.cards.filter(
+      (card) => card.type === type && card.articleId === articleId,
+    );
+
+    const existingWords = existingCards.map((card) =>
+      type === "VOCABULARY" ? card.word : card.sentence,
+    );
 
     const newItems =
       type === "VOCABULARY"
@@ -215,7 +219,10 @@ export async function saveFlashcard(
             const wordItem = item as WordList;
             return !existingWords.includes(wordItem.vocabulary);
           })
-        : items;
+        : items.filter((item) => {
+            const sentenceItem = item as Sentence;
+            return !existingWords.includes(sentenceItem.sentence);
+          });
 
     if (newItems.length === 0) {
       return {
