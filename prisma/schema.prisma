@@ -16,7 +16,7 @@ model User {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   password           String?
-  cefrLevel          String?              @default("A1-")
+  cefrLevel          String?              @default("A0-")
   level              Int                  @default(1)
   xp                 Int                  @default(0)
   schoolId           String?              @map("school_id")

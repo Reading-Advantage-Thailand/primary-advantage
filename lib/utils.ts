@@ -57,7 +57,7 @@ export function calculateLevelAndCefrLevel(xpEarned: number, userXp: number) {
   const level = levels.find(
     (level) => xpEarned >= level.min && xpEarned <= level.max,
   );
-  const cefrLevel = level?.cefrLevel || "A1-";
+  const cefrLevel = level?.cefrLevel || "A0-";
   const raLevel = level?.raLevel || 1;
 
   return { newXp, raLevel, cefrLevel };
