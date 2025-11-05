@@ -174,10 +174,13 @@
       "noClassrooms": "未找到教室",
       "loading": "正在加载教室...",
       "toast": {
+        "createSuccess": "教室创建成功",
         "invalidData": "收到无效的数据格式",
         "loadFailed": "加载教室失败",
         "createFailed": "创建教室失败",
         "updateFailed": "更新教室失败",
+        "updateSuccess": "更新教室成功",
+        "deleteSuccess": "删除教室成功",
         "deleteFailed": "删除教室失败"
       }
     },

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import React from "react";
 import { MainNavItem } from "@/types";
 import { cn } from "@/lib/utils";

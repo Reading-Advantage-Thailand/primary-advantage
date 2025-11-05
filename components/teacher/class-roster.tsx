@@ -29,7 +29,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import {
   Dialog,
   DialogContent,

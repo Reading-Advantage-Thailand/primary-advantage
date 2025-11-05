@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { Icons } from "@/components/icons";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 const FormSchema = z.object({

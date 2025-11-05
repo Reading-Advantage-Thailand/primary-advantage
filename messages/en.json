@@ -174,10 +174,13 @@
       "noClassrooms": "No classrooms found",
       "loading": "Loading classrooms...",
       "toast": {
+        "createSuccess": "Classroom created successfully",
         "invalidData": "Invalid data format received",
         "loadFailed": "Failed to load classrooms",
         "createFailed": "Failed to create classroom",
         "updateFailed": "Failed to update classroom",
+        "updateSuccess": "Classroom updated successfully",
+        "deleteSuccess": "Classroom deleted successfully",
         "deleteFailed": "Failed to delete classroom"
       }
     },

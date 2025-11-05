@@ -22,7 +22,7 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/table";
 import { License } from "@prisma/client";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import {
   AlertDialog,
   AlertDialogAction,

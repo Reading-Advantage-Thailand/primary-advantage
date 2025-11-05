@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import {
   Form,
   FormControl,
@@ -68,7 +68,7 @@ export function SignUpForm({
       >
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Create an account</h1>
-          <p className="text-balance text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm text-balance">
             Join us and explore the platform!
           </p>
         </div>
@@ -142,7 +142,7 @@ export function SignUpForm({
         <FormError message={error} />
         <FormSuccess message={success} />
 
-        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex flex-col gap-1 text-xs">
           <div className="flex items-center space-x-2">
             <Checkbox
               id="terms"
@@ -151,7 +151,7 @@ export function SignUpForm({
             />
             <label
               htmlFor="terms"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               Accept terms and conditions
             </label>

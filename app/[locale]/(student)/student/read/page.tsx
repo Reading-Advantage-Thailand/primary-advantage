@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import React from "react";
 import genreDataJson from "@/data/genres.json";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { fetchArticles } from "@/server/controllers/articleController";
 import { cleanGenre, cn, sanitizeTranslationKey } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";

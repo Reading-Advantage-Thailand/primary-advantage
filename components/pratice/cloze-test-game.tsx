@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 interface ClozeTestData {
@@ -822,7 +822,9 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
               <CardContent className="p-6 text-center">
                 <Target className="mx-auto mb-3 h-8 w-8 text-blue-500" />
                 <div className="text-3xl font-bold text-blue-600">{score}</div>
-                <p className="text-muted-foreground text-sm">{t("complete.stats.perfectScores")}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.perfectScores")}
+                </p>
               </CardContent>
             </Card>
 
@@ -832,7 +834,9 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
                 <div className="text-3xl font-bold text-green-600">
                   {accuracy}%
                 </div>
-                <p className="text-muted-foreground text-sm">{t("complete.stats.accuracy")}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.accuracy")}
+                </p>
               </CardContent>
             </Card>
 
@@ -842,7 +846,9 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
                 <div className="text-3xl font-bold text-purple-600">
                   {formatTime(timer)}
                 </div>
-                <p className="text-muted-foreground text-sm">{t("complete.stats.totalTime")}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t("complete.stats.totalTime")}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -872,17 +878,12 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
   if (!isPlaying) {
     return (
       <div className="container mx-auto max-w-4xl space-y-8 px-4">
-        <Header
-          heading={t("title")}
-          text={t("descriptionLong")}
-        />
+        <Header heading={t("title")} text={t("descriptionLong")} />
 
         <Card className="mx-auto max-w-2xl">
           <CardHeader className="pb-6 text-center">
             <CardTitle className="text-2xl">{t("startScreen.title")}</CardTitle>
-            <p className="text-muted-foreground">
-              {t("startScreen.subtitle")}
-            </p>
+            <p className="text-muted-foreground">{t("startScreen.subtitle")}</p>
           </CardHeader>
 
           <CardContent className="space-y-8">
@@ -894,18 +895,29 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
                     {activeSentences.length}
                   </span>
                 </div>
-                <p className="text-sm font-medium">{t("startScreen.stats.clozeTests")}</p>
-                <p className="text-muted-foreground text-xs">{t("startScreen.stats.readyToPlay")}</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.stats.clozeTests")}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  {t("startScreen.stats.readyToPlay")}
+                </p>
               </div>
 
               <div className="space-y-2 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                   <Target className="h-6 w-6 text-green-600" />
                 </div>
-                <p className="text-sm font-medium">{t("startScreen.stats.fillBlanks")}</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.stats.fillBlanks")}
+                </p>
                 <p className="text-muted-foreground text-xs">
                   {t("startScreen.stats.blanksEach", {
-                    count: selectedDifficulty === "easy" ? 1 : selectedDifficulty === "medium" ? 2 : 3
+                    count:
+                      selectedDifficulty === "easy"
+                        ? 1
+                        : selectedDifficulty === "medium"
+                          ? 2
+                          : 3,
                   })}
                 </p>
               </div>
@@ -916,10 +928,17 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
                 </div>
                 <p className="text-sm font-medium">
                   {t("startScreen.stats.estimatedTime", {
-                    time: selectedDifficulty === "easy" ? "5" : selectedDifficulty === "medium" ? "10" : "15"
+                    time:
+                      selectedDifficulty === "easy"
+                        ? "5"
+                        : selectedDifficulty === "medium"
+                          ? "10"
+                          : "15",
                   })}
                 </p>
-                <p className="text-muted-foreground text-xs">{t("startScreen.stats.estimatedTimeLabel")}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t("startScreen.stats.estimatedTimeLabel")}
+                </p>
               </div>
             </div>
 
@@ -929,12 +948,12 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
             <div className="bg-muted/50 space-y-3 rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <div className="bg-primary h-2 w-2 rounded-full" />
-                <p className="text-sm font-medium">{t("startScreen.howToPlay")}</p>
+                <p className="text-sm font-medium">
+                  {t("startScreen.howToPlay")}
+                </p>
               </div>
               <ul className="text-muted-foreground ml-4 space-y-2 text-sm">
-                <li>
-                  • {t("startScreen.instructions.step1")}
-                </li>
+                <li>• {t("startScreen.instructions.step1")}</li>
                 <li>• {t("startScreen.instructions.step2")}</li>
                 <li>• {t("startScreen.instructions.step3")}</li>
               </ul>
@@ -998,9 +1017,12 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
                   </span>
                 </div>
                 <p className="text-muted-foreground text-sm">
-                  {selectedDifficulty === "easy" && t("startScreen.difficulty.easyDescription")}
-                  {selectedDifficulty === "medium" && t("startScreen.difficulty.mediumDescription")}
-                  {selectedDifficulty === "hard" && t("startScreen.difficulty.hardDescription")}
+                  {selectedDifficulty === "easy" &&
+                    t("startScreen.difficulty.easyDescription")}
+                  {selectedDifficulty === "medium" &&
+                    t("startScreen.difficulty.mediumDescription")}
+                  {selectedDifficulty === "hard" &&
+                    t("startScreen.difficulty.hardDescription")}
                 </p>
               </div>
             </div>
@@ -1031,12 +1053,20 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("startScreen.loadingButton", { difficulty: t(`startScreen.difficulty.${selectedDifficulty}`) })}
+                  {t("startScreen.loadingButton", {
+                    difficulty: t(
+                      `startScreen.difficulty.${selectedDifficulty}`,
+                    ),
+                  })}
                 </>
               ) : (
                 <>
                   <Play className="mr-2 h-5 w-5" />
-                  {t("startScreen.startButton", { difficulty: t(`startScreen.difficulty.${selectedDifficulty}`) })}
+                  {t("startScreen.startButton", {
+                    difficulty: t(
+                      `startScreen.difficulty.${selectedDifficulty}`,
+                    ),
+                  })}
                 </>
               )}
             </Button>
@@ -1059,16 +1089,16 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
 
   return (
     <div className="container mx-auto max-w-4xl space-y-4 px-4">
-      <Header
-        heading={t("title")}
-        text={t("descriptionShort")}
-      />
+      <Header heading={t("title")} text={t("descriptionShort")} />
 
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="text-muted-foreground flex items-center justify-between text-sm">
           <span>
-            {t("gameplay.progress", { current: currentIndex + 1, total: activeSentences.length })}
+            {t("gameplay.progress", {
+              current: currentIndex + 1,
+              total: activeSentences.length,
+            })}
           </span>
           <div className="flex items-center gap-4">
             <span>
@@ -1089,7 +1119,9 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div className="space-y-3">
               <CardTitle className="text-xl">
-                {t("gameplay.articleTitle", { title: currentSentence.articleTitle })}
+                {t("gameplay.articleTitle", {
+                  title: currentSentence.articleTitle,
+                })}
               </CardTitle>
               <p className="text-muted-foreground text-sm">
                 {t("gameplay.instruction")}
@@ -1205,7 +1237,8 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
                       {userAnswers.every((a) => a.isCorrect)
                         ? t("results.allCorrect")
                         : t("results.partialCorrect", {
-                            correct: userAnswers.filter((a) => a.isCorrect).length,
+                            correct: userAnswers.filter((a) => a.isCorrect)
+                              .length,
                             total: currentSentence.blanks.length,
                           })}
                     </h3>
@@ -1216,7 +1249,9 @@ export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
                       <div className="space-y-3">
                         <Separator />
                         <div>
-                          <h4 className="mb-3 font-medium">{t("results.correctAnswers")}</h4>
+                          <h4 className="mb-3 font-medium">
+                            {t("results.correctAnswers")}
+                          </h4>
                           <div className="space-y-2">
                             {currentSentence.blanks.map((blank, index) => (
                               <div

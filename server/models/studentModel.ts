@@ -27,14 +27,6 @@ export const getStudents = async (
   const { page, limit, search, classroomId, cefrLevel, userWithRoles } = params;
 
   try {
-    console.log("Student Model: Fetching students with params:", {
-      page,
-      limit,
-      search,
-      classroomId,
-      cefrLevel,
-    });
-
     // Calculate offset for pagination
     const offset = (page - 1) * limit;
 
@@ -89,11 +81,6 @@ export const getStudents = async (
       whereClause.cefrLevel = cefrLevel;
     }
 
-    console.log(
-      "Student Model: Where clause:",
-      JSON.stringify(whereClause, null, 2),
-    );
-
     // Fetch students with classroom information
     const [students, totalCount] = await Promise.all([
       prisma.user.findMany({
@@ -125,10 +112,6 @@ export const getStudents = async (
         where: whereClause,
       }),
     ]);
-
-    console.log(
-      `Student Model: Found ${students.length} students, total: ${totalCount}`,
-    );
 
     // Transform data for response
     const studentsData: StudentData[] = students.map((student) => ({
@@ -614,8 +597,6 @@ export const deleteStudent = async (
 // Get student statistics
 export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
   try {
-    console.log("Student Model: Calculating statistics");
-
     // Build where clause based on user's permissions
     let whereClause: any = {
       roles: {
@@ -667,7 +648,7 @@ export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
     // Calculate most common CEFR level
     const levelCounts = allStudentsForStats.reduce(
       (acc, student) => {
-        const level = student.cefrLevel || "A1-";
+        const level = student.cefrLevel || "A0-";
         acc[level] = (acc[level] || 0) + 1;
         return acc;
       },
@@ -677,7 +658,7 @@ export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
     const mostCommonLevel =
       Object.entries(levelCounts).reduce((a, b) =>
         levelCounts[a[0]] > levelCounts[b[0]] ? a : b,
-      )?.[0] || "A1-";
+      )?.[0] || "A0-";
 
     // Calculate active users this week
     const activeUserIds = new Set(
@@ -699,7 +680,6 @@ export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
       activePercentage,
     };
 
-    console.log("Student Model: Statistics calculated:", statistics);
     return statistics;
   } catch (error) {
     console.error("Student Model: Error calculating statistics:", error);

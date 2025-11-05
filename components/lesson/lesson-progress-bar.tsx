@@ -689,7 +689,7 @@ export default function LessonProgressBar({
         <div className="sticky top-6">
           <div className="overflow-hidden rounded-2xl border border-gray-300 bg-gray-200 shadow-lg dark:border-gray-700 dark:bg-gray-900">
             {/* Progress Header */}
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6">
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-4">
               <div className="flex items-center justify-between text-white">
                 <div>
                   <h3 className="font-semibold">

@@ -1,8 +1,7 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 
 export default function NotFound() {
   const t = useTranslations("NotFound");

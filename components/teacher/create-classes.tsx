@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "../ui/label";
 import { PlusIcon } from "lucide-react";
-// import { useClassroomStore } from "@/store/classroom-store";
+import { generateRandomClassCode } from "@/lib/utils";
 
 interface CreateNewClassProps {
   buttonText?: string;
@@ -35,10 +35,8 @@ export default function CreateNewClass({
   const t = useTranslations("TeacherCreateClass");
   const [classroomName, setClassroomName] = useState<string>("");
   const [grade, setGrade] = useState<string>("");
-  const [classCode, setClassCode] = useState<string>("");
+  const [classCode, setClassCode] = useState<string>(generateRandomClassCode());
   const [open, setOpen] = useState<boolean>(false);
-  // const { fetchClassrooms } = useClassroomStore();
-  // const t = useScopedI18n("components.myClasses.createNewClass");
 
   const handleCreateClass = async () => {
     try {
@@ -51,9 +49,8 @@ export default function CreateNewClass({
       }
 
       const classroom = {
+        name: classroomName,
         classCode: classCode,
-        classroomName: classroomName,
-        description: "description",
         grade: grade,
       };
 
@@ -76,7 +73,7 @@ export default function CreateNewClass({
 
       setClassroomName("");
       setGrade("");
-      setClassCode(generateRandomCode());
+      setClassCode(generateRandomClassCode());
       setOpen(false);
 
       // Call the callback to refresh the parent component's data
@@ -95,14 +92,6 @@ export default function CreateNewClass({
   const handleClose = () => {
     setOpen(false);
   };
-
-  const generateRandomCode = () => {
-    return Math.random().toString(36).substring(2, 8);
-  };
-
-  useEffect(() => {
-    setClassCode(generateRandomCode());
-  }, []);
 
   return (
     <div className="max-w-sm">
@@ -135,6 +124,7 @@ export default function CreateNewClass({
                 type="text"
                 className="col-span-3 cursor-default"
                 value={classCode}
+                disabled
                 readOnly
               />
             </div>

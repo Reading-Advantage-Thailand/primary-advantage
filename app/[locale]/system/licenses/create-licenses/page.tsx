@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { CreateLicenseForm } from "./create-license-form";
 import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import React from "react";
 
 export default function CreateLicensesPage() {

@@ -38,7 +38,7 @@ import {
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Header } from "../header";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useCurrentRole } from "@/hooks/use-current-role";
 import {
   Dialog,
