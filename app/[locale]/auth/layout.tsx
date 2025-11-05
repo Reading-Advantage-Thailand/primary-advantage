@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { siteConfig } from "@/configs/site-config";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Icons } from "@/components/icons";
 
 export default function AuthLayout({

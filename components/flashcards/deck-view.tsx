@@ -25,7 +25,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { FlashcardGameInline } from "./flashcard-game";
 import { getDeckCards } from "@/actions/flashcard";
 import { toast } from "sonner";

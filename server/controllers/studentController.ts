@@ -31,8 +31,6 @@ export const getStudentsController = async (
   request: NextRequest,
 ): Promise<NextResponse<StudentsResponse | { error: string }>> => {
   try {
-    console.log("Student Controller: Starting GET request...");
-
     const user = await currentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -59,14 +57,6 @@ export const getStudentsController = async (
     const search = searchParams.get("search") || "";
     const classroomId = searchParams.get("classroomId") || "";
     const cefrLevel = searchParams.get("cefrLevel") || "";
-
-    console.log("Student Controller: Query params:", {
-      page,
-      limit,
-      search,
-      classroomId,
-      cefrLevel,
-    });
 
     // Get students data using model
     const { students, totalCount } = await getStudents({
@@ -96,7 +86,6 @@ export const getStudentsController = async (
       pagination,
     };
 
-    console.log("Student Controller: Successfully fetched students");
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
     console.error("Student Controller: Error in getStudentsController:", error);

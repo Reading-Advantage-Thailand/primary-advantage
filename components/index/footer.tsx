@@ -2,7 +2,7 @@ import { Icons } from "@/components/icons";
 import { siteConfig } from "@/configs/site-config";
 import { ThemeToggle } from "@/components/switchers/theme-switcher-toggle";
 import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Palette } from "lucide-react";
 // import { ThemeCustomizer } from "./theme-customizer";
 
@@ -54,7 +54,7 @@ export function Footer({ className }: FooterProps) {
         />
       </svg>
       <div className="bg-[#172554]">
-        <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8 mt-[-2px]">
+        <div className="mx-auto mt-[-2px] w-full max-w-screen-xl p-4 py-6 lg:py-8">
           <div className="md:flex md:justify-between">
             <div className="mb-6 md:mb-0">
               <a className="flex items-center">
@@ -67,14 +67,14 @@ export function Footer({ className }: FooterProps) {
                 Provinding the best English learning experience.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 sm:gap-6">
               {info.map((item) => (
                 <div key={item.title}>
                   <div>
-                    <h2 className="mb-6 text-sm font-semibold uppercase text-white">
+                    <h2 className="mb-6 text-sm font-semibold text-white uppercase">
                       {item.title}
                     </h2>
-                    <ul className="text-gray-400 font-medium">
+                    <ul className="font-medium text-gray-400">
                       {item.links.map((link) => (
                         <li key={link.title} className="mb-4">
                           <Link href={link.href}>{link.title}</Link>
@@ -86,7 +86,7 @@ export function Footer({ className }: FooterProps) {
               ))}
             </div>
           </div>
-          <hr className="my-6 sm:mx-auto border-gray-700 lg:my-8" />
+          <hr className="my-6 border-gray-700 sm:mx-auto lg:my-8" />
           <div className="sm:flex sm:items-center sm:justify-between">
             <span className="text-sm text-gray-400 sm:text-center">
               © 2024{" "}
@@ -95,10 +95,10 @@ export function Footer({ className }: FooterProps) {
               </a>
               . All Rights Reserved.
             </span>
-            <div className="flex gap-2 justify-center  items-center">
+            <div className="flex items-center justify-center gap-2">
               <Link href={siteConfig.link.github} className="mr-2">
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="currentColor"

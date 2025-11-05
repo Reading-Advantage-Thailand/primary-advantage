@@ -213,11 +213,11 @@ export default function TaskLessonSummary({
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Time Card */}
         <Card className="group dark:bg-background relative overflow-hidden border-blue-200 bg-blue-400 transition-all duration-300 hover:shadow-lg dark:border-blue-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
+          <CardContent>
+            <div className="flex items-center justify-center gap-4">
               <div className="rounded-full bg-blue-100 p-3 transition-transform duration-300 group-hover:scale-110 dark:bg-blue-900">
                 <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
@@ -235,8 +235,8 @@ export default function TaskLessonSummary({
 
         {/* Words Card */}
         <Card className="group dark:bg-background relative overflow-hidden border-purple-200 bg-purple-400 transition-all duration-300 hover:shadow-lg dark:border-purple-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
+          <CardContent>
+            <div className="flex items-center justify-center gap-4">
               <div className="rounded-full bg-purple-100 p-3 transition-transform duration-300 group-hover:scale-110 dark:bg-purple-900">
                 <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
@@ -254,8 +254,8 @@ export default function TaskLessonSummary({
 
         {/* Sentences Card */}
         <Card className="group dark:bg-background relative overflow-hidden border-indigo-200 bg-indigo-400 transition-all duration-300 hover:shadow-lg dark:border-indigo-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
+          <CardContent>
+            <div className="flex items-center justify-center gap-4">
               <div className="rounded-full bg-indigo-100 p-3 transition-transform duration-300 group-hover:scale-110 dark:bg-indigo-900">
                 <Brain className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
               </div>
@@ -273,8 +273,8 @@ export default function TaskLessonSummary({
 
         {/* XP Card */}
         <Card className="group dark:bg-background relative overflow-hidden border-yellow-200 bg-yellow-400 transition-all duration-300 hover:shadow-lg dark:border-yellow-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
+          <CardContent>
+            <div className="flex items-center justify-center gap-4">
               <div className="rounded-full bg-yellow-100 p-3 transition-transform duration-300 group-hover:scale-110 dark:bg-yellow-900">
                 <Star className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
               </div>
@@ -294,7 +294,7 @@ export default function TaskLessonSummary({
       {/* Quiz Performance */}
       {quizScores && (
         <Card className="border-gradient-to-r dark:bg-background overflow-hidden border-2 bg-violet-200 from-pink-400 to-violet-400 dark:from-pink-800 dark:to-violet-800">
-          <CardHeader className="bg-gradient-to-r from-pink-300 to-violet-300 pb-4 dark:from-pink-950 dark:to-violet-950">
+          <CardHeader className="-mt-6 bg-gradient-to-r from-pink-300 to-violet-300 p-6 dark:from-pink-950 dark:to-violet-950">
             <div className="flex items-center gap-3">
               <Target className="h-6 w-6 text-pink-600 dark:text-pink-400" />
               <CardTitle className="text-xl font-bold text-pink-700 dark:text-pink-300">
@@ -393,13 +393,11 @@ export default function TaskLessonSummary({
         {/* Saved Words */}
         {wordList.length > 0 && (
           <Card className="dark:bg-background overflow-hidden bg-emerald-100">
-            <CardHeader className="bg-gradient-to-r from-emerald-300 to-green-300 dark:from-emerald-950 dark:to-green-950">
-              <div className="flex items-center gap-3">
-                <Sparkles className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                <CardTitle className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
-                  {t("vocabulary.title", { count: wordList.length })}
-                </CardTitle>
-              </div>
+            <CardHeader className="-mt-6 flex items-center gap-3 bg-gradient-to-r from-emerald-300 to-green-300 p-6 dark:from-emerald-950 dark:to-green-950">
+              <Sparkles className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              <CardTitle className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+                {t("vocabulary.title", { count: wordList.length })}
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="grid gap-3 sm:grid-cols-2">
@@ -426,7 +424,7 @@ export default function TaskLessonSummary({
         {/* Saved Sentences */}
         {sentenceList.length > 0 && (
           <Card className="dark:bg-background overflow-hidden bg-blue-100">
-            <CardHeader className="bg-gradient-to-r from-blue-300 to-indigo-300 dark:from-blue-950 dark:to-indigo-950">
+            <CardHeader className="-mt-6 flex items-center gap-3 bg-gradient-to-r from-blue-300 to-indigo-300 p-6 dark:from-blue-950 dark:to-indigo-950">
               <div className="flex items-center gap-3">
                 <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 <CardTitle className="text-xl font-bold text-blue-700 dark:text-blue-300">

@@ -174,10 +174,13 @@
       "noClassrooms": "Không tìm thấy lớp học",
       "loading": "Đang tải lớp học...",
       "toast": {
+        "createSuccess": "Tạo lớp học thành công",
         "invalidData": "Định dạng dữ liệu không hợp lệ",
         "loadFailed": "Tải danh sách lớp học thất bại",
         "createFailed": "Tạo lớp học thất bại",
         "updateFailed": "Cập nhật lớp học thất bại",
+        "updateSuccess": "Cập nhật lớp học thành công",
+        "deleteSuccess": "Xóa lớp học thành công",
         "deleteFailed": "Xóa lớp học thất bại"
       }
     },

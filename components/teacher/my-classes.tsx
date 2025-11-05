@@ -61,14 +61,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { Header } from "../header";
 // import { useCourseStore, useClassroomStore } from "@/store/classroom-store";
 import { Icons } from "@/components/icons";
 import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { classroom_v1 } from "googleapis";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import CreateClass from "./create-classes";
@@ -115,12 +115,6 @@ type Classes = {
   alternateLink?: string;
 };
 
-type Schema$Course = classroom_v1.Schema$Course;
-
-type CourseWithCount = Schema$Course & {
-  studentCount?: any[];
-};
-
 export default function MyClasses() {
   const t = useTranslations("TeacherMyClasses");
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -135,11 +129,6 @@ export default function MyClasses() {
   const [coursesOpen, setCoursesOpen] = useState<boolean>(false);
   const [importState, setImportState] = useState(0);
   const [selected, setSelected] = useState("");
-  // const t = useScopedI18n("components.articleRecordsTable");
-  // const tc = useScopedI18n("components.myClasses");
-  // const { courses, setCourses, selectedCourses, setSelectedCourses } =
-  //   useCourseStore();
-  // const { classrooms, fetchClassrooms } = useClassroomStore();
   const [classrooms, setClassrooms] = useState<Classes[]>([]);
   const [dialogOpen, setDialogOpen] = useState<string>("");
   const [nameChange, setNameChange] = useState<string>("");
@@ -339,7 +328,9 @@ export default function MyClasses() {
                   {t("actions.roster")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => router.push(`/teacher/reports/${payment.id}`)}
+                  onClick={() =>
+                    router.push(`/teacher/reports?classroomId=${payment.id}`)
+                  }
                 >
                   <ChartColumnBigIcon className="size-4" />
                   {t("actions.reports")}

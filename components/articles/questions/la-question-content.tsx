@@ -27,7 +27,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { ActivityType } from "@/types/enum";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import {
   Form,
   FormControl,

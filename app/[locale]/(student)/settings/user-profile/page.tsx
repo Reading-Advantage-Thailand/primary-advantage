@@ -7,7 +7,7 @@ import { UpdateUserLicenseForm } from "@/components/update-user-license";
 import { ArrowLeftIcon, BadgeCheck } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import ChangeRole from "@/components/shared/change-role";
 import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";

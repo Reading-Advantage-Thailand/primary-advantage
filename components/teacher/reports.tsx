@@ -29,7 +29,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 // import EditStudent from "./edit-student";
 // import RemoveStudent from "./remove-student-inclass";

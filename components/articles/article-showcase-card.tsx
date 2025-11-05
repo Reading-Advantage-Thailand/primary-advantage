@@ -1,7 +1,7 @@
 import React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Badge } from "../ui/badge";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/i18n/navigation";
 import { ArticleShowcase } from "@/types";
 import { ActivityStatus, ActivityType } from "@/types/enum";
 import StarRating from "../ui/rating";

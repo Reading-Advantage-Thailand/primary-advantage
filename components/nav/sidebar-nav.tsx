@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { SidebarNavItem } from "@/types";
 import {
@@ -37,7 +37,7 @@ interface SidebarNavProps {
 
 export function SidebarNav({ items, user }: SidebarNavProps) {
   const path = usePathname();
-  const pathWithoutLocale = "/" + path.split("/").slice(2).join("/");
+  // const pathWithoutLocale = "/" + path.split("/").slice(2).join("/");
   const t = useTranslations("Sidebar");
   const tSubItem = useTranslations("Sidebar.subItem");
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
@@ -53,13 +53,13 @@ export function SidebarNav({ items, user }: SidebarNavProps) {
 
   const isItemActive = (href: string) => {
     // Exact match for the current path
-    return pathWithoutLocale === href;
+    return path === href;
   };
 
   const isParentActive = (href: string) => {
     // For parent paths, check if current path starts with the href followed by a slash
     // This prevents false positives like /teacher/my-students matching /teacher/my-students-archive
-    return pathWithoutLocale.startsWith(href + "/");
+    return path.startsWith(href + "/");
   };
 
   const isAnyChildActive = (items: any[]) => {
@@ -67,9 +67,7 @@ export function SidebarNav({ items, user }: SidebarNavProps) {
   };
 
   const hasExactChildMatch = (items: any[]) => {
-    return items?.some(
-      (child) => child.href && pathWithoutLocale === child.href,
-    );
+    return items?.some((child) => child.href && path === child.href);
   };
 
   // Permission checking helpers
@@ -102,7 +100,7 @@ export function SidebarNav({ items, user }: SidebarNavProps) {
 
   return (
     <TooltipProvider>
-      {pathWithoutLocale.startsWith("/settings") && (
+      {path.startsWith("/settings") && (
         <button
           className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-500"
           onClick={() => window.history.back()}

@@ -68,18 +68,20 @@ export default async function RootLayout({
         <body
           className={` ${fontSans.variable} bg-background min-h-screen font-sans antialiased`}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-            enableColorScheme
-          >
-            {/* <LayoutProvider> */}
-            <NextIntlClientProvider>{children}</NextIntlClientProvider>
-            <Toaster />
-            {/* </LayoutProvider> */}
-          </ThemeProvider>
+          <NextIntlClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              enableColorScheme
+            >
+              {/* <LayoutProvider> */}
+              {children}
+              <Toaster />
+              {/* </LayoutProvider> */}
+            </ThemeProvider>
+          </NextIntlClientProvider>
         </body>
       </html>
     </SessionProvider>

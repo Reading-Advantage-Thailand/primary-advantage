@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AddAdminDialog } from "./add-admin-dialog";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 interface SchoolAdmin {

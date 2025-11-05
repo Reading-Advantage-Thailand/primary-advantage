@@ -51,6 +51,7 @@ import {
   Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { generateRandomClassCode } from "@/lib/utils";
 
 interface Classroom {
   id: string;
@@ -86,8 +87,8 @@ interface Classroom {
 
 export function ClassroomsTable() {
   const t = useTranslations("Admin.Classrooms");
+  const tc = useTranslations("TeacherCreateClass");
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedClassroom, setSelectedClassroom] = useState<Classroom | null>(
@@ -101,6 +102,7 @@ export function ClassroomsTable() {
   const [formData, setFormData] = useState({
     name: "",
     grade: "",
+    classCode: generateRandomClassCode(),
     passwordStudents: "",
   });
 
@@ -151,11 +153,22 @@ export function ClassroomsTable() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setIsCreateDialogOpen(false);
-        setFormData({ name: "", grade: "", passwordStudents: "" });
-        fetchClassrooms();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to create classroom");
       }
+
+      setFormData({
+        name: "",
+        grade: "",
+        classCode: generateRandomClassCode(),
+        passwordStudents: "",
+      });
+      setIsAddDialogOpen(false);
+      await fetchClassrooms();
+      toast.success(t("toast.createSuccess"), {
+        richColors: true,
+      });
     } catch (error) {
       console.error("Error creating classroom:", error);
       toast.error(t("toast.createFailed"));
@@ -170,17 +183,28 @@ export function ClassroomsTable() {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/classroom/${selectedClassroom.id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setIsEditDialogOpen(false);
-        setSelectedClassroom(null);
-        setFormData({ name: "", grade: "", passwordStudents: "" });
-        fetchClassrooms();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to update classroom");
       }
+
+      setIsEditDialogOpen(false);
+      setSelectedClassroom(null);
+      setFormData({
+        name: "",
+        grade: "",
+        classCode: generateRandomClassCode(),
+        passwordStudents: "",
+      });
+      await fetchClassrooms();
+      toast.success(t("toast.updateSuccess"), {
+        richColors: true,
+      });
     } catch (error) {
       console.error("Error updating classroom:", error);
       toast.error(t("toast.updateFailed"));
@@ -198,11 +222,17 @@ export function ClassroomsTable() {
         method: "DELETE",
       });
 
-      if (response.ok) {
-        setIsDeleteDialogOpen(false);
-        setSelectedClassroom(null);
-        fetchClassrooms();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to delete classroom");
       }
+
+      setIsDeleteDialogOpen(false);
+      setSelectedClassroom(null);
+      await fetchClassrooms();
+      toast.success(t("toast.deleteSuccess"), {
+        richColors: true,
+      });
     } catch (error) {
       console.error("Error deleting classroom:", error);
       toast.error(t("toast.deleteFailed"));
@@ -216,6 +246,7 @@ export function ClassroomsTable() {
     setFormData({
       name: classroom.name,
       grade: classroom.grade || "",
+      classCode: classroom.classCode || "",
       passwordStudents: classroom.passwordStudents || "",
     });
     setIsEditDialogOpen(true);
@@ -239,6 +270,7 @@ export function ClassroomsTable() {
     setFormData({
       name: "",
       grade: "",
+      classCode: generateRandomClassCode(),
       passwordStudents: "",
     });
   };
@@ -287,6 +319,18 @@ export function ClassroomsTable() {
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="classCode" className="text-right">
+                      {t("classCode")}
+                    </Label>
+                    <Input
+                      id="classCode"
+                      value={formData.classCode}
+                      disabled
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="grade" className="text-right">
                       {t("grade")}
                     </Label>
@@ -300,22 +344,13 @@ export function ClassroomsTable() {
                         <SelectValue placeholder={t("selectGrade")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="A1-">A1-</SelectItem>
-                        <SelectItem value="A1">A1</SelectItem>
-                        <SelectItem value="A1+">A1+</SelectItem>
-                        <SelectItem value="A2-">A2-</SelectItem>
-                        <SelectItem value="A2">A2</SelectItem>
-                        <SelectItem value="A2+">A2+</SelectItem>
-                        <SelectItem value="B1-">B1-</SelectItem>
-                        <SelectItem value="B1">B1</SelectItem>
-                        <SelectItem value="B1+">B1+</SelectItem>
-                        <SelectItem value="B2-">B2-</SelectItem>
-                        <SelectItem value="B2">B2</SelectItem>
-                        <SelectItem value="B2+">B2+</SelectItem>
-                        <SelectItem value="C1-">C1-</SelectItem>
-                        <SelectItem value="C1">C1</SelectItem>
-                        <SelectItem value="C1+">C1+</SelectItem>
-                        <SelectItem value="C2">C2</SelectItem>
+                        {Array.from({ length: 10 }, (_, i) => i + 3).map(
+                          (grade: number, index: number) => (
+                            <SelectItem key={index} value={String(grade)}>
+                              {tc("fields.gradeItem", { grade })}
+                            </SelectItem>
+                          ),
+                        )}
                       </SelectContent>
                     </Select>
                   </div>

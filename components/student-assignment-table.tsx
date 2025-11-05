@@ -324,8 +324,8 @@ export default function StudentAssignmentTable() {
 
         return (
           <div className="flex items-center justify-center gap-2">
-            <span className="text-lg">{getStatusIcon(status)}</span>
-            <span className="w-8 text-sm">{getStatusText(status)}</span>
+            <span>{getStatusIcon(status)}</span>
+            <span>{getStatusText(status)}</span>
           </div>
         );
       },

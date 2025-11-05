@@ -114,7 +114,7 @@ export default function StudentsPage() {
   const [statistics, setStatistics] = useState<Statistics>({
     totalStudents: 0,
     averageXp: 0,
-    mostCommonLevel: "A1-",
+    mostCommonLevel: "A0-",
     activeThisWeek: 0,
     activePercentage: 0,
   });
@@ -158,15 +158,7 @@ export default function StudentsPage() {
       if (selectedClassroom) params.append("classroomId", selectedClassroom);
       if (selectedCefrLevel) params.append("cefrLevel", selectedCefrLevel);
 
-      console.log("Fetching students with URL:", `/api/students?${params}`);
-
       const response = await fetch(`/api/students?${params}`);
-
-      console.log("Response status:", response.status);
-      console.log(
-        "Response headers:",
-        Object.fromEntries(response.headers.entries()),
-      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -177,7 +169,6 @@ export default function StudentsPage() {
       }
 
       const data: StudentsResponse = await response.json();
-      console.log("Students data received:", data);
 
       setStudents(data.students);
       setStatistics(data.statistics);
@@ -192,25 +183,19 @@ export default function StudentsPage() {
   // Fetch classrooms data
   const fetchClassrooms = async () => {
     try {
-      console.log("Fetching classrooms...");
       const response = await fetch("/api/classrooms");
-
-      console.log("Classrooms response status:", response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Classrooms API Error Response:", errorText);
         throw new Error(
           `Failed to fetch classrooms: ${response.status} ${response.statusText}`,
         );
       }
 
       const data: Classroom[] = await response.json();
-      console.log("Classrooms data received:", data);
       setClassrooms(data);
     } catch (error) {
       console.error("Error fetching classrooms:", error);
-      // Don't show alert for classrooms error, just log it
     }
   };
 

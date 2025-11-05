@@ -3,11 +3,11 @@
 import { ArrowUp } from "lucide-react";
 import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export function GoToTop() {
   return (
-    <div className="fixed bottom-4 right-4 z-50 ">
+    <div className="fixed right-4 bottom-4 z-50">
       <Link
         href="#"
         onClick={(e) => {
@@ -16,10 +16,10 @@ export function GoToTop() {
         }}
         className={cn(
           buttonVariants({ variant: "default" }),
-          "shadow-lg hover:shadow-xl transition-shadow rounded-full"
+          "rounded-full shadow-lg transition-shadow hover:shadow-xl",
         )}
       >
-        <ArrowUp className="w-4 h-4" />
+        <ArrowUp className="h-4 w-4" />
       </Link>
     </div>
   );

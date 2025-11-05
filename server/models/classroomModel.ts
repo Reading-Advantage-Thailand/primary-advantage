@@ -37,57 +37,69 @@ export const createClassCode = async (
 
 export const createClassroom = async (data: {
   name: string;
-  teacherId: string;
+  teacherId?: string;
   classCode?: string;
   grade?: string;
-  description?: string;
+  role?: string;
 }) => {
   try {
-    // Create the classroom first
-    const classroom = await prisma.classroom.create({
-      data: {
-        name: data.name,
-        classCode: data.classCode || null,
-        grade: data.grade || null,
-        // Note: grade and description are not in the current schema
-        // If needed, they should be added to the Prisma schema first
-      },
-    });
+    let created = false;
+    await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { id: data.teacherId },
+        select: { schoolId: true },
+      });
 
-    // Then create the teacher relationship
-    if (data.teacherId) {
-      await prisma.classroomTeachers.create({
+      let schoolId = user?.schoolId ?? null;
+
+      if (data.role === "teacher" && data.teacherId) {
+        const classroom = await tx.classroom.create({
+          data: {
+            name: data.name,
+            classCode: data.classCode || null,
+            grade: data.grade || null,
+            schoolId: schoolId,
+          },
+        });
+
+        await tx.classroomTeachers.create({
+          data: {
+            classroomId: classroom.id,
+            userId: data.teacherId,
+          },
+        });
+        created = true;
+        return;
+      }
+
+      if (data.role === "admin") {
+        await tx.classroom.create({
+          data: {
+            name: data.name,
+            classCode: data.classCode || null,
+            grade: data.grade || null,
+            schoolId: schoolId,
+          },
+        });
+        created = true;
+        return;
+      }
+
+      // system or other elevated roles: create without owner assignment; school optional
+      await tx.classroom.create({
         data: {
-          classroomId: classroom.id,
-          userId: data.teacherId,
+          name: data.name,
+          classCode: data.classCode || null,
+          grade: data.grade || null,
         },
       });
-    }
-
-    // Return the classroom with relationships
-    return await prisma.classroom.findUnique({
-      where: { id: classroom.id },
-      include: {
-        teachers: {
-          select: {
-            id: true,
-            user: {
-              select: { id: true, name: true, email: true },
-            },
-          },
-        },
-        students: {
-          select: {
-            id: true,
-            student: {
-              select: { id: true, name: true, email: true },
-            },
-          },
-        },
-      },
+      created = true;
     });
+
+    if (!created) throw new Error("FAILED_CREATE");
+    return { success: true, message: "Classroom created successfully" };
   } catch (error) {
-    throw new Error("Failed to create classroom");
+    throw new Error("FAILED_CREATE");
   }
 };
 
@@ -440,38 +452,66 @@ export const updateClassroom = async (
 };
 
 // Delete a classroom
-export const deleteClassroom = async (id: string, teacherId: string) => {
+export const deleteClassroom = async (
+  classroomId: string,
+  teacherId: string,
+  role?: string,
+) => {
   try {
-    // First check if the classroom belongs to the teacher
-    const classroom = await prisma.classroom.findFirst({
-      where: {
-        id,
-        teachers: {
-          some: {
-            userId: teacherId,
+    if (role === "teacher") {
+      // First, verify the teacher is part of the classroom
+      const classroom = await prisma.classroom.findFirst({
+        where: {
+          id: classroomId,
+        },
+        include: {
+          teachers: {
+            select: {
+              userId: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!classroom) {
-      return false;
+      if (!classroom) {
+        return { success: false, error: "Classroom not found" };
+      }
+
+      // Count how many teachers are in the classroom
+      const teacherCount = classroom.teachers.length;
+
+      if (teacherCount > 1) {
+        // Multiple teachers: only remove the current teacher from the classroom
+        await prisma.classroomTeachers.deleteMany({
+          where: {
+            classroomId: classroomId,
+            userId: teacherId,
+          },
+        });
+        return { success: true, message: "Removed from classroom" };
+      } else {
+        // Only one teacher: delete the entire classroom
+        await prisma.classroom.delete({
+          where: { id: classroomId },
+        });
+        return { success: true, message: "Classroom deleted" };
+      }
     }
 
-    // Delete all classroom student relationships first
-    await prisma.classroomStudent.deleteMany({
-      where: { classroomId: id },
-    });
+    if (role === "admin" || role === "system") {
+      await prisma.classroom.delete({
+        where: { id: classroomId },
+      });
+      return { success: true };
+    }
 
-    // Then delete the classroom
-    await prisma.classroom.delete({
-      where: { id },
-    });
-
-    return true;
+    return {
+      success: false,
+      error: "Insufficient permissions to delete classroom",
+    };
   } catch (error) {
     console.error("Error deleting classroom:", error);
-    return false;
+    return { success: false, error: "Failed to delete classroom" };
   }
 };
 
@@ -481,6 +521,78 @@ export const getAllStudentsByTeacher = async (teacherId: string) => {
     // Get all classrooms for the teacher
     const classrooms = await prisma.classroom.findMany({
       where: { teachers: { some: { userId: teacherId } } },
+      include: {
+        students: {
+          include: {
+            student: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                xp: true,
+                level: true,
+                cefrLevel: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Extract unique students across all classrooms
+    const studentMap = new Map();
+
+    classrooms.forEach((classroom) => {
+      classroom.students.forEach((classroomStudent) => {
+        const student = classroomStudent.student;
+        if (!studentMap.has(student.id)) {
+          studentMap.set(student.id, {
+            id: student.id,
+            display_name: student.name,
+            email: student.email,
+            xp: student.xp,
+            level: student.level,
+            cefrLevel: student.cefrLevel,
+            createdAt: student.createdAt,
+            updatedAt: student.updatedAt,
+            classrooms: [],
+          });
+        }
+        // Add classroom info to student
+        studentMap.get(student.id).classrooms.push({
+          id: classroom.id,
+          name: classroom.name,
+        });
+      });
+    });
+
+    // Convert map to array
+    const students = Array.from(studentMap.values());
+
+    return students;
+  } catch (error) {
+    console.error("Error fetching students by teacher:", error);
+    throw new Error("Failed to fetch students");
+  }
+};
+
+// Get all students by admin
+export const getAllStudentsByAdmin = async (adminId: string) => {
+  try {
+    const schoolId = await prisma.schoolAdmins.findFirst({
+      where: { userId: adminId },
+      select: { schoolId: true },
+    });
+
+    if (!schoolId) {
+      return [];
+    }
+
+    // Get all classrooms for the teacher
+    const classrooms = await prisma.classroom.findMany({
+      where: { schoolId: schoolId.schoolId },
       include: {
         students: {
           include: {
@@ -744,26 +856,24 @@ export const generateClassCode = async (
   teacherId?: string,
 ) => {
   try {
-    // Verify classroom exists and teacher has access (if teacherId provided)
-    // const whereClause: any = { id: classroomId };
-    // if (teacherId) {
-    //   whereClause.teachers = {
-    //     some: {
-    //       userId: teacherId,
-    //     },
-    //   };
-    // }
-
+    // Get classroom with existing password
     const classroom = await prisma.classroom.findUnique({
       where: { id: classroomId },
-      select: { id: true, name: true },
+      select: {
+        id: true,
+        name: true,
+        passwordStudents: true,
+        codeExpiresAt: true,
+      },
     });
 
     if (!classroom) {
       return null;
     }
 
-    // Generate a unique 6-character alphanumeric code
+    const existingPassword = classroom.passwordStudents;
+
+    // Generate a unique 8-character alphanumeric code
     const generateCode = () => {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       let code = "";
@@ -773,42 +883,49 @@ export const generateClassCode = async (
       return code;
     };
 
-    let newCode = generateCode();
-
-    // Ensure the code is unique
-    let codeExists = true;
-    let attempts = 0;
-    const maxAttempts = 10;
-
-    console.log("newCode", newCode);
-
-    while (codeExists && attempts < maxAttempts) {
-      const existingCode = await prisma.classroom.findMany({
-        where: { passwordStudents: { equals: "UD0EMPPT" } },
+    // Function to check if password exists in database
+    const isPasswordUnique = async (password: string): Promise<boolean> => {
+      const existing = await prisma.classroom.findFirst({
+        where: {
+          passwordStudents: password,
+        },
       });
+      return !existing;
+    };
 
-      console.log("existingCode", Boolean(!existingCode));
+    let newPassword = generateCode();
+    let attempts = 0;
+    const maxAttempts = 20;
 
-      if (!existingCode) {
-        codeExists = false;
-      } else {
-        newCode = generateCode();
-        attempts++;
+    // Generate new password that:
+    // 1. Is not in the database
+    // 2. Is different from existing password (if any)
+    while (attempts < maxAttempts) {
+      const isUnique = await isPasswordUnique(newPassword);
+      const isDifferent = !existingPassword || newPassword !== existingPassword;
+
+      if (isUnique && isDifferent) {
+        break;
       }
+
+      newPassword = generateCode();
+      attempts++;
     }
 
     if (attempts >= maxAttempts) {
-      throw new Error("Unable to generate unique class code");
+      throw new Error(
+        "Unable to generate unique class code after maximum attempts",
+      );
     }
 
     // Set expiration to 7 days from now
     const expiresAt = addDays(new Date(), 7);
 
-    // Update the classroom with the new code
+    // Update the classroom with the new password and expiration date
     const updatedClassroom = await prisma.classroom.update({
       where: { id: classroomId },
       data: {
-        passwordStudents: newCode,
+        passwordStudents: newPassword,
         codeExpiresAt: expiresAt,
       },
       select: {
@@ -821,7 +938,6 @@ export const generateClassCode = async (
 
     return updatedClassroom;
   } catch (error) {
-    console.log("error", error);
     console.error("Error generating class code:", error);
     throw new Error("Failed to generate class code");
   }

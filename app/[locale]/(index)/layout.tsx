@@ -7,7 +7,7 @@ import { indexPageConfig } from "@/configs/index-page-config";
 import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ReactNode } from "react";
 
 export default async function Layout({ children }: { children: ReactNode }) {

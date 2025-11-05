@@ -11,6 +11,7 @@ import {
   getAvailableStudentsForClassroom,
   getClassroomWithStudents,
   generateClassCode,
+  getAllStudentsByAdmin,
 } from "@/server/models/classroomModel";
 import { currentUser } from "@/lib/session";
 import { validateUser } from "../utils/auth";
@@ -86,38 +87,25 @@ export async function getClassroomController(
 }
 
 // POST /api/classroom - Create a new classroom
-export async function createClassroomController(req: NextRequest) {
+export async function createClassroomController(
+  name: string,
+  userId?: string,
+  grade?: string,
+  classCode?: string,
+  role?: string,
+) {
   try {
-    const user = await currentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const { classroomName, grade, classCode, description } = body;
-
-    if (!classroomName) {
-      return NextResponse.json(
-        { error: "Classroom name is required" },
-        { status: 400 },
-      );
-    }
-
-    const classroom = await createClassroom({
-      name: classroomName,
-      teacherId: user.id,
+    await createClassroom({
+      name,
+      teacherId: userId,
       classCode,
       grade,
-      description,
+      role,
     });
 
-    return NextResponse.json({ classroom }, { status: 201 });
+    return { success: true, message: "Classroom created successfully" };
   } catch (error) {
-    console.error("Error creating classroom:", error);
-    return NextResponse.json(
-      { error: "Failed to create classroom" },
-      { status: 500 },
-    );
+    throw new Error("FAILED_CREATE");
   }
 }
 
@@ -168,33 +156,21 @@ export async function updateClassroomController(
 
 // DELETE /api/classroom/[id] - Delete a classroom
 export async function deleteClassroomController(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  classroomId: string,
+  userId: string,
+  role?: string,
 ) {
   try {
-    const user = await currentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const result = await deleteClassroom(classroomId, userId, role);
+
+    if (result && typeof result === "object" && "success" in result) {
+      return result;
     }
 
-    const { id } = await params;
-
-    const success = await deleteClassroom(id, user.id);
-
-    if (!success) {
-      return NextResponse.json(
-        { error: "Classroom not found or unauthorized" },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json({ success: true }, { status: 200 });
+    return { success: true };
   } catch (error) {
     console.error("Error deleting classroom:", error);
-    return NextResponse.json(
-      { error: "Failed to delete classroom" },
-      { status: 500 },
-    );
+    return { success: false, error: "Failed to delete classroom" };
   }
 }
 
@@ -213,6 +189,10 @@ export async function fetchStudentsByRole() {
       case "system":
         // system can see all students in the system
         students = await getAllStudentsInSystem();
+        break;
+
+      case "admin":
+        students = await getAllStudentsByAdmin(user.id);
         break;
 
       case "teacher":

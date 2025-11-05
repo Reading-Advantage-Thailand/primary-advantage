@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
-import { getToken } from "next-auth/jwt";
 import { currentUser } from "./lib/session";
 
 // Define protected routes and their required roles
@@ -69,7 +68,7 @@ export default async function middleware(request: NextRequest) {
   }
 
   //handle i18n routing
-  const response = await intlMiddleware(request);
+  const response = intlMiddleware(request);
 
   // Check if the route is protected
   const isProtectedRoute = Object.keys(protectedRoutes).some((route) =>

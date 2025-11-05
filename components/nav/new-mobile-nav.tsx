@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Link, { LinkProps } from "next/link";
-import { useRouter } from "next/navigation";
 
+import { useRouter } from "@/i18n/navigation";
+import Link, { LinkProps } from "next/link";
 // import { source } from "@/lib/source"
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
