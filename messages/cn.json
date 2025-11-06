@@ -2489,6 +2489,11 @@
         "title": "删除教师",
         "description": "确定要删除 {name} 吗？该操作无法撤销，所有相关班级与学生数据将受到影响。"
       },
+      "moveDialog": {
+        "title": "将教师转移到您的学校",
+        "description": "邮箱为 {email} 的教师已经属于学校 {schoolName}。您要将此教师转移到您的学校吗？",
+        "confirmButton": "转移教师"
+      },
       "form": {
         "name": "姓名",
         "namePlaceholder": "请输入姓名",
@@ -2520,7 +2525,8 @@
       "classrooms": {
         "loading": "正在加载班级...",
         "empty": "暂无班级",
-        "studentsCount": "（{count} 名学生）"
+        "studentsCount": "（{count} 名学生）",
+        "noClassroomsAssigned": "未分配班级"
       },
       "tableHeaders": {
         "teacher": "教师",
@@ -2537,6 +2543,15 @@
       "empty": {
         "search": "未找到符合搜索条件的教师",
         "default": "暂无教师"
+      },
+      "toasts": {
+        "createSuccess": "创建教师成功",
+        "updateSuccess": "更新教师成功",
+        "deleteSuccess": "删除教师成功",
+        "loadError": "加载教师数据失败",
+        "createError": "创建教师失败",
+        "updateError": "更新教师失败",
+        "deleteError": "删除教师失败"
       }
     }
   },

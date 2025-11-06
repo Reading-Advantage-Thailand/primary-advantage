@@ -2491,6 +2491,11 @@
         "title": "Xóa giáo viên",
         "description": "Bạn có chắc muốn xóa {name}? Hành động này không thể hoàn tác. Tất cả lớp học và dữ liệu học sinh liên quan sẽ bị ảnh hưởng."
       },
+      "moveDialog": {
+        "title": "Chuyển giáo viên đến trường của bạn",
+        "description": "Giáo viên có email {email} đã thuộc trường {schoolName}. Bạn có muốn chuyển giáo viên này đến trường của bạn không?",
+        "confirmButton": "Chuyển giáo viên"
+      },
       "form": {
         "name": "Họ và tên",
         "namePlaceholder": "Nhập họ và tên",
@@ -2522,7 +2527,8 @@
       "classrooms": {
         "loading": "Đang tải lớp học...",
         "empty": "Không có lớp học",
-        "studentsCount": "({count} học sinh)"
+        "studentsCount": "({count} học sinh)",
+        "noClassroomsAssigned": "Không có lớp học được gán"
       },
       "tableHeaders": {
         "teacher": "Giáo viên",
@@ -2539,6 +2545,15 @@
       "empty": {
         "search": "Không tìm thấy giáo viên phù hợp với tìm kiếm",
         "default": "Không có giáo viên nào"
+      },
+      "toasts": {
+        "createSuccess": "Tạo giáo viên thành công",
+        "updateSuccess": "Cập nhật giáo viên thành công",
+        "deleteSuccess": "Xóa giáo viên thành công",
+        "loadError": "Không thể tải dữ liệu giáo viên",
+        "createError": "Không thể tạo giáo viên",
+        "updateError": "Không thể cập nhật giáo viên",
+        "deleteError": "Không thể xóa giáo viên"
       }
     }
   },

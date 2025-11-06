@@ -2491,6 +2491,11 @@
         "title": "Delete Teacher",
         "description": "Are you sure you want to delete {name}? This action cannot be undone. All associated classes and student data will be affected."
       },
+      "moveDialog": {
+        "title": "Move Teacher to Your School",
+        "description": "The teacher with email {email} already belongs to school {schoolName}. Do you want to move this teacher to your school?",
+        "confirmButton": "Move Teacher"
+      },
       "form": {
         "name": "Full Name",
         "namePlaceholder": "Enter full name",
@@ -2522,7 +2527,8 @@
       "classrooms": {
         "loading": "Loading classrooms...",
         "empty": "No classrooms available",
-        "studentsCount": "({count} students)"
+        "studentsCount": "({count} students)",
+        "noClassroomsAssigned": "No classrooms assigned"
       },
       "tableHeaders": {
         "teacher": "Teacher",
@@ -2539,6 +2545,15 @@
       "empty": {
         "search": "No teachers found matching your search",
         "default": "No teachers found"
+      },
+      "toasts": {
+        "createSuccess": "Teacher created successfully",
+        "updateSuccess": "Teacher updated successfully",
+        "deleteSuccess": "Teacher deleted successfully",
+        "loadError": "Failed to load teachers data",
+        "createError": "Failed to create teacher",
+        "updateError": "Failed to update teacher",
+        "deleteError": "Failed to delete teacher"
       }
     }
   },
