@@ -88,7 +88,14 @@ export const getTeachersController = async (
 export const createTeacherController = async (
   request: NextRequest,
 ): Promise<
-  NextResponse<{ success: boolean; teacher?: TeacherData } | { error: string }>
+  NextResponse<
+    | { success: boolean; teacher?: TeacherData }
+    | {
+        error: string;
+        requiresConfirmation?: boolean;
+        existingSchool?: { id: string; name: string };
+      }
+  >
 > => {
   try {
     const user = await currentUser();
@@ -111,8 +118,8 @@ export const createTeacherController = async (
     }
 
     const body = await request.json();
-    const { name, email, role, cefrLevel, password, classroomIds } =
-      body as CreateTeacherInput;
+    const { name, email, role, password, classroomIds, force } =
+      body as CreateTeacherInput & { force?: boolean };
 
     // Validate required fields
     if (!name || !email || !role) {
@@ -136,15 +143,26 @@ export const createTeacherController = async (
       name,
       email,
       role,
-      cefrLevel: cefrLevel || "A1",
       password,
       classroomIds,
       userWithRoles,
+      force: force || false,
     });
 
     if (!result.success) {
-      const status =
-        result.error === "User with this email already exists" ? 409 : 400;
+      // If confirmation is required, return special response
+      if (result.requiresConfirmation) {
+        return NextResponse.json(
+          {
+            error: result.error || "Teacher already belongs to a school",
+            requiresConfirmation: true,
+            existingSchool: result.existingSchool,
+          },
+          { status: 409 },
+        );
+      }
+
+      const status = 400;
       return NextResponse.json(
         { error: result.error || "Failed to create teacher" },
         { status },

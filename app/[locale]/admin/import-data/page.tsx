@@ -130,7 +130,6 @@ export default function ImportDataPage() {
       setUploadProgress(100);
 
       const result = await response.json();
-      console.log("Upload result", result);
 
       if (!response.ok) {
         throw new Error(result.details || t("errors.uploadFailed"));

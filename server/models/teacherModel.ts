@@ -233,29 +233,87 @@ export const createTeacher = async (params: {
   name: string;
   email: string;
   role: string;
-  cefrLevel: string;
   password?: string;
   classroomIds?: string[];
   userWithRoles: UserWithRoles;
-}): Promise<{ success: boolean; teacher?: TeacherData; error?: string }> => {
-  const {
-    name,
-    email,
-    role,
-    cefrLevel,
-    password,
-    classroomIds,
-    userWithRoles,
-  } = params;
+  force?: boolean; // If true, move teacher even if they have a school
+}): Promise<{
+  success: boolean;
+  teacher?: TeacherData;
+  error?: string;
+  requiresConfirmation?: boolean;
+  existingSchool?: { id: string; name: string };
+}> => {
+  const { name, email, role, password, classroomIds, userWithRoles, force } =
+    params;
 
   try {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
+      include: {
+        School: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
 
+    // Determine school assignment
+    let schoolId = null;
+    if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
+      schoolId = userWithRoles.schoolId;
+    }
+
+    // If user exists, handle accordingly
     if (existingUser) {
-      return { success: false, error: "User with this email already exists" };
+      // Check if user has a school
+      if (existingUser.schoolId && existingUser.School) {
+        // If force is true, move the teacher to the new school
+        if (force) {
+          // Update the teacher to the new school
+          return await updateExistingTeacherToSchool({
+            existingUser,
+            name,
+            email,
+            role,
+            password,
+            classroomIds,
+            schoolId,
+            userWithRoles,
+          });
+        } else {
+          // Return confirmation required
+          return {
+            success: false,
+            requiresConfirmation: true,
+            existingSchool: {
+              id: existingUser.School.id,
+              name: existingUser.School.name,
+            },
+            error: "Teacher already belongs to a school",
+          };
+        }
+      } else {
+        // User exists but has no school - update them to the admin's school
+        return await updateExistingTeacherToSchool({
+          existingUser,
+          name,
+          email,
+          role,
+          password,
+          classroomIds,
+          schoolId,
+          userWithRoles,
+        });
+      }
     }
 
     // Get the role ID
@@ -265,12 +323,6 @@ export const createTeacher = async (params: {
 
     if (!roleRecord) {
       return { success: false, error: "Invalid role specified" };
-    }
-
-    // Determine school assignment
-    let schoolId = null;
-    if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
-      schoolId = userWithRoles.schoolId;
     }
 
     // Generate password if not provided
@@ -303,7 +355,6 @@ export const createTeacher = async (params: {
           name,
           email,
           password: hashedPassword,
-          cefrLevel,
           schoolId,
           roles: {
             create: {
@@ -390,6 +441,227 @@ export const createTeacher = async (params: {
     return { success: false, error: "Failed to create teacher" };
   }
 };
+
+// Helper function to update existing teacher to a new school
+async function updateExistingTeacherToSchool(params: {
+  existingUser: any;
+  name: string;
+  email: string;
+  role: string;
+  password?: string;
+  classroomIds?: string[];
+  schoolId: string | null;
+  userWithRoles: UserWithRoles;
+}): Promise<{
+  success: boolean;
+  teacher?: TeacherData;
+  error?: string;
+}> {
+  const {
+    existingUser,
+    name,
+    email,
+    role,
+    password,
+    classroomIds,
+    schoolId,
+    userWithRoles,
+  } = params;
+
+  try {
+    // Get the role ID
+    const roleRecord = await prisma.role.findFirst({
+      where: { name: role },
+    });
+
+    if (!roleRecord) {
+      return { success: false, error: "Invalid role specified" };
+    }
+
+    // Validate classroom IDs if provided
+    if (classroomIds && classroomIds.length > 0) {
+      const validClassrooms = await prisma.classroom.findMany({
+        where: {
+          id: { in: classroomIds },
+          schoolId: schoolId, // Ensure classrooms belong to the same school
+        },
+      });
+
+      if (validClassrooms.length !== classroomIds.length) {
+        return {
+          success: false,
+          error: "Some classroom IDs are invalid or not accessible",
+        };
+      }
+    }
+
+    // Update the existing teacher in a transaction
+    const updatedTeacher = await prisma.$transaction(async (tx) => {
+      // Prepare update data
+      const updateData: any = {
+        name,
+        schoolId,
+      };
+
+      // Update password if provided
+      if (password) {
+        updateData.password = bcrypt.hashSync(password, 10);
+      }
+
+      // Update the user
+      const user = await tx.user.update({
+        where: { id: existingUser.id },
+        data: updateData,
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+        },
+      });
+
+      // Check if user has the role, if not add it
+      const hasRole = user.roles.some((r) => r.role.name === role);
+      if (!hasRole) {
+        // Get teacher and admin role IDs
+        const teacherAdminRoles = await tx.role.findMany({
+          where: {
+            name: {
+              in: ["teacher", "admin"],
+            },
+          },
+        });
+
+        const roleIds = teacherAdminRoles.map((r) => r.id);
+
+        // Remove existing teacher/admin roles and add the new one
+        await tx.userRole.deleteMany({
+          where: {
+            userId: user.id,
+            roleId: {
+              in: roleIds,
+            },
+          },
+        });
+
+        await tx.userRole.create({
+          data: {
+            userId: user.id,
+            roleId: roleRecord.id,
+          },
+        });
+      } else if (user.roles[0]?.role.name !== role) {
+        // Role exists but different, update it
+        // Get teacher and admin role IDs
+        const teacherAdminRoles = await tx.role.findMany({
+          where: {
+            name: {
+              in: ["teacher", "admin"],
+            },
+          },
+        });
+
+        const roleIds = teacherAdminRoles.map((r) => r.id);
+
+        await tx.userRole.deleteMany({
+          where: {
+            userId: user.id,
+            roleId: {
+              in: roleIds,
+            },
+          },
+        });
+
+        await tx.userRole.create({
+          data: {
+            userId: user.id,
+            roleId: roleRecord.id,
+          },
+        });
+      }
+
+      // Handle classroom assignments
+      if (classroomIds !== undefined) {
+        // Remove existing classroom assignments
+        await tx.classroomTeachers.deleteMany({
+          where: { userId: user.id },
+        });
+
+        // Add new classroom assignments
+        if (classroomIds.length > 0) {
+          await tx.classroomTeachers.createMany({
+            data: classroomIds.map((classroomId) => ({
+              classroomId,
+              userId: user.id,
+            })),
+            skipDuplicates: true,
+          });
+        }
+      }
+
+      // Fetch the complete teacher data with classroom relationships
+      const completeTeacher = await tx.user.findUnique({
+        where: { id: user.id },
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+          ClassroomTeachers: {
+            include: {
+              classroom: {
+                include: {
+                  students: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!completeTeacher) {
+        throw new Error("Failed to fetch updated teacher");
+      }
+
+      return completeTeacher;
+    });
+
+    // Calculate totals
+    const totalStudents = updatedTeacher.ClassroomTeachers.reduce((sum, ct) => {
+      return sum + ct.classroom.students.length;
+    }, 0);
+    const totalClasses = updatedTeacher.ClassroomTeachers.length;
+
+    // Format response
+    const teacherData: TeacherData = {
+      id: updatedTeacher.id,
+      name: updatedTeacher.name,
+      email: updatedTeacher.email,
+      role:
+        updatedTeacher.roles.find((r) => r.role.name === role)?.role.name ||
+        updatedTeacher.roles[0]?.role.name ||
+        "teacher",
+      createdAt: updatedTeacher.createdAt.toISOString(),
+      image: updatedTeacher.image,
+      schoolId: updatedTeacher.schoolId,
+      cefrLevel: updatedTeacher.cefrLevel,
+      totalStudents,
+      totalClasses,
+      assignedClassrooms: updatedTeacher.ClassroomTeachers.map((ct) => ({
+        id: ct.classroom.id,
+        name: ct.classroom.name,
+        grade: ct.classroom.grade,
+      })),
+    };
+
+    return { success: true, teacher: teacherData };
+  } catch (error) {
+    console.error("Teacher Model: Error updating existing teacher:", error);
+    return { success: false, error: "Failed to update teacher" };
+  }
+}
 
 // Update teacher
 export const updateTeacher = async (

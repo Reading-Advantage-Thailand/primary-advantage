@@ -17,8 +17,8 @@ const classroomCsvRowSchema = z.object({
     .trim()
     .refine((val) => val.length > 0, "Classroom name cannot be empty")
     .refine(
-      (val) => /^[a-zA-Z0-9\s\-_()]+$/.test(val),
-      "Classroom name can only contain letters, numbers, spaces, hyphens, underscores, and parentheses",
+      (val) => /^[\p{L}\p{M}\p{N}\s\-\/_().,]+$/u.test(val),
+      "Classroom name can only contain letters, numbers, spaces, hyphens, underscores, parentheses, periods, commas, and slashes",
     ),
 });
 
@@ -30,7 +30,7 @@ const userCsvRowSchema = z.object({
     .trim()
     .refine((val) => val.length > 0, "Name cannot be empty")
     .refine(
-      (val) => /^[a-zA-Z\s\-']+$/.test(val),
+      (val) => /^[\p{L}\p{M}\s\-']+$/u.test(val),
       "Name can only contain letters, spaces, hyphens, and apostrophes",
     ),
   email: z.string().email("Invalid email format").toLowerCase().trim(),
@@ -40,7 +40,7 @@ const userCsvRowSchema = z.object({
     .max(500, "Classroom names too long (max 500 characters)")
     .trim()
     .refine(
-      (val) => /^[a-zA-Z0-9\s\-\/_(),]+$/.test(val),
+      (val) => /^[\p{L}\p{M}\p{N}\s\-\/_(),.]+$/u.test(val),
       "Classroom names can only contain letters, numbers, spaces, hyphens, underscores, parentheses, and commas",
     ),
   role: z.enum(["student", "teacher", "admin"], {
@@ -85,7 +85,7 @@ const parseClassroomNames = (classroomNames: string): string[] => {
 
 // Helper function to validate individual classroom name format
 const validateClassroomNameFormat = (className: string): boolean => {
-  return /^[a-zA-Z0-9\s\-\/_()]+$/.test(className);
+  return /^[\p{L}\p{M}\p{N}\s\-\/_(),.]+$/u.test(className);
 };
 
 // Helper function to validate classroom names exist in database

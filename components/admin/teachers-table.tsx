@@ -88,12 +88,20 @@ export function TeachersTable() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isConfirmMoveDialogOpen, setIsConfirmMoveDialogOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+  const [pendingTeacherData, setPendingTeacherData] = useState<{
+    name: string;
+    email: string;
+    role: "teacher" | "admin";
+    classroomIds: string[];
+    password?: string;
+    existingSchool: { id: string; name: string };
+  } | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     role: "teacher" as "teacher" | "admin",
-    cefrLevel: "A1",
     assignedClassroomIds: [] as string[],
     password: "",
   });
@@ -173,18 +181,26 @@ export function TeachersTable() {
       teacher.email?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const handleAddTeacher = async () => {
+  const handleAddTeacher = async (force = false) => {
     try {
+      // Use pendingTeacherData if force is true and it exists, otherwise use formData
+      const dataToUse =
+        force && pendingTeacherData ? pendingTeacherData : formData;
+
       const requestData: CreateTeacherRequest & {
         classroomIds?: string[];
         password?: string;
+        force?: boolean;
       } = {
-        name: formData.name,
-        email: formData.email,
-        role: formData.role,
-        cefrLevel: formData.cefrLevel,
-        classroomIds: formData.assignedClassroomIds,
-        ...(formData.password && { password: formData.password }),
+        name: dataToUse.name,
+        email: dataToUse.email,
+        role: dataToUse.role,
+        classroomIds:
+          force && pendingTeacherData
+            ? pendingTeacherData.classroomIds
+            : formData.assignedClassroomIds,
+        ...(dataToUse.password && { password: dataToUse.password }),
+        ...(force && { force: true }),
       };
 
       const response = await fetch("/api/teachers", {
@@ -195,22 +211,45 @@ export function TeachersTable() {
         body: JSON.stringify(requestData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("🔍 Create teacher error:", errorData);
-        throw new Error(errorData.error || "Failed to create teacher");
-      }
+      const responseData = await response.json();
 
-      const result = await response.json();
+      if (!response.ok) {
+        // Check if confirmation is required
+        if (responseData.requiresConfirmation && responseData.existingSchool) {
+          // Store the pending data and show confirmation dialog
+          setPendingTeacherData({
+            name: formData.name,
+            email: formData.email,
+            role: formData.role,
+            classroomIds: formData.assignedClassroomIds,
+            ...(formData.password && { password: formData.password }),
+            existingSchool: responseData.existingSchool,
+          });
+          setIsConfirmMoveDialogOpen(true);
+          return;
+        }
+
+        console.error("🔍 Create teacher error:", responseData);
+        throw new Error(responseData.error || "Failed to create teacher");
+      }
 
       toast.success("Teacher created successfully");
 
       setIsAddDialogOpen(false);
+      setIsConfirmMoveDialogOpen(false);
+      setPendingTeacherData(null);
       resetForm();
       fetchTeachers(); // Refresh the list
     } catch (error: any) {
       console.error("🔍 Error creating teacher:", error);
       toast.error(error.message || "Failed to create teacher");
+    }
+  };
+
+  const handleConfirmMoveTeacher = async () => {
+    if (pendingTeacherData) {
+      // Retry with force: true (handleAddTeacher will use pendingTeacherData)
+      await handleAddTeacher(true);
     }
   };
 
@@ -225,7 +264,6 @@ export function TeachersTable() {
         name: formData.name,
         email: formData.email,
         role: formData.role,
-        cefrLevel: formData.cefrLevel,
         classroomIds: formData.assignedClassroomIds,
         ...(formData.password && { password: formData.password }),
       };
@@ -288,7 +326,6 @@ export function TeachersTable() {
       name: teacher.name || "",
       email: teacher.email || "",
       role: teacher.role as "teacher" | "admin",
-      cefrLevel: teacher.cefrLevel || "A1",
       assignedClassroomIds: teacher.assignedClassrooms?.map((c) => c.id) || [],
       password: "",
     });
@@ -306,7 +343,6 @@ export function TeachersTable() {
       name: "",
       email: "",
       role: "teacher",
-      cefrLevel: "A1",
       assignedClassroomIds: [],
       password: "",
     });
@@ -460,39 +496,6 @@ export function TeachersTable() {
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="add-cefr">{t("form.cefr")}</Label>
-                  <Select
-                    value={formData.cefrLevel}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, cefrLevel: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("form.cefrPlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="A1">
-                        A1 - {t("cefrLevels.A1")}
-                      </SelectItem>
-                      <SelectItem value="A2">
-                        A2 - {t("cefrLevels.A2")}
-                      </SelectItem>
-                      <SelectItem value="B1">
-                        B1 - {t("cefrLevels.B1")}
-                      </SelectItem>
-                      <SelectItem value="B2">
-                        B2 - {t("cefrLevels.B2")}
-                      </SelectItem>
-                      <SelectItem value="C1">
-                        C1 - {t("cefrLevels.C1")}
-                      </SelectItem>
-                      <SelectItem value="C2">
-                        C2 - {t("cefrLevels.C2")}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
                   <Label htmlFor="add-password">
                     {t("form.passwordOptional")}
                   </Label>
@@ -586,7 +589,7 @@ export function TeachersTable() {
                   {t("actions.cancel")}
                 </Button>
                 <Button
-                  onClick={handleAddTeacher}
+                  onClick={() => handleAddTeacher(false)}
                   disabled={!formData.name || !formData.email}
                 >
                   {t("actions.add")}
@@ -602,7 +605,6 @@ export function TeachersTable() {
                 <TableHead>{t("tableHeaders.teacher")}</TableHead>
                 <TableHead>{t("tableHeaders.email")}</TableHead>
                 <TableHead>{t("tableHeaders.role")}</TableHead>
-                <TableHead>{t("tableHeaders.cefr")}</TableHead>
                 <TableHead>{t("tableHeaders.assignedClassrooms")}</TableHead>
                 <TableHead>{t("tableHeaders.students")}</TableHead>
                 <TableHead>{t("tableHeaders.classes")}</TableHead>
@@ -668,11 +670,6 @@ export function TeachersTable() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">
-                        {teacher.cefrLevel || "N/A"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {teacher.assignedClassrooms &&
                         teacher.assignedClassrooms.length > 0 ? (
@@ -688,7 +685,7 @@ export function TeachersTable() {
                           ))
                         ) : (
                           <span className="text-muted-foreground text-sm">
-                            No classrooms assigned
+                            {t("classrooms.noClassroomsAssigned")}
                           </span>
                         )}
                       </div>
@@ -769,27 +766,6 @@ export function TeachersTable() {
                 <SelectContent>
                   <SelectItem value="teacher">{t("roles.teacher")}</SelectItem>
                   <SelectItem value="admin">{t("roles.admin")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-cefr">{t("form.cefr")}</Label>
-              <Select
-                value={formData.cefrLevel}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, cefrLevel: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("form.cefrPlaceholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="A1">A1 - {t("cefrLevels.A1")}</SelectItem>
-                  <SelectItem value="A2">A2 - {t("cefrLevels.A2")}</SelectItem>
-                  <SelectItem value="B1">B1 - {t("cefrLevels.B1")}</SelectItem>
-                  <SelectItem value="B2">B2 - {t("cefrLevels.B2")}</SelectItem>
-                  <SelectItem value="C1">C1 - {t("cefrLevels.C1")}</SelectItem>
-                  <SelectItem value="C2">C2 - {t("cefrLevels.C2")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -928,6 +904,38 @@ export function TeachersTable() {
             </Button>
             <Button variant="destructive" onClick={handleDeleteTeacher}>
               {t("actions.delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Move Teacher Confirmation Dialog */}
+      <Dialog
+        open={isConfirmMoveDialogOpen}
+        onOpenChange={setIsConfirmMoveDialogOpen}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{t("moveDialog.title")}</DialogTitle>
+            <DialogDescription>
+              {t("moveDialog.description", {
+                email: pendingTeacherData?.email ?? "",
+                schoolName: pendingTeacherData?.existingSchool.name ?? "",
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsConfirmMoveDialogOpen(false);
+                setPendingTeacherData(null);
+              }}
+            >
+              {t("actions.cancel")}
+            </Button>
+            <Button variant="default" onClick={handleConfirmMoveTeacher}>
+              {t("moveDialog.confirmButton")}
             </Button>
           </DialogFooter>
         </DialogContent>
