@@ -564,6 +564,7 @@
     "updatedAt": "Ngày cập nhật",
     "saveToFlashcard": "Flashcard: Đã lưu",
     "notSaved": "Flashcard: Chưa lưu",
+    "studyAsLesson": "Học thành bài viết 45 phút",
     "selection": {
       "title": "Lựa chọn bài viết",
       "description": "Vui lòng chọn {selection} bạn muốn đọc",

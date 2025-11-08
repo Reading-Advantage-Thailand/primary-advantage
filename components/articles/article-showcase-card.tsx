@@ -1,13 +1,11 @@
 "use client";
 import React from "react";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { Badge } from "../ui/badge";
 import { usePathname } from "@/i18n/navigation";
 import { ArticleShowcase } from "@/types";
-import { ActivityStatus, ActivityType } from "@/types/enum";
 import StarRating from "../ui/rating";
 import { useLocale, useTranslations } from "next-intl";
-import { sanitizeTranslationKey } from "@/lib/utils";
 import { getArticleImageUrl } from "@/lib/storage-config";
 import { PlayIcon, XIcon } from "lucide-react";
 
@@ -41,13 +39,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
       e.preventDefault(); // Prevent parent Link navigation
       e.stopPropagation(); // Stop event bubbling
 
-      // Navigate to a different page - update this path to your desired destination
-      // Examples:
-      // - router.push(`/student/preview/${article.id}`);
-      // - router.push(`/student/practice/${article.id}`);
-      // - router.push(`/student/read/${article.id}?autoplay=true`);
-
-      router.push(`/student/lesson/${article.id}`);
+      router.push(`/student/lesson/${article.id}?type=article`);
     };
 
     // Handle toggle click and navigate to another page
@@ -55,13 +47,12 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
       e.preventDefault(); // Prevent parent Link navigation
       e.stopPropagation(); // Stop event bubbling
 
-      // Navigate to a different page - update this path to your desired destination
-      // Examples:
-      // - router.push(`/student/preview/${article.id}`);
-      // - router.push(`/student/practice/${article.id}`);
-      // - router.push(`/student/read/${article.id}?autoplay=true`);
-
-      router.push(`/student/read/${article.id}`);
+      // If toggle is active, go to lesson mode, otherwise go to read mode
+      if (isToggle) {
+        router.push(`/student/lesson/${article.id}?type=article`);
+      } else {
+        router.push(`/student/read/${article.id}`);
+      }
     };
 
     return (
@@ -91,17 +82,16 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
               <Badge className="max-w-max shadow-lg" variant="destructive">
                 {t("cefrLevel", { level: article.cefrLevel ?? 0 })}
               </Badge>
-              {/* <Badge className="max-w-max shadow-lg" variant="destructive">
-            {t(`subgenres.${sanitizeTranslationKey(article.subGenre ?? "")}`)},{" "}
-            {t(`genres.${sanitizeTranslationKey(article.genre ?? "")}`)}
-          </Badge> */}
               <Badge className="max-w-max shadow-lg" variant="destructive">
                 <StarRating initialRating={article.rating} readOnly />
               </Badge>
             </div>
-            {/* <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-end gap-2">
               <div
-                onClick={() => setIsToggle(!isToggle)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsToggle(!isToggle);
+                }}
                 className="cursor-pointer"
               >
                 {isToggle ? (
@@ -117,10 +107,10 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
                   variant="destructive"
                 >
                   <PlayIcon className="h-4 w-4 fill-white stroke-white" />
-                  Study as 45-min Lesson
+                  {t("studyAsLesson", { default: "Study as 45-min Lesson" })}
                 </Badge>
               )}
-            </div> */}
+            </div>
           </div>
 
           <div className="mt-auto">

@@ -564,6 +564,7 @@
     "updatedAt": "อัพเดตเมื่อ",
     "saveToFlashcard": "แฟลชการ์ด: บันทึกแล้ว",
     "notSaved": "แฟลชการ์ด: ไม่บันทึก",
+    "studyAsLesson": "ศึกษาเป็นบทความ 45 นาที",
     "selection": {
       "title": "การเลือกบทความ",
       "description": "กรุณาเลือก {selection} ที่คุณต้องการอ่าน",

@@ -28,30 +28,16 @@ import {
   TaskLessonSummary,
 } from "./task";
 
-import { Article, AssignmentStudent, Classroom } from "@/types";
+import { Article } from "@/types";
 import { saveArticleToFlashcard } from "@/actions/flashcard";
 
-export interface LessonAssignmentProps {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: Date;
-  updatedAt: Date;
-  classroomId: string;
-  articleId: string;
-  teacherId: string;
-  teacherName: string;
-  dueDate: Date;
-  AssignmentStudent?: AssignmentStudent[] | null;
-  article?: Article | null;
-  classroom?: Classroom | null;
+export interface StandaloneLessonProps {
+  article: Article;
 }
 
-export default function LessonProgressBar({
-  assignment,
-}: {
-  assignment: LessonAssignmentProps;
-}) {
+export default function StandaloneLessonProgressBar({
+  article,
+}: StandaloneLessonProps) {
   const t = useTranslations("Lesson");
   const [isExpanded, setIsExpanded] = useState(false);
   const [maxHeight, setMaxHeight] = useState("0px");
@@ -88,9 +74,7 @@ export default function LessonProgressBar({
         if (!isMounted) return;
 
         setPhaseLoading(true);
-        const response = await fetch(
-          `/api/assignments/${assignment?.id}/progress`,
-        );
+        const response = await fetch(`/api/lessons/${article?.id}/progress`);
 
         if (!isMounted) return;
 
@@ -105,7 +89,7 @@ export default function LessonProgressBar({
 
           // Update phase on initial load
           if (isMounted) {
-            setCurrentTask(taskNumber);
+            setCurrentTask(taskNumber === 0 ? 1 : taskNumber);
             setTimer(data.userLessonProgress.timeSpent as number);
             // Pause timer if on lesson summary
             if (taskNumber === 14) {
@@ -144,48 +128,7 @@ export default function LessonProgressBar({
       isMounted = false;
       clearTimeout(timeoutId);
     };
-  }, [initialLoadComplete, assignment?.id, setTimer, setPaused]);
-
-  // const updatePhaseCompletion = useCallback(
-  //   (phaseIndex: number, isComplete: boolean) => {
-  //     setPhaseCompletion((prev) => {
-  //       const updated = [...prev];
-  //       if (updated[phaseIndex] !== isComplete) {
-  //         updated[phaseIndex] = isComplete;
-  //         return updated;
-  //       }
-  //       return prev; // Return previous state if no change to prevent unnecessary re-renders
-  //     });
-  //   },
-  //   [],
-  // );
-
-  // useEffect(() => {
-  //   const logActivity = async () => {
-  //     if (currentPhase === 14) {
-  //       await fetch(`/api/v1/users/${userId}/activitylog`, {
-  //         method: "PUT",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           articleId: article.id,
-  //           activityType: ActivityType.LessonRead,
-  //           activityStatus: ActivityStatus.Completed,
-  //           timeTaken: elapsedTime,
-  //           details: {
-  //             title: article.title,
-  //             level: article.ra_level,
-  //             cefr_level: article.cefr_level,
-  //             type: article.type,
-  //             genre: article.genre,
-  //             subgenre: article.subgenre,
-  //           },
-  //         }),
-  //       });
-  //     }
-  //   };
-
-  //   logActivity();
-  // }, [currentPhase, userId, article, elapsedTime]);
+  }, [initialLoadComplete, article?.id, setTimer, setPaused]);
 
   const startLesson = async () => {
     try {
@@ -203,11 +146,10 @@ export default function LessonProgressBar({
 
       setPhaseLoading(true);
 
-      const response = await fetch(`/api/assignments/${assignment?.id}`, {
+      const response = await fetch(`/api/lessons/${article?.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          articleId: assignment?.articleId,
           progress: Math.round((1 / 14) * 100),
           timeSpent: 0,
         }),
@@ -247,13 +189,6 @@ export default function LessonProgressBar({
   };
 
   const nextTask = async (Task: number, elapsedTime: number) => {
-    // Check if current phase is completed before proceeding
-    // if (!phaseCompletion[Phase - 1]) {
-    //   setShakeButton(true);
-    //   setTimeout(() => setShakeButton(false), 500);
-    //   return;
-    // }
-
     // Prevent multiple clicks and transitions
     if (phaseLoading || isTransitioning) {
       return;
@@ -274,39 +209,17 @@ export default function LessonProgressBar({
       setPhaseLoading(true);
 
       if (newTask === 7) {
-        await saveArticleToFlashcard(assignment?.articleId as string);
+        await saveArticleToFlashcard(article?.id as string);
       }
-      // Handle final phase logging
-      // if (Phase === 13) {
-      //   await fetch(`/api/v1/users/${userId}/activitylog`, {
-      //     method: "PUT",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({
-      //       articleId: article.id,
-      //       activityType: ActivityType.LessonRead,
-      //       activityStatus: ActivityStatus.Completed,
-      //       timeTaken: elapsedTime,
-      //       details: {
-      //         title: article.title,
-      //         level: article.ra_level,
-      //         cefr_level: article.cefr_level,
-      //         type: article.type,
-      //         genre: article.genre,
-      //         subgenre: article.subgenre,
-      //       },
-      //     }),
-      //   });
-      // }
 
       if (newTask === 14) {
         setPaused(true);
       }
 
-      const response = await fetch(`/api/assignments/${assignment?.id}`, {
+      const response = await fetch(`/api/lessons/${article?.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          articleId: assignment?.articleId,
           progress: Math.round((newTask / 14) * 100),
           timeSpent: timer,
         }),
@@ -382,60 +295,34 @@ export default function LessonProgressBar({
     switch (taskNum) {
       case 1:
         return (
-          <TaskIntroduction
-            article={assignment?.article as Article}
-            onCompleteChange={() => {}}
-          />
+          <TaskIntroduction article={article} onCompleteChange={() => {}} />
         );
       case 2:
-        return (
-          <TaskPreviewVocabulary article={assignment?.article as Article} />
-        );
+        return <TaskPreviewVocabulary article={article} />;
       case 3:
-        return <TaskFirstReading article={assignment?.article as Article} />;
+        return <TaskFirstReading article={article} />;
       case 4:
-        return (
-          <TaskVocabularyCollection article={assignment?.article as Article} />
-        );
+        return <TaskVocabularyCollection article={article} />;
       case 5:
-        return <TaskDeepReading article={assignment?.article as Article} />;
+        return <TaskDeepReading article={article} />;
       case 6:
-        return (
-          <TaskSentenceCollection article={assignment?.article as Article} />
-        );
+        return <TaskSentenceCollection article={article} />;
       case 7:
-        return <TaskMultipleChoice article={assignment?.article as Article} />;
+        return <TaskMultipleChoice article={article} />;
       case 8:
-        return <TaskShortAnswer article={assignment?.article as Article} />;
+        return <TaskShortAnswer article={article} />;
       case 9:
-        return (
-          <TaskVocabularyFlashcards
-            articleId={assignment?.articleId as string}
-          />
-        );
+        return <TaskVocabularyFlashcards articleId={article?.id} />;
       case 10:
-        return (
-          <TaskVocabularyMatching articleId={assignment?.articleId as string} />
-        );
+        return <TaskVocabularyMatching articleId={article?.id} />;
       case 11:
-        return (
-          <TaskSentenceFlashcards articleId={assignment?.articleId as string} />
-        );
+        return <TaskSentenceFlashcards articleId={article?.id} />;
       case 12:
-        return (
-          <TaskSentenceActivities articleId={assignment?.articleId as string} />
-        );
+        return <TaskSentenceActivities articleId={article?.id} />;
       case 13:
-        return (
-          <TaskLanguageQuestions article={assignment?.article as Article} />
-        );
+        return <TaskLanguageQuestions article={article} />;
       case 14:
-        return (
-          <TaskLessonSummary
-            article={assignment?.article as Article}
-            timerSpent={timer}
-          />
-        );
+        return <TaskLessonSummary article={article} timerSpent={timer} />;
       default:
         return null;
     }
@@ -486,43 +373,6 @@ export default function LessonProgressBar({
       default:
         return "";
     }
-  };
-
-  const skipTask = async (Task: number) => {
-    // if (Phase === 13) {
-    //   await fetch(`/api/v1/users/${userId}/activitylog`, {
-    //     method: "PUT",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({
-    //       articleId: article.id,
-    //       activityType: ActivityType.LessonRead,
-    //       activityStatus: ActivityStatus.Completed,
-    //       timeTaken: elapsedTime,
-    //       details: {
-    //         title: article.title,
-    //         level: article.ra_level,
-    //         cefr_level: article.cefr_level,
-    //         type: article.type,
-    //         genre: article.genre,
-    //         subgenre: article.subgenre,
-    //       },
-    //     }),
-    //   });
-    // }
-    setCurrentTask(Task + 1);
-
-    // const url = classroomId
-    //   ? `/api/v1/lesson/${userId}?articleId=${articleId}&classroomId=${classroomId}`
-    //   : `/api/v1/lesson/${userId}?articleId=${articleId}`;
-
-    // await fetch(url, {
-    //   method: "PUT",
-    //   body: JSON.stringify({
-    //     phase: Phase,
-    //     status: 2,
-    //     elapsedTime: elapsedTime,
-    //   }),
-    // });
   };
 
   useEffect(() => {
@@ -592,7 +442,6 @@ export default function LessonProgressBar({
                         </>
                       ) : (
                         <>
-                          {/* <span>{t("startLesson")}</span> */}
                           {t("actions.startLesson", {
                             default: "Start Lesson",
                           })}
@@ -630,7 +479,6 @@ export default function LessonProgressBar({
                           ) : (
                             <>
                               <ArrowLeft className="mr-3 h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                              {/* <span>{t("previousPhase")}</span> */}
                               {t("actions.previousTask", {
                                 default: "Previous Task",
                               })}
@@ -662,7 +510,6 @@ export default function LessonProgressBar({
                           </>
                         ) : (
                           <>
-                            {/* <span>{t("nextPhase")}</span> */}
                             {t("actions.nextTask", { default: "Next Task" })}
                             <ArrowLeft className="ml-3 h-5 w-5 rotate-180 transition-transform group-hover:translate-x-1" />
                           </>

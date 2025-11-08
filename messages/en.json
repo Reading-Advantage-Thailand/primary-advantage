@@ -564,6 +564,7 @@
     "updatedAt": "Updated At",
     "saveToFlashcard": "Flashcard: Saved",
     "notSaved": "Flashcard: Not Saved",
+    "studyAsLesson": "Study as 45-min Lesson",
     "selection": {
       "title": "Article Selection",
       "description": "Please choose the {selection} you want to read",
