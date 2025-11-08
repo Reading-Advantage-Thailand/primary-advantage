@@ -14,6 +14,9 @@ import { redirect } from "next/navigation";
 import { saveArticleToFlashcard } from "@/actions/flashcard";
 import AssignButton from "@/components/teacher/assign-button";
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { FileTextIcon } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -39,6 +42,7 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
   }
 
   const { articleId } = await params;
+  const t = await getTranslations("Article");
   const { article } = await getArticleById(articleId);
 
   const isAtLeastTeacher = (role: string) =>
@@ -109,6 +113,12 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
                   .audioSentencesUrl as string
               }
             />
+            <Link href={`/student/lesson/${articleId}?type=article`}>
+              <Button variant="default">
+                <FileTextIcon className="h-4 w-4" />
+                {t("studyAsLesson", { default: "Study as 45-min Lesson" })}
+              </Button>
+            </Link>
           </div>
 
           <MCQuestionCard articleId={articleId} />

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
+import { getPathname } from "./i18n/navigation";
 import { routing } from "./i18n/routing";
 import { currentUser } from "./lib/session";
 
@@ -27,6 +28,7 @@ const intlMiddleware = createIntlMiddleware(routing);
 
 export default async function middleware(request: NextRequest) {
   // Get the pathname without locale
+
   const pathname = request.nextUrl.pathname;
   const locale = request.nextUrl.pathname.split("/")[1];
   const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";

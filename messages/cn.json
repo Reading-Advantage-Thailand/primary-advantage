@@ -564,6 +564,7 @@
     "updatedAt": "更新时间",
     "saveToFlashcard": "闪卡: 已保存",
     "notSaved": "闪卡: 未保存",
+    "studyAsLesson": "学习为 45 分钟课程",
     "selection": {
       "title": "文章选择",
       "description": "请选择您想要阅读的 {selection}",

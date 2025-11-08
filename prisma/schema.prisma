@@ -472,18 +472,18 @@ enum AssignmentStatus {
 }
 
 model UserLessonProgress {
-  id           String     @id @default(cuid())
-  userId       String     @map("user_id")
-  articleId    String     @map("article_id")
-  assignmentId String     @map("assignment_id")
-  progress     Int        @default(0)
-  timeSpent    Int        @default(0)
-  isCompleted  Boolean    @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  article      Article    @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  id           String      @id @default(cuid())
+  userId       String      @map("user_id")
+  articleId    String      @map("article_id")
+  assignmentId String?     @map("assignment_id")
+  progress     Int         @default(0)
+  timeSpent    Int         @default(0)
+  isCompleted  Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article      Article     @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
 
   @@map("user_lesson_progress")
 }
