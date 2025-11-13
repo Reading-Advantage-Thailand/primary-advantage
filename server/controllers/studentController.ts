@@ -149,7 +149,7 @@ export const createStudentController = async (
     const result = await createStudent({
       name,
       email,
-      cefrLevel: cefrLevel || "A1-",
+      cefrLevel: cefrLevel || "A0-",
       classroomId,
       password,
       userWithRoles,

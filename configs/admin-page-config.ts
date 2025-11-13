@@ -110,7 +110,7 @@ export const adminPageConfig: PageConfig = {
       title: "articlecreation",
       href: "/admin/article-creation",
       icon: "FileTextIcon",
-      requiredPermissions: ["ARTICLE_CREATION"],
+      requiredPermissions: ["SYSTEM_ACCESS"],
     },
   ],
 };

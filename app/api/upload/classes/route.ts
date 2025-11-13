@@ -1001,7 +1001,7 @@ export async function POST(request: NextRequest) {
     if (filename === "students.csv" || filename === "teachers.csv") {
       message = "Users uploaded and created successfully";
       note =
-        "Users created with default values: password=null, cefrLevel=A1-, level=1, xp=0. Users need to set passwords before they can log in.";
+        "Users created with default values: password=null, cefrLevel=A0-, level=1, xp=0. Users need to set passwords before they can log in.";
       stats = {
         ...stats,
         processedUsers: processedUsers.length,

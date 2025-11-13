@@ -551,7 +551,7 @@ export default function EnhancedClassRoster() {
                     studentName={
                       student.display_name || t("labels.studentDefault")
                     }
-                    currentCefrLevel={student.cefrLevel || "A1-"}
+                    currentCefrLevel={student.cefrLevel || "A0-"}
                     onUpdate={fetchClassroomData}
                   />
                 </div>

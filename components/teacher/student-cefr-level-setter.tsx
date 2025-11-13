@@ -32,84 +32,69 @@ interface StudentCefrLevelSetterProps {
 }
 
 const CEFR_LEVELS = [
-  { value: "A1-", label: "A1- (Beginner)", description: "Pre-A1, very basic" },
+  { value: "A0-", label: "A0- (Beginner)", description: "Pre-A0, very basic" },
   {
-    value: "A1",
-    label: "A1 (Beginner)",
+    value: "A0",
+    label: "A0 (Beginner)",
     description: "Basic user, elementary",
   },
   {
-    value: "A1+",
-    label: "A1+ (High Beginner)",
+    value: "A0+",
+    label: "A0+ (High Beginner)",
     description: "Upper elementary",
   },
   {
+    value: "A1-",
+    label: "A1- (Pre-Intermediate)",
+    description: "Lower intermediate",
+  },
+  {
+    value: "A1",
+    label: "A1 (Pre-Intermediate)",
+    description: "Pre-intermediate",
+  },
+  {
+    value: "A1+",
+    label: "A1+ (High Pre-Intermediate)",
+    description: "Upper pre-intermediate",
+  },
+  {
     value: "A2-",
-    label: "A2- (Pre-Intermediate)",
+    label: "A2- (Low Intermediate)",
     description: "Lower intermediate",
   },
   {
     value: "A2",
-    label: "A2 (Pre-Intermediate)",
-    description: "Pre-intermediate",
-  },
-  {
-    value: "A2+",
-    label: "A2+ (High Pre-Intermediate)",
-    description: "Upper pre-intermediate",
-  },
-  {
-    value: "B1-",
-    label: "B1- (Low Intermediate)",
-    description: "Lower intermediate",
-  },
-  {
-    value: "B1",
-    label: "B1 (Intermediate)",
+    label: "A2 (Intermediate)",
     description: "Independent user, intermediate",
   },
   {
-    value: "B1+",
-    label: "B1+ (High Intermediate)",
+    value: "A2+",
+    label: "A2+ (High Intermediate)",
     description: "Upper intermediate",
   },
   {
-    value: "B2-",
-    label: "B2- (Low Upper-Intermediate)",
+    value: "B1-",
+    label: "B1- (Low Upper-Intermediate)",
     description: "Lower upper-intermediate",
   },
   {
-    value: "B2",
-    label: "B2 (Upper-Intermediate)",
+    value: "B1",
+    label: "B1 (Upper-Intermediate)",
     description: "Upper-intermediate",
   },
   {
-    value: "B2+",
-    label: "B2+ (High Upper-Intermediate)",
+    value: "B1+",
+    label: "B1+ (High Upper-Intermediate)",
     description: "Advanced lower",
   },
-  { value: "C1-", label: "C1- (Low Advanced)", description: "Lower advanced" },
+  { value: "B2-", label: "B2- (Low Advanced)", description: "Lower advanced" },
   {
-    value: "C1",
-    label: "C1 (Advanced)",
+    value: "B2",
+    label: "B2 (Advanced)",
     description: "Proficient user, advanced",
   },
-  { value: "C1+", label: "C1+ (High Advanced)", description: "Upper advanced" },
-  {
-    value: "C2-",
-    label: "C2- (Low Proficiency)",
-    description: "Lower proficiency",
-  },
-  {
-    value: "C2",
-    label: "C2 (Proficiency)",
-    description: "Mastery, proficient",
-  },
-  {
-    value: "C2+",
-    label: "C2+ (High Proficiency)",
-    description: "Native-like proficiency",
-  },
+  { value: "B2+", label: "B2+ (High Advanced)", description: "Upper advanced" },
 ];
 
 export default function StudentCefrLevelSetter({
