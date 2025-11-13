@@ -22,7 +22,9 @@ export default function CEFRLevels({ currentLevel }: Cefrlevel) {
   const td: string | any = useTranslations("Reports.level.description");
   const t = useTranslations("Reports.level");
   const levels = [
+    "A0-",
     "A0",
+    "A0+",
     "A1-",
     "A1",
     "A1+",

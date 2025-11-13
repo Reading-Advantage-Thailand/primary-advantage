@@ -268,7 +268,7 @@ export async function POST(request: NextRequest) {
         email: row.email.trim(),
         name: row.name.trim(),
         password: null, // No password from CSV, will need to be set later
-        cefrLevel: "A1-", // Default CEFR level
+        cefrLevel: "A0-", // Default CEFR level
         level: 1, // Default level
         xp: 0, // Default XP
         schoolId: currentUser.schoolId, // Assign to current user's school (null for system users)
@@ -495,7 +495,7 @@ export async function POST(request: NextRequest) {
         : {
             note: "system user - users imported without school assignment",
           },
-      note: "Users created with default values: password=null, cefrLevel=A1-, level=1, xp=0",
+      note: "Users created with default values: password=null, cefrLevel=A0-, level=1, xp=0",
     });
   } catch (error) {
     console.error("File upload error:", error);

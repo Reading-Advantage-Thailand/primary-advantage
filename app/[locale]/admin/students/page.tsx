@@ -502,6 +502,9 @@ export default function StudentsPage() {
                           />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="A0-">A0-</SelectItem>
+                          <SelectItem value="A0">A0</SelectItem>
+                          <SelectItem value="A0+">A0+</SelectItem>
                           <SelectItem value="A1-">A1-</SelectItem>
                           <SelectItem value="A1">A1</SelectItem>
                           <SelectItem value="A1+">A1+</SelectItem>
@@ -514,10 +517,6 @@ export default function StudentsPage() {
                           <SelectItem value="B2-">B2-</SelectItem>
                           <SelectItem value="B2">B2</SelectItem>
                           <SelectItem value="B2+">B2+</SelectItem>
-                          <SelectItem value="C1-">C1-</SelectItem>
-                          <SelectItem value="C1">C1</SelectItem>
-                          <SelectItem value="C1+">C1+</SelectItem>
-                          <SelectItem value="C2">C2</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -599,6 +598,9 @@ export default function StudentsPage() {
                   <SelectValue placeholder={t("filters.cefrPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="A0-">A0-</SelectItem>
+                  <SelectItem value="A0">A0</SelectItem>
+                  <SelectItem value="A0+">A0+</SelectItem>
                   <SelectItem value="A1-">A1-</SelectItem>
                   <SelectItem value="A1">A1</SelectItem>
                   <SelectItem value="A1+">A1+</SelectItem>
@@ -611,10 +613,6 @@ export default function StudentsPage() {
                   <SelectItem value="B2-">B2-</SelectItem>
                   <SelectItem value="B2">B2</SelectItem>
                   <SelectItem value="B2+">B2+</SelectItem>
-                  <SelectItem value="C1-">C1-</SelectItem>
-                  <SelectItem value="C1">C1</SelectItem>
-                  <SelectItem value="C1+">C1+</SelectItem>
-                  <SelectItem value="C2">C2</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -882,6 +880,9 @@ export default function StudentsPage() {
                     <SelectValue placeholder={t("form.cefrPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="A0-">A0-</SelectItem>
+                    <SelectItem value="A0">A0</SelectItem>
+                    <SelectItem value="A0+">A0+</SelectItem>
                     <SelectItem value="A1-">A1-</SelectItem>
                     <SelectItem value="A1">A1</SelectItem>
                     <SelectItem value="A1+">A1+</SelectItem>
@@ -894,10 +895,6 @@ export default function StudentsPage() {
                     <SelectItem value="B2-">B2-</SelectItem>
                     <SelectItem value="B2">B2</SelectItem>
                     <SelectItem value="B2+">B2+</SelectItem>
-                    <SelectItem value="C1-">C1-</SelectItem>
-                    <SelectItem value="C1">C1</SelectItem>
-                    <SelectItem value="C1+">C1+</SelectItem>
-                    <SelectItem value="C2">C2</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

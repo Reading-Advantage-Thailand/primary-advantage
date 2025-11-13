@@ -125,7 +125,7 @@ export default function MyStudents() {
         body: JSON.stringify({
           xp: 0,
           level: 1,
-          cefrLevel: "A1-",
+          cefrLevel: "A0-",
         }),
       });
 
@@ -268,7 +268,7 @@ export default function MyStudents() {
                   <StudentCefrLevelSetter
                     studentId={payment.id}
                     studentName={payment.display_name || "Student"}
-                    currentCefrLevel={payment.cefrLevel || "A1-"}
+                    currentCefrLevel={payment.cefrLevel || "A0-"}
                     onUpdate={fetchStudents}
                   />
                 </div>
