@@ -8,6 +8,7 @@ export default async function AdminHomeLayout({
     <AppLayout
       mainNavConfig={adminPageConfig.mainNav}
       sidebarNavConfig={adminPageConfig.sidebarNav}
+      disableLeaderboard
     >
       {children}
     </AppLayout>

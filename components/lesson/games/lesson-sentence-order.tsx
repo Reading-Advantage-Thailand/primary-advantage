@@ -38,6 +38,7 @@ import {
 } from "@/actions/flashcard";
 import { ActivityType, FlashcardType, UserXpEarned } from "@/types/enum";
 import { updateUserActivity } from "@/actions/user";
+import { useSession } from "next-auth/react";
 
 interface OrderSentenceData {
   id: string;
@@ -110,7 +111,7 @@ export default function LessonSentenceOrder({
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [isPlayingHintAudio, setIsPlayingHintAudio] = useState(false);
   const [showCorrectOrder, setShowCorrectOrder] = useState(false);
-
+  const { data: session, update } = useSession();
   const [highlightHintsEnabled, setHighlightHintsEnabled] = useState(false);
   const [audioHintsEnabled, setAudioHintsEnabled] = useState(false);
 
@@ -300,6 +301,11 @@ export default function LessonSentenceOrder({
         },
       );
       setIsPlaying(false);
+      update({
+        user: {
+          ...session?.user,
+        },
+      });
     }
   }, [currentIndex, activeSentences.length]);
 

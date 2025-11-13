@@ -52,6 +52,7 @@ steps:
       - "--set-env-vars=PROJECT_ID=${_PROJECT_ID}"
       - "--set-env-vars=NODE_ENV=${_NODE_ENV}"
       - "--set-env-vars=AUTH_TRUST_HOST=true"
+      - "--set-env-vars=ACCESS_KEY=${_ACCESS_KEY}"
 
 # Substitutions
 substitutions:
@@ -71,6 +72,7 @@ substitutions:
   _STORAGE_BUCKET_NAME: "STORAGE_BUCKET_NAME"
   _STORAGE_CLIENT_EMAIL: "STORAGE_CLIENT_EMAIL"
   _STORAGE_PRIVATE_KEY: "STORAGE_PRIVATE_KEY"
+  _ACCESS_KEY: "ACCESS_KEY"
 
 # Secrets
 availableSecrets:

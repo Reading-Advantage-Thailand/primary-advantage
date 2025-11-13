@@ -727,7 +727,7 @@ export async function POST(request: NextRequest) {
           email: userData.email,
           name: userData.name,
           password: userData.password,
-          cefrLevel: "A1-", // Default CEFR level
+          cefrLevel: "A0-", // Default CEFR level
           level: 1, // Default level
           xp: 0, // Default XP
           schoolId: userData.schoolId,

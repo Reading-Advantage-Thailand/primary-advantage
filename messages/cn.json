@@ -71,6 +71,15 @@
       "progressTracking": "进度跟踪"
     }
   },
+  "Leaderboard": {
+    "title": "排行榜",
+    "rank": "排名",
+    "name": "姓名",
+    "xp": "XP",
+    "room": "房间",
+    "you": "你",
+    "noDataAvailable": "本月没有可用数据"
+  },
   "Question": {
     "SAQuestion": {
       "title": "简答题",

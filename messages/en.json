@@ -71,6 +71,15 @@
       "progressTracking": "Progress Tracking"
     }
   },
+  "Leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "name": "Name",
+    "xp": "XP",
+    "room": "Room",
+    "you": "You",
+    "noDataAvailable": "No data available for this month"
+  },
   "Question": {
     "SAQuestion": {
       "title": "Short Answer Question",

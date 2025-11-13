@@ -64,6 +64,7 @@ import { cn } from "@/lib/utils";
 import { reviewCard } from "@/actions/flashcard";
 import { QuizContext, QuizContextProvider } from "@/contexts/question-context";
 import { updateUserActivity } from "@/actions/user";
+import { useSession } from "next-auth/react";
 
 // FSRS Configuration
 const f = fsrs(generatorParameters({ enable_fuzz: true }));
@@ -141,7 +142,7 @@ function LessonVocabularyFlashcardCardContent({
     {},
   );
   const { timer, setPaused } = useContext(QuizContext);
-
+  const { data: session, update } = useSession();
   // Computed values
   const currentCard = words[currentCardIndex];
 
@@ -232,6 +233,11 @@ function LessonVocabularyFlashcardCardContent({
                 score: UserXpEarned.VOCABULARY_FLASHCARDS,
               },
             );
+            update({
+              user: {
+                ...session?.user,
+              },
+            });
           } else {
             toast.error("Failed to save ratings");
           }

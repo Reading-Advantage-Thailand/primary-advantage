@@ -2,6 +2,27 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useTranslations } from "next-intl";
 
+export const LEVELS_XP = [
+  { min: 0, max: 4999, cefrLevel: "A0-", raLevel: 1 },
+  { min: 5000, max: 10999, cefrLevel: "A0", raLevel: 2 },
+  { min: 11000, max: 17999, cefrLevel: "A0+", raLevel: 3 },
+  { min: 18000, max: 25999, cefrLevel: "A1-", raLevel: 4 },
+  { min: 26000, max: 34999, cefrLevel: "A1", raLevel: 5 },
+  { min: 35000, max: 44999, cefrLevel: "A1+", raLevel: 6 },
+  { min: 45000, max: 55999, cefrLevel: "A2-", raLevel: 7 },
+  { min: 56000, max: 67999, cefrLevel: "A2", raLevel: 8 },
+  { min: 68000, max: 80999, cefrLevel: "A2+", raLevel: 9 },
+  { min: 81000, max: 94999, cefrLevel: "B1-", raLevel: 10 },
+  { min: 95000, max: 109999, cefrLevel: "B1", raLevel: 11 },
+  { min: 110000, max: 125999, cefrLevel: "B1+", raLevel: 12 },
+  { min: 126000, max: 142999, cefrLevel: "B2-", raLevel: 13 },
+  { min: 143000, max: 160999, cefrLevel: "B2", raLevel: 14 },
+  { min: 161000, max: 179999, cefrLevel: "B2+", raLevel: 15 },
+  // { min: 180000, max: 199999, cefrLevel: "C2-", raLevel: 16 },
+  // { min: 200000, max: 220999, cefrLevel: "C2", raLevel: 17 },
+  // { min: 221000, max: 242999, cefrLevel: "C2+", raLevel: 18 },
+];
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -32,29 +53,8 @@ export function generateRandomClassCode() {
 }
 
 export function calculateLevelAndCefrLevel(xpEarned: number, userXp: number) {
-  const levels = [
-    { min: 0, max: 4999, cefrLevel: "A0-", raLevel: 1 },
-    { min: 5000, max: 10999, cefrLevel: "A0", raLevel: 2 },
-    { min: 11000, max: 17999, cefrLevel: "A0+", raLevel: 3 },
-    { min: 18000, max: 25999, cefrLevel: "A1-", raLevel: 4 },
-    { min: 26000, max: 34999, cefrLevel: "A1", raLevel: 5 },
-    { min: 35000, max: 44999, cefrLevel: "A1+", raLevel: 6 },
-    { min: 45000, max: 55999, cefrLevel: "A2-", raLevel: 7 },
-    { min: 56000, max: 67999, cefrLevel: "A2", raLevel: 8 },
-    { min: 68000, max: 80999, cefrLevel: "A2+", raLevel: 9 },
-    { min: 81000, max: 94999, cefrLevel: "B1-", raLevel: 10 },
-    { min: 95000, max: 109999, cefrLevel: "B1", raLevel: 11 },
-    { min: 110000, max: 125999, cefrLevel: "B1+", raLevel: 12 },
-    { min: 126000, max: 142999, cefrLevel: "B2-", raLevel: 13 },
-    { min: 143000, max: 160999, cefrLevel: "B2", raLevel: 14 },
-    { min: 161000, max: 179999, cefrLevel: "B2+", raLevel: 15 },
-    // { min: 180000, max: 199999, cefrLevel: "C2-", raLevel: 16 },
-    // { min: 200000, max: 220999, cefrLevel: "C2", raLevel: 17 },
-    // { min: 221000, max: 242999, cefrLevel: "C2+", raLevel: 18 },
-  ];
-
   const newXp = userXp + xpEarned;
-  const level = levels.find(
+  const level = LEVELS_XP.find(
     (level) => xpEarned >= level.min && xpEarned <= level.max,
   );
   const cefrLevel = level?.cefrLevel || "A0-";

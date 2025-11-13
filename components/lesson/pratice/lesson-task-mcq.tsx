@@ -21,6 +21,7 @@ import { ActivityType, AnswerStatus, QuestionState } from "@/types/enum";
 import { Article, MCQuestion } from "@/types";
 import { finishQuiz, retakeQuiz } from "@/actions/question";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 interface LessonMCQProps {
   article: Article;
@@ -45,8 +46,8 @@ function LessonMCQContent({ article }: { article: Article }) {
   const [responses, setResponses] = useState<any[]>([]);
   const [activeQuestion, setActiveQuestion] = useState(null) as any;
   const [isPanding, startTransition] = useTransition();
-
   const { timer, setPaused } = useContext(QuizContext);
+  const { data: session, update } = useSession();
 
   useEffect(() => {
     if (article.multipleChoiceQuestions) {
@@ -204,6 +205,11 @@ function LessonMCQContent({ article }: { article: Article }) {
         (res) => {
           if (res.success) {
             setState(QuestionState.COMPLETED);
+            update({
+              user: {
+                ...session?.user,
+              },
+            });
           }
         },
       );

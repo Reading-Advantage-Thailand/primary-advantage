@@ -25,6 +25,7 @@ import AudioButton from "../audio-button";
 import { Rating } from "ts-fsrs";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 interface FlashcardGameInlineProps {
   deck: {
@@ -56,6 +57,7 @@ export function FlashcardGameInline({
     {},
   );
   const t = useTranslations("SentencesPage.sentencesCard");
+  const { data: session, update } = useSession();
 
   const currentCard = cards[currentIndex];
   const progress = cards.length > 0 ? (completedCards / cards.length) * 100 : 0;
@@ -101,6 +103,11 @@ export function FlashcardGameInline({
 
           if (allSuccess) {
             setSessionComplete(true);
+            update({
+              user: {
+                ...session?.user,
+              },
+            });
           } else {
             toast.error("Failed to save ratings");
           }

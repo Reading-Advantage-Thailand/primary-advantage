@@ -8,6 +8,7 @@ export default async function SystemHomeLayout({
     <AppLayout
       mainNavConfig={systemPageConfig.mainNav}
       sidebarNavConfig={systemPageConfig.sidebarNav}
+      disableLeaderboard
     >
       {children}
     </AppLayout>

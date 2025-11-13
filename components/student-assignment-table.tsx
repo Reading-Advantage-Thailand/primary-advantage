@@ -353,7 +353,7 @@ export default function StudentAssignmentTable() {
       cell: ({ row }) => {
         const assignment = row.original.assignment;
         return (
-          <div className="flex w-24 justify-center">
+          <div className="flex w-24 items-center justify-center">
             <Button
               variant="outline"
               size="sm"

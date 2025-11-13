@@ -346,6 +346,7 @@ model School {
   licenses     License[]
   admins       SchoolAdmins[]
   users        User[]
+  leaderboards Leaderboard[]
 
   @@map("schools")
 }
@@ -486,4 +487,15 @@ model UserLessonProgress {
   assignment   Assignment? @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
 
   @@map("user_lesson_progress")
+}
+
+model Leaderboard {
+  id        String   @id @default(cuid())
+  schoolId  String?  @map("school_id")
+  details   Json?    @map("details")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  school    School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("leaderboards")
 }

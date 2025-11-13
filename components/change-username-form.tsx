@@ -43,6 +43,7 @@ export function ChangeUsernameForm({
     },
   });
   const router = useRouter();
+  const { data: session, update } = useSession();
   const t = useTranslations("Settings.userProfile");
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
@@ -64,6 +65,12 @@ export function ChangeUsernameForm({
         await updateSession({
           user: {
             ...data,
+          },
+        });
+
+        update({
+          user: {
+            ...session?.user,
           },
         });
 
