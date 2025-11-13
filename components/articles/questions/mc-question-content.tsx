@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { finishQuiz } from "@/actions/question";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 export default function MCQuestionContent({
   articleId,
@@ -33,6 +34,7 @@ export default function MCQuestionContent({
   const router = useRouter();
   const [isPanding, startTransition] = useTransition();
 
+  const { data: session, update } = useSession();
   const t = useTranslations("Question");
   const tc = useTranslations("Components");
 
@@ -134,6 +136,11 @@ export default function MCQuestionContent({
             toast("Quiz finished successfully", {
               style: {
                 background: `var(--success)`,
+              },
+            });
+            update({
+              user: {
+                ...session?.user,
               },
             });
             router.refresh();

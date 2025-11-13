@@ -8,6 +8,7 @@ export default async function TeacherHomeLayout({
     <AppLayout
       mainNavConfig={teacherPageConfig.mainNav}
       sidebarNavConfig={teacherPageConfig.sidebarNav}
+      disableLeaderboard
     >
       {children}
     </AppLayout>

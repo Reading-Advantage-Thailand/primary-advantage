@@ -7,8 +7,11 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/switchers/theme-switcher-toggle";
 import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { redirect } from "@/i18n/navigation";
+import Leaderboard from "../leaderboard";
+import { getLocale } from "next-intl/server";
+import { Role } from "@/types/enum";
+import { getSchoolLeaderboardController } from "@/server/controllers/schoolController";
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -28,46 +31,40 @@ export default async function AppLayout({
   mainNavConfig,
   sidebarNavConfig,
   disableProgressBar,
-  disableSidebar,
-  disableLeaderboard,
+  disableSidebar = false,
+  disableLeaderboard = false,
 }: AppLayoutProps) {
   const session = await auth();
-  //   const user = await getCurrentUser();
+  const locale = await getLocale();
 
   // Redirect to sign in page if user is not logged in
   if (!session) {
-    return redirect("/auth/signin");
+    return redirect({ href: "/auth/signin", locale });
   }
 
-  //   const feactlearderboard = async () => {
-  //     if (!user.license_id) return [];
-  //     const res = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/users/ranking/${user.license_id}`,
-  //       { method: "GET", headers: headers() }
-  //     );
-  //     if (!res.ok) throw new Error("Failed to fetch LeaderBoard list");
-  //     const fetchdata = await res.json();
-  //     return fetchdata.results;
-  //   };
+  let leaderboardData: any | null = null;
 
-  //   const leaderboard = await feactlearderboard();
-
-  // Redirect to level selection page if user has not selected a level
-  // if (user.level === undefined || user.cefr_level === "") {
-  //   return redirect("/level");
-  // }
+  if (session?.user?.role === Role.student) {
+    const leaderboard = await getSchoolLeaderboardController(
+      session?.user?.schoolId,
+      session?.user?.id,
+    );
+    if (leaderboard?.success) {
+      leaderboardData = leaderboard?.data;
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col space-y-6">
       <header className="bg-background sticky top-0 z-40 border-b">
-        <div className="container flex h-16 items-center justify-between py-4">
+        <div className="container flex h-16 items-center justify-between">
           <MainNav items={mainNavConfig} />
-          {/* {!disableProgressBar && (
+          {!disableProgressBar && session?.user?.role === Role.student && (
             <ProgressBar
-              progress={session.user.xp}
-              level={session.user.level!}
+              currentXP={session.user.xp!}
+              currentLevel={session.user.level!}
             />
-          )} */}
+          )}
           <div className="flex items-center justify-center gap-2">
             <LocaleSwitcher />
             <ThemeToggle />
@@ -79,16 +76,20 @@ export default async function AppLayout({
         className={cn(
           "container",
           disableSidebar
-            ? "grid flex-1 gap-12"
-            : "mx-auto gap-12 px-4 lg:grid lg:flex-1 lg:grid-cols-[200px_1fr]",
+            ? "flex flex-1 gap-12"
+            : "flexl-1 flex flex-col gap-4 lg:flex-row",
         )}
       >
         {!disableSidebar && (
           <aside className="lg:flex lg:w-[230px] lg:flex-col">
             <SidebarNav items={sidebarNavConfig || []} user={session?.user} />
-            {/* {user.license_id && !disableLeaderboard ? (
-              <Leaderboard data={leaderboard} />
-            ) : null} */}
+            {!disableLeaderboard && session?.user?.role === Role.student ? (
+              <Leaderboard
+                data={leaderboardData?.results || []}
+                schoolName={leaderboardData?.schoolName || ""}
+                userId={session?.user?.id || ""}
+              />
+            ) : null}
           </aside>
         )}
         <main className="flex w-full flex-1 flex-col overflow-hidden">

@@ -71,6 +71,15 @@
       "progressTracking": "การติดตามความก้าวหน้า"
     }
   },
+  "Leaderboard": {
+    "title": "กระดานผู้นำ",
+    "rank": "อันดับ",
+    "name": "ชื่อ",
+    "xp": "XP",
+    "room": "ห้อง",
+    "you": "คุณ",
+    "noDataAvailable": "ไม่มีข้อมูลสำหรับเดือนนี้"
+  },
   "Question": {
     "SAQuestion": {
       "title": "คำถามตอบสั้น",

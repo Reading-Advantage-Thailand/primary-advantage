@@ -11,6 +11,7 @@ declare module "next-auth" {
     level?: number;
     xp?: number;
     cefrLevel?: string;
+    schoolId?: string;
   }
   /**
    * The shape of the account object returned in the OAuth providers' `account` callback,
@@ -40,5 +41,6 @@ declare module "next-auth/jwt" {
     level?: number;
     xp?: number;
     cefrLevel?: string;
+    schoolId?: string;
   }
 }

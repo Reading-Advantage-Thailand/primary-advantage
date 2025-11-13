@@ -22,6 +22,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Article, WordListTimestamp } from "@/types";
 import { getLessonSummaryData } from "@/actions/article";
+import { useSession } from "next-auth/react";
 
 interface WordList {
   vocabulary: string;
@@ -58,6 +59,7 @@ export default function TaskLessonSummary({
     ?.sentence as Sentence[];
   const router = useRouter();
   const t = useTranslations("Lesson.Summary");
+  const { data: session, update } = useSession();
 
   // Fetch lesson summary data
   useEffect(() => {
@@ -75,6 +77,11 @@ export default function TaskLessonSummary({
           setTotalXp(result.data.totalXp);
           setQuizScores(result.data.quizScores);
           setShowCelebration(true);
+          update({
+            user: {
+              ...session?.user,
+            },
+          });
         }
       } catch (error) {
         console.error("Error fetching lesson summary data:", error);

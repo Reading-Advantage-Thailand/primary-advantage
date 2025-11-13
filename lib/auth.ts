@@ -38,6 +38,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             xp: user.xp,
             level: user.level,
             cefrLevel: user.cefrLevel,
+            schoolId: user.schoolId,
           } as User;
 
           if (type === "student") {
@@ -93,6 +94,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.xp = user.xp;
         token.level = user.level;
         token.cefrLevel = user.cefrLevel;
+        token.schoolId = user.schoolId;
       }
 
       if (trigger === "update" && token.email) {
@@ -105,6 +107,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.level = dbUser.level;
           token.cefrLevel = dbUser.cefrLevel as string;
           token.role = dbUser.roles.map((role) => role.role.name).join(", ");
+          token.schoolId = dbUser.schoolId as string;
         }
       }
 
@@ -141,6 +144,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.xp = dbUser.xp;
           token.level = dbUser.level;
           token.cefrLevel = dbUser.cefrLevel as string;
+          token.schoolId = dbUser.schoolId as string;
         }
       }
 
@@ -155,6 +159,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.xp = token.xp;
         session.user.level = token.level;
         session.user.cefrLevel = token.cefrLevel;
+        session.user.schoolId = token.schoolId;
       }
       return session;
     },

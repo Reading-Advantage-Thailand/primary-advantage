@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 interface OrderSentenceData {
   id: string;
@@ -106,6 +107,7 @@ export function OrderSentenceGame({
   const [highlightHintsEnabled, setHighlightHintsEnabled] = useState(false);
   const [audioHintsEnabled, setAudioHintsEnabled] = useState(false);
   const t = useTranslations("SentencesPage.sentenceOrder");
+  const { data: session, update } = useSession();
 
   const [activeSentences, setActiveSentences] =
     useState<OrderSentenceData[]>(sentences);
@@ -293,6 +295,11 @@ export function OrderSentenceGame({
         }),
       });
       setIsPlaying(false);
+      update({
+        user: {
+          ...session?.user,
+        },
+      });
     }
   }, [currentIndex, activeSentences.length]);
 

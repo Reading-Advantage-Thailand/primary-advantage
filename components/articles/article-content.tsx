@@ -60,7 +60,6 @@ export default function ArticleContent({ article }: Props) {
   const [isTranslateOpen, setIsTranslateOpen] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("th");
   const [isPanding, startTransition] = useTransition();
-  const locale = useLocale();
   const t = useTranslations("Components");
   const [isControlsVisible, setIsControlsVisible] = useState<boolean>(true);
   const [isAutoScrollPaused, setIsAutoScrollPaused] = useState<boolean>(false);
@@ -389,16 +388,12 @@ export default function ArticleContent({ article }: Props) {
     .filter((p) => p.trim() !== "");
 
   return (
-    <div>
-      <div
-        ref={controlsRef}
-        className="my-2 flex items-center justify-center gap-4"
-      >
-        <div id="onborda-audio" className="flex flex-grow items-center">
+    <div className="flex flex-col gap-4">
+      <div ref={controlsRef} className="flex flex-col gap-2 md:flex-row">
+        <div id="onborda-audio" className="w-full">
           <audio
             ref={audioRef}
             src={getAudioUrl(article.audioUrl || "")}
-            className="w-full"
             onTimeUpdate={handleTimeUpdate}
             onEnded={() => {
               setIsPlaying(false);
@@ -415,46 +410,16 @@ export default function ArticleContent({ article }: Props) {
             {t("audioButton")}
           </Button>
         </div>
-        <div id="onborda-translate" className="flex items-center gap-2">
-          {/* <Select
-            value={selectedLanguage}
-            onValueChange={setSelectedLanguage}
-            disabled={loading}
-          >
-            <SelectTrigger className="h-10 w-16 min-w-16">
-              <div className="flex items-center justify-center">
-                <Languages className="h-4 w-4" />
-                <SelectValue>
-                  <span className="text-lg">
-                    {selectedLanguage === "th" && "🇹🇭"}
-                    {selectedLanguage === "vi" && "🇻🇳"}
-                    {selectedLanguage === "cn" && "🇨🇳"}
-                    {selectedLanguage === "tw" && "🇹🇼"}
-                  </span>
-                </SelectValue>
-              </div>
-            </SelectTrigger>
-            <SelectContent position="popper" className="max-h-60 w-48">
-              {Object.entries(SUPPORTED_LANGUAGES).map(([code, name]) => (
-                <SelectItem key={code} value={code} className="w-full">
-                  <span className="truncate">{name}</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select> */}
-
+        <div id="onborda-translate" className="flex gap-2">
           <Select
             value={selectedLanguage}
             onValueChange={setSelectedLanguage}
             disabled={loading}
           >
-            <SelectTrigger className="h-10">
-              {" "}
-              {/* Even smaller width */}
+            <SelectTrigger className="h-10 w-full">
               <div className="flex items-center gap-2">
                 <Languages className="h-4 w-4" />
                 <SelectValue>
-                  {/* Show only flag */}
                   <span className="text-lg">
                     {selectedLanguage === "th" && "🇹🇭"}
                     {selectedLanguage === "vi" && "🇻🇳"}
@@ -502,8 +467,8 @@ export default function ArticleContent({ article }: Props) {
             )}
 
             {/* Main Controls */}
-            <div className="flex items-center justify-center gap-4">
-              <div className="flex max-w-md flex-grow items-center">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-center md:gap-4">
+              <div className="flex w-full items-center md:flex-grow">
                 <Button
                   variant="default"
                   className="w-full"
@@ -518,9 +483,9 @@ export default function ArticleContent({ article }: Props) {
                   onValueChange={setSelectedLanguage}
                   disabled={loading}
                 >
-                  <SelectTrigger className="h-10">
-                    <div className="flex items-center gap-2">
-                      <Languages className="h-4 w-4" />
+                  <SelectTrigger className="h-10 w-[70px] md:w-auto">
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <Languages className="h-4 w-4 shrink-0" />
                       <SelectValue>
                         <span className="text-lg">
                           {selectedLanguage === "th" && "🇹🇭"}
@@ -549,11 +514,13 @@ export default function ArticleContent({ article }: Props) {
                       : setIsTranslateOpen(true);
                     handleTranslate(currentSentenceIndex);
                   }}
-                  className="flex items-center gap-2"
+                  className="flex flex-1 items-center gap-2"
                 >
                   <>
-                    <Languages className="h-4 w-4" />
-                    {isTranslateOpen ? t("closeButton") : t("translate")}
+                    <Languages className="h-4 w-4 shrink-0" />
+                    <span className="truncate">
+                      {isTranslateOpen ? t("closeButton") : t("translate")}
+                    </span>
                   </>
                 </Button>
               </div>
@@ -942,8 +909,8 @@ export default function ArticleContent({ article }: Props) {
                   getArticleImageUrl(article.id, groupIndex + 1) || `/nopic.png`
                 }
                 alt="Article Image"
-                width={640}
-                height={640}
+                width={1024}
+                height={1024}
                 unoptimized
               />
               <p className="mb-4 indent-8 whitespace-pre-wrap">

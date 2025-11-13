@@ -4,8 +4,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardContent,
+  CardFooter,
 } from "@/components/ui/card";
-import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { Article } from "@/types";
 import { AlertCircle, BookCheck } from "lucide-react";
@@ -44,11 +45,11 @@ export default async function ArticleCard({ article }: Props) {
   return (
     <div className="md:basis-3/5">
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-col gap-4">
           <CardTitle className="font-article text-3xl font-bold md:text-5xl">
             {article.title}
           </CardTitle>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             <Badge>{t("Article.raLevel", { level: article.raLevel })}</Badge>
             <Badge>
               {t("Article.cefrLevel", { level: article.cefrLevel })}
@@ -61,18 +62,11 @@ export default async function ArticleCard({ article }: Props) {
           <CardDescription className="font-article text-lg md:text-xl">
             {getLocalizedSummary()}
           </CardDescription>
-          <div className="flex justify-center">
-            {/* <Image
-              src={imageUrl}
-              alt="Malcolm X"
-              width={640}
-              height={640}
-              unoptimized
-            /> */}
-          </div>
-          <ArticleContent article={article} />
         </CardHeader>
-        <footer>
+        <CardContent>
+          <ArticleContent article={article} />
+        </CardContent>
+        <CardFooter>
           <div className="flex items-center gap-4 px-8">
             <AlertCircle width={64} height={64} />
             <p className="text-sm leading-loose">
@@ -83,7 +77,7 @@ export default async function ArticleCard({ article }: Props) {
               cross-referencing any facts used in academic work.
             </p>
           </div>
-        </footer>
+        </CardFooter>
       </Card>
       {/* <RatingPopup
         userId={userId}

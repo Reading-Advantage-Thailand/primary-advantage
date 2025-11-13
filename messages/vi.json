@@ -71,6 +71,15 @@
       "progressTracking": "Theo dõi tiến độ"
     }
   },
+  "Leaderboard": {
+    "title": "Bảng xếp hạng",
+    "rank": "Hạng",
+    "name": "Tên",
+    "xp": "XP",
+    "room": "Phòng",
+    "you": "Bạn",
+    "noDataAvailable": "Không có dữ liệu cho tháng này"
+  },
   "Question": {
     "SAQuestion": {
       "title": "Câu hỏi ngắn",
