@@ -10,6 +10,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/lib/auth";
 import { LayoutProvider } from "@/hooks/use-layout";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import QueryProvider from "@/components/providers/query-provider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -39,8 +41,6 @@ export const metadata: Metadata = {
   // },
   icons: {
     icon: "/primary-advantage.png",
-    // shortcut: "/favicon-16x16.png",
-    // apple: "/apple-touch-icon.png",
   },
   // manifest: `${siteConfig.url}/site.webmanifest`,
   // manifest: `http://localhost:3000/site.webmanifest`,
@@ -64,9 +64,9 @@ export default async function RootLayout({
 
   return (
     <SessionProvider session={session}>
-      <html lang={locale} suppressHydrationWarning>
+      <html lang={locale} suppressHydrationWarning className="overscroll-none">
         <body
-          className={` ${fontSans.variable} bg-background min-h-screen font-sans antialiased`}
+          className={`${fontSans.variable} bg-background min-h-screen font-sans antialiased [--header-height:calc(var(--spacing)*14)]`}
         >
           <NextIntlClientProvider>
             <ThemeProvider
@@ -76,10 +76,10 @@ export default async function RootLayout({
               disableTransitionOnChange
               enableColorScheme
             >
-              {/* <LayoutProvider> */}
-              {children}
-              <Toaster />
-              {/* </LayoutProvider> */}
+              <QueryProvider>
+                <NuqsAdapter>{children}</NuqsAdapter>
+                <Toaster />
+              </QueryProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
         </body>

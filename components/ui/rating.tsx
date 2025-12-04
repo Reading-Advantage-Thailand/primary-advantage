@@ -45,7 +45,7 @@ interface StarRatingProps {
 const StarRating: React.FC<StarRatingProps> = ({
   initialRating = 0,
   maxRating = 5,
-  starSizeClass = "w-5 h-5",
+  starSizeClass = "w-4 h-4",
   onRatingChange,
   readOnly = false,
 }) => {

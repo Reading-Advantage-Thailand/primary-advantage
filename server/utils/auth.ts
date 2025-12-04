@@ -5,6 +5,7 @@ export interface UserWithRoles {
   id: string;
   email: string | null;
   schoolId: string | null;
+  level: number;
   roles: Array<{
     role: {
       id: string;
@@ -26,7 +27,11 @@ export const validateUser = async (
 
     const userWithRoles = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        schoolId: true,
+        level: true,
         roles: {
           include: {
             role: true,

@@ -204,21 +204,6 @@ export const articleGeneratorSchema = z.object({
     .describe(
       "A detailed description of an image to go along with the passage",
     ),
-
-  // imageDesc: z
-  //   .array(z.string())
-  //   .describe(
-  //     "A detailed description of an image to go along with the passage. A maximum of 3 images.",
-  //   ),
-  // imageDesc: z.array(z.string()).describe(
-  //   `Generate an array of 1 to 3 detailed image prompts that visually represent the key moments of the article, ensuring absolute consistency for main characters.
-
-  //   - **Image 1 (Beginning):** Describe an image that captures the initial scene or character setup. Crucially,
-  //   - **Image 2 (Middle):** Describe an image that shows the central conflict or a key action. Again,
-  //   - **Image 3 (End):** Describe an image that represents the resolution or final outcome. Once more,
-
-  //   Each description should be a single, detailed prompt for a high-quality image generator, using cinematic, photorealistic, or painterly styles as appropriate. Focus on visual details like specific clothing, unique markings, consistent age, and consistent general appearance.`,
-  // ),
   translatedSummary: z.object({
     th: z.string().describe("The Thai translation of the vocabulary."),
     cn: z
@@ -301,4 +286,181 @@ export const articleGeneratorSchema = z.object({
     .describe(
       "Create a series of 5 long answer questions based on the article",
     ),
+});
+
+export const storyGeneratorSchema = z.object({
+  topic: z.string().describe("The topic of the story"),
+  title: z.string().describe("The title of the story"),
+  summary: z.string().describe("The summary of the story"),
+  translatedSummary: z.object({
+    th: z.string().describe("The Thai translation of the summary"),
+    cn: z
+      .string()
+      .describe("The Simplified Chinese translation of the summary"),
+    tw: z
+      .string()
+      .describe("The Traditional Chinese translation of the summary"),
+    vi: z.string().describe("The Vietnamese translation of the summary"),
+  }),
+  imageDesc: z.string().describe("The image description of the story"),
+  chapters: z
+    .array(
+      z.object({
+        chapterNumber: z.number().describe("The chapter number"),
+        title: z.string().describe("The title of the chapter"),
+        summary: z.string().describe("The summary of the chapter"),
+        translatedSummary: z.object({
+          th: z.string().describe("The Thai translation of the summary"),
+          cn: z
+            .string()
+            .describe("The Simplified Chinese translation of the summary"),
+          tw: z
+            .string()
+            .describe("The Traditional Chinese translation of the summary"),
+          vi: z.string().describe("The Vietnamese translation of the summary"),
+        }),
+        passage: z.string().describe("The passage of the chapter"),
+        wordlist: z
+          .array(
+            z.object({
+              vocabulary: z.string().describe("The vocabulary of the chapter"),
+              definition: z
+                .string()
+                .describe("The definition of the vocabulary"),
+            }),
+          )
+          .describe("The wordlist of the chapter"),
+        sentences: z.array(z.string()).describe("The sentences of the chapter"),
+        sentencesFlashcard: z
+          .array(
+            z.object({
+              sentence: z.string().describe("The sentence of the chapter"),
+              translation: z.object({
+                th: z.string().describe("The Thai translation of the sentence"),
+                cn: z
+                  .string()
+                  .describe(
+                    "The Simplified Chinese translation of the sentence",
+                  ),
+                tw: z
+                  .string()
+                  .describe(
+                    "The Traditional Chinese translation of the sentence",
+                  ),
+                vi: z
+                  .string()
+                  .describe("The Vietnamese translation of the sentence"),
+              }),
+            }),
+          )
+          .describe("The sentences flashcard of the chapter"),
+        multipleChoiceQuestions: z
+          .array(
+            z.object({
+              question: z.string().describe("The question of the chapter"),
+              options: z
+                .array(z.string())
+                .describe("The options of the question"),
+              answer: z.string().describe("The answer of the question"),
+            }),
+          )
+          .describe("The multiple choice questions of the chapter"),
+        shortAnswerQuestions: z
+          .array(
+            z.object({
+              question: z.string().describe("The question of the chapter"),
+              answer: z.string().describe("The answer of the question"),
+            }),
+          )
+          .describe("The short answer questions of the chapter"),
+        longAnswerQuestions: z
+          .array(
+            z.object({
+              question: z.string().describe("The question of the chapter"),
+            }),
+          )
+          .describe("The long answer questions of the chapter"),
+      }),
+    )
+    .describe("The chapters of the story"),
+  characters: z
+    .array(
+      z.object({
+        name: z.string().describe("The name of the character"),
+        description: z.string().describe("The description of the character"),
+        imageDesc: z
+          .string()
+          .describe("The image description of the character"),
+      }),
+    )
+    .describe("The characters of the story"),
+});
+
+export const articleResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  summary: z.string(),
+  translatedSummary: z.object({
+    th: z.string(),
+    cn: z.string(),
+    tw: z.string(),
+    vi: z.string(),
+  }),
+  passage: z.string(),
+  translatedPassage: z.object({
+    th: z.array(z.string()),
+    cn: z.array(z.string()),
+    tw: z.array(z.string()),
+    vi: z.array(z.string()),
+  }),
+  audioUrl: z.string(),
+  sentences: z.array(
+    z.object({
+      words: z.array(
+        z.object({
+          word: z.string(),
+          start: z.number(),
+          end: z.number(),
+        }),
+      ),
+      sentence: z.string(),
+      startTime: z.number(),
+      endTime: z.number(),
+    }),
+  ),
+  genre: z.string(),
+  subGenre: z.string().nullable(),
+  type: z.string(),
+  raLevel: z.number(),
+  cefrLevel: z.string(),
+  rating: z.number(),
+  flashcard: z.object({
+    audioWordsUrl: z.string(),
+    words: z.array(
+      z.object({
+        vocabulary: z.string(),
+        definition: z.object({
+          en: z.string(),
+          th: z.string(),
+          cn: z.string(),
+          tw: z.string(),
+          vi: z.string(),
+        }),
+        timeSeconds: z.number(),
+      }),
+    ),
+    audioSentencesUrl: z.string(),
+    sentences: z.array(
+      z.object({
+        sentence: z.string(),
+        timeSeconds: z.number(),
+        translation: z.object({
+          th: z.string(),
+          cn: z.string(),
+          tw: z.string(),
+          vi: z.string(),
+        }),
+      }),
+    ),
+  }),
 });

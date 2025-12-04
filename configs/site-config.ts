@@ -11,7 +11,7 @@ export const siteConfig: SiteConfig = {
   navItems: [
     {
       href: "/",
-      label: "Home",
+      label: "home",
       icon: "HomeIcon",
     },
     {

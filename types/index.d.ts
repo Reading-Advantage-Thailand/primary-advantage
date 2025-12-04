@@ -129,22 +129,25 @@ export interface WordList {
 export interface MCQuestion {
   id: string;
   question: string;
+  articleId: string;
+  storyChapterId?: string;
   options?: string[];
   answer?: string;
-  articleId: string;
   textualEvidence?: string;
 }
 
 export interface SAQuestion {
   id: string;
   question: string;
-  answer?: string;
   articleId: string;
+  storyChapterId?: string;
+  answer?: string;
 }
 export interface LAQuestion {
   id: string;
   question: string;
   articleId: string;
+  storyChapterId?: string;
 }
 
 export interface SaveSentenceAndWordFlashcard {
@@ -514,4 +517,57 @@ export interface Classroom {
   schoolId: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ArticleResponse {
+  id: string;
+  title: string;
+  summary: string;
+  translatedSummary: Record<string, string> | null;
+  passage: string;
+  translatedPassage: Record<string, string[]> | null;
+  audioUrl: string;
+  sentences: {
+    words: {
+      word: string;
+      start: number;
+      end: number;
+    }[];
+    sentence: string;
+    startTime: number;
+    endTime: number;
+  }[];
+  genre: string;
+  subGenre: string | null;
+  type: string;
+  raLevel: number;
+  cefrLevel: string;
+  rating: number;
+  flashcard: {
+    words: {
+      vocabulary: string;
+      definition: {
+        en: string;
+        th: string;
+        cn: string;
+        tw: string;
+        vi: string;
+      };
+      startTime: number;
+      endTime: number;
+      audioUrl: string;
+    }[];
+    sentences: {
+      sentence: string;
+      translation: {
+        th: string;
+        cn: string;
+        tw: string;
+        vi: string;
+      };
+      startTime: number;
+      endTime: number;
+      audioUrl: string;
+    }[];
+  };
 }
