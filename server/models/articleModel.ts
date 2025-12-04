@@ -454,7 +454,7 @@ export const getQuestionsByArticleId = async (
           .map((q) => ({
             ...q,
             textualEvidence: q.textualEvidence || undefined,
-          }));
+          })) as MCQuestion[];
         break;
 
       case ActivityType.SA_QUESTION:
@@ -464,7 +464,7 @@ export const getQuestionsByArticleId = async (
         if (saQuestions.length === 0) {
           throw new Error(`No SA questions found for article ${articleId}`);
         }
-        questions = saQuestions[0];
+        questions = saQuestions[0] as SAQuestion;
         break;
 
       case ActivityType.LA_QUESTION:
@@ -474,7 +474,7 @@ export const getQuestionsByArticleId = async (
         if (laQuestions.length === 0) {
           throw new Error(`No LA questions found for article ${articleId}`);
         }
-        questions = laQuestions[0];
+        questions = laQuestions[0] as LAQuestion;
         break;
 
       default:

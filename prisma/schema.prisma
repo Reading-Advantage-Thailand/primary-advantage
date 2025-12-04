@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  // output   = "../generated/prisma"
 }
 
 datasource db {
@@ -201,38 +202,44 @@ model SentencsAndWordsForFlashcard {
 }
 
 model MultipleChoiceQuestion {
-  id              String   @id @default(cuid())
+  id              String        @id @default(cuid())
   question        String
   options         String[]
   answer          String
   textualEvidence String?
-  articleId       String   @map("article_id")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  article         Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId       String?       @map("article_id")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  article         Article?      @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  storyChapter    StoryChapter? @relation(fields: [storyChapterId], references: [id], onDelete: Cascade)
+  storyChapterId  String?       @map("story_chapter_id")
 
   @@map("multiple_choice_questions")
 }
 
 model ShortAnswerQuestion {
-  id        String   @id @default(cuid())
-  question  String
-  answer    String
-  articleId String   @map("article_id")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  question       String
+  answer         String
+  articleId      String?       @map("article_id")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  article        Article?      @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  storyChapter   StoryChapter? @relation(fields: [storyChapterId], references: [id], onDelete: Cascade)
+  storyChapterId String?       @map("story_chapter_id")
 
   @@map("short_answer_questions")
 }
 
 model LongAnswerQuestion {
-  id        String   @id @default(cuid())
-  question  String
-  articleId String   @map("article_id")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  question       String
+  articleId      String?       @map("article_id")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  article        Article?      @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  storyChapter   StoryChapter? @relation(fields: [storyChapterId], references: [id], onDelete: Cascade)
+  storyChapterId String?       @map("story_chapter_id")
 
   @@map("long_answer_questions")
 }
@@ -252,34 +259,36 @@ model FlashcardDeck {
 }
 
 model FlashcardCard {
-  id            String          @id @default(cuid())
-  deckId        String          @map("deck_id")
-  type          FlashcardType
-  articleId     String?         @map("article_id")
-  audioUrl      String?         @map("audio_url")
-  startTime     Float?          @map("start_time")
-  endTime       Float?          @map("end_time")
-  word          String?
-  definition    Json?
-  sentence      String?
-  translation   Json?
-  context       String?
-  due           DateTime        @default(now())
-  stability     Float           @default(0.0)
-  difficulty    Float           @default(0.0)
-  elapsedDays   Int             @default(0) @map("elapsed_days")
-  scheduledDays Int             @default(0) @map("scheduled_days")
-  learningSteps Int             @default(0) @map("learning_steps")
-  reps          Int             @default(0)
-  lapses        Int             @default(0)
-  state         CardState       @default(NEW)
-  lastReview    DateTime?       @map("last_review")
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  reviews       CardReview[]
-  clozeTestGame ClozeTestGame[]
-  article       Article?        @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  deck          FlashcardDeck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  id             String          @id @default(cuid())
+  deckId         String          @map("deck_id")
+  type           FlashcardType
+  articleId      String?         @map("article_id")
+  storyChapterId String?         @map("story_chapter_id")
+  audioUrl       String?         @map("audio_url")
+  startTime      Float?          @map("start_time")
+  endTime        Float?          @map("end_time")
+  word           String?
+  definition     Json?
+  sentence       String?
+  translation    Json?
+  context        String?
+  due            DateTime        @default(now())
+  stability      Float           @default(0.0)
+  difficulty     Float           @default(0.0)
+  elapsedDays    Int             @default(0) @map("elapsed_days")
+  scheduledDays  Int             @default(0) @map("scheduled_days")
+  learningSteps  Int             @default(0) @map("learning_steps")
+  reps           Int             @default(0)
+  lapses         Int             @default(0)
+  state          CardState       @default(NEW)
+  lastReview     DateTime?       @map("last_review")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  reviews        CardReview[]
+  clozeTestGame  ClozeTestGame[]
+  article        Article?        @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  storyChapter   StoryChapter?   @relation(fields: [storyChapterId], references: [id], onDelete: Cascade)
+  deck           FlashcardDeck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
 
   @@map("flashcard_cards")
 }
@@ -498,4 +507,46 @@ model Leaderboard {
   school    School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   @@map("leaderboards")
+}
+
+model Story {
+  id               String         @id @default(cuid())
+  title            String
+  summary          String
+  imageDescription String
+  type             String?
+  genre            String?
+  subGenre         String?
+  cefrLevel        String?
+  raLevel          Int?
+  rating           Float?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  storyChapters    StoryChapter[]
+
+  @@map("stories")
+}
+
+model StoryChapter {
+  id                      String                   @id @default(cuid())
+  storyId                 String
+  chapterNumber           Int
+  title                   String
+  summary                 String
+  translatedSummary       Json?
+  imageDescription        String
+  sentences               Json?
+  translatedSentences     Json?
+  audioSentencesUrl       String?                  @map("audio_sentences_url")
+  words                   Json?
+  audioWordsUrl           String?                  @map("audio_words_url")
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  story                   Story                    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  multipleChoiceQuestions MultipleChoiceQuestion[]
+  shortAnswerQuestions    ShortAnswerQuestion[]
+  longAnswerQuestions     LongAnswerQuestion[]
+  flashcardCards          FlashcardCard[]
+
+  @@map("story_chapters")
 }

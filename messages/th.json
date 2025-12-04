@@ -18,6 +18,7 @@
     "contact": "ติดต่อ",
     "authors": "ผู้เขียน",
     "login": "เข้าสู่ระบบ",
+    "menu": "เมนู",
     "usernav": {
       "settings": "ตั้งค่า",
       "logout": "ออกจากระบบ",
@@ -32,6 +33,7 @@
   },
   "Sidebar": {
     "read": "อ่าน",
+    "stories": "เรื่องราว",
     "assignments": "งานที่กำหนด",
     "history": "ประวัติ",
     "sentences": "ประโยค",

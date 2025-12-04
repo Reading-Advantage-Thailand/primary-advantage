@@ -12,6 +12,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Icons } from "@/components/icons";
+import { useTranslations } from "next-intl";
 
 export function MobileNav({
   //   tree,
@@ -23,6 +25,7 @@ export function MobileNav({
   className?: string;
 }) {
   const [open, setOpen] = React.useState(false);
+  const t = useTranslations("MainNav");
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -38,21 +41,22 @@ export function MobileNav({
             <div className="relative size-4">
               <span
                 className={cn(
-                  "bg-foreground absolute left-0 block h-0.5 w-4 transition-all duration-100",
+                  "absolute left-0 block h-0.5 w-4 bg-cyan-500 transition-all duration-100",
                   open ? "top-[0.4rem] -rotate-45" : "top-1",
                 )}
               />
               <span
                 className={cn(
-                  "bg-foreground absolute left-0 block h-0.5 w-4 transition-all duration-100",
+                  "absolute left-0 block h-0.5 w-4 bg-cyan-500 transition-all duration-100",
                   open ? "top-[0.4rem] rotate-45" : "top-2.5",
                 )}
               />
             </div>
             <span className="sr-only">Toggle Menu</span>
           </div>
-          <span className="flex h-8 items-center text-lg leading-none font-medium">
-            Menu
+          <span className="font-heading flex h-8 items-center gap-2 text-lg leading-none text-cyan-500">
+            <Icons.logo />
+            {t("menu")}
           </span>
         </Button>
       </PopoverTrigger>
@@ -66,15 +70,17 @@ export function MobileNav({
         <div className="flex flex-col gap-12 overflow-auto px-6 py-6">
           <div className="flex flex-col gap-4">
             <div className="text-muted-foreground text-sm font-medium">
-              Menu
+              {t("menu")}
             </div>
             <div className="flex flex-col gap-3">
-              <MobileLink href="/" onOpenChange={setOpen}>
-                Home
-              </MobileLink>
               {items.map((item, index) => (
-                <MobileLink key={index} href={item.href} onOpenChange={setOpen}>
-                  {item.label}
+                <MobileLink
+                  key={index}
+                  href={item.href}
+                  onOpenChange={setOpen}
+                  className="capitalize"
+                >
+                  {t(item.label)}
                 </MobileLink>
               ))}
             </div>

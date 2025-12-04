@@ -18,6 +18,7 @@
     "contact": "聯繫",
     "authors": "作者",
     "login": "登錄",
+    "menu": "菜單",
     "usernav": {
       "settings": "設置",
       "logout": "退出",
@@ -32,6 +33,7 @@
   },
   "Sidebar": {
     "read": "閱讀",
+    "stories": "故事",
     "assignments": "作業",
     "history": "歷史",
     "sentences": "句子",

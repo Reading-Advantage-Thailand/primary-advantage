@@ -34,7 +34,7 @@ export const studentPageConfig: PageConfig = {
     // {
     //   title: "stories",
     //   href: "/student/stories",
-    //   icon: "storyBook",
+    //   icon: "BookAIcon",
     //   requiredPermissions: ["STUDENT_ACCESS"],
     // },
     {

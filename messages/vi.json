@@ -18,6 +18,7 @@
     "contact": "Liên hệ",
     "authors": "tác giả",
     "login": "Đăng nhập",
+    "menu": "Mục lục",
     "usernav": {
       "settings": "Cài đặt",
       "logout": "Đăng xuất",
@@ -32,6 +33,7 @@
   },
   "Sidebar": {
     "read": "Đọc",
+    "stories": "Câu chuyện",
     "assignments": "Bài tập",
     "history": "Lịch sử",
     "sentences": "Câu",
