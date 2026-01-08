@@ -18,18 +18,10 @@ steps:
   # Step 3: Run database migrations
   - name: "gcr.io/google-appengine/exec-wrapper"
     id: "migrate-db"
+    entrypoint: "bash"
     args:
-      - "-i"
-      - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
-      - "-s"
-      - "${_CLOUD_SQL_INSTANCE}"
-      - "--"
-      - "-e"
-      - "DATABASE_URL=$$DATABASE_URL"
-      - "npx"
-      - "prisma"
-      - "migrate"
-      - "deploy"
+      - "-c"
+      - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$DATABASE_URL -- npx prisma migrate deploy"
     secretEnv: ["DATABASE_URL"]
 
   # Step 4: Deploy to Cloud Run
