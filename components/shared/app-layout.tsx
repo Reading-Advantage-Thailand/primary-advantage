@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/switchers/theme-switcher-toggle";
 import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
 import { auth } from "@/lib/auth";
 import { redirect } from "@/i18n/navigation";
-import Leaderboard from "../leaderboard";
+import Leaderboard from "@/components/leaderboard";
 import { getLocale } from "next-intl/server";
 import { Role } from "@/types/enum";
 import { getSchoolLeaderboardController } from "@/server/controllers/schoolController";
@@ -44,15 +44,20 @@ export default async function AppLayout({
 
   let leaderboardData: any | null = null;
 
-  if (session?.user?.role === Role.student) {
-    const leaderboard = await getSchoolLeaderboardController(
-      session?.user?.schoolId,
-      session?.user?.id,
-    );
-    if (leaderboard?.success) {
-      leaderboardData = leaderboard?.data;
-    }
-  }
+  // if (session?.user?.role === Role.student) {
+  //   const leaderboard = await getSchoolLeaderboardController(
+  //     session?.user?.schoolId,
+  //     session?.user?.id,
+  //   );
+  //   if (leaderboard?.success) {
+  //     leaderboardData = leaderboard?.data;
+  //   } else {
+  //     leaderboardData = {
+  //       results: [],
+  //       schoolName: "",
+  //     };
+  //   }
+  // }
 
   return (
     <div className="flex min-h-screen flex-col space-y-6">

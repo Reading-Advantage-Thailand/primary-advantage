@@ -86,6 +86,11 @@ export function convertCefrLevel(cefrLevel: string) {
   return level?.raLevel || 1;
 }
 
+export function convertRaLevelToCefr(raLevel: number): string {
+  const level = LEVELS_XP.find((level) => level.raLevel === raLevel);
+  return level?.cefrLevel || "A0-";
+}
+
 export function convertLocaleFull(locale: string) {
   const localeMap: Record<string, string> = {
     en: "English",

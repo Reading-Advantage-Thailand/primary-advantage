@@ -7,6 +7,12 @@ import {
   updateTeacher,
   deleteTeacher,
   getTeacherStatistics,
+  getTeachersDashboardModel,
+  getTeacherClassReportModel,
+  getClassroomHeatmapModel,
+  createTeacherClassGoalModel,
+  deleteTeacherClassGoalModel,
+  getTeacherClassGoalsModel,
 } from "@/server/models/teacherModel";
 import { validateUser, checkAdminPermissions } from "@/server/utils/auth";
 import {
@@ -15,6 +21,7 @@ import {
   CreateTeacherInput,
   UpdateTeacherInput,
 } from "@/types/index";
+import { CreateGoalInput } from "@/types/learning-goals";
 
 // GET Controller - Fetch teachers
 export const getTeachersController = async (
@@ -336,5 +343,100 @@ export const deleteTeacherController = async (
       { error: "Internal server error" },
       { status: 500 },
     );
+  }
+};
+
+export const fetchTeacherDashboardController = async (userId: string) => {
+  try {
+    const dashboardData = await getTeachersDashboardModel(userId);
+    return dashboardData;
+  } catch (error) {
+    console.error(
+      "Teacher Controller: Error in fetchTeacherDashboardController:",
+      error,
+    );
+    throw error;
+  }
+};
+
+export const fetchTeacherClassReportController = async (
+  classroomId: string,
+) => {
+  try {
+    const reportData = await getTeacherClassReportModel(classroomId);
+    return reportData;
+  } catch (error) {
+    console.error(
+      "Teacher Controller: Error in fetchTeacherClassReportController:",
+      error,
+    );
+    throw error;
+  }
+};
+
+export const fetchTeacherClassHeatMapController = async (
+  classroomId: string,
+  expanded: boolean,
+) => {
+  try {
+    const heatmapData = await getClassroomHeatmapModel(classroomId, expanded);
+    return heatmapData;
+  } catch (error) {
+    console.error(
+      "Teacher Controller: Error in fetchTeacherClassHeatMapController:",
+      error,
+    );
+    throw error;
+  }
+};
+
+export const fetchTeacherClassGoalController = async (classroomId: string) => {
+  try {
+    const goalsData = await getTeacherClassGoalsModel(classroomId);
+    return goalsData;
+  } catch (error) {
+    console.error(
+      "Teacher Controller: Error in fetchTeacherClassGoalController:",
+      error,
+    );
+    throw error;
+  }
+};
+
+export const createTeacherClassGoalController = async (
+  classroomId: string,
+  goalData: CreateGoalInput,
+) => {
+  // Implementation for creating a class goal
+  // This is a placeholder and should be implemented as per application logic
+  try {
+    // Call to model function to create class goal can be placed here
+    const result = await createTeacherClassGoalModel(classroomId, goalData);
+    return { success: true, result };
+  } catch (error) {
+    console.error(
+      "Teacher Controller: Error in createTeacherClassGoalController:",
+      error,
+    );
+    throw error;
+  }
+};
+
+export const deleteTeacherClassGoalController = async (
+  classroomId: string,
+  student: any,
+) => {
+  // Implementation for creating a class goal
+  // This is a placeholder and should be implemented as per application logic
+  try {
+    // Call to model function to create class goal can be placed here
+    const result = await deleteTeacherClassGoalModel(classroomId, student);
+    return { success: true, result };
+  } catch (error) {
+    console.error(
+      "Teacher Controller: Error in deleteTeacherClassGoalController:",
+      error,
+    );
+    throw error;
   }
 };

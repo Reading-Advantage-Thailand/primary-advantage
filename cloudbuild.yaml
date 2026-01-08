@@ -18,11 +18,21 @@ steps:
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
 
   # Step 3: Run database migrations
-  # - name: "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
-  #   id: "migrate-database"
-  #   entrypoint: "npx"
-  #   args: ["prisma", "migrate", "deploy"]
-  #   secretEnv: ["DATABASE_URL"]
+  - name: "gcr.io/google-appengine/exec-wrapper"
+    id: "migrate-db"
+    args:
+      - "-i"
+      - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
+      - "-s"
+      - "${_CLOUD_SQL_INSTANCE}"
+      - "-e"
+      - "DATABASE_URL=${_DATABASE_URL}"
+      - "--"
+      - "npx"
+      - "prisma"
+      - "migrate"
+      - "deploy"
+    secretEnv: ["DATABASE_URL"]
 
   # Step 4: Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
@@ -73,6 +83,7 @@ substitutions:
   _STORAGE_CLIENT_EMAIL: "STORAGE_CLIENT_EMAIL"
   _STORAGE_PRIVATE_KEY: "STORAGE_PRIVATE_KEY"
   _ACCESS_KEY: "ACCESS_KEY"
+  _CLOUD_SQL_INSTANCE: "reading-advantage:asia-southeast1:cloud-sql"
 
 # Secrets
 availableSecrets:

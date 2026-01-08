@@ -147,6 +147,216 @@
       "loading": "載入中...",
       "noArticles": "未找到文章",
       "noArticlesToRead": "沒有需要重新閱讀的文章"
+    },
+    "Dashboard": {
+      "xpVelocity": {
+        "title": "XP 速度",
+        "description": "追蹤您的學習速度",
+        "overview": "您的學習速度隨時間變化",
+        "emptyMessage": "沒有活動資料",
+        "ariaLabel": "XP 速度指標",
+        "quickStats": "快速統計",
+        "period": {
+          "7d": "過去7天",
+          "30d": "過去30天",
+          "ema": "EMA 速度"
+        },
+        "label": {
+          "7dAvg": "7天平均",
+          "30dAvg": "30天平均",
+          "trend": "趨勢"
+        },
+        "units": {
+          "xpPerDay": "XP/天"
+        },
+        "kpi": {
+          "7dayAvg": "7天平均",
+          "xpPerDay": "每日 XP",
+          "activeDays": "活躍天數",
+          "last7Days": "過去7天"
+        },
+        "tip": "💡 提示：完成更多活動以更好地追蹤速度"
+      },
+      "etaCard": {
+        "title": "預計到達下一級的時間",
+        "ariaLabel": "預計到達下一級的時間",
+        "regionLabel": "ETA 資訊",
+        "eta": {
+          "na": "不適用",
+          "lessThanOne": "少於1天",
+          "oneDay": "1天",
+          "days": "天",
+          "weeks": "週",
+          "months": "月"
+        },
+        "expected": "預計：",
+        "confidenceRange": "置信區間",
+        "bestCase": "最好情況：",
+        "worstCase": "最壞情況：",
+        "confidence": {
+          "high": "高置信度",
+          "medium": "中置信度",
+          "low": "低置信度",
+          "insufficient": "資料不足"
+        },
+        "basedOnVelocity": "基於您目前的速度 {value}"
+      },
+      "genreEngagement": {
+        "title": "類型參與度",
+        "description": "您的閱讀偏好和推薦",
+        "emptyMessage": "開始閱讀以查看您的類型偏好",
+        "yourTopGenres": "您喜歡的類型",
+        "reads": "次閱讀",
+        "score": "分數：",
+        "recommendedForYou": "為您推薦",
+        "cefrAppropriate": "CEFR 適配",
+        "genresRead": "已讀類型",
+        "totalReads": "總閱讀量",
+        "totalScore": "總分"
+      },
+      "srsHealth": {
+        "title": "SRS 健康",
+        "description": "間隔重複系統狀態",
+        "emptyMessage": "沒有閃卡資料",
+        "status": {
+          "healthy": "健康",
+          "moderate": "一般",
+          "overloaded": "過載",
+          "critical": "嚴重"
+        },
+        "due": "到期",
+        "totalCards": "總卡片數",
+        "reviewedToday": "今日已複習",
+        "retentionRate": "記憶率",
+        "quickActions": "快速操作",
+        "recommendations": "建議",
+        "practiceNow": "立即練習",
+        "cards": "張卡片"
+      },
+      "aiCoach": {
+        "title": "AI 學習教練",
+        "description": "基於您資料的個人化分析",
+        "emptyMessage": "繼續學習以獲取 AI 分析",
+        "basedOnMetrics": "基於您目前的指標：",
+        "xpPerDay": "XP/天",
+        "retention": "記憶率",
+        "related": "相關：",
+        "refreshNotice": "💡 AI 分析每24小時根據您的最新活動更新",
+        "priority": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        }
+      },
+      "compactHeatmap": {
+        "title": "活動熱力圖",
+        "lastRange": "過去90天",
+        "activities": "活動",
+        "stats": {
+          "total": "總計",
+          "peakDay": "峰值日",
+          "dailyAvg": "日均"
+        },
+        "dow": {
+          "sun": "日",
+          "mon": "一",
+          "tue": "二",
+          "wed": "三",
+          "thu": "四",
+          "fri": "五",
+          "sat": "六"
+        },
+        "legend": {
+          "less": "少",
+          "more": "多"
+        },
+        "hoverForDetails": "將滑鼠懸停在方塊上查看詳情",
+        "topActivityDates": "活動最活躍日期"
+      },
+      "activeGoals": {
+        "title": "進行中的目標",
+        "loading": "載入中...",
+        "emptyDescription": "設定目標以追蹤您的進度",
+        "createFirst": "建立您的第一個目標",
+        "viewAll": "檢視全部",
+        "description": "您的前3個學習目標",
+        "highPriority": "高優先順序",
+        "daysLeft": "還剩 {count} 天",
+        "dueToday": "今日到期",
+        "overdue": "已逾期",
+        "onTrack": "進度正常"
+      },
+      "title": "學生儀表板",
+      "description": "學習進度和推薦概覽",
+      "practiceButton": "練習閃卡",
+      "setGoalButton": "設定目標"
+    },
+    "reportpage": {
+      "title": "使用者活動",
+      "activityprogress": "活動進度",
+      "recentactivity": "最近活動",
+      "inProgress": "進行中",
+      "completed": "已完成",
+      "daterange": "日期範圍",
+      "xpearned": "獲得的 XP",
+      "xpoverall": "XP 總計",
+      "activityheatmap": "活動熱力圖",
+      "readingstatschart": "閱讀統計圖表",
+      "timeframes": {
+        "7d": "過去7天",
+        "30d": "過去30天",
+        "90d": "過去3個月",
+        "6m": "過去6個月"
+      },
+      "granularity": {
+        "day": "天",
+        "hour": "小時"
+      },
+      "activityTypes": {
+        "reading": "閱讀",
+        "questions": "問題",
+        "flashcards": "閃卡",
+        "practice": "練習",
+        "assessment": "評估",
+        "rating": "評分",
+        "other": "其他"
+      },
+      "clear": "清除",
+      "labels": {
+        "activities": "活動",
+        "across": "在",
+        "sessions": "會話",
+        "students": "學生",
+        "completed": "已完成",
+        "minutes": "分鐘"
+      },
+      "stats": {
+        "totalActivities": "總活動",
+        "peakDaily": "每日峰值"
+      },
+      "legend": {
+        "less": "少",
+        "more": "多"
+      },
+      "errorLoading": "載入熱力圖時出錯",
+      "ariaLabel": "活動熱力圖。使用方向鍵導覽，按 Enter 選擇。",
+      "srSummary": "活動熱力圖顯示從 {start} 到 {end} 的 {total} 個活動。峰值 {peak} 個活動。共 {students} 名學生。",
+      "activityTimeline": {
+        "title": "活動時間軸",
+        "errorLoading": "載入活動時間軸失敗",
+        "emptyTitle": "暫無活動",
+        "emptyDescription": "此期間沒有記錄的活動。",
+        "clearFilters": "清除",
+        "srSummaryStart": "活動時間軸顯示",
+        "srSummaryMid": "活動從",
+        "srSummaryTo": "到",
+        "labels": {
+          "assignment": "作業",
+          "srs": "SRS",
+          "reading": "閱讀",
+          "practice": "練習"
+        }
+      }
     }
   },
   "Admin": {
@@ -215,6 +425,98 @@
           "emailInvalid": "請輸入有效的電子郵件地址"
         }
       }
+    },
+    "Dashboard": {
+      "title": "管理員儀表板",
+      "subtitle": "管理您的學校教育平台",
+      "timeframes": {
+        "7d": "7天",
+        "30d": "30天",
+        "90d": "90天"
+      },
+      "timeframeDescription": {
+        "7d": "過去7天",
+        "30d": "過去30天",
+        "90d": "過去90天"
+      },
+      "kpis": {
+        "dataSource": {
+          "userActivity": "使用者活動日誌",
+          "classroomActivity": "課堂活動",
+          "lessonRecords": "課程記錄",
+          "userRegistration": "使用者註冊",
+          "systemMonitoring": "系統監控"
+        },
+        "activeStudents": {
+          "title": "活躍學生",
+          "tooltip": "在所選時間範圍內至少有一次活動的學生"
+        },
+        "activeTeachers": {
+          "title": "活躍教師",
+          "description": "共{total}人",
+          "tooltip": "在所選時間範圍內有活動的教師和管理員"
+        },
+        "activeClassrooms": {
+          "title": "活躍課堂",
+          "description": "有學生活動",
+          "tooltip": "在所選時間範圍內至少有一名活躍學生的課堂"
+        },
+        "readingSessions": {
+          "title": "閱讀次數",
+          "description": "已完成",
+          "tooltip": "已完成的閱讀次數總數"
+        },
+        "totalXp": {
+          "title": "獲得總經驗值",
+          "description": "今日閱讀次數",
+          "tooltip": "今日完成的閱讀次數"
+        },
+        "newUsers": {
+          "title": "新使用者",
+          "description": "今日加入",
+          "tooltip": "今日新註冊使用者"
+        },
+        "systemHealth": {
+          "title": "系統健康",
+          "description": "{status}",
+          "tooltip": "整體系統健康狀態"
+        }
+      },
+      "teacherEffectiveness": {
+        "title": "教師效能",
+        "description": "學生參與度與進步速度對比",
+        "engagement": "參與度",
+        "progress": "進度",
+        "accuracy": "準確率",
+        "students": "學生",
+        "levels": "等級",
+        "topPerformers": "優秀表現",
+        "performanceLevels": {
+          "high": "高效能",
+          "average": "一般",
+          "needsSupport": "需要支持"
+        },
+        "emptyMessage": "暫無教師資料",
+        "tooltip": {
+          "engagement": "參與度：{rate}%",
+          "activeStudents": "{active}/{total}名活躍學生",
+          "classroom": "課堂"
+        },
+        "legend": {
+          "excellent": "≥80%（優秀）",
+          "good": "60-79%（良好）",
+          "needsSupport": "<60%（需要支持）"
+        },
+        "topTeacher": "參與度最高的教師",
+        "activeLabel": "活躍",
+        "classroomLabel": "課堂"
+      },
+      "licenseSelector": {
+        "title": "選擇授權",
+        "placeholder": "選擇一個授權",
+        "availableLabel": "可用授權",
+        "users": "使用者：{used}/{max}"
+      }
     }
   },
   "ImportData": {
@@ -258,7 +560,11 @@
     "preview": {
       "button": "預覽",
       "title": "資料預覽",
-      "columns": { "name": "姓名", "email": "電子郵件", "role": "角色" }
+      "columns": {
+        "name": "姓名",
+        "email": "電子郵件",
+        "role": "角色"
+      }
     },
     "formatGuide": {
       "title": "CSV 格式指南",
@@ -553,6 +859,544 @@
         "deleteFailed": "刪除文章失敗",
         "deleteError": "刪除文章時發生錯誤"
       }
+    },
+    "kpiCard": {
+      "source": "來源"
+    },
+    "aiInsights": {
+      "insights": {
+        "title": "AI 洞見",
+        "description": "由真實 AI 提供的智慧分析",
+        "empty": "目前尚無洞見。繼續使用平台以生成個人化建議。"
+      },
+      "loading": {
+        "skeleton": "正在載入洞見..."
+      },
+      "toast": {
+        "dismiss": {
+          "title": "已隱藏洞見",
+          "description": "該洞見已從您的視圖中隱藏。"
+        },
+        "dismissError": {
+          "title": "錯誤",
+          "description": "隱藏洞見失敗。請重試。"
+        },
+        "actionRecorded": {
+          "title": "已記錄操作",
+          "description": "感謝您對此洞見採取行動！"
+        },
+        "actionError": {
+          "title": "錯誤",
+          "description": "記錄操作失敗。請重試。"
+        },
+        "refreshed": {
+          "title": "洞見已更新",
+          "description": "AI 洞見已使用最新資料重新生成。"
+        }
+      },
+      "actions": {
+        "done": "完成"
+      },
+      "suggestions": {
+        "title": "智慧建議",
+        "description": "可執行的建議以優化您的平台",
+        "empty": "完成更多活動以接收個人化建議。",
+        "actionItems": "{count} 個操作項目",
+        "impact": "影響："
+      }
+    },
+    "adoptionWidget": {
+      "title": "學生參與度（按等級）",
+      "description": "按{mode}劃分的活躍學生",
+      "modes": {
+        "grade": "年級",
+        "cefr": "CEFR等級"
+      },
+      "timeframe": {
+        "7d": "最近7天",
+        "30d": "最近30天",
+        "90d": "最近3個月"
+      },
+      "empty": "暫無學生資料",
+      "view": {
+        "cefr": "CEFR",
+        "grade": "年級"
+      },
+      "item": {
+        "activeStudents": "{count} 名活躍學生",
+        "avgXp": "平均 {xp} XP"
+      },
+      "summary": {
+        "title": "總體參與度",
+        "activeInTimeframe": "{active}/{total} 名學生在過去 {timeframe} 活躍"
+      }
+    },
+    "alertCenter": {
+      "title": "警報中心",
+      "unacknowledged": "未確認的警報",
+      "noAlerts": "目前沒有警報",
+      "viewAll": "檢視所有警報",
+      "filter": {
+        "unread": "未讀",
+        "critical": "重要",
+        "all": "全部"
+      },
+      "markRead": "標記為已讀",
+      "dialog": {
+        "title": "所有警報",
+        "total": "總警報數",
+        "all": "全部",
+        "unread": "未讀",
+        "critical": "重要",
+        "noAlertsCategory": "此類別中沒有警報"
+      },
+      "read": "已讀",
+      "viewDetails": "檢視詳情"
+    },
+    "compactHeatmap": {
+      "title": "活動熱力圖",
+      "lastRange": "最近90天",
+      "activities": "活動",
+      "stats": {
+        "total": "總計",
+        "peakDay": "峰值日",
+        "dailyAvg": "日均"
+      },
+      "dow": {
+        "sun": "日",
+        "mon": "一",
+        "tue": "二",
+        "wed": "三",
+        "thu": "四",
+        "fri": "五",
+        "sat": "六"
+      },
+      "legend": {
+        "less": "少",
+        "more": "多"
+      },
+      "hoverForDetails": "將滑鼠懸停在方塊上檢視詳情",
+      "topActivityDates": "活動最活躍日期"
+    },
+    "widgetShell": {
+      "refresh": "重新整理",
+      "viewAll": "檢視全部",
+      "noData": "暫無資料",
+      "tryAgain": "重試"
+    },
+    "modernActiveUsers": {
+      "labels": {
+        "activeUsers": "活躍使用者"
+      },
+      "today": "今天",
+      "avg": {
+        "7d": "7天平均",
+        "30d": "30天平均",
+        "90d": "90天平均",
+        "allTime": "全部平均"
+      },
+      "title": {
+        "activityTrend": "活動趨勢"
+      },
+      "tooltip": {
+        "activeUsers": "活躍使用者"
+      }
+    },
+    "modernLicenseUsage": {
+      "title": "授權使用",
+      "noLicenses": {
+        "title": "找不到授權",
+        "description": "目前沒有授權資料。"
+      },
+      "schools": {
+        "total": "學校總數"
+      },
+      "of": "/",
+      "labels": {
+        "usage": "使用",
+        "used": "已使用",
+        "expires": "到期"
+      },
+      "warnings": {
+        "nearLimit": "使用率超過80%。請考慮盡快升級。",
+        "expiresSoon": "授權將在30天內到期。"
+      }
+    },
+    "activityCharts": {
+      "title": "活動概覽",
+      "description": "監控使用者活動、參與模式和即時事件",
+      "timeframe": {
+        "7": "過去7天",
+        "30": "過去30天",
+        "90": "過去3個月",
+        "all": "全部時間"
+      },
+      "heatmap": {
+        "title": "活動熱力圖",
+        "description": "每日活動等級",
+        "range": {
+          "7": "過去7天內",
+          "30": "過去30天內",
+          "90": "過去3個月內",
+          "all": "過去一年內"
+        },
+        "tooltip": "{date}: {count} 次活動"
+      },
+      "legend": {
+        "less": "少",
+        "more": "多"
+      },
+      "daily": {
+        "title": "每日活動趨勢",
+        "description": "所選期間的活動等級"
+      },
+      "engagement": {
+        "title": "使用者參與度",
+        "description": "使用者與會話對比"
+      },
+      "timeline": {
+        "title": "活動日誌",
+        "description": "最近的使用者活動和事件",
+        "empty": "未找到符合所選篩選條件的事件。",
+        "by": "由 {user}",
+        "filterByType": "按類型篩選",
+        "allTypes": "所有類型",
+        "table": {
+          "type": "類型",
+          "activity": "活動",
+          "description": "描述",
+          "user": "使用者",
+          "time": "時間"
+        },
+        "pagination": {
+          "showing": "顯示 {start}-{end}，共 {total}",
+          "previous": "上一頁",
+          "next": "下一頁",
+          "page": "頁碼",
+          "of": "共"
+        }
+      },
+      "types": {
+        "reading": "閱讀",
+        "practice": "練習",
+        "assessment": "評估",
+        "achievement": "成就"
+      },
+      "events": {
+        "activity": "活動",
+        "srsPractice": "SRS練習會話",
+        "assignment": "作業",
+        "reading": "閱讀",
+        "practice": "練習"
+      },
+      "charts": {
+        "activity": "活動",
+        "users": "使用者",
+        "sessions": "會話"
+      },
+      "time": {
+        "justNow": "剛剛",
+        "minutesAgo": "{m}分鐘前",
+        "hoursAgo": "{h}小時前",
+        "daysAgo": "{d}天前"
+      }
+    },
+    "metricsCards": {
+      "totalSessions": {
+        "title": "總會話數",
+        "description": "閱讀會話總數"
+      },
+      "activeUsers": {
+        "title": "活躍使用者",
+        "description": "期間內活躍的使用者"
+      },
+      "readingSessions": {
+        "title": "閱讀會話",
+        "description": "閱讀會話總數"
+      },
+      "alignmentScore": {
+        "title": "對齊分數",
+        "description": "內容對齊品質"
+      },
+      "learningVelocity": {
+        "title": "學習速度",
+        "description": "每位學生平均 XP ({dateRange})",
+        "fallback": {
+          "description": "每分鐘單字數"
+        }
+      },
+      "avgSessionTime": {
+        "title": "平均會話時間",
+        "description": "每次會話的平均時間"
+      },
+      "totalActivity": {
+        "title": "總活動",
+        "description": "今日用戶活動"
+      },
+      "activeUsersLast24": {
+        "description": "過去24小時內的活躍使用者"
+      },
+      "readingSessionsToday": {
+        "description": "今日閱讀文章數"
+      },
+      "learningVelocityFallback": {
+        "description": "每分鐘單字數"
+      }
+    },
+    "activityTimeline": {
+      "title": "活動時間軸",
+      "errorLoading": "載入活動時間軸失敗，請重試。",
+      "emptyTitle": "找不到活動",
+      "emptyDescription": "所選期間沒有事件。",
+      "summary": "{total} 個活動，從 {start} 到 {end}",
+      "timeframe": {
+        "7d": "過去7天",
+        "30d": "過去30天",
+        "90d": "過去3個月"
+      },
+      "clearFilters": "清除篩選",
+      "labels": {
+        "assignment": "作業",
+        "srs": "SRS 練習",
+        "reading": "閱讀",
+        "practice": "練習",
+        "completed": "已完成"
+      },
+      "types": {
+        "assignment": "作業",
+        "srs": "SRS",
+        "reading": "閱讀",
+        "practice": "練習"
+      },
+      "status": {
+        "completed": "已完成",
+        "in_progress": "進行中",
+        "unknown": "未知"
+      },
+      "srSummaryStart": "時間軸摘要：",
+      "srSummaryMid": "活動在",
+      "srSummaryTo": "和",
+      "srEventSuffix": "事件"
+    },
+    "activeGoalsWidget": {
+      "title": "進行中的目標",
+      "loading": "載入中...",
+      "emptyDescription": "暫無進行中的目標",
+      "createFirst": "建立您的第一個目標",
+      "description": "您的前3個學習目標",
+      "highPriority": "高優先順序",
+      "daysLeft": "還剩 {count} 天",
+      "dueToday": "今日到期",
+      "overdue": "已逾期",
+      "onTrack": "進度正常"
+    },
+    "assignmentNotificationDialog": {
+      "title": "發送作業通知",
+      "description": "選擇要通知的作業和學生",
+      "selectInstruction": "選擇要通知的作業",
+      "selected": "已選擇",
+      "detail": "詳情",
+      "badges": {
+        "overdue": "逾期",
+        "dueToday": "今天截止",
+        "oneDay": "剩餘1天",
+        "daysRemaining": "剩餘"
+      },
+      "back": "返回",
+      "students": {
+        "completedLabel": "已完成的學生",
+        "incompleteLabel": "未完成的學生"
+      },
+      "selectStudents": "選擇要通知的學生",
+      "deselectAll": "取消全選",
+      "selectAll": "全選",
+      "studentStatus": { "completed": "已完成", "incomplete": "未完成" },
+      "history": { "empty": "暫無通知歷史", "sentTo": "已發送給" },
+      "studentsLabel": "名學生",
+      "tabs": { "select": "選擇", "history": "歷史" },
+      "cancel": "取消",
+      "sending": "發送中...",
+      "sentSuccess": "通知發送成功",
+      "sentError": "發生錯誤",
+      "sendDefault": "向未完成的學生發送通知",
+      "sendToSelected": "發送給{count}名學生"
+    },
+    "assignmentNotification": {
+      "title": "作業通知",
+      "description": "您有{count}條作業通知",
+      "badge": {
+        "teacherNotified": "教師已通知",
+        "new": "新"
+      },
+      "fromTeacher": "教師{name}",
+      "dueLabel": "截止日期：",
+      "due": {
+        "overdue": "逾期{days}天",
+        "today": "今天截止",
+        "oneDay": "剩餘1天",
+        "fewDays": "剩餘{days}天",
+        "severalDays": "剩餘{days}天",
+        "days": "剩餘{days}天"
+      },
+      "goToAssignment": "前往作業",
+      "acknowledge": "確認",
+      "acknowledgeAll": "全部確認",
+      "close": "關閉",
+      "createdAt": "創建於"
+    },
+    "classDashboardKpis": {
+      "errorTitle": "載入班級儀表板時發生錯誤",
+      "totalStudents": {
+        "title": "學生總數",
+        "description": "本週 {active} 人活躍"
+      },
+      "activeStudents": {
+        "title": "活躍學生",
+        "description": "{rate}% 活躍率"
+      },
+      "avgLevel": { "title": "平均等級", "description": "班級閱讀等級" },
+      "totalXp": { "title": "總經驗值", "description": "班級累計經驗值" },
+      "activeAssignments": {
+        "title": "進行中的作業",
+        "description": "目前進行中"
+      },
+      "completed": { "title": "已完成", "description": "作業提交數" }
+    },
+    "classAccuracyMetrics": {
+      "title": "學生準確率（按類型）",
+      "errorDescription": "無法載入準確率資料",
+      "descriptionPrefix": "按題型細分的表現",
+      "active": "活躍",
+      "mcqAvg": "選擇題平均",
+      "openEndedAvg": "開放式問答平均",
+      "overallAvg": "整體平均",
+      "headers": {
+        "student": "學生",
+        "mcq": "選擇題",
+        "openEnded": "開放式問答（分數≥70%）",
+        "overall": "整體"
+      },
+      "noActivity": "暫無學生活動資料"
+    },
+    "classActivityHeatmap": {
+      "title": "活動熱力圖",
+      "days": "天",
+      "description": "過去{days}天的學生活動",
+      "seeDetail": "查看詳情",
+      "error": "無法載入活動資料",
+      "noData": "暫無活動資料",
+      "stats": {
+        "activeUsers": "活躍用戶",
+        "totalActivity": "總活動量",
+        "peakDay": "高峰日"
+      },
+      "legend": { "title": "活動級別：", "less": "較少", "more": "較多" },
+      "topActiveDays": "最活躍日期",
+      "activities": "次活動",
+      "dow": {
+        "sun": "日",
+        "mon": "一",
+        "tue": "二",
+        "wed": "三",
+        "thu": "四",
+        "fri": "五",
+        "sat": "六"
+      }
+    },
+    "classAlignmentMatrix": {
+      "title": "CEFR ↔ RA 對齊矩陣",
+      "error": "無法載入對齊資料",
+      "noData": "暫無對齊資料",
+      "alignmentScore": "對齊分數：",
+      "studentsWithActivity": "有閱讀活動的學生",
+      "alignedLabel": "已對齊",
+      "aboveLabel": "超出水準",
+      "stats": {
+        "averageLevel": "平均水準：",
+        "modalLevel": "眾數水準：",
+        "totalReadings": "總閱讀量："
+      }
+    },
+    "classAssignmentFunnel": {
+      "title": "作業漏斗",
+      "error": "無法載入作業資料",
+      "noData": "暫無作業資料",
+      "description": "完成率及風險作業",
+      "seeDetail": "查看詳情",
+      "overallCompletion": "整體完成",
+      "highCompletion": "高完成率",
+      "atRisk": "風險",
+      "stale": "過期",
+      "notStarted": "未開始",
+      "needAttention": "個作業需要關注",
+      "needAttentionPlural": "個作業需要關注",
+      "showing": "顯示{count}個作業",
+      "clearFilter": "清除篩選"
+    },
+    "classBatchActions": {
+      "title": "班級管理",
+      "description": "管理和追蹤學生進度的工具",
+      "noExportData": "沒有可匯出的學生資料",
+      "csv": {
+        "name": "姓名",
+        "email": "電子郵件",
+        "level": "等級",
+        "cefr": "CEFR等級",
+        "xp": "經驗值",
+        "readingSessions": "閱讀會話",
+        "assignmentsCompleted": "已完成作業",
+        "assignmentsPending": "待完成作業",
+        "avgAccuracy": "平均準確率(%)",
+        "lastActive": "最後活躍",
+        "joinedAt": "加入時間"
+      },
+      "actions": {
+        "export": "匯出資料",
+        "exportDesc": "下載學生資料為CSV",
+        "notify": "發送作業通知",
+        "notifyDesc": "通知有待完成作業的學生",
+        "assign": "指派作業",
+        "assignDesc": "選擇文章指派給學生",
+        "manage": "管理學生",
+        "manageDesc": "管理該班級的學生名單"
+      },
+      "exportError": "匯出資料時發生錯誤: {message}",
+      "selectedStudents": "已選擇 {count} 名學生",
+      "processing": "處理中..."
+    },
+    "classGenreEngagement": {
+      "title": "類型參與度",
+      "description": "閱讀偏好 • 最受歡迎：{mostPopular}",
+      "loading": "載入類型資料中...",
+      "errorUnableToLoad": "無法載入類型資料",
+      "noData": "沒有類型資料",
+      "labels": {
+        "books": "本",
+        "percentSuffix": "%",
+        "avgLevel": "平均等級",
+        "xp": "XP"
+      },
+      "moreGenres": "+{count} 更多類型"
+    },
+    "classVelocityTable": {
+      "title": "速度與預估",
+      "description": "閱讀速度與進度指標",
+      "errorUnableToLoad": "無法載入速度資料",
+      "noData": "沒有速度資料",
+      "noActivity": "在所選時間範圍內沒有閱讀活動",
+      "noActivityDetails": "學生在過去 {days} 天內未完成任何文章",
+      "labels": {
+        "articlesPerDay": "文章/天",
+        "articlesPerMonth": "文章/月",
+        "trend": "趨勢"
+      },
+      "trend": { "up": "上升", "down": "下降", "stable": "穩定" },
+      "stats": {
+        "totalArticles": "文章總數：",
+        "totalWords": "總字數：",
+        "totalTime": "總時間：",
+        "min": "分"
+      }
     }
   },
   "WordList": {
@@ -718,7 +1562,9 @@
       "title": "CEFR 等級",
       "yourlevel": "您的等級",
       "description": {
+        "A0-": "您可以识别您以前见过的单词和名称，尤其是在有图片帮助的情况下。您可以理解您周围的真实简单的标志和基本信息，如在哪里和什么时候发生什么事情。",
         "A0": "您可以识别您以前见过的单词和名称，尤其是在有图片帮助的情况下。您可以理解您周围的真实简单的标志和基本信息，如在哪里和什么时候发生什么事情。",
+        "A0+": "您可以识别您以前见过的单词和名称，尤其是在有图片帮助的情况下。您可以理解您周围的真实简单的标志和基本信息，如在哪里和什么时候发生什么事情。",
         "A1-": "您开始识别更多的单词和简单的短语，超越了最基本的词汇。您可以遵循短、简单的方向，并理解基本的短语和句子，关于您需要的事情。",
         "A1": "您可以理解非常短和简单的文本。您可以识别足够的单词来发现它们在通知和简单指南中的位置。您可以使用您知道的单词谈论简单、日常的事情。",
         "A1+": "您开始理解对您重要的句子表达。阅读不仅仅是识别熟悉的单词；您开始理解简单的文本中的整个信息。",
@@ -856,7 +1702,6 @@
     "clozeTest": "填空測試",
     "orderWord": "排列單字",
     "matching": "配對",
-
     "matchingGame": {
       "title": "翻譯配對遊戲",
       "description": "練習將單字與其含義從您的抽認卡集合中配對！",
@@ -1676,8 +2521,12 @@
         "title": "關鍵句子：{count} 句",
         "more": "+{count} 句已保存"
       },
-      "actions": { "backToRead": "返回閱讀頁面" },
-      "toast": { "failed": "無法載入課程總結" }
+      "actions": {
+        "backToRead": "返回閱讀頁面"
+      },
+      "toast": {
+        "failed": "無法載入課程總結"
+      }
     },
     "VocabularyFlashcards": {
       "loading": {
@@ -1733,12 +2582,84 @@
         "timeTaken": "花費時間",
         "completed": "已完成"
       }
+    },
+    "VocabularyMatching": {
+      "loading": {
+        "title": "正在載入閃卡",
+        "description": "正在準備您的詞彙練習..."
+      },
+      "noCards": {
+        "title": "無可用詞彙",
+        "description": "此文章尚無可用的詞彙閃卡。"
+      },
+      "error": {
+        "title": "載入失敗",
+        "description": "載入詞彙時發生錯誤，請重試。"
+      },
+      "buttons": {
+        "tryAgain": "重試",
+        "showAnswers": "顯示答案",
+        "completeActivity": "完成活動"
+      },
+      "start": {
+        "title": "開始詞彙配對",
+        "subtitle": "選擇您喜歡的定義語言",
+        "languageLabel": "定義語言",
+        "languageHint": "詞義將以此語言顯示",
+        "startButton": "開始配對遊戲"
+      },
+      "completed": {
+        "title": "詞彙練習完成！",
+        "subtitle": "您的詞彙練習做得很好",
+        "xpEarned": "獲得 XP",
+        "completed": "已完成"
+      },
+      "game": {
+        "title": "📚 將單詞與定義配對",
+        "instruction": "點擊左側單詞，然後點擊右側的定義",
+        "columns": {
+          "words": "單詞",
+          "definitions": "定義"
+        }
+      },
+      "progress": {
+        "matched": "{matched}/{total} 已配對",
+        "correct": "{correct}/{total} 正確"
+      },
+      "results": {
+        "perfect": "完美！所有配對都正確！🎉",
+        "partialCorrect": "{correct}/{total} 正確 💪",
+        "correctMatches": "正確配對：",
+        "showAnswers": "已顯示正確配對！📖",
+        "correctMatch": "配對正確！✅",
+        "incorrectMatch": "配對不正確，再試一次！❌",
+        "tryAgain": "{correct}/{total} 正確，再試一次！💪"
+      },
+      "toast": {
+        "failedToLoad": "無法載入詞彙"
+      }
+    },
+    "Introduction": {
+      "phase1Title": "課程介紹",
+      "phase1Description": "在本課程中，您將閱讀一篇關於「{title}」的文章",
+      "cefrLevel": "CEFR 等級：{level}",
+      "raLevel": "RA 等級：{level}",
+      "estimatedReadTime": "預計閱讀時間：{time}",
+      "articleSummary": "文章摘要",
+      "learningObjectives": "學習目標",
+      "understandMainIdeas": "理解主要思想：",
+      "learnVocabulary": "學習詞彙：",
+      "improveComprehension": "提高閱讀理解："
     }
   },
   "LessonLanguageQuestion": {
     "title": "AI 閱讀助理",
-    "loading": { "conversation": "正在載入對話..." },
-    "status": { "online": "線上" },
+    "loading": {
+      "conversation": "正在載入對話..."
+    },
+    "status": {
+      "online": "線上"
+    },
     "header": {
       "readyWithName": "準備好幫助 {name} 解答問題",
       "ready": "準備好幫助你解答問題"
@@ -1753,7 +2674,10 @@
       "placeholderWithName": "{name}，問問關於這篇文章的問題...",
       "placeholder": "輸入你關於這篇文章的問題..."
     },
-    "buttons": { "send": "送出", "skip": "略過" },
+    "buttons": {
+      "send": "送出",
+      "skip": "略過"
+    },
     "tips": {
       "askVocabulary": "詢問詞彙",
       "discussTheme": "討論主題思想",
@@ -1770,7 +2694,9 @@
       "questionOf": "第 {current} 題 / 共 {total} 題",
       "completePercent": "完成 {percent}%"
     },
-    "timer": { "seconds": "{seconds}秒" },
+    "timer": {
+      "seconds": "{seconds}秒"
+    },
     "completed": {
       "title": "測驗完成",
       "description": "做得好！你已完成測驗",
@@ -1786,7 +2712,9 @@
     }
   },
   "LessonSAQ": {
-    "completed": { "title": "測驗完成" },
+    "completed": {
+      "title": "測驗完成"
+    },
     "labels": {
       "question": "問題：",
       "yourAnswer": "你的答案：",
@@ -1794,13 +2722,23 @@
       "feedback": "反饋：",
       "score": "分數："
     },
-    "timer": { "elapsed": "用時：{time}" },
-    "form": {
-      "placeholder": { "answer": "在此輸入你的答案..." },
-      "help": { "detailedResponse": "寫下詳細回答以展示你的理解" },
-      "validation": { "answerRequired": "請輸入您的答案" }
+    "timer": {
+      "elapsed": "用時：{time}"
     },
-    "actions": { "submit": "送出" }
+    "form": {
+      "placeholder": {
+        "answer": "在此輸入你的答案..."
+      },
+      "help": {
+        "detailedResponse": "寫下詳細回答以展示你的理解"
+      },
+      "validation": {
+        "answerRequired": "請輸入您的答案"
+      }
+    },
+    "actions": {
+      "submit": "送出"
+    }
   },
   "LessonCloze": {
     "loading": {
@@ -1921,7 +2859,9 @@
     "prompt": {
       "thinkAndReveal": "思考這個詞的意思，然後顯示答案"
     },
-    "buttons": { "showAnswer": "顯示答案" },
+    "buttons": {
+      "showAnswer": "顯示答案"
+    },
     "rating": {
       "prompt": "您對這個詞的記憶程度如何？",
       "again": "再來一次",
@@ -2041,7 +2981,9 @@
       "archive": "封存",
       "delete": "刪除"
     },
-    "search": { "placeholder": "搜尋" },
+    "search": {
+      "placeholder": "搜尋"
+    },
     "import": {
       "fromLabel": "從以下匯入新班級",
       "googleClassroom": "Google Classroom",
@@ -2061,7 +3003,10 @@
         "aboutDescription": "此功能可匯入 Google Classroom 學生。學生將自動加入您的班級。"
       }
     },
-    "pagination": { "previous": "上一頁", "next": "下一頁" },
+    "pagination": {
+      "previous": "上一頁",
+      "next": "下一頁"
+    },
     "edit": {
       "title": "編輯班級",
       "description": "您確定要編輯此班級嗎？",
@@ -2090,8 +3035,13 @@
     }
   },
   "TeacherCreateClass": {
-    "button": { "newClassroom": "新增班級" },
-    "dialog": { "title": "建立班級", "description": "建立一個新班級" },
+    "button": {
+      "newClassroom": "新增班級"
+    },
+    "dialog": {
+      "title": "建立班級",
+      "description": "建立一個新班級"
+    },
     "fields": {
       "className": "班級名稱",
       "classNamePlaceholder": "班級名稱",
@@ -2100,7 +3050,10 @@
       "gradePlaceholder": "年級",
       "gradeItem": "年級 {grade}"
     },
-    "actions": { "create": "建立", "cancel": "取消" },
+    "actions": {
+      "create": "建立",
+      "cancel": "取消"
+    },
     "toast": {
       "attention": "提醒",
       "fillAllFields": "請填寫所有欄位",
@@ -2108,79 +3061,6 @@
       "classCreated": "建立班級成功",
       "error": "錯誤",
       "failedCreate": "建立班級失敗"
-    }
-  },
-  "teacher": {
-    "myStudents": {
-      "title": "我的學生",
-      "description": "查看並管理您的學生",
-      "table": {
-        "name": "姓名",
-        "email": "電子郵件",
-        "classrooms": "班級",
-        "actions": "操作",
-        "empty": "空"
-      },
-      "actions": {
-        "progress": "進度",
-        "resetProgress": "重設進度",
-        "cancel": "取消",
-        "reset": "重設"
-      },
-      "search": {
-        "placeholder": "按姓名搜尋"
-      },
-      "pagination": {
-        "previous": "上一頁",
-        "next": "下一頁"
-      },
-      "unknown": {
-        "student": "匿名",
-        "email": "未知"
-      },
-      "classrooms": {
-        "none": "無班級",
-        "more": "+{count} 更多"
-      },
-      "dialog": {
-        "reset": {
-          "title": "重設進度",
-          "description": "您確定要重設該學生的學習進度嗎？"
-        }
-      },
-      "toast": {
-        "reset": {
-          "success": "XP 重設成功。",
-          "error": "XP 重設失敗。"
-        }
-      }
-    },
-    "cefrSetter": {
-      "button": { "setLevel": "設定等級" },
-      "dialog": {
-        "title": "為 {name} 設定 CEFR 等級",
-        "description": "為此學生選擇合適的 CEFR 等級，同時也會更新其閱讀等級（RA）。"
-      },
-      "labels": {
-        "currentLevel": "目前等級",
-        "newLevel": "新等級"
-      },
-      "select": { "placeholder": "選擇 CEFR 等級" },
-      "preview": {
-        "title": "預覽：",
-        "cefr": "CEFR 等級：",
-        "ra": "RA 等級："
-      },
-      "actions": {
-        "cancel": "取消",
-        "update": "更新等級",
-        "updating": "更新中..."
-      },
-      "toast": {
-        "noChanges": "沒有可儲存的變更",
-        "success": "已將 {name} 的 CEFR 等級更新為 {level}",
-        "error": "更新 CEFR 等級失敗"
-      }
     }
   },
   "Teacher": {
@@ -2427,6 +3307,299 @@
       "cancel": "取消",
       "edit": "編輯",
       "noStudentsInSelectedStatus": "所選狀態下沒有學生"
+    },
+    "myStudents": {
+      "title": "我的學生",
+      "description": "查看並管理您的學生",
+      "table": {
+        "name": "姓名",
+        "email": "電子郵件",
+        "classrooms": "班級",
+        "actions": "操作",
+        "empty": "空"
+      },
+      "actions": {
+        "progress": "進度",
+        "resetProgress": "重設進度",
+        "cancel": "取消",
+        "reset": "重設"
+      },
+      "search": {
+        "placeholder": "按姓名搜尋"
+      },
+      "pagination": {
+        "previous": "上一頁",
+        "next": "下一頁"
+      },
+      "unknown": {
+        "student": "匿名",
+        "email": "未知"
+      },
+      "classrooms": {
+        "none": "無班級",
+        "more": "+{count} 更多"
+      },
+      "dialog": {
+        "reset": {
+          "title": "重設進度",
+          "description": "您確定要重設該學生的學習進度嗎？"
+        }
+      },
+      "toast": {
+        "reset": {
+          "success": "XP 重設成功。",
+          "error": "XP 重設失敗。"
+        }
+      }
+    },
+    "cefrSetter": {
+      "button": {
+        "setLevel": "設定等級"
+      },
+      "dialog": {
+        "title": "為 {name} 設定 CEFR 等級",
+        "description": "為此學生選擇合適的 CEFR 等級，同時也會更新其閱讀等級（RA）。"
+      },
+      "labels": {
+        "currentLevel": "目前等級",
+        "newLevel": "新等級"
+      },
+      "select": {
+        "placeholder": "選擇 CEFR 等級"
+      },
+      "preview": {
+        "title": "預覽：",
+        "cefr": "CEFR 等級：",
+        "ra": "RA 等級："
+      },
+      "actions": {
+        "cancel": "取消",
+        "update": "更新等級",
+        "updating": "更新中..."
+      },
+      "toast": {
+        "noChanges": "沒有可儲存的變更",
+        "success": "已將 {name} 的 CEFR 等級更新為 {level}",
+        "error": "更新 CEFR 等級失敗"
+      }
+    },
+    "Dashboard": {
+      "title": "教師儀表板",
+      "description": "監控您的課堂，追蹤學生進度，並獲取由 AI 提供的見解",
+      "kpis": {
+        "totalClasses": "總班級數",
+        "totalStudents": "總學生數",
+        "activeStudents": "活躍學生",
+        "averageLevel": "平均水平",
+        "weeklyXP": "每週經驗值",
+        "accuracy": "準確率",
+        "readingVelocity": "閱讀速度",
+        "onTrack": "進度正常",
+        "activeToday": "今日活躍",
+        "completedToday": "今日完成",
+        "pending": "待處理的作業",
+        "managing": "管理中",
+        "class": "班級",
+        "classes": "班級",
+        "managingClasses": "管理 {count} 個班級",
+        "acrossAllClasses": "所有班級",
+        "activeOf": "{active}/{total} 活躍（30天）",
+        "classAverageLevel": "班級平均CEFR水平",
+        "averageReadingLevel": "所有學生的平均閱讀水平",
+        "xpEarnedThisWeek": "本週獲得的經驗值",
+        "averageQuizAccuracy": "平均測驗準確率",
+        "booksPerWeek": "每週閱讀書籍",
+        "studentsMeetingGoals": "達成目標的學生",
+        "studentsActiveToday": "今日活躍學生",
+        "assignmentsCompletedToday": "今日完成的作業",
+        "assignmentsPending": "有未完成作業的任務",
+        "engagementRate": "參與率"
+      },
+      "classOverview": {
+        "title": "班級概覽",
+        "description": "管理和監控您的所有教室",
+        "hideArchived": "隱藏已歸檔",
+        "showArchived": "顯示已歸檔",
+        "exportCSV": "匯出CSV",
+        "export": {
+          "headers": {
+            "className": "班級名稱",
+            "classCode": "班級代碼",
+            "students": "學生",
+            "active7d": "活躍（7天）",
+            "avgLevel": "平均等級",
+            "totalXp": "總 XP",
+            "status": "狀態"
+          }
+        },
+        "searchPlaceholder": "按班級名稱或代碼搜尋...",
+        "className": "班級名稱",
+        "code": "代碼",
+        "students": "學生",
+        "active7d": "活躍（7天）",
+        "avgLevel": "平均水平",
+        "totalXP": "總經驗值",
+        "trend": "趨勢",
+        "status": "狀態",
+        "actions": "操作",
+        "viewDetails": "檢視詳情",
+        "viewReports": "檢視報告",
+        "assignments": "作業",
+        "archived": "已歸檔",
+        "active": "活躍",
+        "noClassesFound": "未找到班級",
+        "noClassesMatchingSearch": "未找到符合搜尋條件的班級",
+        "showing": "顯示 {count}/{total} 個班級",
+        "totalStudents": "總學生數：{count}"
+      },
+      "classDetail": {
+        "classCodePrefix": "班級代碼：",
+        "refresh": "重新整理",
+        "exportCSV": "匯出 CSV",
+        "settings": "設定",
+        "tabs": {
+          "overview": "概覽",
+          "assignments": "作業",
+          "students": "學生",
+          "alignment": "對齊",
+          "activity": "活動",
+          "goals": "目標"
+        },
+        "goals": {
+          "management": {
+            "title": "班級目標",
+            "addGoalButton": "為班級新增目標",
+            "searchPlaceholder": "搜尋目標...",
+            "filterAllStatus": "所有狀態",
+            "filterAllGoals": "所有目標",
+            "filterActive": "進行中",
+            "filterFullyCompleted": "已完成",
+            "totalGoals": "總目標數",
+            "activeGoals": "進行中",
+            "fullyCompleted": "已完成",
+            "allStudentsFinished": "所有學生已完成",
+            "noGoalsFound": "未找到目標",
+            "noGoalsDescription": "建立第一個班級目標以開始",
+            "noMatchingGoals": "沒有符合目前篩選條件的目標",
+            "createFirstGoal": "建立第一個目標"
+          },
+          "createDialog": {
+            "title": "為整個班級建立目標",
+            "description": "此目標將為 {className} 中的所有學生設定",
+            "goalType": "目標類型",
+            "title_label": "標題",
+            "titlePlaceholder": "例如：每週閱讀目標",
+            "description_label": "描述（選填）",
+            "descriptionPlaceholder": "新增有關此目標的詳細資訊...",
+            "targetValue": "目標值",
+            "targetValuePlaceholder": "100",
+            "unit": "單位",
+            "targetDate": "目標日期",
+            "priority": "優先順序",
+            "priorityLow": "低",
+            "priorityMedium": "中",
+            "priorityHigh": "高",
+            "cancelButton": "取消",
+            "createButton": "為班級建立目標",
+            "creatingButton": "建立中...",
+            "goalTypes": {
+              "XP_TOTAL": "總經驗值",
+              "XP_DAILY": "每日經驗值",
+              "XP_WEEKLY": "每週經驗值",
+              "ARTICLES_READ": "已讀文章",
+              "READING_TIME": "閱讀時間",
+              "VOCABULARY": "詞彙",
+              "STREAK": "閱讀連續天數",
+              "CEFR_LEVEL": "CEFR 級別",
+              "CUSTOM": "自訂目標"
+            },
+            "units": {
+              "xp": "經驗值",
+              "articles": "篇文章",
+              "minutes": "分鐘",
+              "words": "個單字",
+              "days": "天",
+              "level": "級",
+              "units": "單位"
+            },
+            "toast": {
+              "successTitle": "目標建立成功",
+              "successDescription": "已為 {className} 中的 {count} 名學生建立目標",
+              "errorTitle": "建立目標失敗",
+              "errorDescription": "建立目標時發生錯誤",
+              "genericError": "建立目標失敗，請重試"
+            }
+          },
+          "progressDialog": {
+            "title": "{goalTitle}",
+            "description": "此目標的學生進度 • 目標：{targetValue} {unit}",
+            "stats": {
+              "total": "總數",
+              "completed": "已完成",
+              "active": "進行中",
+              "avgProgress": "平均進度"
+            },
+            "table": {
+              "student": "學生",
+              "progress": "進度",
+              "status": "狀態",
+              "currentTarget": "目前/目標",
+              "unknown": "未知",
+              "completedOn": "完成於 {date}"
+            }
+          },
+          "card": {
+            "priorityHigh": "高優先順序",
+            "priorityMedium": "中優先順序",
+            "priorityLow": "低優先順序",
+            "noDescription": "無描述",
+            "viewDetails": "檢視詳情",
+            "deleteAll": "全部刪除",
+            "confirmDelete": {
+              "title": "刪除所有學生的目標",
+              "description": "您確定要為所有 {count} 名學生刪除此目標嗎？此操作無法復原",
+              "cancel": "取消",
+              "confirm": "全部刪除"
+            },
+            "toast": {
+              "deleteSuccess": "目標已刪除",
+              "deleteSuccessDescription": "已成功刪除 {count} 名學生的目標",
+              "deleteError": "錯誤",
+              "deleteErrorDescription": "刪除部分目標失敗，請重試"
+            },
+            "stats": {
+              "completed": "{completed} 已完成",
+              "active": "{active} 進行中",
+              "students": "{total} 名學生",
+              "dueIn": "{days} 天後到期",
+              "dueToday": "今天到期",
+              "overdue": "逾期 {days} 天"
+            }
+          }
+        }
+      },
+      "aiBrief": {
+        "title": "AI教師簡報",
+        "description": "AI驅動的見解和建議",
+        "updatedAt": "更新於 {time}",
+        "refreshInsights": "重新整理見解",
+        "keyInsights": "關鍵見解（{count}）",
+        "evidence": "證據：",
+        "actionable": "可操作",
+        "noInsights": "目前沒有特定見解",
+        "aiInsightsWillAppear": "AI見解將顯示在此處",
+        "priority": {
+          "low": "低",
+          "medium": "中",
+          "high": "高"
+        }
+      },
+      "lastUpdated": "最後更新：{time}",
+      "error": {
+        "title": "錯誤",
+        "message": "無法載入控制台資料",
+        "retry": "重試"
+      }
     }
   },
   "AdminTeachers": {
@@ -2572,7 +3745,9 @@
       "title": "學生管理",
       "subtitle": "管理學生及其學習進度"
     },
-    "page": { "title": "學生管理" },
+    "page": {
+      "title": "學生管理"
+    },
     "stats": {
       "totalStudents": "學生總數",
       "allClassrooms": "所有班級",
@@ -2644,12 +3819,88 @@
       "loading": "正在載入學生...",
       "empty": "沒有符合條件的學生。"
     },
-    "badges": { "noClass": "無班級" },
+    "badges": {
+      "noClass": "無班級"
+    },
     "pagination": {
       "showing": "顯示第 {from} 到第 {to} 位，共 {total} 位學生",
       "previous": "上一頁",
       "next": "下一頁",
       "pageOf": "第 {page} 頁，共 {totalPages} 頁"
+    }
+  },
+  "System": {
+    "Dashboard": {
+      "title": "系統儀表板",
+      "dateRange": {
+        "7d": "最近 7 天",
+        "30d": "最近 30 天",
+        "90d": "最近 3 個月",
+        "all": "全部時間"
+      },
+      "export": "匯出",
+      "refresh": "重新整理",
+      "refreshing": "正在重新整理...",
+      "loading": "正在載入資料...",
+      "metricsUnavailableTitle": "部分資料可能無法使用：",
+      "tabs": {
+        "overview": "概覽",
+        "activity": "活動",
+        "insights": "AI 洞察"
+      },
+      "cards": {
+        "totalSchools": {
+          "title": "學校總數",
+          "desc": "活躍機構"
+        },
+        "totalUsers": {
+          "title": "使用者總數",
+          "count": "{students} 名學生，{teachers} 名教師"
+        },
+        "totalArticles": {
+          "title": "文章總數",
+          "desc": "可用內容庫"
+        },
+        "completionRate": {
+          "title": "完成率",
+          "desc": "成功完成的文章"
+        }
+      },
+      "licenseUsage": {
+        "title": "授權使用情況",
+        "description": "監控各學校的授權分配和使用情況"
+      },
+      "activeUsers": {
+        "title": "活躍使用者",
+        "description": "即時使用者活動和參與度指標"
+      },
+      "systemHealth": {
+        "title": "系統健康",
+        "description": "即時系統效能和健康指標",
+        "database": "資料庫效能",
+        "apiResponse": "API 回應時間",
+        "errorRate": "錯誤率",
+        "uptime": "系統運行時間",
+        "status": {
+          "excellent": "優秀",
+          "good": "良好",
+          "low": "較低"
+        }
+      },
+      "recentActivity": {
+        "title": "最近活動",
+        "description": "最新管理操作和系統變更",
+        "events": {
+          "newSchoolLicense": "新學校授權已啟用",
+          "contentUpdated": "內容庫已更新",
+          "maintenanceCompleted": "系統維護已完成",
+          "milestoneReached": "閱讀會話里程碑已達成"
+        }
+      },
+      "noData": {
+        "title": "暫無資料",
+        "description": "請嘗試調整篩選條件或重新整理頁面"
+      }
     }
   }
 }

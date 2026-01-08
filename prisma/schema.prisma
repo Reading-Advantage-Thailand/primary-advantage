@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   // output   = "../generated/prisma"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -9,31 +10,35 @@ datasource db {
 }
 
 model User {
-  id                 String               @id @default(cuid())
-  name               String?
-  email              String?              @unique
-  emailVerified      DateTime?            @map("email_verified")
-  image              String?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  password           String?
-  cefrLevel          String?              @default("A0-")
-  level              Int                  @default(1)
-  xp                 Int                  @default(0)
-  schoolId           String?              @map("school_id")
-  accounts           Account[]
-  ArticleActivityLog ArticleActivityLog[]
-  AssignmentStudent  AssignmentStudent[]
-  studentClassroom   ClassroomStudent[]
-  ClassroomTeachers  ClassroomTeachers[]
-  FlashcardDeck      FlashcardDeck[]
-  SchoolAdmins       SchoolAdmins[]
-  sessions           Session[]
-  userActivity       UserActivity[]
-  roles              UserRole[]
-  School             School?              @relation(fields: [schoolId], references: [id])
-  XpLogs             XPLogs[]
-  userLessonProgress UserLessonProgress[]
+  id                    String                   @id @default(cuid())
+  name                  String?
+  email                 String?                  @unique
+  emailVerified         DateTime?                @map("email_verified")
+  image                 String?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  lastActiveAt          DateTime?                @map("last_active_at")
+  password              String?
+  cefrLevel             String?                  @default("A0-")
+  level                 Int                      @default(1)
+  xp                    Int                      @default(0)
+  schoolId              String?                  @map("school_id")
+  accounts              Account[]
+  ArticleActivityLog    ArticleActivityLog[]
+  AssignmentStudent     AssignmentStudent[]
+  studentClassroom      ClassroomStudent[]
+  ClassroomTeachers     ClassroomTeachers[]
+  FlashcardDeck         FlashcardDeck[]
+  SchoolAdmins          SchoolAdmins[]
+  sessions              Session[]
+  userActivity          UserActivity[]
+  roles                 UserRole[]
+  School                School?                  @relation(fields: [schoolId], references: [id])
+  XpLogs                XPLogs[]
+  userLessonProgress    UserLessonProgress[]
+  learningGoals         LearningGoal[]
+  receivedNotifications AssignmentNotification[] @relation("StudentNotifications")
+  sentNotifications     AssignmentNotification[] @relation("TeacherNotifications")
 
   @@map("users")
 }
@@ -403,20 +408,21 @@ model ClassroomTeachers {
 }
 
 model Assignment {
-  id                 String               @id @default(cuid())
-  name               String?
-  description        String?
-  classroomId        String               @map("classroom_id")
-  articleId          String               @map("article_id")
-  teacherId          String               @map("teacher_id")
-  teacherName        String               @map("teacher_name")
-  dueDate            DateTime             @map("due_date")
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  AssignmentStudent  AssignmentStudent[]
-  article            Article              @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  classroom          Classroom            @relation(fields: [classroomId], references: [id], onDelete: Cascade)
-  userLessonProgress UserLessonProgress[]
+  id                      String                   @id @default(cuid())
+  name                    String?
+  description             String?
+  classroomId             String                   @map("classroom_id")
+  articleId               String                   @map("article_id")
+  teacherId               String                   @map("teacher_id")
+  teacherName             String                   @map("teacher_name")
+  dueDate                 DateTime                 @map("due_date")
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  AssignmentStudent       AssignmentStudent[]
+  article                 Article                  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  classroom               Classroom                @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  userLessonProgress      UserLessonProgress[]
+  assignmentNotifications AssignmentNotification[]
 
   @@map("assignments")
 }
@@ -427,6 +433,7 @@ model AssignmentStudent {
   studentId    String           @map("student_id")
   status       AssignmentStatus @default(NOT_STARTED)
   startedAt    DateTime?        @map("started_at")
+  score        Int?             @map("score")
   completedAt  DateTime?        @map("completed_at")
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
@@ -487,6 +494,7 @@ model UserLessonProgress {
   articleId    String      @map("article_id")
   assignmentId String?     @map("assignment_id")
   progress     Int         @default(0)
+  score        Int?        @map("score")
   timeSpent    Int         @default(0)
   isCompleted  Boolean     @default(false)
   createdAt    DateTime    @default(now())
@@ -549,4 +557,170 @@ model StoryChapter {
   flashcardCards          FlashcardCard[]
 
   @@map("story_chapters")
+}
+
+enum AIInsightType {
+  TREND
+  ALERT
+  RECOMMENDATION
+  ACHIEVEMENT
+  WARNING
+}
+
+enum AIInsightScope {
+  STUDENT
+  TEACHER
+  CLASSROOM
+  LICENSE
+  SYSTEM
+}
+
+enum AIInsightPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum GoalType {
+  XP_TOTAL // Total XP target
+  XP_DAILY // Daily XP target
+  XP_WEEKLY // Weekly XP target
+  ARTICLES_READ // Number of articles
+  READING_TIME // Minutes of reading
+  VOCABULARY // New words learned
+  STREAK // Daily streak
+  CEFR_LEVEL // Reach a CEFR level
+  CUSTOM // User-defined goal
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  CANCELLED
+  EXPIRED
+}
+
+enum GoalPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum RecurringPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+model AIInsight {
+  id          String            @id @default(cuid())
+  type        AIInsightType     @map("insight_type")
+  scope       AIInsightScope    @map("scope")
+  priority    AIInsightPriority @default(MEDIUM)
+  title       Json?
+  description Json?
+  confidence  Float             @default(0.0) // 0.0 to 1.0
+  data        Json? // Additional structured data
+
+  // Context references
+  userId      String? @map("user_id")
+  classroomId String? @map("classroom_id")
+  licenseId   String? @map("license_id")
+
+  // Metadata
+  generatedBy  String    @default("ai") @map("generated_by") // 'ai' or 'system'
+  modelVersion String?   @map("model_version") // Track AI model used
+  dismissed    Boolean   @default(false)
+  dismissedAt  DateTime? @map("dismissed_at")
+  actionTaken  Boolean   @default(false) @map("action_taken")
+
+  // Timestamps
+  validUntil DateTime? @map("valid_until")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId, dismissed, validUntil])
+  @@index([classroomId, dismissed, validUntil])
+  @@index([licenseId, dismissed, validUntil])
+  @@index([scope, priority, createdAt])
+  @@map("ai_insights")
+}
+
+model LearningGoal {
+  id              String            @id @default(cuid())
+  userId          String            @map("user_id")
+  goalType        GoalType          @map("goal_type")
+  title           String
+  description     String?
+  targetValue     Float             @map("target_value")
+  currentValue    Float             @default(0) @map("current_value")
+  unit            String // e.g., "articles", "xp", "words", "days"
+  startDate       DateTime          @default(now()) @map("start_date")
+  targetDate      DateTime          @map("target_date")
+  completedAt     DateTime?         @map("completed_at")
+  status          GoalStatus        @default(ACTIVE)
+  priority        GoalPriority      @default(MEDIUM)
+  isRecurring     Boolean           @default(false) @map("is_recurring")
+  recurringPeriod RecurringPeriod?  @map("recurring_period")
+  metadata        Json? // Additional flexible data (e.g., specific genres, CEFR levels)
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestones      GoalMilestone[]
+  progressLogs    GoalProgressLog[]
+
+  @@index([userId, status])
+  @@index([targetDate])
+  @@map("learning_goals")
+}
+
+model GoalMilestone {
+  id          String       @id @default(cuid())
+  goalId      String       @map("goal_id")
+  title       String
+  description String?
+  targetValue Float        @map("target_value")
+  order       Int // Sequence order of the milestone
+  achievedAt  DateTime?    @map("achieved_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  goal        LearningGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId])
+  @@map("goal_milestones")
+}
+
+model GoalProgressLog {
+  id            String        @id @default(cuid())
+  goalId        String        @map("goal_id")
+  value         Float // Progress value added
+  previousValue Float         @map("previous_value")
+  newValue      Float         @map("new_value")
+  note          String?
+  activityId    String?       @map("activity_id") // Reference to XPLog or UserActivity
+  activityType  ActivityType? @map("activity_type")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  goal          LearningGoal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId, createdAt])
+  @@map("goal_progress_logs")
+}
+
+model AssignmentNotification {
+  id           String     @id @default(cuid())
+  teacherId    String     @map("teacher_id")
+  studentId    String     @map("student_id")
+  assignmentId String     @map("assignment_id")
+  isNoticed    Boolean    @default(false) @map("is_noticed")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  teacher      User       @relation("TeacherNotifications", fields: [teacherId], references: [id], onDelete: Cascade)
+  student      User       @relation("StudentNotifications", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId, teacherId])
+  @@index([studentId, isNoticed])
+  @@index([teacherId])
+  @@map("assignment_notifications")
 }

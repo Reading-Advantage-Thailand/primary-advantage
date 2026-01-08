@@ -6,6 +6,7 @@ import { randomBytes } from "crypto";
 import { currentUser } from "@/lib/session";
 import { generateLicenseKey } from "@/lib/utils";
 import { SubscriptionType } from "@prisma/client";
+import { withAuth } from "@/server/utils/middleware";
 
 const CreateLicenseSchema = z.object({
   name: z.string().min(3).max(100),
@@ -94,20 +95,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (req, context, user) => {
   try {
-    // Check authentication
-    const user = await currentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (!user || (user.role !== "admin" && user.role !== "system")) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
     // Get query parameters for pagination and filtering
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "50");
     const status = searchParams.get("status");
@@ -128,29 +119,25 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // Get licenses with pagination
-    const [licenses, total] = await Promise.all([
-      prisma.license.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-        include: {
-          School: {
-            select: {
-              id: true,
-              name: true,
-              _count: {
-                select: { users: true },
-              },
+    const licenses = await prisma.license.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        School: {
+          select: {
+            id: true,
+            name: true,
+            _count: {
+              select: { users: true },
             },
           },
         },
-      }),
-      prisma.license.count({ where }),
-    ]);
+      },
+    });
 
-    return NextResponse.json(licenses);
+    return NextResponse.json(licenses, { status: 200 });
   } catch (error) {
     console.error("Error fetching licenses:", error);
     return NextResponse.json(
@@ -158,7 +145,7 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
 export async function DELETE(request: NextRequest) {
   try {

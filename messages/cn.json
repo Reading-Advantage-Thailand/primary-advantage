@@ -147,6 +147,216 @@
       "loading": "加载中...",
       "noArticles": "未找到文章",
       "noArticlesToRead": "没有需要重新阅读的文章"
+    },
+    "Dashboard": {
+      "xpVelocity": {
+        "title": "XP 速度",
+        "description": "跟踪您的学习速度",
+        "overview": "您的学习速度随时间变化",
+        "emptyMessage": "没有活动数据",
+        "ariaLabel": "XP 速度指标",
+        "quickStats": "快速统计",
+        "period": {
+          "7d": "过去7天",
+          "30d": "过去30天",
+          "ema": "EMA 速度"
+        },
+        "label": {
+          "7dAvg": "7天平均",
+          "30dAvg": "30天平均",
+          "trend": "趋势"
+        },
+        "units": {
+          "xpPerDay": "XP/天"
+        },
+        "kpi": {
+          "7dayAvg": "7天平均",
+          "xpPerDay": "每日 XP",
+          "activeDays": "活跃天数",
+          "last7Days": "过去7天"
+        },
+        "tip": "💡 提示：完成更多活动以更好地跟踪速度"
+      },
+      "etaCard": {
+        "title": "预计到达下一级的时间",
+        "ariaLabel": "预计到达下一级的时间",
+        "regionLabel": "ETA 信息",
+        "eta": {
+          "na": "不适用",
+          "lessThanOne": "少于1天",
+          "oneDay": "1天",
+          "days": "天",
+          "weeks": "周",
+          "months": "月"
+        },
+        "expected": "预计：",
+        "confidenceRange": "置信区间",
+        "bestCase": "最好情况：",
+        "worstCase": "最坏情况：",
+        "confidence": {
+          "high": "高置信度",
+          "medium": "中置信度",
+          "low": "低置信度",
+          "insufficient": "数据不足"
+        },
+        "basedOnVelocity": "基于您当前的速度 {value}"
+      },
+      "genreEngagement": {
+        "title": "类型参与度",
+        "description": "您的阅读偏好和推荐",
+        "emptyMessage": "开始阅读以查看您的类型偏好",
+        "yourTopGenres": "您喜欢的类型",
+        "reads": "次阅读",
+        "score": "分数：",
+        "recommendedForYou": "为您推荐",
+        "cefrAppropriate": "CEFR 适配",
+        "genresRead": "已读类型",
+        "totalReads": "总阅读量",
+        "totalScore": "总分"
+      },
+      "srsHealth": {
+        "title": "SRS 健康",
+        "description": "间隔重复系统状态",
+        "emptyMessage": "没有闪卡数据",
+        "status": {
+          "healthy": "健康",
+          "moderate": "一般",
+          "overloaded": "过载",
+          "critical": "严重"
+        },
+        "due": "到期",
+        "totalCards": "总卡片数",
+        "reviewedToday": "今日已复习",
+        "retentionRate": "记忆率",
+        "quickActions": "快速操作",
+        "recommendations": "建议",
+        "practiceNow": "立即练习",
+        "cards": "张卡片"
+      },
+      "aiCoach": {
+        "title": "AI 学习教练",
+        "description": "基于您数据的个性化分析",
+        "emptyMessage": "继续学习以获取 AI 分析",
+        "basedOnMetrics": "基于您当前的指标：",
+        "xpPerDay": "XP/天",
+        "retention": "记忆率",
+        "related": "相关：",
+        "refreshNotice": "💡 AI 分析每24小时根据您的最新活动更新",
+        "priority": {
+          "high": "高",
+          "medium": "中",
+          "low": "低"
+        }
+      },
+      "compactHeatmap": {
+        "title": "活动热力图",
+        "lastRange": "过去90天",
+        "activities": "活动",
+        "stats": {
+          "total": "总计",
+          "peakDay": "峰值日",
+          "dailyAvg": "日均"
+        },
+        "dow": {
+          "sun": "日",
+          "mon": "一",
+          "tue": "二",
+          "wed": "三",
+          "thu": "四",
+          "fri": "五",
+          "sat": "六"
+        },
+        "legend": {
+          "less": "少",
+          "more": "多"
+        },
+        "hoverForDetails": "将鼠标悬停在方块上查看详情",
+        "topActivityDates": "活动最活跃日期"
+      },
+      "activeGoals": {
+        "title": "进行中的目标",
+        "loading": "加载中...",
+        "emptyDescription": "设定目标以跟踪您的进度",
+        "createFirst": "创建您的第一个目标",
+        "viewAll": "查看全部",
+        "description": "您的前3个学习目标",
+        "highPriority": "高优先级",
+        "daysLeft": "还剩 {count} 天",
+        "dueToday": "今日到期",
+        "overdue": "已逾期",
+        "onTrack": "进度正常"
+      },
+      "title": "学生仪表板",
+      "description": "学习进度和推荐概览",
+      "practiceButton": "练习闪卡",
+      "setGoalButton": "设定目标"
+    },
+    "reportpage": {
+      "title": "用户活动",
+      "activityprogress": "活动进度",
+      "recentactivity": "最近活动",
+      "inProgress": "进行中",
+      "completed": "已完成",
+      "daterange": "日期范围",
+      "xpearned": "获得的 XP",
+      "xpoverall": "XP 总计",
+      "activityheatmap": "活动热力图",
+      "readingstatschart": "阅读统计图表",
+      "timeframes": {
+        "7d": "过去7天",
+        "30d": "过去30天",
+        "90d": "过去3个月",
+        "6m": "过去6个月"
+      },
+      "granularity": {
+        "day": "天",
+        "hour": "小时"
+      },
+      "activityTypes": {
+        "reading": "阅读",
+        "questions": "问题",
+        "flashcards": "闪卡",
+        "practice": "练习",
+        "assessment": "评估",
+        "rating": "评分",
+        "other": "其他"
+      },
+      "clear": "清除",
+      "labels": {
+        "activities": "活动",
+        "across": "在",
+        "sessions": "会话",
+        "students": "学生",
+        "completed": "已完成",
+        "minutes": "分钟"
+      },
+      "stats": {
+        "totalActivities": "总活动",
+        "peakDaily": "每日峰值"
+      },
+      "legend": {
+        "less": "少",
+        "more": "多"
+      },
+      "errorLoading": "加载热力图时出错",
+      "ariaLabel": "活动热力图。使用箭头键导航，按 Enter 选择。",
+      "srSummary": "活动热力图显示从 {start} 到 {end} 的 {total} 个活动。峰值 {peak} 个活动。共 {students} 名学生。",
+      "activityTimeline": {
+        "title": "活动时间线",
+        "errorLoading": "加载活动时间线失败",
+        "emptyTitle": "暂无活动",
+        "emptyDescription": "此期间没有记录的活动。",
+        "clearFilters": "清除",
+        "srSummaryStart": "活动时间线显示",
+        "srSummaryMid": "活动从",
+        "srSummaryTo": "到",
+        "labels": {
+          "assignment": "作业",
+          "srs": "SRS",
+          "reading": "阅读",
+          "practice": "练习"
+        }
+      }
     }
   },
   "Admin": {
@@ -215,6 +425,98 @@
           "emailInvalid": "请输入有效的电子邮箱地址"
         }
       }
+    },
+    "Dashboard": {
+      "title": "管理员仪表板",
+      "subtitle": "管理您的学校教育平台",
+      "timeframes": {
+        "7d": "7天",
+        "30d": "30天",
+        "90d": "90天"
+      },
+      "timeframeDescription": {
+        "7d": "过去7天",
+        "30d": "过去30天",
+        "90d": "过去90天"
+      },
+      "kpis": {
+        "dataSource": {
+          "userActivity": "用户活动日志",
+          "classroomActivity": "课堂活动",
+          "lessonRecords": "课程记录",
+          "userRegistration": "用户注册",
+          "systemMonitoring": "系统监控"
+        },
+        "activeStudents": {
+          "title": "活跃学生",
+          "tooltip": "在所选时间范围内至少有一次活动的学生"
+        },
+        "activeTeachers": {
+          "title": "活跃教师",
+          "description": "共{total}人",
+          "tooltip": "在所选时间范围内有活动的教师和管理员"
+        },
+        "activeClassrooms": {
+          "title": "活跃课堂",
+          "description": "有学生活动",
+          "tooltip": "在所选时间范围内至少有一名活跃学生的课堂"
+        },
+        "readingSessions": {
+          "title": "阅读次数",
+          "description": "已完成",
+          "tooltip": "已完成的阅读次数总数"
+        },
+        "totalXp": {
+          "title": "获得总经验值",
+          "description": "今日阅读次数",
+          "tooltip": "今日完成的阅读次数"
+        },
+        "newUsers": {
+          "title": "新用户",
+          "description": "今日加入",
+          "tooltip": "今日新注册用户"
+        },
+        "systemHealth": {
+          "title": "系统健康",
+          "description": "{status}",
+          "tooltip": "整体系统健康状态"
+        }
+      },
+      "teacherEffectiveness": {
+        "title": "教师效能",
+        "description": "学生参与度与进步速度对比",
+        "engagement": "参与度",
+        "progress": "进度",
+        "accuracy": "准确率",
+        "students": "学生",
+        "levels": "等级",
+        "topPerformers": "优秀表现",
+        "performanceLevels": {
+          "high": "高效能",
+          "average": "一般",
+          "needsSupport": "需要支持"
+        },
+        "emptyMessage": "暂无教师数据",
+        "tooltip": {
+          "engagement": "参与度：{rate}%",
+          "activeStudents": "{active}/{total}名活跃学生",
+          "classroom": "课堂"
+        },
+        "legend": {
+          "excellent": "≥80%（优秀）",
+          "good": "60-79%（良好）",
+          "needsSupport": "<60%（需要支持）"
+        },
+        "topTeacher": "参与度最高的教师",
+        "activeLabel": "活跃",
+        "classroomLabel": "课堂"
+      },
+      "licenseSelector": {
+        "title": "选择许可证",
+        "placeholder": "选择一个许可证",
+        "availableLabel": "可用许可证",
+        "users": "用户：{used}/{max}"
+      }
     }
   },
   "ImportData": {
@@ -258,7 +560,11 @@
     "preview": {
       "button": "预览",
       "title": "数据预览",
-      "columns": { "name": "姓名", "email": "邮箱", "role": "角色" }
+      "columns": {
+        "name": "姓名",
+        "email": "邮箱",
+        "role": "角色"
+      }
     },
     "formatGuide": {
       "title": "CSV 格式指南",
@@ -553,6 +859,543 @@
         "deleteFailed": "删除文章失败",
         "deleteError": "删除文章时发生错误"
       }
+    },
+    "kpiCard": {
+      "source": "来源"
+    },
+    "aiInsights": {
+      "insights": {
+        "title": "AI 见解",
+        "description": "由真实 AI 提供的智能分析",
+        "empty": "目前没有可用见解。继续使用平台以生成个性化推荐。"
+      },
+      "loading": {
+        "skeleton": "正在加载见解..."
+      },
+      "toast": {
+        "dismiss": {
+          "title": "已隐藏见解",
+          "description": "该见解已从您的视图中隐藏。"
+        },
+        "dismissError": {
+          "title": "错误",
+          "description": "隐藏见解失败。请重试。"
+        },
+        "actionRecorded": {
+          "title": "操作已记录",
+          "description": "感谢您对该见解采取行动！"
+        },
+        "actionError": {
+          "title": "错误",
+          "description": "记录操作失败。请重试。"
+        },
+        "refreshed": {
+          "title": "见解已刷新",
+          "description": "AI 见解已使用最新数据重新生成。"
+        }
+      },
+      "actions": {
+        "done": "完成"
+      },
+      "suggestions": {
+        "title": "智能建议",
+        "description": "可行的建议以优化您的平台",
+        "empty": "完成更多活动以接收个性化建议。",
+        "actionItems": "{count} 项操作",
+        "impact": "影响："
+      }
+    },
+    "adoptionWidget": {
+      "title": "学生参与度（按等级）",
+      "description": "按{mode}划分的活跃学生",
+      "modes": {
+        "grade": "年级",
+        "cefr": "CEFR等级"
+      },
+      "timeframe": {
+        "7d": "最近7天",
+        "30d": "最近30天",
+        "90d": "最近3个月"
+      },
+      "empty": "暂无学生数据",
+      "view": {
+        "cefr": "CEFR",
+        "grade": "年级"
+      },
+      "item": {
+        "activeStudents": "{count} 名活跃学生",
+        "avgXp": "平均 {xp} XP"
+      },
+      "summary": {
+        "title": "总体参与度",
+        "activeInTimeframe": "{active}/{total} 名学生在过去 {timeframe} 活跃"
+      }
+    },
+    "alertCenter": {
+      "title": "警报中心",
+      "unacknowledged": "未确认的警报",
+      "noAlerts": "目前没有警报",
+      "viewAll": "查看所有警报",
+      "filter": {
+        "unread": "未读",
+        "critical": "重要",
+        "all": "全部"
+      },
+      "markRead": "标记为已读",
+      "dialog": {
+        "title": "所有警报",
+        "total": "总警报数",
+        "all": "全部",
+        "unread": "未读",
+        "critical": "重要",
+        "noAlertsCategory": "此类别中没有警报"
+      },
+      "read": "已读",
+      "viewDetails": "查看详情"
+    },
+    "compactHeatmap": {
+      "title": "活动热力图",
+      "lastRange": "最近90天",
+      "activities": "活动",
+      "stats": {
+        "total": "总计",
+        "peakDay": "峰值日",
+        "dailyAvg": "日均"
+      },
+      "dow": {
+        "sun": "日",
+        "mon": "一",
+        "tue": "二",
+        "wed": "三",
+        "thu": "四",
+        "fri": "五",
+        "sat": "六"
+      },
+      "legend": {
+        "less": "少",
+        "more": "多"
+      },
+      "hoverForDetails": "将鼠标悬停在方块上查看详情",
+      "topActivityDates": "活动最活跃日期"
+    },
+    "widgetShell": {
+      "refresh": "刷新",
+      "viewAll": "查看全部",
+      "noData": "暂无数据",
+      "tryAgain": "重试"
+    },
+    "modernActiveUsers": {
+      "labels": {
+        "activeUsers": "活跃用户"
+      },
+      "today": "今天",
+      "avg": {
+        "7d": "7天平均",
+        "30d": "30天平均",
+        "90d": "90天平均",
+        "allTime": "全部平均"
+      },
+      "title": {
+        "activityTrend": "活动趋势"
+      },
+      "tooltip": {
+        "activeUsers": "活跃用户"
+      }
+    },
+    "modernLicenseUsage": {
+      "title": "许可证使用",
+      "noLicenses": {
+        "title": "未找到许可证",
+        "description": "目前没有许可证数据。"
+      },
+      "schools": {
+        "total": "学校总数"
+      },
+      "of": "/",
+      "labels": {
+        "usage": "使用",
+        "used": "已使用",
+        "expires": "到期"
+      },
+      "warnings": {
+        "nearLimit": "使用率超过80%。请考虑尽快升级。",
+        "expiresSoon": "许可证将在30天内到期。"
+      }
+    },
+    "activityCharts": {
+      "title": "活动概览",
+      "description": "监控用户活动、参与模式和实时事件",
+      "timeframe": {
+        "7": "过去7天",
+        "30": "过去30天",
+        "90": "过去3个月",
+        "all": "全部时间"
+      },
+      "heatmap": {
+        "title": "活动热力图",
+        "description": "每日活动水平",
+        "range": {
+          "7": "过去7天内",
+          "30": "过去30天内",
+          "90": "过去3个月内",
+          "all": "过去一年内"
+        },
+        "tooltip": "{date}：{count} 次活动"
+      },
+      "legend": {
+        "less": "少",
+        "more": "多"
+      },
+      "daily": {
+        "title": "每日活动趋势",
+        "description": "所选期间的活动水平"
+      },
+      "engagement": {
+        "title": "用户参与度",
+        "description": "用户与会话对比"
+      },
+      "timeline": {
+        "title": "活动日志",
+        "description": "最近的用户活动和事件",
+        "empty": "未找到符合所选筛选条件的事件。",
+        "by": "由 {user}",
+        "filterByType": "按类型筛选",
+        "allTypes": "所有类型",
+        "table": {
+          "type": "类型",
+          "activity": "活动",
+          "description": "描述",
+          "user": "用户",
+          "time": "时间"
+        },
+        "pagination": {
+          "showing": "显示 {start}-{end}，共 {total}",
+          "previous": "上一页",
+          "next": "下一页",
+          "page": "页码",
+          "of": "共"
+        }
+      },
+      "types": {
+        "reading": "阅读",
+        "practice": "练习",
+        "assessment": "评估",
+        "achievement": "成就"
+      },
+      "events": {
+        "activity": "活动",
+        "srsPractice": "SRS练习会话",
+        "assignment": "作业",
+        "reading": "阅读",
+        "practice": "练习"
+      },
+      "charts": {
+        "activity": "活动",
+        "users": "用户",
+        "sessions": "会话"
+      },
+      "time": {
+        "justNow": "刚刚",
+        "minutesAgo": "{m}分钟前",
+        "hoursAgo": "{h}小时前",
+        "daysAgo": "{d}天前"
+      }
+    },
+    "metricsCards": {
+      "totalSessions": {
+        "title": "会话总数",
+        "description": "阅读会话总数"
+      },
+      "activeUsers": {
+        "title": "活跃用户",
+        "description": "期间内活跃的用户"
+      },
+      "readingSessions": {
+        "title": "阅读会话",
+        "description": "阅读会话总数"
+      },
+      "alignmentScore": {
+        "title": "对齐评分",
+        "description": "内容对齐质量"
+      },
+      "learningVelocity": {
+        "title": "学习速度",
+        "description": "每名学生的平均 XP ({dateRange})",
+        "fallback": {
+          "description": "每分钟单词数"
+        }
+      },
+      "avgSessionTime": {
+        "title": "平均会话时间",
+        "description": "每次会话的平均时间"
+      },
+      "totalActivity": {
+        "title": "总活动",
+        "description": "今日用户活动"
+      },
+      "activeUsersLast24": {
+        "description": "过去24小时内活跃的用户"
+      },
+      "readingSessionsToday": {
+        "description": "今日阅读文章数"
+      },
+      "learningVelocityFallback": {
+        "description": "每分钟单词数"
+      }
+    },
+    "activityTimeline": {
+      "title": "活动时间线",
+      "errorLoading": "加载活动时间线失败，请重试。",
+      "emptyTitle": "未找到活动",
+      "emptyDescription": "所选期间没有事件。",
+      "summary": "{total} 个活动，从 {start} 到 {end}",
+      "timeframe": {
+        "7d": "过去7天",
+        "30d": "过去30天",
+        "90d": "过去3个月"
+      },
+      "clearFilters": "清除筛选",
+      "labels": {
+        "assignment": "作业",
+        "srs": "SRS 练习",
+        "reading": "阅读",
+        "practice": "练习",
+        "completed": "已完成"
+      },
+      "types": {
+        "assignment": "作业",
+        "srs": "SRS",
+        "reading": "阅读",
+        "practice": "练习"
+      },
+      "status": {
+        "completed": "已完成",
+        "in_progress": "进行中",
+        "unknown": "未知"
+      },
+      "srSummaryStart": "时间线摘要：",
+      "srSummaryMid": "活动在",
+      "srSummaryTo": "和",
+      "srEventSuffix": "事件"
+    },
+    "activeGoalsWidget": {
+      "title": "进行中的目标",
+      "loading": "加载中...",
+      "emptyDescription": "暂无进行中的目标",
+      "createFirst": "创建您的第一个目标",
+      "description": "您的前3个学习目标",
+      "highPriority": "高优先级",
+      "daysLeft": "还剩 {count} 天",
+      "dueToday": "今日到期",
+      "overdue": "已逾期",
+      "onTrack": "进度正常"
+    },
+    "assignmentNotificationDialog": {
+      "title": "发送作业通知",
+      "description": "选择要通知的作业和学生",
+      "selectInstruction": "选择要通知的作业",
+      "selected": "已选择",
+      "detail": "详情",
+      "badges": {
+        "overdue": "逾期",
+        "dueToday": "今天截止",
+        "oneDay": "剩余1天",
+        "daysRemaining": "剩余"
+      },
+      "back": "返回",
+      "students": {
+        "completedLabel": "已完成的学生",
+        "title": "学生仪表盘数据",
+        "description": "您的学习进度和建议概览",
+        "incompleteLabel": "未完成的学生"
+      },
+      "selectStudents": "选择要通知的学生",
+      "deselectAll": "取消全选",
+      "selectAll": "全选",
+      "studentStatus": { "completed": "已完成", "incomplete": "未完成" },
+      "history": { "empty": "暂无通知历史", "sentTo": "已发送给" },
+      "studentsLabel": "名学生",
+      "tabs": { "select": "选择", "history": "历史" },
+      "cancel": "取消",
+      "sending": "发送中...",
+      "sentSuccess": "通知发送成功",
+      "sentError": "发生错误",
+      "sendDefault": "向未完成的学生发送通知",
+      "sendToSelected": "发送给{count}名学生"
+    },
+    "assignmentNotification": {
+      "title": "作业通知",
+      "description": "您有{count}条作业通知",
+      "badge": {
+        "teacherNotified": "教师已通知",
+        "new": "新"
+      },
+      "fromTeacher": "教师{name}",
+      "dueLabel": "截止日期：",
+      "due": {
+        "overdue": "逾期{days}天",
+        "today": "今天截止",
+        "oneDay": "剩余1天",
+        "fewDays": "剩余{days}天",
+        "severalDays": "剩余{days}天",
+        "days": "剩余{days}天"
+      },
+      "goToAssignment": "前往作业",
+      "acknowledge": "确认",
+      "acknowledgeAll": "全部确认",
+      "close": "关闭",
+      "createdAt": "创建于"
+    },
+    "classDashboardKpis": {
+      "errorTitle": "加载班级仪表板时出错",
+      "totalStudents": {
+        "title": "学生总数",
+        "description": "本周 {active} 名活跃"
+      },
+      "activeStudents": {
+        "title": "活跃学生",
+        "description": "{rate}% 活跃率"
+      },
+      "avgLevel": { "title": "平均水平", "description": "班级阅读水平" },
+      "totalXp": { "title": "总 XP", "description": "班级累计 XP" },
+      "activeAssignments": {
+        "title": "进行中的作业",
+        "description": "当前正在进行"
+      },
+      "completed": { "title": "已完成", "description": "作业提交数" }
+    },
+    "classAccuracyMetrics": {
+      "title": "学生准确率（按类型）",
+      "errorDescription": "无法加载准确率数据",
+      "descriptionPrefix": "按题型细分的表现",
+      "active": "活跃",
+      "mcqAvg": "选择题平均",
+      "openEndedAvg": "开放式问答平均",
+      "overallAvg": "总体平均",
+      "headers": {
+        "student": "学生",
+        "mcq": "选择题",
+        "openEnded": "开放式问答（分数≥70%）",
+        "overall": "总体"
+      },
+      "noActivity": "暂无学生活动数据"
+    },
+    "classActivityHeatmap": {
+      "title": "活动热力图",
+      "days": "天",
+      "description": "过去{days}天的学生活动",
+      "seeDetail": "查看详情",
+      "error": "无法加载活动数据",
+      "noData": "暂无活动数据",
+      "stats": {
+        "activeUsers": "活跃用户",
+        "totalActivity": "总活动量",
+        "peakDay": "高峰日"
+      },
+      "legend": { "title": "活动级别：", "less": "较少", "more": "较多" },
+      "topActiveDays": "最活跃日期",
+      "activities": "次活动",
+      "dow": {
+        "sun": "日",
+        "mon": "一",
+        "tue": "二",
+        "wed": "三",
+        "thu": "四",
+        "fri": "五",
+        "sat": "六"
+      }
+    },
+    "classAlignmentMatrix": {
+      "title": "CEFR ↔ RA 对齐矩阵",
+      "error": "无法加载对齐数据",
+      "noData": "暂无对齐数据",
+      "alignmentScore": "对齐分数：",
+      "studentsWithActivity": "有阅读活动的学生",
+      "alignedLabel": "已对齐",
+      "aboveLabel": "超出水平",
+      "stats": {
+        "averageLevel": "平均水平：",
+        "modalLevel": "众数水平：",
+        "totalReadings": "总阅读量："
+      }
+    },
+    "classAssignmentFunnel": {
+      "title": "作业漏斗",
+      "error": "无法加载作业数据",
+      "noData": "暂无作业数据",
+      "description": "完成率及风险作业",
+      "seeDetail": "查看详情",
+      "overallCompletion": "总体完成",
+      "highCompletion": "高完成率",
+      "atRisk": "风险",
+      "stale": "过期",
+      "showing": "显示{count}个作业",
+      "clearFilter": "清除筛选"
+    },
+    "classBatchActions": {
+      "title": "班级管理",
+      "description": "管理和跟踪学生进度的工具",
+      "noExportData": "没有可导出的学生数据",
+      "csv": {
+        "name": "姓名",
+        "email": "邮箱",
+        "level": "等级",
+        "cefr": "CEFR等级",
+        "xp": "经验值",
+        "readingSessions": "阅读会话",
+        "assignmentsCompleted": "已完成作业",
+        "assignmentsPending": "待完成作业",
+        "avgAccuracy": "平均准确率(%)",
+        "lastActive": "最后活跃",
+        "joinedAt": "加入时间"
+      },
+      "actions": {
+        "export": "导出数据",
+        "exportDesc": "下载学生数据为CSV",
+        "notify": "发送作业通知",
+        "notifyDesc": "通知有未完成作业的学生",
+        "assign": "分配作业",
+        "assignDesc": "选择文章分配给学生",
+        "manage": "管理学生",
+        "manageDesc": "管理本班的学生名单"
+      },
+      "exportError": "导出数据时出错: {message}",
+      "selectedStudents": "已选择 {count} 名学生",
+      "processing": "处理中..."
+    },
+    "classGenreEngagement": {
+      "title": "类别参与度",
+      "description": "阅读偏好 • 最受欢迎：{mostPopular}",
+      "loading": "正在加载类别数据...",
+      "errorUnableToLoad": "无法加载类别数据",
+      "noData": "没有类别数据",
+      "labels": {
+        "books": "书籍",
+        "percentSuffix": "%",
+        "avgLevel": "平均水平",
+        "xp": "经验值"
+      },
+      "moreGenres": "+{count} 更多类别"
+    },
+    "classVelocityTable": {
+      "title": "速度与预估",
+      "description": "阅读速度与进度指标",
+      "errorUnableToLoad": "无法加载速度数据",
+      "noData": "没有速度数据",
+      "noActivity": "在所选时间范围内没有阅读活动",
+      "noActivityDetails": "学生在过去{days}天内未完成任何文章",
+      "labels": {
+        "articlesPerDay": "文章/天",
+        "articlesPerMonth": "文章/月",
+        "trend": "趋势"
+      },
+      "trend": { "up": "上升", "down": "下降", "stable": "稳定" },
+      "stats": {
+        "totalArticles": "文章总数：",
+        "totalWords": "总字数：",
+        "totalTime": "总时间：",
+        "min": "分"
+      }
     }
   },
   "WordList": {
@@ -718,7 +1561,9 @@
       "title": "CEFR 等级",
       "yourlevel": "您的等级",
       "description": {
+        "A0-": "您可以识别您以前见过的单词和名称，尤其是在有图片帮助的情况下。您可以理解您周围的真实简单的标志和基本信息，如在哪里和什么时候发生什么事情。",
         "A0": "您可以识别您以前见过的单词和名称，尤其是在有图片帮助的情况下。您可以理解您周围的真实简单的标志和基本信息，如在哪里和什么时候发生什么事情。",
+        "A0+": "您可以识别您以前见过的单词和名称，尤其是在有图片帮助的情况下。您可以理解您周围的真实简单的标志和基本信息，如在哪里和什么时候发生什么事情。",
         "A1-": "您开始识别更多的单词和简单的短语，超越了最基本的词汇。您可以遵循短、简单的方向，并理解基本的短语和句子，关于您需要的事情。",
         "A1": "您可以理解非常短和简单的文本。您可以识别足够的单词来发现它们在通知和简单指南中的位置。您可以使用您知道的单词谈论简单、日常的事情。",
         "A1+": "您开始理解对您重要的句子表达。阅读不仅仅是识别熟悉的单词；您开始理解简单的文本中的整个信息。",
@@ -856,7 +1701,6 @@
     "clozeTest": "填空测试",
     "orderWord": "排列单词",
     "matching": "匹配",
-
     "matchingGame": {
       "title": "翻译配对游戏",
       "description": "练习将单词与其含义从您的抽认卡集合中配对！",
@@ -1676,8 +2520,12 @@
         "title": "关键句子：{count} 句",
         "more": "+{count} 句已保存"
       },
-      "actions": { "backToRead": "返回阅读页面" },
-      "toast": { "failed": "无法加载课程总结" }
+      "actions": {
+        "backToRead": "返回阅读页面"
+      },
+      "toast": {
+        "failed": "无法加载课程总结"
+      }
     },
     "VocabularyFlashcards": {
       "loading": {
@@ -1733,12 +2581,84 @@
         "timeTaken": "花费时间",
         "completed": "已完成"
       }
+    },
+    "VocabularyMatching": {
+      "loading": {
+        "title": "正在加载闪卡",
+        "description": "正在准备您的词汇练习..."
+      },
+      "noCards": {
+        "title": "无可用词汇",
+        "description": "此文章尚无可用的词汇闪卡。"
+      },
+      "error": {
+        "title": "加载失败",
+        "description": "加载词汇时发生错误，请重试。"
+      },
+      "buttons": {
+        "tryAgain": "重试",
+        "showAnswers": "显示答案",
+        "completeActivity": "完成活动"
+      },
+      "start": {
+        "title": "开始词汇配对",
+        "subtitle": "选择您喜欢的定义语言",
+        "languageLabel": "定义语言",
+        "languageHint": "词义将以此语言显示",
+        "startButton": "开始配对游戏"
+      },
+      "completed": {
+        "title": "词汇练习完成！",
+        "subtitle": "您的词汇练习做得很好",
+        "xpEarned": "获得 XP",
+        "completed": "已完成"
+      },
+      "game": {
+        "title": "📚 将单词与定义配对",
+        "instruction": "点击左侧单词，然后点击右侧的定义",
+        "columns": {
+          "words": "单词",
+          "definitions": "定义"
+        }
+      },
+      "progress": {
+        "matched": "{matched}/{total} 已配对",
+        "correct": "{correct}/{total} 正确"
+      },
+      "results": {
+        "perfect": "完美！所有配对都正确！🎉",
+        "partialCorrect": "{correct}/{total} 正确 💪",
+        "correctMatches": "正确配对：",
+        "showAnswers": "已显示正确配对！📖",
+        "correctMatch": "配对正确！✅",
+        "incorrectMatch": "配对不正确，再试一次！❌",
+        "tryAgain": "{correct}/{total} 正确，再试一次！💪"
+      },
+      "toast": {
+        "failedToLoad": "无法加载词汇"
+      }
+    },
+    "Introduction": {
+      "phase1Title": "课程介绍",
+      "phase1Description": "在本课程中，您将阅读一篇关于「{title}」的文章",
+      "cefrLevel": "CEFR 等级：{level}",
+      "raLevel": "RA 等级：{level}",
+      "estimatedReadTime": "预计阅读时间：{time}",
+      "articleSummary": "文章摘要",
+      "learningObjectives": "学习目标",
+      "understandMainIdeas": "理解主要思想：",
+      "learnVocabulary": "学习词汇：",
+      "improveComprehension": "提高阅读理解："
     }
   },
   "LessonLanguageQuestion": {
     "title": "AI 阅读助手",
-    "loading": { "conversation": "正在加载对话..." },
-    "status": { "online": "在线" },
+    "loading": {
+      "conversation": "正在加载对话..."
+    },
+    "status": {
+      "online": "在线"
+    },
     "header": {
       "readyWithName": "已准备好帮助 {name} 解答问题",
       "ready": "已准备好帮助你解答问题"
@@ -1753,7 +2673,10 @@
       "placeholderWithName": "{name}，问一问关于这篇文章的问题...",
       "placeholder": "输入你关于这篇文章的问题..."
     },
-    "buttons": { "send": "发送", "skip": "跳过" },
+    "buttons": {
+      "send": "发送",
+      "skip": "跳过"
+    },
     "tips": {
       "askVocabulary": "询问词汇",
       "discussTheme": "讨论主题思想",
@@ -1770,7 +2693,9 @@
       "questionOf": "第 {current} 题 / 共 {total} 题",
       "completePercent": "完成 {percent}%"
     },
-    "timer": { "seconds": "{seconds}秒" },
+    "timer": {
+      "seconds": "{seconds}秒"
+    },
     "completed": {
       "title": "测验完成",
       "description": "做得好！你已完成测验",
@@ -1786,7 +2711,9 @@
     }
   },
   "LessonSAQ": {
-    "completed": { "title": "测验完成" },
+    "completed": {
+      "title": "测验完成"
+    },
     "labels": {
       "question": "问题：",
       "yourAnswer": "你的答案：",
@@ -1794,13 +2721,23 @@
       "feedback": "反馈：",
       "score": "分数："
     },
-    "timer": { "elapsed": "用时：{time}" },
-    "form": {
-      "placeholder": { "answer": "在此输入你的答案..." },
-      "help": { "detailedResponse": "写下详细回答以展示你的理解" },
-      "validation": { "answerRequired": "请输入您的答案" }
+    "timer": {
+      "elapsed": "用时：{time}"
     },
-    "actions": { "submit": "提交" }
+    "form": {
+      "placeholder": {
+        "answer": "在此输入你的答案..."
+      },
+      "help": {
+        "detailedResponse": "写下详细回答以展示你的理解"
+      },
+      "validation": {
+        "answerRequired": "请输入您的答案"
+      }
+    },
+    "actions": {
+      "submit": "提交"
+    }
   },
   "LessonCloze": {
     "loading": {
@@ -1921,7 +2858,9 @@
     "prompt": {
       "thinkAndReveal": "思考这个句子的意思，然后显示答案。"
     },
-    "buttons": { "showAnswer": "显示答案" },
+    "buttons": {
+      "showAnswer": "显示答案"
+    },
     "rating": {
       "prompt": "您对这个句子的记忆程度如何？",
       "again": "再来一次",
@@ -2041,7 +2980,9 @@
       "archive": "归档",
       "delete": "删除"
     },
-    "search": { "placeholder": "搜索" },
+    "search": {
+      "placeholder": "搜索"
+    },
     "import": {
       "fromLabel": "从以下导入新班级",
       "googleClassroom": "Google Classroom",
@@ -2061,7 +3002,10 @@
         "aboutDescription": "此功能允许导入 Google Classroom 学生。学生将自动加入您的班级。"
       }
     },
-    "pagination": { "previous": "上一页", "next": "下一页" },
+    "pagination": {
+      "previous": "上一页",
+      "next": "下一页"
+    },
     "edit": {
       "title": "编辑班级",
       "description": "您确定要编辑此班级吗？",
@@ -2090,8 +3034,13 @@
     }
   },
   "TeacherCreateClass": {
-    "button": { "newClassroom": "新建班级" },
-    "dialog": { "title": "创建班级", "description": "创建一个新班级" },
+    "button": {
+      "newClassroom": "新建班级"
+    },
+    "dialog": {
+      "title": "创建班级",
+      "description": "创建一个新班级"
+    },
     "fields": {
       "className": "班级名称",
       "classNamePlaceholder": "班级名称",
@@ -2100,7 +3049,10 @@
       "gradePlaceholder": "年级",
       "gradeItem": "年级 {grade}"
     },
-    "actions": { "create": "创建", "cancel": "取消" },
+    "actions": {
+      "create": "创建",
+      "cancel": "取消"
+    },
     "toast": {
       "attention": "提示",
       "fillAllFields": "请填写所有字段",
@@ -2108,79 +3060,6 @@
       "classCreated": "班级创建成功",
       "error": "错误",
       "failedCreate": "创建班级失败"
-    }
-  },
-  "teacher": {
-    "myStudents": {
-      "title": "我的学生",
-      "description": "查看并管理您的学生",
-      "table": {
-        "name": "姓名",
-        "email": "邮箱",
-        "classrooms": "班级",
-        "actions": "操作",
-        "empty": "空"
-      },
-      "actions": {
-        "progress": "进度",
-        "resetProgress": "重置进度",
-        "cancel": "取消",
-        "reset": "重置"
-      },
-      "search": {
-        "placeholder": "按姓名搜索"
-      },
-      "pagination": {
-        "previous": "上一页",
-        "next": "下一页"
-      },
-      "unknown": {
-        "student": "匿名",
-        "email": "未知"
-      },
-      "classrooms": {
-        "none": "无班级",
-        "more": "+{count} 更多"
-      },
-      "dialog": {
-        "reset": {
-          "title": "重置进度",
-          "description": "确定要重置该学生的学习进度吗？"
-        }
-      },
-      "toast": {
-        "reset": {
-          "success": "XP 重置成功。",
-          "error": "XP 重置失败。"
-        }
-      }
-    },
-    "cefrSetter": {
-      "button": { "setLevel": "设置等级" },
-      "dialog": {
-        "title": "为 {name} 设置 CEFR 等级",
-        "description": "为该学生选择合适的 CEFR 等级，同时会更新其阅读等级（RA）。"
-      },
-      "labels": {
-        "currentLevel": "当前等级",
-        "newLevel": "新等级"
-      },
-      "select": { "placeholder": "选择 CEFR 等级" },
-      "preview": {
-        "title": "预览：",
-        "cefr": "CEFR 等级：",
-        "ra": "RA 等级："
-      },
-      "actions": {
-        "cancel": "取消",
-        "update": "更新等级",
-        "updating": "更新中..."
-      },
-      "toast": {
-        "noChanges": "没有可保存的更改",
-        "success": "已将 {name} 的 CEFR 等级更新为 {level}",
-        "error": "更新 CEFR 等级失败"
-      }
     }
   },
   "Teacher": {
@@ -2427,6 +3306,299 @@
       "cancel": "取消",
       "edit": "编辑",
       "noStudentsInSelectedStatus": "所选状态下没有学生"
+    },
+    "myStudents": {
+      "title": "我的学生",
+      "description": "查看并管理您的学生",
+      "table": {
+        "name": "姓名",
+        "email": "邮箱",
+        "classrooms": "班级",
+        "actions": "操作",
+        "empty": "空"
+      },
+      "actions": {
+        "progress": "进度",
+        "resetProgress": "重置进度",
+        "cancel": "取消",
+        "reset": "重置"
+      },
+      "search": {
+        "placeholder": "按姓名搜索"
+      },
+      "pagination": {
+        "previous": "上一页",
+        "next": "下一页"
+      },
+      "unknown": {
+        "student": "匿名",
+        "email": "未知"
+      },
+      "classrooms": {
+        "none": "无班级",
+        "more": "+{count} 更多"
+      },
+      "dialog": {
+        "reset": {
+          "title": "重置进度",
+          "description": "确定要重置该学生的学习进度吗？"
+        }
+      },
+      "toast": {
+        "reset": {
+          "success": "XP 重置成功。",
+          "error": "XP 重置失败。"
+        }
+      }
+    },
+    "cefrSetter": {
+      "button": {
+        "setLevel": "设置等级"
+      },
+      "dialog": {
+        "title": "为 {name} 设置 CEFR 等级",
+        "description": "为该学生选择合适的 CEFR 等级，同时会更新其阅读等级（RA）。"
+      },
+      "labels": {
+        "currentLevel": "当前等级",
+        "newLevel": "新等级"
+      },
+      "select": {
+        "placeholder": "选择 CEFR 等级"
+      },
+      "preview": {
+        "title": "预览：",
+        "cefr": "CEFR 等级：",
+        "ra": "RA 等级："
+      },
+      "actions": {
+        "cancel": "取消",
+        "update": "更新等级",
+        "updating": "更新中..."
+      },
+      "toast": {
+        "noChanges": "没有可保存的更改",
+        "success": "已将 {name} 的 CEFR 等级更新为 {level}",
+        "error": "更新 CEFR 等级失败"
+      }
+    },
+    "Dashboard": {
+      "title": "教师仪表板",
+      "description": "监控您的课堂，追踪学生进度，并获取由 AI 提供的见解",
+      "kpis": {
+        "totalClasses": "总班级数",
+        "totalStudents": "总学生数",
+        "activeStudents": "活跃学生",
+        "averageLevel": "平均水平",
+        "weeklyXP": "每周经验值",
+        "accuracy": "准确率",
+        "readingVelocity": "阅读速度",
+        "onTrack": "进度正常",
+        "activeToday": "今日活跃",
+        "completedToday": "今日完成",
+        "pending": "待处理的作业",
+        "managing": "管理中",
+        "class": "班级",
+        "classes": "班级",
+        "managingClasses": "管理 {count} 个班级",
+        "acrossAllClasses": "所有班级",
+        "activeOf": "{active}/{total} 活跃（30天）",
+        "classAverageLevel": "班级平均CEFR水平",
+        "averageReadingLevel": "所有学生的平均阅读水平",
+        "xpEarnedThisWeek": "本周获得的经验值",
+        "averageQuizAccuracy": "平均测验准确率",
+        "booksPerWeek": "每周阅读书籍",
+        "studentsMeetingGoals": "达成目标的学生",
+        "studentsActiveToday": "今日活跃学生",
+        "assignmentsCompletedToday": "今日完成的作业",
+        "assignmentsPending": "有未完成作业的任务",
+        "engagementRate": "参与率"
+      },
+      "classOverview": {
+        "title": "班级概览",
+        "description": "管理和监控您的所有教室",
+        "hideArchived": "隐藏已归档",
+        "showArchived": "显示已归档",
+        "exportCSV": "导出CSV",
+        "export": {
+          "headers": {
+            "className": "班级名称",
+            "classCode": "班级代码",
+            "students": "学生",
+            "active7d": "活跃（7天）",
+            "avgLevel": "平均水平",
+            "totalXp": "总经验值",
+            "status": "状态"
+          }
+        },
+        "searchPlaceholder": "按班级名称或代码搜索...",
+        "className": "班级名称",
+        "code": "代码",
+        "students": "学生",
+        "active7d": "活跃（7天）",
+        "avgLevel": "平均水平",
+        "totalXP": "总经验值",
+        "trend": "趋势",
+        "status": "状态",
+        "actions": "操作",
+        "viewDetails": "查看详情",
+        "viewReports": "查看报告",
+        "assignments": "作业",
+        "archived": "已归档",
+        "active": "活跃",
+        "noClassesFound": "未找到班级",
+        "noClassesMatchingSearch": "未找到符合搜索条件的班级",
+        "showing": "显示 {count}/{total} 个班级",
+        "totalStudents": "总学生数：{count}"
+      },
+      "classDetail": {
+        "classCodePrefix": "班级代码：",
+        "refresh": "刷新",
+        "exportCSV": "导出CSV",
+        "settings": "设置",
+        "tabs": {
+          "overview": "概览",
+          "assignments": "作业",
+          "students": "学生",
+          "alignment": "对齐",
+          "activity": "活动",
+          "goals": "目标"
+        },
+        "goals": {
+          "management": {
+            "title": "班级目标",
+            "addGoalButton": "为班级添加目标",
+            "searchPlaceholder": "搜索目标...",
+            "filterAllStatus": "所有状态",
+            "filterAllGoals": "所有目标",
+            "filterActive": "进行中",
+            "filterFullyCompleted": "已完成",
+            "totalGoals": "总目标数",
+            "activeGoals": "进行中",
+            "fullyCompleted": "已完成",
+            "allStudentsFinished": "所有学生已完成",
+            "noGoalsFound": "未找到目标",
+            "noGoalsDescription": "创建第一个班级目标以开始",
+            "noMatchingGoals": "没有符合当前筛选条件的目标",
+            "createFirstGoal": "创建第一个目标"
+          },
+          "createDialog": {
+            "title": "为整个班级创建目标",
+            "description": "此目标将为 {className} 中的所有学生设置",
+            "goalType": "目标类型",
+            "title_label": "标题",
+            "titlePlaceholder": "例如：每周阅读目标",
+            "description_label": "描述（可选）",
+            "descriptionPlaceholder": "添加有关此目标的详细信息...",
+            "targetValue": "目标值",
+            "targetValuePlaceholder": "100",
+            "unit": "单位",
+            "targetDate": "目标日期",
+            "priority": "优先级",
+            "priorityLow": "低",
+            "priorityMedium": "中",
+            "priorityHigh": "高",
+            "cancelButton": "取消",
+            "createButton": "为班级创建目标",
+            "creatingButton": "创建中...",
+            "goalTypes": {
+              "XP_TOTAL": "总经验值",
+              "XP_DAILY": "每日经验值",
+              "XP_WEEKLY": "每周经验值",
+              "ARTICLES_READ": "已读文章",
+              "READING_TIME": "阅读时间",
+              "VOCABULARY": "词汇",
+              "STREAK": "阅读连续天数",
+              "CEFR_LEVEL": "CEFR级别",
+              "CUSTOM": "自定义目标"
+            },
+            "units": {
+              "xp": "经验值",
+              "articles": "篇文章",
+              "minutes": "分钟",
+              "words": "个单词",
+              "days": "天",
+              "level": "级",
+              "units": "单位"
+            },
+            "toast": {
+              "successTitle": "目标创建成功",
+              "successDescription": "已为 {className} 中的 {count} 名学生创建目标",
+              "errorTitle": "创建目标失败",
+              "errorDescription": "创建目标时发生错误",
+              "genericError": "创建目标失败，请重试"
+            }
+          },
+          "progressDialog": {
+            "title": "{goalTitle}",
+            "description": "此目标的学生进度 • 目标：{targetValue} {unit}",
+            "stats": {
+              "total": "总数",
+              "completed": "已完成",
+              "active": "进行中",
+              "avgProgress": "平均进度"
+            },
+            "table": {
+              "student": "学生",
+              "progress": "进度",
+              "status": "状态",
+              "currentTarget": "当前/目标",
+              "unknown": "未知",
+              "completedOn": "完成于 {date}"
+            }
+          },
+          "card": {
+            "priorityHigh": "高优先级",
+            "priorityMedium": "中优先级",
+            "priorityLow": "低优先级",
+            "noDescription": "无描述",
+            "viewDetails": "查看详情",
+            "deleteAll": "全部删除",
+            "confirmDelete": {
+              "title": "删除所有学生的目标",
+              "description": "您确定要为所有 {count} 名学生删除此目标吗？此操作无法撤消",
+              "cancel": "取消",
+              "confirm": "全部删除"
+            },
+            "toast": {
+              "deleteSuccess": "目标已删除",
+              "deleteSuccessDescription": "已成功删除 {count} 名学生的目标",
+              "deleteError": "错误",
+              "deleteErrorDescription": "删除部分目标失败，请重试"
+            },
+            "stats": {
+              "completed": "{completed} 已完成",
+              "active": "{active} 进行中",
+              "students": "{total} 名学生",
+              "dueIn": "{days} 天后到期",
+              "dueToday": "今天到期",
+              "overdue": "逾期 {days} 天"
+            }
+          }
+        }
+      },
+      "aiBrief": {
+        "title": "AI教师简报",
+        "description": "AI驱动的见解和建议",
+        "updatedAt": "更新于 {time}",
+        "refreshInsights": "刷新见解",
+        "keyInsights": "关键见解（{count}）",
+        "evidence": "证据：",
+        "actionable": "可操作",
+        "noInsights": "目前没有特定见解",
+        "aiInsightsWillAppear": "AI见解将显示在此处",
+        "priority": {
+          "low": "低",
+          "medium": "中",
+          "high": "高"
+        }
+      },
+      "lastUpdated": "最后更新：{time}",
+      "error": {
+        "title": "错误",
+        "message": "无法加载控制台数据",
+        "retry": "重试"
+      }
     }
   },
   "AdminTeachers": {
@@ -2572,7 +3744,9 @@
       "title": "学生管理",
       "subtitle": "管理学生及其学习进度"
     },
-    "page": { "title": "学生管理" },
+    "page": {
+      "title": "学生管理"
+    },
     "stats": {
       "totalStudents": "学生总数",
       "allClassrooms": "所有班级",
@@ -2644,12 +3818,88 @@
       "loading": "正在加载学生...",
       "empty": "没有找到符合条件的学生。"
     },
-    "badges": { "noClass": "无班级" },
+    "badges": {
+      "noClass": "无班级"
+    },
     "pagination": {
       "showing": "显示第 {from} 到第 {to} 条，共 {total} 名学生",
       "previous": "上一页",
       "next": "下一页",
       "pageOf": "第 {page} 页，共 {totalPages} 页"
+    }
+  },
+  "System": {
+    "Dashboard": {
+      "title": "系统仪表板",
+      "dateRange": {
+        "7d": "最近 7 天",
+        "30d": "最近 30 天",
+        "90d": "最近 3 个月",
+        "all": "全部时间"
+      },
+      "export": "导出",
+      "refresh": "刷新",
+      "refreshing": "正在刷新...",
+      "loading": "正在加载数据...",
+      "metricsUnavailableTitle": "部分数据可能不可用：",
+      "tabs": {
+        "overview": "概览",
+        "activity": "活动",
+        "insights": "AI 洞察"
+      },
+      "cards": {
+        "totalSchools": {
+          "title": "学校总数",
+          "desc": "活跃机构"
+        },
+        "totalUsers": {
+          "title": "用户总数",
+          "count": "{students} 名学生，{teachers} 名教师"
+        },
+        "totalArticles": {
+          "title": "文章总数",
+          "desc": "可用内容库"
+        },
+        "completionRate": {
+          "title": "完成率",
+          "desc": "成功完成的文章"
+        }
+      },
+      "licenseUsage": {
+        "title": "许可证使用情况",
+        "description": "监控各学校的许可证分配和使用情况"
+      },
+      "activeUsers": {
+        "title": "活跃用户",
+        "description": "实时用户活动和参与度指标"
+      },
+      "systemHealth": {
+        "title": "系统健康",
+        "description": "实时系统性能和健康指标",
+        "database": "数据库性能",
+        "apiResponse": "API 响应时间",
+        "errorRate": "错误率",
+        "uptime": "系统运行时间",
+        "status": {
+          "excellent": "优秀",
+          "good": "良好",
+          "low": "较低"
+        }
+      },
+      "recentActivity": {
+        "title": "最近活动",
+        "description": "最新管理操作和系统变更",
+        "events": {
+          "newSchoolLicense": "新学校许可证已激活",
+          "contentUpdated": "内容库已更新",
+          "maintenanceCompleted": "系统维护已完成",
+          "milestoneReached": "阅读会话里程碑已达成"
+        }
+      },
+      "noData": {
+        "title": "暂无数据",
+        "description": "请尝试调整筛选条件或刷新页面"
+      }
     }
   }
 }

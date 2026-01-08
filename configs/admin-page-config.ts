@@ -31,28 +31,28 @@ export const adminPageConfig: PageConfig = {
       icon: "LayoutDashboardIcon",
       requiredPermissions: ["ADMIN_ACCESS"],
       // hideWhenNoPermission: true,
-      items: [
-        {
-          title: "admin",
-          href: "/admin/dashboard",
-          icon: "ChevronRightIcon",
-          requiredPermissions: ["ADMIN_ACCESS"],
-        },
-        {
-          title: "teachers",
-          href: "/admin/dashboard/teachers",
-          icon: "ChevronRightIcon",
-          requiredPermissions: ["SYSTEM_ACCESS"],
-          hideWhenNoPermission: true,
-        },
-        {
-          title: "students",
-          href: "/admin/dashboard/students",
-          icon: "ChevronRightIcon",
-          requiredPermissions: ["SYSTEM_ACCESS"],
-          hideWhenNoPermission: true,
-        },
-      ],
+      // items: [
+      //   {
+      //     title: "admin",
+      //     href: "/admin/dashboard",
+      //     icon: "ChevronRightIcon",
+      //     requiredPermissions: ["ADMIN_ACCESS"],
+      //   },
+      //   {
+      //     title: "teachers",
+      //     href: "/admin/dashboard/teachers",
+      //     icon: "ChevronRightIcon",
+      //     requiredPermissions: ["SYSTEM_ACCESS"],
+      //     hideWhenNoPermission: true,
+      //   },
+      //   {
+      //     title: "students",
+      //     href: "/admin/dashboard/students",
+      //     icon: "ChevronRightIcon",
+      //     requiredPermissions: ["SYSTEM_ACCESS"],
+      //     hideWhenNoPermission: true,
+      //   },
+      // ],
     },
     {
       title: "teachers",

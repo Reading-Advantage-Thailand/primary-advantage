@@ -55,7 +55,7 @@ export default function AssignButton({ article }: { article: article }) {
       </DialogTrigger>
       <DialogContent
         className="max-h-[80vh] overflow-y-auto"
-        closeButtonShow={false}
+        showCloseButton={false}
       >
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>

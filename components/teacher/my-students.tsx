@@ -74,7 +74,7 @@ type MyStudentProps = {
 };
 
 export default function MyStudents() {
-  const t = useTranslations("teacher.myStudents");
+  const t = useTranslations("Teacher.myStudents");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
