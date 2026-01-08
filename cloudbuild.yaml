@@ -7,8 +7,6 @@ steps:
       - "-t"
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
       - "."
-      - "--build-arg=DATABASE_URL=${_DATABASE_URL}"
-    secretEnv: ["DATABASE_URL"]
 
   # Step 2: Push Docker image
   - name: "gcr.io/cloud-builders/docker"
@@ -25,8 +23,6 @@ steps:
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
       - "-s"
       - "${_CLOUD_SQL_INSTANCE}"
-      - "-e"
-      - "DATABASE_URL=${_DATABASE_URL}"
       - "--"
       - "npx"
       - "prisma"
