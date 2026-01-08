@@ -3,6 +3,8 @@ import { currentUser } from "@/lib/session";
 import { validateUser, UserWithRoles } from "@/server/utils/auth";
 import { hasPermission, Permission } from "@/lib/permissions";
 import { decodeJwt, jwtVerify } from "jose";
+import { subMinutes } from "date-fns";
+import { prisma } from "@/lib/prisma";
 
 // Define the type for the authenticated user object passed to the handler
 export type AuthenticatedUser = UserWithRoles & { role: string };
@@ -107,7 +109,22 @@ export function withAuth<T = any>(
         }
       }
 
-      // 4. Call the handler with the authenticated user
+      // 4. Update user last active at
+      const threshole = subMinutes(new Date(), 30);
+
+      try {
+        await prisma.user.updateMany({
+          where: {
+            id: sessionUser.id,
+            OR: [{ lastActiveAt: { lt: threshole } }, { lastActiveAt: null }],
+          },
+          data: { lastActiveAt: new Date() },
+        });
+      } catch (error) {
+        console.error("Tracking Error:", error);
+      }
+
+      // 5. Call the handler with the authenticated user
       return handler(req, context, userForPermissions);
     } catch (error) {
       console.error("API Guard Error:", error);

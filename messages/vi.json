@@ -147,6 +147,216 @@
       "loading": "Đang tải...",
       "noArticles": "Không tìm thấy bài viết",
       "noArticlesToRead": "Không có bài viết cần đọc lại"
+    },
+    "Dashboard": {
+      "xpVelocity": {
+        "title": "Tốc độ XP",
+        "description": "Theo dõi tốc độ học tập của bạn",
+        "overview": "Tốc độ học tập của bạn theo thời gian",
+        "emptyMessage": "Không có dữ liệu hoạt động",
+        "ariaLabel": "Chỉ số tốc độ XP",
+        "quickStats": "Thống kê nhanh",
+        "period": {
+          "7d": "7 ngày qua",
+          "30d": "30 ngày qua",
+          "ema": "Tốc độ EMA"
+        },
+        "label": {
+          "7dAvg": "TB 7 ngày",
+          "30dAvg": "TB 30 ngày",
+          "trend": "Xu hướng"
+        },
+        "units": {
+          "xpPerDay": "XP/ngày"
+        },
+        "kpi": {
+          "7dayAvg": "TB 7 ngày",
+          "xpPerDay": "XP mỗi ngày",
+          "activeDays": "Ngày hoạt động",
+          "last7Days": "7 ngày qua"
+        },
+        "tip": "💡 Mẹo: Hoàn thành nhiều hoạt động hơn để theo dõi tốc độ tốt hơn"
+      },
+      "etaCard": {
+        "title": "Thời gian dự kiến đến cấp độ tiếp theo",
+        "ariaLabel": "Thời gian dự kiến đến cấp độ tiếp theo",
+        "regionLabel": "Thông tin ETA",
+        "eta": {
+          "na": "Không có",
+          "lessThanOne": "Ít hơn 1 ngày",
+          "oneDay": "1 ngày",
+          "days": "ngày",
+          "weeks": "tuần",
+          "months": "tháng"
+        },
+        "expected": "Dự kiến:",
+        "confidenceRange": "Phạm vi tin cậy",
+        "bestCase": "Tốt nhất:",
+        "worstCase": "Xấu nhất:",
+        "confidence": {
+          "high": "Độ tin cậy cao",
+          "medium": "Độ tin cậy trung bình",
+          "low": "Độ tin cậy thấp",
+          "insufficient": "Dữ liệu không đủ"
+        },
+        "basedOnVelocity": "Dựa trên tốc độ hiện tại của bạn {value}"
+      },
+      "genreEngagement": {
+        "title": "Tương tác theo thể loại",
+        "description": "Sở thích đọc và gợi ý của bạn",
+        "emptyMessage": "Bắt đầu đọc để xem sở thích thể loại của bạn",
+        "yourTopGenres": "Thể loại yêu thích",
+        "reads": "lượt đọc",
+        "score": "Điểm:",
+        "recommendedForYou": "Gợi ý cho bạn",
+        "cefrAppropriate": "Phù hợp CEFR",
+        "genresRead": "Thể loại đã đọc",
+        "totalReads": "Tổng lượt đọc",
+        "totalScore": "Tổng điểm"
+      },
+      "srsHealth": {
+        "title": "Sức khỏe SRS",
+        "description": "Trạng thái hệ thống ôn tập giãn cách",
+        "emptyMessage": "Không có dữ liệu thẻ ghi nhớ",
+        "status": {
+          "healthy": "Khỏe mạnh",
+          "moderate": "Trung bình",
+          "overloaded": "Quá tải",
+          "critical": "Nghiêm trọng"
+        },
+        "due": "đến hạn",
+        "totalCards": "Tổng thẻ",
+        "reviewedToday": "Đã ôn hôm nay",
+        "retentionRate": "Tỷ lệ ghi nhớ",
+        "quickActions": "Hành động nhanh",
+        "recommendations": "Gợi ý",
+        "practiceNow": "Luyện tập ngay",
+        "cards": "thẻ"
+      },
+      "aiCoach": {
+        "title": "Huấn luyện viên AI",
+        "description": "Phân tích cá nhân hóa dựa trên dữ liệu của bạn",
+        "emptyMessage": "Tiếp tục học để nhận phân tích từ AI",
+        "basedOnMetrics": "Dựa trên chỉ số hiện tại của bạn:",
+        "xpPerDay": "XP/ngày",
+        "retention": "ghi nhớ",
+        "related": "Liên quan:",
+        "refreshNotice": "💡 Phân tích AI cập nhật mỗi 24 giờ dựa trên hoạt động mới nhất của bạn",
+        "priority": {
+          "high": "Cao",
+          "medium": "Trung bình",
+          "low": "Thấp"
+        }
+      },
+      "compactHeatmap": {
+        "title": "Bản đồ nhiệt hoạt động",
+        "lastRange": "90 ngày qua",
+        "activities": "hoạt động",
+        "stats": {
+          "total": "Tổng",
+          "peakDay": "Ngày cao điểm",
+          "dailyAvg": "TB hàng ngày"
+        },
+        "dow": {
+          "sun": "CN",
+          "mon": "T2",
+          "tue": "T3",
+          "wed": "T4",
+          "thu": "T5",
+          "fri": "T6",
+          "sat": "T7"
+        },
+        "legend": {
+          "less": "Ít",
+          "more": "Nhiều"
+        },
+        "hoverForDetails": "Di chuột qua ô để xem chi tiết",
+        "topActivityDates": "Ngày hoạt động cao nhất"
+      },
+      "activeGoals": {
+        "title": "Mục tiêu đang thực hiện",
+        "loading": "Đang tải...",
+        "emptyDescription": "Đặt mục tiêu để theo dõi tiến độ của bạn",
+        "createFirst": "Tạo mục tiêu đầu tiên",
+        "viewAll": "Xem tất cả",
+        "description": "Top 3 mục tiêu học tập của bạn",
+        "highPriority": "Ưu tiên cao",
+        "daysLeft": "Còn {count} ngày",
+        "dueToday": "Đến hạn hôm nay",
+        "overdue": "Quá hạn",
+        "onTrack": "Đúng tiến độ"
+      },
+      "title": "Bảng điều khiển học sinh",
+      "description": "Tổng quan về tiến độ học tập và gợi ý",
+      "practiceButton": "Luyện thẻ ghi nhớ",
+      "setGoalButton": "Đặt mục tiêu"
+    },
+    "reportpage": {
+      "title": "Hoạt động người dùng",
+      "activityprogress": "Tiến độ hoạt động",
+      "recentactivity": "Hoạt động gần đây",
+      "inProgress": "Đang thực hiện",
+      "completed": "Hoàn thành",
+      "daterange": "Khoảng thời gian",
+      "xpearned": "XP đã nhận",
+      "xpoverall": "Tổng XP",
+      "activityheatmap": "Bản đồ nhiệt hoạt động",
+      "readingstatschart": "Biểu đồ thống kê đọc",
+      "timeframes": {
+        "7d": "7 ngày qua",
+        "30d": "30 ngày qua",
+        "90d": "3 tháng qua",
+        "6m": "6 tháng qua"
+      },
+      "granularity": {
+        "day": "Ngày",
+        "hour": "Giờ"
+      },
+      "activityTypes": {
+        "reading": "Đọc",
+        "questions": "Câu hỏi",
+        "flashcards": "Thẻ ghi nhớ",
+        "practice": "Luyện tập",
+        "assessment": "Đánh giá",
+        "rating": "Xếp hạng",
+        "other": "Khác"
+      },
+      "clear": "Xóa",
+      "labels": {
+        "activities": "hoạt động",
+        "across": "trong",
+        "sessions": "phiên",
+        "students": "học sinh",
+        "completed": "hoàn thành",
+        "minutes": "phút"
+      },
+      "stats": {
+        "totalActivities": "Tổng hoạt động",
+        "peakDaily": "Cao điểm hàng ngày"
+      },
+      "legend": {
+        "less": "Ít",
+        "more": "Nhiều"
+      },
+      "errorLoading": "Lỗi khi tải bản đồ nhiệt",
+      "ariaLabel": "Bản đồ nhiệt hoạt động. Sử dụng phím mũi tên để điều hướng, Enter để chọn.",
+      "srSummary": "Bản đồ nhiệt hoạt động hiển thị {total} hoạt động từ {start} đến {end}. {peak} hoạt động cao điểm. Trong {students} học sinh.",
+      "activityTimeline": {
+        "title": "Dòng thời gian hoạt động",
+        "errorLoading": "Không thể tải dòng thời gian hoạt động",
+        "emptyTitle": "Chưa có hoạt động",
+        "emptyDescription": "Không có hoạt động được ghi nhận trong khoảng thời gian này.",
+        "clearFilters": "Xóa",
+        "srSummaryStart": "Dòng thời gian hoạt động hiển thị",
+        "srSummaryMid": "hoạt động từ",
+        "srSummaryTo": "đến",
+        "labels": {
+          "assignment": "Bài tập",
+          "srs": "SRS",
+          "reading": "Đọc",
+          "practice": "Luyện tập"
+        }
+      }
     }
   },
   "Admin": {
@@ -215,6 +425,98 @@
           "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ"
         }
       }
+    },
+    "Dashboard": {
+      "title": "Bảng điều khiển quản trị",
+      "subtitle": "Quản lý nền tảng giáo dục của trường bạn",
+      "timeframes": {
+        "7d": "7 ngày",
+        "30d": "30 ngày",
+        "90d": "90 ngày"
+      },
+      "timeframeDescription": {
+        "7d": "Trong 7 ngày qua",
+        "30d": "Trong 30 ngày qua",
+        "90d": "Trong 90 ngày qua"
+      },
+      "kpis": {
+        "dataSource": {
+          "userActivity": "Nhật ký hoạt động người dùng",
+          "classroomActivity": "Hoạt động lớp học",
+          "lessonRecords": "Hồ sơ bài học",
+          "userRegistration": "Đăng ký người dùng",
+          "systemMonitoring": "Giám sát hệ thống"
+        },
+        "activeStudents": {
+          "title": "Học sinh hoạt động",
+          "tooltip": "Học sinh có ít nhất một hoạt động trong khoảng thời gian đã chọn"
+        },
+        "activeTeachers": {
+          "title": "Giáo viên hoạt động",
+          "description": "{total} tổng cộng",
+          "tooltip": "Giáo viên và quản trị viên có hoạt động trong khoảng thời gian đã chọn"
+        },
+        "activeClassrooms": {
+          "title": "Lớp học hoạt động",
+          "description": "Có hoạt động học sinh",
+          "tooltip": "Lớp học có ít nhất một học sinh hoạt động trong khoảng thời gian đã chọn"
+        },
+        "readingSessions": {
+          "title": "Phiên đọc",
+          "description": "Phiên đã hoàn thành",
+          "tooltip": "Tổng số phiên đọc đã hoàn thành"
+        },
+        "totalXp": {
+          "title": "Tổng XP đã kiếm",
+          "description": "Phiên hôm nay",
+          "tooltip": "Phiên đọc đã hoàn thành hôm nay"
+        },
+        "newUsers": {
+          "title": "Người dùng mới",
+          "description": "Tham gia hôm nay",
+          "tooltip": "Người dùng mới tham gia hôm nay"
+        },
+        "systemHealth": {
+          "title": "Tình trạng hệ thống",
+          "description": "{status}",
+          "tooltip": "Tình trạng sức khỏe hệ thống tổng thể"
+        }
+      },
+      "teacherEffectiveness": {
+        "title": "Hiệu quả giáo viên",
+        "description": "Mức độ tham gia của học sinh so với tốc độ tiến bộ",
+        "engagement": "Tham gia",
+        "progress": "Tiến độ",
+        "accuracy": "Độ chính xác",
+        "students": "học sinh",
+        "levels": "cấp độ",
+        "topPerformers": "Thành tích xuất sắc",
+        "performanceLevels": {
+          "high": "Hiệu suất cao",
+          "average": "Trung bình",
+          "needsSupport": "Cần hỗ trợ"
+        },
+        "emptyMessage": "Không có dữ liệu giáo viên",
+        "tooltip": {
+          "engagement": "Tham gia: {rate}%",
+          "activeStudents": "{active}/{total} học sinh hoạt động",
+          "classroom": "lớp học"
+        },
+        "legend": {
+          "excellent": "≥80% (Xuất sắc)",
+          "good": "60-79% (Tốt)",
+          "needsSupport": "<60% (Cần hỗ trợ)"
+        },
+        "topTeacher": "Giáo viên có tỷ lệ tham gia cao nhất",
+        "activeLabel": "hoạt động",
+        "classroomLabel": "lớp học"
+      },
+      "licenseSelector": {
+        "title": "Chọn giấy phép",
+        "placeholder": "Chọn một giấy phép",
+        "availableLabel": "Giấy phép có sẵn",
+        "users": "Người dùng: {used}/{max}"
+      }
     }
   },
   "ImportData": {
@@ -258,7 +560,11 @@
     "preview": {
       "button": "Xem trước",
       "title": "Xem trước dữ liệu",
-      "columns": { "name": "Tên", "email": "Email", "role": "Vai trò" }
+      "columns": {
+        "name": "Tên",
+        "email": "Email",
+        "role": "Vai trò"
+      }
     },
     "formatGuide": {
       "title": "Hướng dẫn định dạng CSV",
@@ -553,6 +859,553 @@
         "deleteFailed": "Xóa bài viết thất bại",
         "deleteError": "Đã xảy ra lỗi khi xóa bài viết"
       }
+    },
+    "kpiCard": {
+      "source": "Nguồn"
+    },
+    "aiInsights": {
+      "insights": {
+        "title": "AI Insights",
+        "description": "Phân tích thông minh được hỗ trợ bởi AI thực sự",
+        "empty": "Hiện chưa có insight. Tiếp tục sử dụng nền tảng để tạo đề xuất cá nhân hóa."
+      },
+      "loading": {
+        "skeleton": "Đang tải insight..."
+      },
+      "toast": {
+        "dismiss": {
+          "title": "Đã ẩn insight",
+          "description": "Insight này đã được ẩn khỏi chế độ xem của bạn."
+        },
+        "dismissError": {
+          "title": "Lỗi",
+          "description": "Ẩn insight thất bại. Vui lòng thử lại."
+        },
+        "actionRecorded": {
+          "title": "Đã ghi nhận hành động",
+          "description": "Cảm ơn bạn đã thực hiện hành động theo insight này!"
+        },
+        "actionError": {
+          "title": "Lỗi",
+          "description": "Ghi nhận hành động thất bại. Vui lòng thử lại."
+        },
+        "refreshed": {
+          "title": "Insight đã được làm mới",
+          "description": "Insight AI đã được tái tạo với dữ liệu mới nhất."
+        }
+      },
+      "actions": {
+        "done": "Xong"
+      },
+      "suggestions": {
+        "title": "Gợi ý thông minh",
+        "description": "Các đề xuất có thể thực hiện để tối ưu hóa nền tảng của bạn",
+        "empty": "Hoàn thành thêm hoạt động để nhận gợi ý cá nhân hóa.",
+        "actionItems": "{count} mục hành động",
+        "impact": "Tác động:"
+      }
+    },
+    "adoptionWidget": {
+      "title": "Mức độ tham gia học sinh theo cấp độ",
+      "description": "Học sinh hoạt động theo {mode}",
+      "modes": {
+        "grade": "lớp",
+        "cefr": "cấp độ CEFR"
+      },
+      "timeframe": {
+        "7d": "7 ngày qua",
+        "30d": "30 ngày qua",
+        "90d": "3 tháng qua"
+      },
+      "empty": "Không có dữ liệu học sinh",
+      "view": {
+        "cefr": "CEFR",
+        "grade": "Lớp"
+      },
+      "item": {
+        "activeStudents": "{count} học sinh hoạt động",
+        "avgXp": "{xp} XP trung bình"
+      },
+      "summary": {
+        "title": "Tổng quan mức độ tham gia",
+        "activeInTimeframe": "{active} trên {total} học sinh hoạt động trong {timeframe} qua"
+      }
+    },
+    "alertCenter": {
+      "title": "Trung tâm cảnh báo",
+      "unacknowledged": "cảnh báo chưa xác nhận",
+      "noAlerts": "Không có cảnh báo nào",
+      "viewAll": "Xem tất cả cảnh báo",
+      "filter": {
+        "unread": "Chưa đọc",
+        "critical": "Quan trọng",
+        "all": "Tất cả"
+      },
+      "markRead": "Đánh dấu đã đọc",
+      "dialog": {
+        "title": "Tất cả cảnh báo",
+        "total": "tổng cảnh báo",
+        "all": "Tất cả",
+        "unread": "Chưa đọc",
+        "critical": "Quan trọng",
+        "noAlertsCategory": "Không có cảnh báo trong danh mục này"
+      },
+      "read": "Đã đọc",
+      "viewDetails": "Xem chi tiết"
+    },
+    "compactHeatmap": {
+      "title": "Bản đồ nhiệt hoạt động",
+      "lastRange": "90 ngày qua",
+      "activities": "hoạt động",
+      "stats": {
+        "total": "Tổng",
+        "peakDay": "Ngày cao điểm",
+        "dailyAvg": "TB ngày"
+      },
+      "dow": {
+        "sun": "CN",
+        "mon": "T2",
+        "tue": "T3",
+        "wed": "T4",
+        "thu": "T5",
+        "fri": "T6",
+        "sat": "T7"
+      },
+      "legend": {
+        "less": "Ít",
+        "more": "Nhiều"
+      },
+      "hoverForDetails": "Di chuột qua ô để xem chi tiết",
+      "topActivityDates": "Ngày hoạt động cao nhất"
+    },
+    "widgetShell": {
+      "refresh": "Làm mới",
+      "viewAll": "Xem tất cả",
+      "noData": "Không có dữ liệu",
+      "tryAgain": "Thử lại"
+    },
+    "modernActiveUsers": {
+      "labels": {
+        "activeUsers": "Người dùng hoạt động"
+      },
+      "today": "Hôm nay",
+      "avg": {
+        "7d": "TB 7 ngày",
+        "30d": "TB 30 ngày",
+        "90d": "TB 90 ngày",
+        "allTime": "TB tất cả"
+      },
+      "title": {
+        "activityTrend": "Xu hướng hoạt động"
+      },
+      "tooltip": {
+        "activeUsers": "Người dùng hoạt động"
+      }
+    },
+    "modernLicenseUsage": {
+      "title": "Sử dụng giấy phép",
+      "noLicenses": {
+        "title": "Không tìm thấy giấy phép",
+        "description": "Không có dữ liệu giấy phép vào lúc này."
+      },
+      "schools": {
+        "total": "tổng số trường"
+      },
+      "of": "trên",
+      "labels": {
+        "usage": "Sử dụng",
+        "used": "đã dùng",
+        "expires": "Hết hạn"
+      },
+      "warnings": {
+        "nearLimit": "Sử dụng trên 80%. Hãy xem xét nâng cấp sớm.",
+        "expiresSoon": "Giấy phép hết hạn trong 30 ngày."
+      }
+    },
+    "activityCharts": {
+      "title": "Tổng quan hoạt động",
+      "description": "Giám sát hoạt động người dùng, mô hình tương tác và sự kiện thời gian thực",
+      "timeframe": {
+        "7": "7 ngày qua",
+        "30": "30 ngày qua",
+        "90": "3 tháng qua",
+        "all": "tất cả thời gian"
+      },
+      "heatmap": {
+        "title": "Bản đồ nhiệt hoạt động",
+        "description": "Mức độ hoạt động hàng ngày",
+        "range": {
+          "7": "trong 7 ngày qua",
+          "30": "trong 30 ngày qua",
+          "90": "trong 3 tháng qua",
+          "all": "trong năm qua"
+        },
+        "tooltip": "{date}: {count} hoạt động"
+      },
+      "legend": {
+        "less": "Ít",
+        "more": "Nhiều"
+      },
+      "daily": {
+        "title": "Xu hướng hoạt động hàng ngày",
+        "description": "Mức độ hoạt động trong khoảng thời gian đã chọn"
+      },
+      "engagement": {
+        "title": "Tương tác người dùng",
+        "description": "So sánh người dùng và phiên"
+      },
+      "timeline": {
+        "title": "Nhật ký hoạt động",
+        "description": "Hoạt động và sự kiện gần đây của người dùng",
+        "empty": "Không tìm thấy sự kiện cho bộ lọc đã chọn.",
+        "by": "bởi {user}",
+        "filterByType": "Lọc theo loại",
+        "allTypes": "Tất cả loại",
+        "table": {
+          "type": "Loại",
+          "activity": "Hoạt động",
+          "description": "Mô tả",
+          "user": "Người dùng",
+          "time": "Thời gian"
+        },
+        "pagination": {
+          "showing": "Hiển thị {start}-{end} trên {total}",
+          "previous": "Trước",
+          "next": "Tiếp",
+          "page": "Trang",
+          "of": "trên"
+        }
+      },
+      "types": {
+        "reading": "Đọc",
+        "practice": "Luyện tập",
+        "assessment": "Đánh giá",
+        "achievement": "Thành tựu"
+      },
+      "events": {
+        "activity": "Hoạt động",
+        "srsPractice": "Phiên luyện tập SRS",
+        "assignment": "Bài tập",
+        "reading": "Đọc",
+        "practice": "Luyện tập"
+      },
+      "charts": {
+        "activity": "Hoạt động",
+        "users": "Người dùng",
+        "sessions": "Phiên"
+      },
+      "time": {
+        "justNow": "Vừa xong",
+        "minutesAgo": "{m} phút trước",
+        "hoursAgo": "{h} giờ trước",
+        "daysAgo": "{d} ngày trước"
+      }
+    },
+    "metricsCards": {
+      "totalSessions": {
+        "title": "Tổng số phiên",
+        "description": "Tổng số phiên đọc"
+      },
+      "activeUsers": {
+        "title": "Người dùng hoạt động",
+        "description": "Người dùng hoạt động trong khoảng thời gian"
+      },
+      "readingSessions": {
+        "title": "Phiên đọc",
+        "description": "Tổng số phiên đọc"
+      },
+      "alignmentScore": {
+        "title": "Điểm đối chiếu",
+        "description": "Chất lượng đối chiếu nội dung"
+      },
+      "learningVelocity": {
+        "title": "Tốc độ học",
+        "description": "XP trung bình mỗi học sinh ({dateRange})",
+        "fallback": {
+          "description": "Từ mỗi phút"
+        }
+      },
+      "avgSessionTime": {
+        "title": "Thời gian phiên trung bình",
+        "description": "Thời gian trung bình cho mỗi phiên"
+      },
+      "totalActivity": {
+        "title": "Tổng hoạt động",
+        "description": "Hoạt động người dùng hôm nay"
+      },
+      "activeUsersLast24": {
+        "description": "Người dùng hoạt động trong 24 giờ qua"
+      },
+      "readingSessionsToday": {
+        "description": "Bài viết đã đọc hôm nay"
+      },
+      "learningVelocityFallback": {
+        "description": "Từ mỗi phút"
+      }
+    },
+    "activityTimeline": {
+      "title": "Dòng thời gian hoạt động",
+      "errorLoading": "Không thể tải dòng thời gian hoạt động. Vui lòng thử lại.",
+      "emptyTitle": "Không tìm thấy hoạt động",
+      "emptyDescription": "Không có sự kiện trong khoảng thời gian đã chọn.",
+      "summary": "{total} hoạt động từ {start} đến {end}",
+      "timeframe": {
+        "7d": "7 ngày qua",
+        "30d": "30 ngày qua",
+        "90d": "3 tháng qua"
+      },
+      "clearFilters": "Xóa bộ lọc",
+      "labels": {
+        "assignment": "Bài tập",
+        "srs": "Luyện SRS",
+        "reading": "Đọc",
+        "practice": "Luyện tập",
+        "completed": "Hoàn thành"
+      },
+      "types": {
+        "assignment": "Bài tập",
+        "srs": "SRS",
+        "reading": "Đọc",
+        "practice": "Luyện tập"
+      },
+      "status": {
+        "completed": "Hoàn thành",
+        "in_progress": "Đang thực hiện",
+        "unknown": "Không rõ"
+      },
+      "srSummaryStart": "Tóm tắt dòng thời gian:",
+      "srSummaryMid": "hoạt động giữa",
+      "srSummaryTo": "và",
+      "srEventSuffix": "sự kiện"
+    },
+    "activeGoalsWidget": {
+      "title": "Mục tiêu đang thực hiện",
+      "loading": "Đang tải...",
+      "emptyDescription": "Chưa có mục tiêu đang thực hiện",
+      "createFirst": "Tạo mục tiêu đầu tiên",
+      "description": "Top 3 mục tiêu học tập của bạn",
+      "highPriority": "Ưu tiên cao",
+      "daysLeft": "Còn {count} ngày",
+      "dueToday": "Đến hạn hôm nay",
+      "overdue": "Quá hạn",
+      "onTrack": "Đúng tiến độ"
+    },
+    "assignmentNotificationDialog": {
+      "title": "Gửi thông báo bài tập",
+      "description": "Chọn bài tập và học sinh để thông báo",
+      "selectInstruction": "Chọn bài tập để thông báo",
+      "selected": "đã chọn",
+      "detail": "Chi tiết",
+      "badges": {
+        "overdue": "Quá hạn",
+        "dueToday": "Hết hạn hôm nay",
+        "oneDay": "Còn 1 ngày",
+        "daysRemaining": "Còn lại"
+      },
+      "back": "Quay lại",
+      "students": {
+        "completedLabel": "Học sinh đã hoàn thành",
+        "incompleteLabel": "Học sinh chưa hoàn thành"
+      },
+      "selectStudents": "Chọn học sinh để thông báo",
+      "deselectAll": "Bỏ chọn tất cả",
+      "selectAll": "Chọn tất cả",
+      "studentStatus": {
+        "completed": "Đã hoàn thành",
+        "incomplete": "Chưa hoàn thành"
+      },
+      "history": {
+        "empty": "Không có lịch sử thông báo",
+        "sentTo": "Đã gửi đến"
+      },
+      "studentsLabel": "học sinh",
+      "tabs": { "select": "Chọn", "history": "Lịch sử" },
+      "cancel": "Hủy",
+      "sending": "Đang gửi...",
+      "sentSuccess": "Thông báo đã gửi thành công",
+      "sentError": "Đã xảy ra lỗi",
+      "sendDefault": "Gửi thông báo đến học sinh chưa hoàn thành",
+      "sendToSelected": "Gửi đến {count} học sinh"
+    },
+    "assignmentNotification": {
+      "title": "Thông báo bài tập",
+      "description": "Bạn có {count} thông báo bài tập",
+      "badge": {
+        "teacherNotified": "Giáo viên đã thông báo",
+        "new": "Mới"
+      },
+      "fromTeacher": "Giáo viên {name}",
+      "dueLabel": "Hạn nộp:",
+      "due": {
+        "overdue": "Quá hạn {days} ngày",
+        "today": "Hết hạn hôm nay",
+        "oneDay": "Còn 1 ngày",
+        "fewDays": "Còn {days} ngày",
+        "severalDays": "Còn {days} ngày",
+        "days": "Còn {days} ngày"
+      },
+      "goToAssignment": "Đi đến bài tập",
+      "acknowledge": "Xác nhận",
+      "acknowledgeAll": "Xác nhận tất cả",
+      "close": "Đóng",
+      "createdAt": "Tạo lúc"
+    },
+    "classDashboardKpis": {
+      "errorTitle": "Lỗi khi tải Bảng điều khiển lớp",
+      "totalStudents": {
+        "title": "Tổng số học sinh",
+        "description": "{active} học sinh hoạt động tuần này"
+      },
+      "activeStudents": {
+        "title": "Học sinh hoạt động",
+        "description": "{rate}% tỷ lệ hoạt động"
+      },
+      "avgLevel": {
+        "title": "Mức trung bình",
+        "description": "Mức đọc của lớp"
+      },
+      "totalXp": { "title": "Tổng XP", "description": "XP tích lũy của lớp" },
+      "activeAssignments": {
+        "title": "Bài tập đang hoạt động",
+        "description": "Đang diễn ra"
+      },
+      "completed": { "title": "Hoàn thành", "description": "Bài tập đã nộp" }
+    },
+    "classAccuracyMetrics": {
+      "title": "Độ chính xác theo học sinh & loại",
+      "errorDescription": "Không thể tải dữ liệu độ chính xác",
+      "descriptionPrefix": "Phân tích hiệu suất theo loại câu hỏi",
+      "active": "hoạt động",
+      "mcqAvg": "TB trắc nghiệm",
+      "openEndedAvg": "TB tự luận",
+      "overallAvg": "TB tổng",
+      "headers": {
+        "student": "Học sinh",
+        "mcq": "Trắc nghiệm",
+        "openEnded": "Tự luận (điểm ≥ 70%)",
+        "overall": "Tổng"
+      },
+      "noActivity": "Không có dữ liệu hoạt động học sinh"
+    },
+    "classActivityHeatmap": {
+      "title": "Biểu đồ nhiệt hoạt động",
+      "days": "ngày",
+      "description": "Hoạt động học sinh trong {days} ngày qua",
+      "seeDetail": "Xem chi tiết",
+      "error": "Không thể tải dữ liệu hoạt động",
+      "noData": "Không có dữ liệu hoạt động",
+      "stats": {
+        "activeUsers": "Người dùng hoạt động",
+        "totalActivity": "Tổng hoạt động",
+        "peakDay": "Ngày cao điểm"
+      },
+      "legend": { "title": "Mức hoạt động:", "less": "Ít", "more": "Nhiều" },
+      "topActiveDays": "Ngày hoạt động nhiều nhất",
+      "activities": "hoạt động",
+      "dow": {
+        "sun": "CN",
+        "mon": "T2",
+        "tue": "T3",
+        "wed": "T4",
+        "thu": "T5",
+        "fri": "T6",
+        "sat": "T7"
+      }
+    },
+    "classAlignmentMatrix": {
+      "title": "Ma trận CEFR ↔ RA",
+      "error": "Không thể tải dữ liệu căn chỉnh",
+      "noData": "Không có dữ liệu căn chỉnh",
+      "alignmentScore": "Điểm căn chỉnh:",
+      "studentsWithActivity": "học sinh có hoạt động đọc",
+      "alignedLabel": "Đã căn chỉnh",
+      "aboveLabel": "Trên mức",
+      "stats": {
+        "averageLevel": "Mức trung bình:",
+        "modalLevel": "Mức phổ biến:",
+        "totalReadings": "Tổng bài đọc:"
+      }
+    },
+    "classAssignmentFunnel": {
+      "title": "Phễu bài tập",
+      "error": "Không thể tải dữ liệu bài tập",
+      "noData": "Không có dữ liệu bài tập",
+      "description": "Tỷ lệ hoàn thành và bài tập rủi ro",
+      "seeDetail": "Xem chi tiết",
+      "overallCompletion": "Hoàn thành tổng",
+      "highCompletion": "Hoàn thành cao",
+      "atRisk": "Rủi ro",
+      "stale": "Quá hạn",
+      "notStarted": "Chưa bắt đầu",
+      "needAttention": "bài tập cần chú ý",
+      "needAttentionPlural": "bài tập cần chú ý",
+      "showing": "Hiển thị {count} bài tập",
+      "clearFilter": "Xóa bộ lọc"
+    },
+    "classBatchActions": {
+      "title": "Quản lý lớp",
+      "description": "Công cụ quản lý và theo dõi tiến độ học sinh",
+      "noExportData": "Không có dữ liệu học sinh để xuất",
+      "csv": {
+        "name": "Tên",
+        "email": "Email",
+        "level": "Cấp độ",
+        "cefr": "Cấp độ CEFR",
+        "xp": "XP",
+        "readingSessions": "Phiên đọc",
+        "assignmentsCompleted": "Bài tập đã hoàn thành",
+        "assignmentsPending": "Bài tập đang chờ",
+        "avgAccuracy": "Độ chính xác TB (%)",
+        "lastActive": "Hoạt động cuối",
+        "joinedAt": "Ngày tham gia"
+      },
+      "actions": {
+        "export": "Xuất dữ liệu",
+        "exportDesc": "Tải dữ liệu học sinh dạng CSV",
+        "notify": "Gửi thông báo bài tập",
+        "notifyDesc": "Thông báo học sinh có bài tập chưa hoàn thành",
+        "assign": "Giao bài tập",
+        "assignDesc": "Chọn bài đọc để giao cho học sinh",
+        "manage": "Quản lý học sinh",
+        "manageDesc": "Quản lý danh sách học sinh trong lớp này"
+      },
+      "exportError": "Lỗi xuất dữ liệu: {message}",
+      "selectedStudents": "Đã chọn {count} học sinh",
+      "processing": "Đang xử lý..."
+    },
+    "classGenreEngagement": {
+      "title": "Tương tác theo thể loại",
+      "description": "Sở thích đọc • Phổ biến nhất: {mostPopular}",
+      "loading": "Đang tải dữ liệu thể loại...",
+      "errorUnableToLoad": "Không thể tải dữ liệu thể loại",
+      "noData": "Không có dữ liệu thể loại",
+      "labels": {
+        "books": "cuốn",
+        "percentSuffix": "%",
+        "avgLevel": "Mức trung bình",
+        "xp": "XP"
+      },
+      "moreGenres": "+{count} thể loại khác"
+    },
+    "classVelocityTable": {
+      "title": "Tốc độ & ETA",
+      "description": "Tốc độ đọc và chỉ số tiến độ",
+      "errorUnableToLoad": "Không thể tải dữ liệu tốc độ",
+      "noData": "Không có dữ liệu tốc độ",
+      "noActivity": "Không có hoạt động đọc trong khoảng thời gian đã chọn",
+      "noActivityDetails": "Học sinh chưa hoàn thành bài viết nào trong {days} ngày qua",
+      "labels": {
+        "articlesPerDay": "Bài/Ngày",
+        "articlesPerMonth": "Bài/Tháng",
+        "trend": "Xu hướng"
+      },
+      "trend": { "up": "Tăng", "down": "Giảm", "stable": "Ổn định" },
+      "stats": {
+        "totalArticles": "Tổng bài viết:",
+        "totalWords": "Tổng từ:",
+        "totalTime": "Tổng thời gian:",
+        "min": "phút"
+      }
     }
   },
   "WordList": {
@@ -718,7 +1571,9 @@
       "title": "Cấp độ CEFR",
       "yourlevel": "Cấp độ của bạn",
       "description": {
+        "A0-": "Bạn có thể nhận ra từ và tên mà bạn đã thấy trước đó, đặc biệt khi có hình ảnh để giúp đỡ. Bạn có thể hiểu các dấu hiệu đơn giản xung quanh bạn và thông tin cơ bản như nơi và khi nào một sự kiện xảy ra.",
         "A0": "Bạn có thể nhận ra từ và tên mà bạn đã thấy trước đó, đặc biệt khi có hình ảnh để giúp đỡ. Bạn có thể hiểu các dấu hiệu đơn giản xung quanh bạn và thông tin cơ bản như nơi và khi nào một sự kiện xảy ra.",
+        "A0+": "Bạn có thể nhận ra từ và tên mà bạn đã thấy trước đó, đặc biệt khi có hình ảnh để giúp đỡ. Bạn có thể hiểu các dấu hiệu đơn giản xung quanh bạn và thông tin cơ bản như nơi và khi nào một sự kiện xảy ra.",
         "A1-": "Bạn đang bắt đầu nhận ra nhiều từ và cụm từ đơn giản hơn ngoài các cơ bản. Bạn có thể theo dõi các hướng dẫn đơn giản và hiểu các cụm từ và câu về những thứ mà bạn cần.",
         "A1": "Bạn có thể hiểu văn bản đơn giản và ngắn gọn. Bạn nhận ra đủ từ để tìm chúng trong các thông báo và hướng dẫn đơn giản. Bạn có thể nói về những điều đơn giản, hằng ngày bằng cách sử dụng các từ mà bạn biết.",
         "A1+": "Bạn đang bắt đầu hiểu các câu và biểu thức quan trọng đối với bạn. Đọc không chỉ là nhận ra các từ quen thuộc nữa; bạn đang bắt đầu hiểu toàn bộ tin nhắn trong các văn bản đơn giản.",
@@ -856,7 +1711,6 @@
     "clozeTest": "Bài kiểm tra điền từ",
     "orderWord": "Sắp xếp từ",
     "matching": "Ghép cặp",
-
     "matchingGame": {
       "title": "Trò chơi ghép cặp dịch thuật",
       "description": "Luyện tập ghép cặp từ với nghĩa của chúng từ bộ sưu tập thẻ ghi nhớ!",
@@ -1799,14 +2653,22 @@
         "title": "Câu quan trọng : {count} câu",
         "more": "+{count} câu được lưu thêm"
       },
-      "actions": { "backToRead": "Quay lại trang đọc" },
-      "toast": { "failed": "Không thể tải tổng kết bài học" }
+      "actions": {
+        "backToRead": "Quay lại trang đọc"
+      },
+      "toast": {
+        "failed": "Không thể tải tổng kết bài học"
+      }
     }
   },
   "LessonLanguageQuestion": {
     "title": "Trợ lý Đọc AI",
-    "loading": { "conversation": "Đang tải cuộc trò chuyện..." },
-    "status": { "online": "Trực tuyến" },
+    "loading": {
+      "conversation": "Đang tải cuộc trò chuyện..."
+    },
+    "status": {
+      "online": "Trực tuyến"
+    },
     "header": {
       "readyWithName": "Sẵn sàng giúp {name} với các câu hỏi",
       "ready": "Sẵn sàng giúp bạn với câu hỏi của bạn"
@@ -1821,7 +2683,10 @@
       "placeholderWithName": "{name}, hãy hỏi về bài đọc...",
       "placeholder": "Nhập câu hỏi về bài đọc..."
     },
-    "buttons": { "send": "Gửi", "skip": "Bỏ qua" },
+    "buttons": {
+      "send": "Gửi",
+      "skip": "Bỏ qua"
+    },
     "tips": {
       "askVocabulary": "Hỏi về từ vựng",
       "discussTheme": "Thảo luận về chủ đề chính",
@@ -1838,7 +2703,9 @@
       "questionOf": "Câu {current} trên {total}",
       "completePercent": "Hoàn thành {percent}%"
     },
-    "timer": { "seconds": "{seconds}s" },
+    "timer": {
+      "seconds": "{seconds}s"
+    },
     "completed": {
       "title": "Hoàn thành bài kiểm tra",
       "description": "Tuyệt vời! Bạn đã hoàn thành bài kiểm tra",
@@ -1854,7 +2721,9 @@
     }
   },
   "LessonSAQ": {
-    "completed": { "title": "Hoàn thành bài kiểm tra" },
+    "completed": {
+      "title": "Hoàn thành bài kiểm tra"
+    },
     "labels": {
       "question": "Câu hỏi:",
       "yourAnswer": "Câu trả lời của bạn:",
@@ -1862,15 +2731,23 @@
       "feedback": "Phản hồi:",
       "score": "Điểm:"
     },
-    "timer": { "elapsed": "Thời gian: {time}" },
+    "timer": {
+      "elapsed": "Thời gian: {time}"
+    },
     "form": {
-      "placeholder": { "answer": "Nhập câu trả lời của bạn..." },
+      "placeholder": {
+        "answer": "Nhập câu trả lời của bạn..."
+      },
       "help": {
         "detailedResponse": "Viết câu trả lời chi tiết để thể hiện sự hiểu biết"
       },
-      "validation": { "answerRequired": "Vui lòng nhập câu trả lời" }
+      "validation": {
+        "answerRequired": "Vui lòng nhập câu trả lời"
+      }
     },
-    "actions": { "submit": "Gửi" }
+    "actions": {
+      "submit": "Gửi"
+    }
   },
   "LessonCloze": {
     "loading": {
@@ -1991,7 +2868,9 @@
     "prompt": {
       "thinkAndReveal": "Nghĩ về ý nghĩa của câu này, sau đó hiển thị câu trả lời."
     },
-    "buttons": { "showAnswer": "Hiển thị câu trả lời" },
+    "buttons": {
+      "showAnswer": "Hiển thị câu trả lời"
+    },
     "rating": {
       "prompt": "Bạn biết câu này tốt như thế nào?",
       "again": "Lại",
@@ -2043,7 +2922,9 @@
       "archive": "Lưu trữ",
       "delete": "Xóa"
     },
-    "search": { "placeholder": "Tìm kiếm" },
+    "search": {
+      "placeholder": "Tìm kiếm"
+    },
     "import": {
       "fromLabel": "Nhập một lớp mới từ",
       "googleClassroom": "Google Classroom",
@@ -2063,7 +2944,10 @@
         "aboutDescription": "Tính năng này giúp nhập học sinh từ Google Classroom. Học sinh sẽ được ghi danh vào lớp của bạn tự động."
       }
     },
-    "pagination": { "previous": "Trước", "next": "Tiếp" },
+    "pagination": {
+      "previous": "Trước",
+      "next": "Tiếp"
+    },
     "edit": {
       "title": "Chỉnh sửa lớp",
       "description": "Bạn có chắc muốn chỉnh sửa lớp này?",
@@ -2092,8 +2976,13 @@
     }
   },
   "TeacherCreateClass": {
-    "button": { "newClassroom": "Lớp học mới" },
-    "dialog": { "title": "Tạo lớp", "description": "Tạo lớp học mới" },
+    "button": {
+      "newClassroom": "Lớp học mới"
+    },
+    "dialog": {
+      "title": "Tạo lớp",
+      "description": "Tạo lớp học mới"
+    },
     "fields": {
       "className": "Tên lớp",
       "classNamePlaceholder": "Tên lớp",
@@ -2102,7 +2991,10 @@
       "gradePlaceholder": "Khối",
       "gradeItem": "Khối {grade}"
     },
-    "actions": { "create": "Tạo", "cancel": "Hủy" },
+    "actions": {
+      "create": "Tạo",
+      "cancel": "Hủy"
+    },
     "toast": {
       "attention": "Chú ý",
       "fillAllFields": "Vui lòng điền đầy đủ các trường",
@@ -2110,79 +3002,6 @@
       "classCreated": "Tạo lớp thành công",
       "error": "Lỗi",
       "failedCreate": "Tạo lớp thất bại"
-    }
-  },
-  "teacher": {
-    "myStudents": {
-      "title": "Học sinh của tôi",
-      "description": "Xem và quản lý học sinh của bạn",
-      "table": {
-        "name": "Tên",
-        "email": "Email",
-        "classrooms": "Lớp học",
-        "actions": "Thao tác",
-        "empty": "Trống"
-      },
-      "actions": {
-        "progress": "Tiến độ",
-        "resetProgress": "Đặt lại tiến độ",
-        "cancel": "Hủy",
-        "reset": "Đặt lại"
-      },
-      "search": {
-        "placeholder": "Tìm theo tên"
-      },
-      "pagination": {
-        "previous": "Trước",
-        "next": "Tiếp"
-      },
-      "unknown": {
-        "student": "Không tên",
-        "email": "Không rõ"
-      },
-      "classrooms": {
-        "none": "Không có lớp",
-        "more": "+{count} thêm"
-      },
-      "dialog": {
-        "reset": {
-          "title": "Đặt lại tiến độ",
-          "description": "Bạn có chắc muốn đặt lại tiến độ của học sinh này không?"
-        }
-      },
-      "toast": {
-        "reset": {
-          "success": "Đặt lại XP thành công.",
-          "error": "Đặt lại XP thất bại."
-        }
-      }
-    },
-    "cefrSetter": {
-      "button": { "setLevel": "Đặt cấp độ" },
-      "dialog": {
-        "title": "Đặt cấp độ CEFR cho {name}",
-        "description": "Chọn cấp độ CEFR phù hợp cho học sinh này. Hệ thống cũng sẽ cập nhật cấp độ đọc (RA)."
-      },
-      "labels": {
-        "currentLevel": "Cấp độ hiện tại",
-        "newLevel": "Cấp độ mới"
-      },
-      "select": { "placeholder": "Chọn cấp độ CEFR" },
-      "preview": {
-        "title": "Xem trước:",
-        "cefr": "Cấp độ CEFR:",
-        "ra": "Cấp độ RA:"
-      },
-      "actions": {
-        "cancel": "Hủy",
-        "update": "Cập nhật cấp độ",
-        "updating": "Đang cập nhật..."
-      },
-      "toast": {
-        "noChanges": "Không có thay đổi để lưu",
-        "success": "Đã cập nhật CEFR của {name} thành {level}",
-        "error": "Không thể cập nhật cấp độ CEFR"
-      }
     }
   },
   "Teacher": {
@@ -2429,6 +3248,299 @@
       "cancel": "Hủy",
       "edit": "Chỉnh sửa",
       "noStudentsInSelectedStatus": "Không có học sinh trong trạng thái đã chọn"
+    },
+    "myStudents": {
+      "title": "Học sinh của tôi",
+      "description": "Xem và quản lý học sinh của bạn",
+      "table": {
+        "name": "Tên",
+        "email": "Email",
+        "classrooms": "Lớp học",
+        "actions": "Thao tác",
+        "empty": "Trống"
+      },
+      "actions": {
+        "progress": "Tiến độ",
+        "resetProgress": "Đặt lại tiến độ",
+        "cancel": "Hủy",
+        "reset": "Đặt lại"
+      },
+      "search": {
+        "placeholder": "Tìm theo tên"
+      },
+      "pagination": {
+        "previous": "Trước",
+        "next": "Tiếp"
+      },
+      "unknown": {
+        "student": "Không tên",
+        "email": "Không rõ"
+      },
+      "classrooms": {
+        "none": "Không có lớp",
+        "more": "+{count} thêm"
+      },
+      "dialog": {
+        "reset": {
+          "title": "Đặt lại tiến độ",
+          "description": "Bạn có chắc muốn đặt lại tiến độ của học sinh này không?"
+        }
+      },
+      "toast": {
+        "reset": {
+          "success": "Đặt lại XP thành công.",
+          "error": "Đặt lại XP thất bại."
+        }
+      }
+    },
+    "cefrSetter": {
+      "button": {
+        "setLevel": "Đặt cấp độ"
+      },
+      "dialog": {
+        "title": "Đặt cấp độ CEFR cho {name}",
+        "description": "Chọn cấp độ CEFR phù hợp cho học sinh này. Hệ thống cũng sẽ cập nhật cấp độ đọc (RA)."
+      },
+      "labels": {
+        "currentLevel": "Cấp độ hiện tại",
+        "newLevel": "Cấp độ mới"
+      },
+      "select": {
+        "placeholder": "Chọn cấp độ CEFR"
+      },
+      "preview": {
+        "title": "Xem trước:",
+        "cefr": "Cấp độ CEFR:",
+        "ra": "Cấp độ RA:"
+      },
+      "actions": {
+        "cancel": "Hủy",
+        "update": "Cập nhật cấp độ",
+        "updating": "Đang cập nhật..."
+      },
+      "toast": {
+        "noChanges": "Không có thay đổi để lưu",
+        "success": "Đã cập nhật CEFR của {name} thành {level}",
+        "error": "Không thể cập nhật cấp độ CEFR"
+      }
+    },
+    "Dashboard": {
+      "title": "Bảng điều khiển giáo viên",
+      "description": "Giám sát lớp học của bạn, theo dõi tiến độ học sinh, và nhận thông tin chi tiết do AI cung cấp",
+      "kpis": {
+        "totalClasses": "Tổng Số Lớp",
+        "totalStudents": "Tổng Số Học Sinh",
+        "activeStudents": "Học Sinh Hoạt Động",
+        "averageLevel": "Trình Độ Trung Bình",
+        "weeklyXP": "XP Hàng Tuần",
+        "accuracy": "Độ Chính Xác",
+        "readingVelocity": "Tốc Độ Đọc",
+        "onTrack": "Đúng Tiến Độ",
+        "activeToday": "Hoạt Động Hôm Nay",
+        "completedToday": "Hoàn Thành Hôm Nay",
+        "pending": "Bài Tập Đang Chờ",
+        "managing": "Đang Quản Lý",
+        "class": "Lớp",
+        "classes": "lớp",
+        "managingClasses": "Đang quản lý {count} lớp",
+        "acrossAllClasses": "Trên tất cả các lớp",
+        "activeOf": "{active}/{total} hoạt động (30 ngày)",
+        "classAverageLevel": "Trình độ CEFR trung bình của lớp",
+        "averageReadingLevel": "Trình độ đọc trung bình của tất cả học sinh",
+        "xpEarnedThisWeek": "XP kiếm được trong tuần này",
+        "averageQuizAccuracy": "Độ chính xác bài kiểm tra trung bình",
+        "booksPerWeek": "Sách mỗi tuần",
+        "studentsMeetingGoals": "Học sinh đạt mục tiêu",
+        "studentsActiveToday": "Học sinh hoạt động hôm nay",
+        "assignmentsCompletedToday": "Bài tập hoàn thành hôm nay",
+        "assignmentsPending": "Bài tập còn học sinh chưa hoàn thành",
+        "engagementRate": "Tỷ lệ tham gia"
+      },
+      "classOverview": {
+        "title": "Tổng Quan Lớp Học",
+        "description": "Quản lý và giám sát tất cả lớp học của bạn",
+        "hideArchived": "Ẩn Đã Lưu Trữ",
+        "showArchived": "Hiện Đã Lưu Trữ",
+        "exportCSV": "Xuất CSV",
+        "export": {
+          "headers": {
+            "className": "Tên lớp",
+            "classCode": "Mã lớp",
+            "students": "Học sinh",
+            "active7d": "Hoạt động (7 ngày)",
+            "avgLevel": "Mức trung bình",
+            "totalXp": "Tổng XP",
+            "status": "Trạng thái"
+          }
+        },
+        "searchPlaceholder": "Tìm kiếm theo tên hoặc mã lớp...",
+        "className": "Tên Lớp",
+        "code": "Mã",
+        "students": "Học Sinh",
+        "active7d": "Hoạt động (7 ngày)",
+        "avgLevel": "Mức TB",
+        "totalXP": "Tổng XP",
+        "trend": "Xu Hướng",
+        "status": "Trạng Thái",
+        "actions": "Hành Động",
+        "viewDetails": "Xem Chi Tiết",
+        "viewReports": "Xem Báo Cáo",
+        "assignments": "Bài Tập",
+        "archived": "Đã Lưu Trữ",
+        "active": "Hoạt Động",
+        "noClassesFound": "Không tìm thấy lớp học",
+        "noClassesMatchingSearch": "Không tìm thấy lớp học phù hợp",
+        "showing": "Hiển thị {count}/{total} lớp",
+        "totalStudents": "Tổng số học sinh: {count}"
+      },
+      "classDetail": {
+        "classCodePrefix": "Mã lớp:",
+        "refresh": "Làm mới",
+        "exportCSV": "Xuất CSV",
+        "settings": "Cài đặt",
+        "tabs": {
+          "overview": "Tổng quan",
+          "assignments": "Bài tập",
+          "students": "Học sinh",
+          "alignment": "Căn chỉnh",
+          "activity": "Hoạt động",
+          "goals": "Mục tiêu"
+        },
+        "goals": {
+          "management": {
+            "title": "Mục tiêu lớp học",
+            "addGoalButton": "Thêm mục tiêu cho lớp",
+            "searchPlaceholder": "Tìm kiếm mục tiêu...",
+            "filterAllStatus": "Tất cả trạng thái",
+            "filterAllGoals": "Tất cả mục tiêu",
+            "filterActive": "Đang thực hiện",
+            "filterFullyCompleted": "Hoàn thành",
+            "totalGoals": "Tổng mục tiêu",
+            "activeGoals": "Đang thực hiện",
+            "fullyCompleted": "Hoàn thành",
+            "allStudentsFinished": "Tất cả học sinh đã hoàn thành",
+            "noGoalsFound": "Không tìm thấy mục tiêu",
+            "noGoalsDescription": "Tạo mục tiêu đầu tiên cho lớp để bắt đầu",
+            "noMatchingGoals": "Không có mục tiêu nào phù hợp với bộ lọc hiện tại",
+            "createFirstGoal": "Tạo mục tiêu đầu tiên"
+          },
+          "createDialog": {
+            "title": "Tạo mục tiêu cho toàn lớp",
+            "description": "Mục tiêu này sẽ được đặt cho tất cả học sinh trong {className}",
+            "goalType": "Loại mục tiêu",
+            "title_label": "Tiêu đề",
+            "titlePlaceholder": "Ví dụ: Mục tiêu đọc hàng tuần",
+            "description_label": "Mô tả (Tùy chọn)",
+            "descriptionPlaceholder": "Thêm chi tiết về mục tiêu này...",
+            "targetValue": "Giá trị mục tiêu",
+            "targetValuePlaceholder": "100",
+            "unit": "Đơn vị",
+            "targetDate": "Ngày mục tiêu",
+            "priority": "Độ ưu tiên",
+            "priorityLow": "Thấp",
+            "priorityMedium": "Trung bình",
+            "priorityHigh": "Cao",
+            "cancelButton": "Hủy",
+            "createButton": "Tạo mục tiêu cho lớp",
+            "creatingButton": "Đang tạo...",
+            "goalTypes": {
+              "XP_TOTAL": "Tổng XP",
+              "XP_DAILY": "XP hàng ngày",
+              "XP_WEEKLY": "XP hàng tuần",
+              "ARTICLES_READ": "Bài viết đã đọc",
+              "READING_TIME": "Thời gian đọc",
+              "VOCABULARY": "Từ vựng",
+              "STREAK": "Chuỗi đọc",
+              "CEFR_LEVEL": "Cấp độ CEFR",
+              "CUSTOM": "Mục tiêu tùy chỉnh"
+            },
+            "units": {
+              "xp": "xp",
+              "articles": "bài viết",
+              "minutes": "phút",
+              "words": "từ",
+              "days": "ngày",
+              "level": "cấp",
+              "units": "đơn vị"
+            },
+            "toast": {
+              "successTitle": "Tạo mục tiêu thành công",
+              "successDescription": "Đã tạo mục tiêu cho {count} học sinh trong {className}",
+              "errorTitle": "Tạo mục tiêu thất bại",
+              "errorDescription": "Đã xảy ra lỗi khi tạo mục tiêu",
+              "genericError": "Tạo mục tiêu thất bại. Vui lòng thử lại"
+            }
+          },
+          "progressDialog": {
+            "title": "{goalTitle}",
+            "description": "Tiến độ học sinh cho mục tiêu này • Mục tiêu: {targetValue} {unit}",
+            "stats": {
+              "total": "Tổng số",
+              "completed": "Hoàn thành",
+              "active": "Đang thực hiện",
+              "avgProgress": "Tiến độ trung bình"
+            },
+            "table": {
+              "student": "Học sinh",
+              "progress": "Tiến độ",
+              "status": "Trạng thái",
+              "currentTarget": "Hiện tại / Mục tiêu",
+              "unknown": "Không xác định",
+              "completedOn": "Hoàn thành vào {date}"
+            }
+          },
+          "card": {
+            "priorityHigh": "Ưu tiên cao",
+            "priorityMedium": "Ưu tiên trung bình",
+            "priorityLow": "Ưu tiên thấp",
+            "noDescription": "Không có mô tả",
+            "viewDetails": "Xem chi tiết",
+            "deleteAll": "Xóa tất cả",
+            "confirmDelete": {
+              "title": "Xóa mục tiêu cho tất cả học sinh",
+              "description": "Bạn có chắc chắn muốn xóa mục tiêu này cho tất cả {count} học sinh? Hành động này không thể hoàn tác",
+              "cancel": "Hủy",
+              "confirm": "Xóa tất cả"
+            },
+            "toast": {
+              "deleteSuccess": "Đã xóa mục tiêu",
+              "deleteSuccessDescription": "Đã xóa thành công mục tiêu cho {count} học sinh",
+              "deleteError": "Lỗi",
+              "deleteErrorDescription": "Xóa một số mục tiêu thất bại. Vui lòng thử lại"
+            },
+            "stats": {
+              "completed": "{completed} hoàn thành",
+              "active": "{active} đang thực hiện",
+              "students": "{total} học sinh",
+              "dueIn": "Còn {days} ngày",
+              "dueToday": "Hết hạn hôm nay",
+              "overdue": "Quá hạn {days} ngày"
+            }
+          }
+        }
+      },
+      "aiBrief": {
+        "title": "Tóm Tắt AI Cho Giáo Viên",
+        "description": "Thông tin chi tiết và đề xuất từ AI",
+        "updatedAt": "Cập nhật {time}",
+        "refreshInsights": "Làm mới thông tin chi tiết",
+        "keyInsights": "Thông Tin Chính ({count})",
+        "evidence": "Bằng chứng:",
+        "actionable": "Có thể thực hiện",
+        "noInsights": "Hiện không có thông tin chi tiết cụ thể",
+        "aiInsightsWillAppear": "Thông tin từ AI sẽ xuất hiện ở đây",
+        "priority": {
+          "low": "thấp",
+          "medium": "trung bình",
+          "high": "cao"
+        }
+      },
+      "lastUpdated": "Cập nhật lần cuối: {time}",
+      "error": {
+        "title": "Lỗi",
+        "message": "Không thể tải dữ liệu bảng điều khiển",
+        "retry": "Thử Lại"
+      }
     }
   },
   "AdminTeachers": {
@@ -2574,7 +3686,9 @@
       "title": "Quản lý học sinh",
       "subtitle": "Quản lý học sinh và tiến độ của họ"
     },
-    "page": { "title": "Quản lý học sinh" },
+    "page": {
+      "title": "Quản lý học sinh"
+    },
     "stats": {
       "totalStudents": "Tổng số học sinh",
       "allClassrooms": "Tất cả lớp học",
@@ -2646,12 +3760,88 @@
       "loading": "Đang tải danh sách học sinh...",
       "empty": "Không tìm thấy học sinh phù hợp với tiêu chí của bạn."
     },
-    "badges": { "noClass": "Không có lớp" },
+    "badges": {
+      "noClass": "Không có lớp"
+    },
     "pagination": {
       "showing": "Hiển thị {from} đến {to} trong tổng {total} học sinh",
       "previous": "Trước",
       "next": "Tiếp",
       "pageOf": "Trang {page} trên {totalPages}"
+    }
+  },
+  "System": {
+    "Dashboard": {
+      "title": "Bảng điều khiển hệ thống",
+      "dateRange": {
+        "7d": "7 ngày qua",
+        "30d": "30 ngày qua",
+        "90d": "3 tháng qua",
+        "all": "Tất cả thời gian"
+      },
+      "export": "Xuất",
+      "refresh": "Làm mới",
+      "refreshing": "Đang làm mới...",
+      "loading": "Đang tải dữ liệu...",
+      "metricsUnavailableTitle": "Một số dữ liệu có thể không khả dụng:",
+      "tabs": {
+        "overview": "Tổng quan",
+        "activity": "Hoạt động",
+        "insights": "Thông tin AI"
+      },
+      "cards": {
+        "totalSchools": {
+          "title": "Tổng số trường",
+          "desc": "Cơ sở hoạt động"
+        },
+        "totalUsers": {
+          "title": "Tổng người dùng",
+          "count": "{students} học sinh, {teachers} giáo viên"
+        },
+        "totalArticles": {
+          "title": "Tổng bài viết",
+          "desc": "Thư viện nội dung có sẵn"
+        },
+        "completionRate": {
+          "title": "Tỷ lệ hoàn thành",
+          "desc": "Bài viết hoàn thành thành công"
+        }
+      },
+      "licenseUsage": {
+        "title": "Sử dụng giấy phép",
+        "description": "Theo dõi phân bổ và sử dụng giấy phép theo trường"
+      },
+      "activeUsers": {
+        "title": "Người dùng hoạt động",
+        "description": "Hoạt động người dùng và số liệu tương tác thời gian thực"
+      },
+      "systemHealth": {
+        "title": "Tình trạng hệ thống",
+        "description": "Hiệu suất hệ thống và số liệu sức khỏe thời gian thực",
+        "database": "Hiệu suất cơ sở dữ liệu",
+        "apiResponse": "Thời gian phản hồi API",
+        "errorRate": "Tỷ lệ lỗi",
+        "uptime": "Thời gian hoạt động hệ thống",
+        "status": {
+          "excellent": "Xuất sắc",
+          "good": "Tốt",
+          "low": "Thấp"
+        }
+      },
+      "recentActivity": {
+        "title": "Hoạt động gần đây",
+        "description": "Các thao tác quản trị và thay đổi hệ thống mới nhất",
+        "events": {
+          "newSchoolLicense": "Giấy phép trường mới được kích hoạt",
+          "contentUpdated": "Thư viện nội dung đã cập nhật",
+          "maintenanceCompleted": "Bảo trì hệ thống hoàn tất",
+          "milestoneReached": "Đạt cột mốc phiên đọc"
+        }
+      },
+      "noData": {
+        "title": "Không có dữ liệu",
+        "description": "Thử điều chỉnh bộ lọc hoặc làm mới trang"
+      }
     }
   }
 }

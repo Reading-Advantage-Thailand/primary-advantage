@@ -16,7 +16,7 @@ import { Role } from "@/types/enum";
 import { User } from "next-auth";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useTranslations } from "next-intl";
-
+import { useQueryClient } from "@tanstack/react-query";
 interface UserAccountNavProps {
   user: User;
 }
@@ -25,7 +25,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const t = useTranslations("MainNav.usernav");
   const tr = useTranslations("Overall.roles");
-
+  const queryClient = useQueryClient();
   const roles = {
     system: { label: tr("system"), color: "bg-[#FFC107]" },
     admin: { label: tr("admin"), color: "bg-[#DC3545]" },
@@ -107,14 +107,14 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
           user?.role === Role.admin ||
           user?.role === Role.system) && (
           <DropdownMenuItem asChild>
-            <Link href="/teacher/my-classes" className="flex items-center">
+            <Link href="/teacher/dashboard" className="flex items-center">
               <span>{t("teacherDashboard")}</span>
             </Link>
           </DropdownMenuItem>
         )}
         {(user?.role === Role.admin || user?.role === Role.system) && (
           <DropdownMenuItem asChild>
-            <Link href="/admin" className="flex items-center">
+            <Link href="/admin/dashboard" className="flex items-center">
               <span>{t("adminDashboard")}</span>
             </Link>
           </DropdownMenuItem>
@@ -154,7 +154,12 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
           onClick={async (event) => {
             event.preventDefault();
             setIsLoading(true);
+
             await signOut({ callbackUrl: `/` });
+
+            queryClient.removeQueries();
+
+            queryClient.clear();
             setIsLoading(false);
           }}
         >

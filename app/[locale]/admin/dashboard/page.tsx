@@ -1,75 +1,57 @@
-import { Header } from "@/components/header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import {
-  WeeklyActivityChart,
-  ClassEngagementChart,
-  ActivityMetricsChart,
-  ActivitySummaryCards,
-} from "@/components/dashboard/class-activity-chart";
-import {
-  BookOpen,
-  Clock,
-  GraduationCapIcon,
-  TrendingUp,
-  UserPenIcon,
-  Users,
-} from "lucide-react";
 import React from "react";
+import { Header } from "@/components/header";
+import { AdminDashboardContent } from "@/components/dashboard/admin/dashboard";
+import { getTranslations } from "next-intl/server";
+import {
+  QueryClient,
+  HydrationBoundary,
+  dehydrate,
+} from "@tanstack/react-query";
+import {
+  fetchAdminDashboardApi,
+  fetchAISummaryApi,
+  fetchLicensesApi,
+} from "@/utils/api-request";
+import { currentUser } from "@/lib/session";
+import { Role } from "@/types/enum";
 
-export default function DashboardPage() {
+export default async function AdminDashboardPage() {
+  const t = await getTranslations("Admin.Dashboard");
+  const user = await currentUser();
+
+  const queryClient = new QueryClient();
+
+  if (user?.role === Role.admin) {
+    await queryClient.prefetchQuery({
+      queryKey: ["admin-dashboard", user?.schoolId, "30"],
+      queryFn: () => fetchAdminDashboardApi(user?.schoolId, "30"),
+      retry: 2,
+    });
+
+    await queryClient.prefetchQuery({
+      queryKey: ["ai-insights", "license", user?.schoolId],
+      queryFn: () => fetchAISummaryApi("license", user?.schoolId),
+      retry: 2,
+    });
+  }
+
+  if (user?.role === Role.system) {
+    await queryClient.prefetchQuery({
+      queryKey: ["system-school-list", user?.id],
+      queryFn: () => fetchLicensesApi(),
+      staleTime: 60 * 60 * 1000,
+    });
+  }
+
   return (
-    <div>
-      <Header heading="Admin Dashboard" text="Admin Dashboard Description" />
-      <Separator className="my-4" />
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Students
-            </CardTitle>
-            <GraduationCapIcon className="text-muted-foreground h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">100</div>
-            <p className="text-muted-foreground text-xs">All students</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Teachers
-            </CardTitle>
-            <UserPenIcon className="text-muted-foreground h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-muted-foreground text-xs">All teachers</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Active This Week
-            </CardTitle>
-            <Clock className="text-muted-foreground h-4 w-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">100%</div>
-            <p className="text-muted-foreground text-xs">
-              All active this week
-            </p>
-          </CardContent>
-        </Card>
+    <>
+      <div className="mb-6 truncate text-xl font-bold sm:text-2xl md:text-3xl">
+        <Header heading={t("title")} text={t("subtitle")} />
       </div>
-      <div className="mt-6 space-y-6">
-        <ActivitySummaryCards />
-        <WeeklyActivityChart />
-        <div className="grid gap-4 md:grid-cols-2">
-          <ActivityMetricsChart />
-          <ClassEngagementChart />
-        </div>
-      </div>
-    </div>
+
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <AdminDashboardContent />
+      </HydrationBoundary>
+    </>
   );
 }

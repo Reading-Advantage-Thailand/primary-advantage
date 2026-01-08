@@ -27,6 +27,12 @@ export const teacherPageConfig: PageConfig = {
   sidebarNav: [
     // Regular navigation item
     {
+      title: "dashboard",
+      href: "/teacher/dashboard",
+      icon: "LayoutDashboardIcon",
+      requiredPermissions: ["TEACHER_ACCESS"],
+    },
+    {
       title: "myClasses",
       href: "/teacher/my-classes",
       icon: "SchoolIcon",

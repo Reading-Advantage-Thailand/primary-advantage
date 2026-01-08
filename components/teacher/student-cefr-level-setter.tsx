@@ -103,7 +103,7 @@ export default function StudentCefrLevelSetter({
   currentCefrLevel,
   onUpdate,
 }: StudentCefrLevelSetterProps) {
-  const t = useTranslations("teacher.cefrSetter");
+  const t = useTranslations("Teacher.cefrSetter");
   const [selectedLevel, setSelectedLevel] = useState(currentCefrLevel);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
