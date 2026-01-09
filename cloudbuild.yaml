@@ -21,7 +21,7 @@ steps:
     entrypoint: "bash"
     args:
       - "-c"
-      - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$DATABASE_URL -- npx prisma migrate deploy"
+      - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$DATABASE_URL -- npx prisma@6.19.0 migrate deploy"
     secretEnv: ["MIGRATE_DB_URL"]
 
   # Step 4: Deploy to Cloud Run
