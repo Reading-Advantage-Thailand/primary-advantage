@@ -4,8 +4,14 @@ steps:
     id: "build-image"
     args:
       - "build"
+      - "--build-arg"
+      - "BUILDKIT_INLINE_CACHE=1"
+      - "--cache-from"
+      - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:latest"
       - "-t"
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
+      - "-t"
+      - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:latest"
       - "."
 
   # Step 2: Push Docker image
@@ -21,7 +27,7 @@ steps:
     entrypoint: "bash"
     args:
       - "-c"
-      - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$DATABASE_URL -- npx prisma@6.19.0 migrate deploy"
+      - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$MIGRATE_DB_URL -- npx prisma@6.19.0 migrate deploy"
     secretEnv: ["MIGRATE_DB_URL"]
 
   # Step 4: Deploy to Cloud Run
