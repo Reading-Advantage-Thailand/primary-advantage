@@ -30,7 +30,29 @@ steps:
     entrypoint: "bash"
     args:
       - "-c"
-      - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$MIGRATE_DB_URL -- npx prisma@6.19.0 migrate deploy"
+      # - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$MIGRATE_DB_URL -- npx prisma@6.19.0 migrate deploy"
+      - |
+        # ใช้ \ เพื่อแบ่งบรรทัดให้อ่านง่าย
+        /buildstep/execute.sh \
+          -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID \
+          -s ${_CLOUD_SQL_INSTANCE} \
+          -e DATABASE_URL=$$MIGRATE_DB_URL \
+          -e DEBUG="prisma:client*,prisma:engine*" \
+          -- bash -c "
+            echo '================ DEBUG PROXY START ================' && \
+            
+            echo '[1] Checking Cloud SQL Socket directory:' && \
+            ls -la /cloudsql/ && \
+            
+            echo '[2] Checking Specific Instance Socket:' && \
+            ls -la /cloudsql/${_CLOUD_SQL_INSTANCE} || echo '❌ Socket file not found!' && \
+            
+            echo '[3] Checking Environment Variable (Safe Check):' && \
+            if [ -z \"\$DATABASE_URL\" ]; then echo '❌ DATABASE_URL is empty!'; else echo '✅ DATABASE_URL is present (length: \${#DATABASE_URL})'; fi && \
+            
+            echo '================ STARTING MIGRATION ================' && \
+            npx prisma@6.19.0 migrate deploy
+          "
     secretEnv: ["MIGRATE_DB_URL"]
 
   # Step 4: Deploy to Cloud Run
