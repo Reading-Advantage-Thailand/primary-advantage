@@ -5,6 +5,8 @@ steps:
     args:
       - "build"
       - "--build-arg"
+      - "DATABASE_URL=$$DATABASE_URL"
+      - "--build-arg"
       - "BUILDKIT_INLINE_CACHE=1"
       - "--cache-from"
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:latest"
@@ -13,6 +15,7 @@ steps:
       - "-t"
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:latest"
       - "."
+    secretEnv: ["DATABASE_URL"]
 
   # Step 2: Push Docker image
   - name: "gcr.io/cloud-builders/docker"
@@ -84,6 +87,8 @@ substitutions:
 # Secrets
 availableSecrets:
   secretManager:
+    - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/21
+      env: "DATABASE_URL"
     - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/latest
       env: "MIGRATE_DB_URL"
 
