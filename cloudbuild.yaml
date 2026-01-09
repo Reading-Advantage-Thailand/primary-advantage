@@ -25,34 +25,78 @@ steps:
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
 
   # Step 3: Run database migrations
-  - name: "gcr.io/google-appengine/exec-wrapper"
+  # - name: "gcr.io/google-appengine/exec-wrapper"
+  #   id: "migrate-db"
+  #   entrypoint: "bash"
+  #   args:
+  #     - "-c"
+  #     - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$MIGRATE_DB_URL -- npx prisma@6.19.0 migrate deploy"
+  #   secretEnv: ["MIGRATE_DB_URL"]
+  - name: "node:20"
     id: "migrate-db"
     entrypoint: "bash"
     args:
       - "-c"
-      # - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$MIGRATE_DB_URL -- npx prisma@6.19.0 migrate deploy"
       - |
-        # ใช้ \ เพื่อแบ่งบรรทัดให้อ่านง่าย
-        /buildstep/execute.sh \
-          -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID \
-          -s ${_CLOUD_SQL_INSTANCE} \
-          -e DATABASE_URL=$$MIGRATE_DB_URL \
-          -e DEBUG="prisma:client*,prisma:engine*" \
-          -- bash -c "
-            echo '================ DEBUG PROXY START ================' && \
-            
-            echo '[1] Checking Cloud SQL Socket directory:' && \
-            ls -la /cloudsql/ && \
-            
-            echo '[2] Checking Specific Instance Socket:' && \
-            ls -la /cloudsql/${_CLOUD_SQL_INSTANCE} || echo '❌ Socket file not found!' && \
-            
-            echo '[3] Checking Environment Variable (Safe Check):' && \
-            if [ -z \"\$$MIGRATE_DB_URL\" ]; then echo '❌ MIGRATE_DB_URL is empty!'; else echo '✅ MIGRATE_DB_URL is present (length: \${#DATABASE_URL})'; fi && \
-            
-            echo '================ STARTING MIGRATION ================' && \
-            npx prisma@6.19.0 migrate deploy
-          "
+        echo "================ DEBUG START ================"
+
+        # 1. ติดตั้ง Proxy
+        echo "[1] Installing Cloud SQL Proxy..."
+        wget -q https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+        chmod +x cloud_sql_proxy
+
+        # 2. รัน Proxy (TCP Mode)
+        echo "[2] Starting Proxy on 127.0.0.1:5432..."
+        ./cloud_sql_proxy -instances=${_CLOUD_SQL_INSTANCE}=tcp:5432 &
+        PROXY_PID=$!
+
+        echo "Waiting for proxy to stabilize (5s)..."
+        sleep 5
+
+        # 3. เตรียม URL (แก้ IP เป็น 127.0.0.1)
+        # Regex: เปลี่ยน host อะไรก็ตาม ให้กลายเป็น 127.0.0.1:5432
+        echo "[3] Preparing Connection String..."
+        if [ -z "$$MIGRATE_DB_URL" ]; then
+           echo "❌ ERROR: MIGRATE_DB_URL is empty! Check availableSecrets."
+           exit 1
+        fi
+
+        export DATABASE_URL=$(echo $$MIGRATE_DB_URL | sed -E 's/@[^:]+:[0-9]+/@127.0.0.1:5432/')
+
+        # ปริ้นเช็ค (เซ็นเซอร์รหัสผ่าน)
+        SAFE_URL=$(echo $$DATABASE_URL | sed -E 's/:[^@]+@/:****@/')
+        echo "✅ Target URL: $SAFE_URL"
+
+        # 4. ทดสอบ Connection เบื้องต้น (Optional)
+        # ลองใช้ nc (netcat) เช็คว่าพอร์ต 5432 เปิดจริงไหม
+        echo "[4] Checking Port Connectivity..."
+        if nc -z 127.0.0.1 5432; then
+            echo "✅ Connectivity OK: Port 5432 is open."
+        else
+            echo "❌ Connectivity FAIL: Cannot reach 127.0.0.1:5432. Proxy might be dead."
+            # ลองดู log proxy หน่อยถ้าพัง
+            ps aux | grep cloud_sql_proxy
+        fi
+
+        echo "================ STARTING PRISMA ================"
+        # 5. รันคำสั่งจริง
+        # --no-install เพื่อใช้ prisma ใน node_modules (ถ้ามี) หรือโหลดใหม่ถ้าจำเป็น
+        # ตั้ง timeout เผื่อค้าง
+        npx prisma@6.19.0 migrate deploy
+
+        EXIT_CODE=$?
+
+        # 6. เก็บกวาด
+        kill $PROXY_PID
+
+        if [ $EXIT_CODE -eq 0 ]; then
+            echo "✅ MIGRATION SUCCESS"
+        else
+            echo "❌ MIGRATION FAILED (Exit Code: $EXIT_CODE)"
+            exit $EXIT_CODE
+        fi
+
+    # อย่าลืมเรียกตัวแปร Secret เข้ามา
     secretEnv: ["MIGRATE_DB_URL"]
 
   # Step 4: Deploy to Cloud Run
