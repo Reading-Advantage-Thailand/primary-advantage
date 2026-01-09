@@ -48,7 +48,7 @@ steps:
             ls -la /cloudsql/${_CLOUD_SQL_INSTANCE} || echo '❌ Socket file not found!' && \
             
             echo '[3] Checking Environment Variable (Safe Check):' && \
-            if [ -z \"\$DATABASE_URL\" ]; then echo '❌ DATABASE_URL is empty!'; else echo '✅ DATABASE_URL is present (length: \${#DATABASE_URL})'; fi && \
+            if [ -z \"\$$MIGRATE_DB_URL\" ]; then echo '❌ MIGRATE_DB_URL is empty!'; else echo '✅ MIGRATE_DB_URL is present (length: \${#DATABASE_URL})'; fi && \
             
             echo '================ STARTING MIGRATION ================' && \
             npx prisma@6.19.0 migrate deploy
