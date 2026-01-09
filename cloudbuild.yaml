@@ -32,6 +32,8 @@ steps:
   #     - "-c"
   #     - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$MIGRATE_DB_URL -- npx prisma@6.19.0 migrate deploy"
   #   secretEnv: ["MIGRATE_DB_URL"]
+
+  # Step 3: Manual Proxy & Migrate (No-Variable Version)
   - name: "node:20"
     id: "migrate-db"
     entrypoint: "bash"
@@ -48,7 +50,7 @@ steps:
         # 2. รัน Proxy (TCP Mode)
         echo "[2] Starting Proxy on 127.0.0.1:5432..."
         ./cloud_sql_proxy -instances=${_CLOUD_SQL_INSTANCE}=tcp:5432 &
-        PROXY_PID=$$!  # <-- แก้เป็น $$! (Process ID)
+        PROXY_PID=$$!
 
         echo "Waiting for proxy to stabilize (5s)..."
         sleep 5
@@ -56,39 +58,36 @@ steps:
         # 3. เตรียม URL
         echo "[3] Preparing Connection String..."
 
-        # ใช้ $$ นำหน้าตัวแปร Env และตัวแปร Shell ทั้งหมด
         if [ -z "$$MIGRATE_DB_URL" ]; then
            echo "❌ ERROR: MIGRATE_DB_URL is empty!"
            exit 1
         fi
 
-        # แปลง URL
+        # สร้างตัวแปร DATABASE_URL (สังเกต $$)
         export DATABASE_URL=$(echo $$MIGRATE_DB_URL | sed -E 's/@[^:]+:[0-9]+/@127.0.0.1:5432/')
 
-        # ปริ้นเช็ค (เซ็นเซอร์รหัสผ่าน)
-        # แก้ $SAFE_URL เป็น $$SAFE_URL
-        SAFE_URL=$(echo $$DATABASE_URL | sed -E 's/:[^@]+@/:****@/')
-        echo "✅ Target URL: $$SAFE_URL"
+        # [แก้ปัญหาจุดเดิม] ปริ้นแบบไม่ต้องสร้างตัวแปร SAFE_URL ให้ Cloud Build งง
+        echo "✅ Target URL (Masked):"
+        echo $$DATABASE_URL | sed -E 's/:[^@]+@/:****@/'
 
         # 4. ทดสอบ Connection
         echo "[4] Checking Port Connectivity..."
         if nc -z 127.0.0.1 5432; then
             echo "✅ Connectivity OK: Port 5432 is open."
         else
-            echo "❌ Connectivity FAIL: Cannot reach 127.0.0.1:5432. Proxy might be dead."
-            ps aux | grep cloud_sql_proxy
+            echo "❌ Connectivity FAIL: Cannot reach 127.0.0.1:5432."
+            # ปริ้น Log Proxy ออกมาดูถ้าพัง
+            cat cloud_sql_proxy.log 2>/dev/null || echo "No proxy log found."
         fi
 
         echo "================ STARTING PRISMA ================"
 
         # 5. รันคำสั่งจริง
         npx prisma@6.19.0 migrate deploy
+        EXIT_CODE=$$?
 
-        # เก็บ Exit Code ไว้เช็คตอนจบ
-        EXIT_CODE=$$? # <-- แก้เป็น $$?
-
-        # 6. เก็บกวาด (Kill Proxy)
-        kill $$PROXY_PID # <-- แก้เป็น $$PROXY_PID
+        # 6. เก็บกวาด
+        kill $$PROXY_PID
 
         if [ $$EXIT_CODE -eq 0 ]; then
             echo "✅ MIGRATION SUCCESS"
@@ -97,7 +96,6 @@ steps:
             exit $$EXIT_CODE
         fi
 
-    # อย่าลืมเรียกตัวแปร Secret เข้ามา
     secretEnv: ["MIGRATE_DB_URL"]
 
   # Step 4: Deploy to Cloud Run
