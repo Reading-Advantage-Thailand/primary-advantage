@@ -22,7 +22,7 @@ steps:
     args:
       - "-c"
       - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$DATABASE_URL -- npx prisma migrate deploy"
-    secretEnv: ["DATABASE_URL"]
+    secretEnv: ["MIGRATE_DB_URL"]
 
   # Step 4: Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
@@ -78,8 +78,10 @@ substitutions:
 # Secrets
 availableSecrets:
   secretManager:
-    - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/latest
+    - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/18
       env: "DATABASE_URL"
+    - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/18
+      env: "MIGRATE_DB_URL"
 
 options:
   logging: CLOUD_LOGGING_ONLY
