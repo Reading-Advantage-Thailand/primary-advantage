@@ -41,7 +41,7 @@ steps:
       - "--region=asia-southeast1"
       - "--platform=managed"
       - "--allow-unauthenticated"
-      - "--set-secrets=DATABASE_URL=${_DATABASE_URL}:latest"
+      - "--set-secrets=DATABASE_URL=${_DATABASE_URL}:21"
       - "--set-secrets=RESEND_API_KEY=${_RESEND_API_KEY}:latest"
       - "--set-secrets=AUTH_SECRET=${_AUTH_SECRET}:latest"
       - "--set-secrets=AUTH_URL=${_AUTH_URL}:latest"
@@ -84,7 +84,7 @@ substitutions:
 # Secrets
 availableSecrets:
   secretManager:
-    - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/18
+    - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/latest
       env: "MIGRATE_DB_URL"
 
 options:
