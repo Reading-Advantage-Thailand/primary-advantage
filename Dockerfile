@@ -26,6 +26,9 @@ ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Fix Memory issue during build
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Generate Prisma client and run Next.js build
 RUN npm run prisma:generate && npm run build
 
