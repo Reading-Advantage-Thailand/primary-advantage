@@ -1,6 +1,7 @@
 import {
   updateSchoolRankingModel,
   getSchoolLeaderboardModel,
+  getSchoolsListModel,
 } from "../models/schoolModel";
 
 export const updateSchoolRankingController = async () => {
@@ -36,5 +37,17 @@ export const getSchoolLeaderboardController = async (
     throw new Error(
       "School Controller: Error fetching school leaderboard: " + error,
     );
+  }
+};
+
+export const fetchSchoolsListController = async () => {
+  try {
+    // Placeholder implementation
+    const schools = await getSchoolsListModel();
+
+    return schools;
+  } catch (error) {
+    console.error("School Controller: Error fetching schools list:", error);
+    throw new Error("School Controller: Error fetching schools list: " + error);
   }
 };

@@ -54,8 +54,6 @@ export default function WordList({
   const t = useTranslations("WordList");
   const tc = useTranslations("Components");
 
-  console.log(words);
-
   useEffect(() => {
     if (words) {
       let wordList = [];

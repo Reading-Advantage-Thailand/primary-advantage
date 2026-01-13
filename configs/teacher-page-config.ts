@@ -112,5 +112,11 @@ export const teacherPageConfig: PageConfig = {
       icon: "ClipboardCheckIcon",
       requiredPermissions: ["TEACHER_ACCESS"],
     },
+    // {
+    //   title: "workbookGenerator",
+    //   href: "/teacher/workbook-generate",
+    //   icon: "FileSpreadsheetIcon",
+    //   requiredPermissions: ["SYSTEM_ACCESS"],
+    // },
   ],
 };

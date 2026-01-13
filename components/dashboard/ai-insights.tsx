@@ -150,10 +150,6 @@ export default function AIInsights({
   //   [scope, contextId],
   // );
 
-  // useEffect(() => {
-  //   fetchAIData();
-  // }, [fetchAIData]);
-
   const handleDismiss = async (insightId: string) => {
     try {
       const response = await fetch("/api/v1/ai/insights/dismiss", {
@@ -309,7 +305,7 @@ export default function AIInsights({
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleRefresh}
+              onClick={() => refetch()}
               disabled={isRefetching}
             >
               <RefreshCw

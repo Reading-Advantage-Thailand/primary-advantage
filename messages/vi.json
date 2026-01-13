@@ -57,6 +57,7 @@
     "studentsandclasses": "Học sinh và lớp học",
     "articlecreation": "Tạo bài viết",
     "back": "Quay lại",
+    "workbookGenerator": "Tạo Workbook",
     "subItem": {
       "admin": "Quản trị viên",
       "teachers": "Giáo viên",
@@ -1406,6 +1407,45 @@
         "totalTime": "Tổng thời gian:",
         "min": "phút"
       }
+    },
+    "workbookGeneratorPage": {
+      "title": "Trình tạo Workbook",
+      "description": "Tạo các workbook đẹp mắt, có thể in được từ các mẫu và nội dung của bạn",
+      "cardTitle": "Tạo Workbook của bạn",
+      "cardDescription": "Tải lên mẫu HTML và nội dung JSON của bạn để tạo workbook tùy chỉnh",
+      "step1": {
+        "title": "Tải lên Mẫu (HTML)",
+        "placeholder": "Chọn `workbook_template.html`"
+      },
+      "step2": {
+        "title": "Tải lên Nội dung (JSON)",
+        "placeholder": "Chọn `content_*.json`"
+      },
+      "selectButton": "Chọn",
+      "generateButton": "Tạo & Xem trước Workbook",
+      "howToUse": {
+        "title": "Cách sử dụng",
+        "step1Title": "Tải lên Mẫu:",
+        "step1Description": "Chọn tệp mẫu HTML của bạn (workbook_template.html) chứa bố cục và cấu trúc",
+        "step2Title": "Tải lên Nội dung:",
+        "step2Description": "Chọn tệp JSON của bạn chứa nội dung bài viết, câu hỏi và từ vựng",
+        "step3Title": "Tạo:",
+        "step3Description": "Nhấp vào nút tạo để tạo và xem trước workbook của bạn trong một tab mới"
+      },
+      "messages": {
+        "uploadBothFiles": "Vui lòng tải lên cả tệp mẫu và tệp dữ liệu JSON.",
+        "popupBlocked": "Cửa sổ bật lên bị chặn. Vui lòng cho phép cửa sổ bật lên cho trang web này để xem workbook.",
+        "successGenerated": "Đã tạo workbook thành công! Đã mở trong tab mới.",
+        "errorGenerating": "Lỗi khi tạo workbook:",
+        "success": "Thành công",
+        "error": "Lỗi"
+      }
+    },
+    "exportWorkbookButton": {
+      "buttonText": "Xuất Workbook",
+      "exporting": "Đang xuất...",
+      "success": "Xuất workbook thành công!",
+      "error": "Không thể xuất workbook"
     }
   },
   "WordList": {

@@ -765,7 +765,7 @@ export const getSystemActivityChartsModel = async (
       let eventType: "reading" | "practice" | "assessment" | "achievement" =
         "reading";
       let title = "Activity";
-      let description = activity.details || "";
+      let description = "";
 
       switch (activity.activityType) {
         case "ARTICLE_READ":

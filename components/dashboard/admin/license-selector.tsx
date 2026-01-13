@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import { fetchLicensesApi } from "@/utils/api-request";
+import { fetchLicensesApi, fetchSchoolsListApi } from "@/utils/api-request";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -36,11 +36,8 @@ interface License {
   name: string;
   maxUsers: number;
   expiresAt: Date;
-  School: {
-    id: string;
-    _count?: {
-      users: number;
-    };
+  _count?: {
+    users: number;
   };
 }
 
@@ -63,12 +60,12 @@ export default function LicenseSelector({
 
   const { data, isPending, error, isError } = useQuery({
     queryKey: ["system-school-list"],
-    queryFn: () => fetchLicensesApi(),
+    queryFn: () => fetchSchoolsListApi(),
     staleTime: 60 * 60 * 1000, // Cache 1 ชั่วโมง
   });
 
   const selectedLicense = data?.find(
-    (l: License) => l.School.id === selectedLicenseId,
+    (l: License) => l.id === selectedLicenseId,
   );
 
   if (isPending) {
@@ -85,36 +82,6 @@ export default function LicenseSelector({
         <CardTitle className="text-lg">{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* <Select
-          value={selectedLicenseId}
-          onValueChange={handleLicenseChange}
-          disabled={isPending}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={t("placeholder")}>
-              {selectedLicense ? selectedLicense.name : t("placeholder")}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>{t("availableLabel")}</SelectLabel>
-              {data.map((license: License, index: number) => (
-                <SelectItem key={index} value={license.School.id}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{license.name}</span>
-                    <span className="text-muted-foreground text-xs">
-                      {t("users", {
-                        used: license.School._count?.users || 0,
-                        max: license.maxUsers,
-                      })}
-                    </span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select> */}
-
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -149,12 +116,12 @@ export default function LicenseSelector({
                     <CommandItem
                       key={index}
                       value={school.name} // **สำคัญ** ใส่ name เพื่อให้ shadcn ใช้ search
-                      onSelect={() => handleLicenseChange(school.School.id)}
+                      onSelect={() => handleLicenseChange(school.id)}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          selectedLicenseId === school.School.id
+                          selectedLicenseId === school.id
                             ? "opacity-100"
                             : "opacity-0",
                         )}
@@ -163,7 +130,7 @@ export default function LicenseSelector({
                         <span className="font-medium">{school.name}</span>
                         <span className="text-muted-foreground text-xs">
                           {t("users", {
-                            used: school.School._count?.users || 0,
+                            used: school?._count?.users || 0,
                             max: school.maxUsers,
                           })}
                         </span>

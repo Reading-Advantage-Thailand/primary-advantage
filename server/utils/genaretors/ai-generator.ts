@@ -8,7 +8,7 @@ import {
   AssignmentStatus,
 } from "@prisma/client";
 
-interface GeneratedInsight {
+export interface GeneratedInsight {
   type: AIInsightType;
   priority: AIInsightPriority;
   title: {
@@ -99,17 +99,17 @@ function parseAIResponse(
 }
 
 function buildLicenseInsightPrompt(license: any, metrics: any): string {
+  // - Max Users: ${metrics.maxUsers}
+  // - License Utilization: ${(metrics.utilizationRate * 100).toFixed(0)}%
+  // - Expires At: ${metrics.expiresAt}
   return `You are an AI assistant for school administrators analyzing your school's reading platform usage and performance metrics.
 
 Your School: ${license.name || "School"}
 - Total Users: ${metrics.totalUsers}
-- Max Users: ${metrics.maxUsers}
-- License Utilization: ${(metrics.utilizationRate * 100).toFixed(0)}%
 - Active Users (30 days): ${metrics.activeUsers}
 - Engagement Rate: ${(metrics.engagementRate * 100).toFixed(0)}%
 - Total XP Earned: ${metrics.totalXP}
 - Recent XP (30 days): ${metrics.recentXP}
-- Expires At: ${metrics.expiresAt}
 
 Generate 4-6 strategic insights as a JSON array focused ONLY on this school's performance:
 [
@@ -159,36 +159,33 @@ function calculateLicenseMetrics(school: any) {
   return {
     totalUsers,
     activeUsers,
-    maxUsers: school.licenses[0].maxUsers,
-    utilizationRate:
-      school.licenses[0].maxUsers > 0
-        ? totalUsers / school.licenses[0].maxUsers
-        : 0,
+    // maxUsers: school.licenses[0].maxUsers,
+    // utilizationRate:
+    //   school.licenses[0].maxUsers > 0
+    //     ? totalUsers / school.licenses[0].maxUsers
+    //     : 0,
     engagementRate: totalUsers > 0 ? activeUsers / totalUsers : 0,
     totalXP,
     recentXP,
-    expiresAt: school.licenses[0].expiryDate,
+    // expiresAt: school.licenses[0].expiryDate,
   };
 }
 
 export async function generateSystemInsights(): Promise<GeneratedInsight[]> {
   try {
     // Fetch all licenses and aggregate data
-    const licenses = await prisma.license.findMany({
+
+    const licenses = await prisma.school.findMany({
       include: {
-        School: {
+        _count: {
+          select: {
+            users: true,
+          },
+        },
+        users: {
           include: {
-            _count: {
-              select: {
-                users: true,
-              },
-            },
-            users: {
-              include: {
-                XpLogs: true,
-                userActivity: true,
-              },
-            },
+            XpLogs: true,
+            userActivity: true,
           },
         },
       },
@@ -201,38 +198,37 @@ export async function generateSystemInsights(): Promise<GeneratedInsight[]> {
     // Calculate system-wide metrics
     const totalLicenses = licenses.length;
     const totalUsers = licenses.reduce(
-      (sum, l) => sum + (l.School?._count.users || 0),
+      (sum, l) => sum + (l._count.users || 0),
       0,
     );
-    const totalCapacity = licenses.reduce((sum, l) => sum + l.maxUsers, 0);
+    // const totalCapacity = licenses.reduce((sum, l) => sum + l.maxUsers, 0);
 
     const activeUsers = licenses.reduce((sum, l) => {
       return (
-        sum +
-        (l.School?.users.filter((u) => u.userActivity.length > 0).length || 0)
+        sum + (l.users.filter((u) => u.userActivity.length > 0).length || 0)
       );
     }, 0);
 
     const totalXP = licenses.reduce((sum, l) => {
       return (
         sum +
-        (l.School?.users.reduce((s, lu) => {
+        (l.users.reduce((s, lu) => {
           return s + (lu.XpLogs.reduce((x, log) => x + log.xpEarned, 0) || 0);
         }, 0) || 0)
       );
     }, 0);
 
-    const utilizationRate = totalCapacity > 0 ? totalUsers / totalCapacity : 0;
+    // const utilizationRate = totalCapacity > 0 ? totalUsers / totalCapacity : 0;
     const engagementRate = totalUsers > 0 ? activeUsers / totalUsers : 0;
 
     // Build prompt for system-level insights
+    // - Total Capacity: ${totalCapacity}
+    // - Utilization Rate: ${(utilizationRate * 100).toFixed(1)}%
     const prompt = `You are an AI assistant for app administrators analyzing system-wide metrics across all schools.
   
   System Overview:
   - Total Schools: ${totalLicenses}
   - Total Users: ${totalUsers}
-  - Total Capacity: ${totalCapacity}
-  - Utilization Rate: ${(utilizationRate * 100).toFixed(1)}%
   - Active Users (30 days): ${activeUsers}
   - Engagement Rate: ${(engagementRate * 100).toFixed(1)}%
   - Total XP (30 days): ${totalXP}
@@ -240,11 +236,11 @@ export async function generateSystemInsights(): Promise<GeneratedInsight[]> {
   Top Schools by Activity:
   ${licenses
     .sort((a, b) => {
-      const aXP = a.School?.users.reduce(
+      const aXP = a.users.reduce(
         (s, u) => s + (u.XpLogs.reduce((x, log) => x + log.xpEarned, 0) || 0),
         0,
       );
-      const bXP = b.School?.users.reduce(
+      const bXP = b.users.reduce(
         (s, u) => s + (u.XpLogs.reduce((x, log) => x + log.xpEarned, 0) || 0),
         0,
       );
@@ -253,7 +249,7 @@ export async function generateSystemInsights(): Promise<GeneratedInsight[]> {
     .slice(0, 5)
     .map(
       (l, i) =>
-        `${i + 1}. ${l.School?.name}: ${l.School?._count.users} users, ${l.School?.users.reduce((s, u) => s + (u.XpLogs.reduce((x, log) => x + log.xpEarned, 0) || 0), 0)} XP`,
+        `${i + 1}. ${l.name}: ${l._count.users} users, ${l.users.reduce((s, u) => s + (u.XpLogs.reduce((x, log) => x + log.xpEarned, 0) || 0), 0)} XP`,
     )
     .join("\n")}
   
@@ -314,54 +310,10 @@ function generateFallbackSystemInsights(): GeneratedInsight[] {
         vi: "Theo dõi sự tham gia và hiệu suất của hệ thống trên toàn bộ trường học trong toàn bộ trường học.",
       },
       confidence: 0.75,
+      data: "fallback",
       validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   ];
-}
-
-export async function saveInsights(
-  insights: GeneratedInsight[],
-  scope: AIInsightScope,
-  userId?: string,
-  classroomId?: string,
-  licenseId?: string,
-): Promise<void> {
-  try {
-    // Delete old insights for this context
-    await prisma.aIInsight.deleteMany({
-      where: {
-        scope,
-        userId: userId || null,
-        classroomId: classroomId || null,
-        licenseId: licenseId || null,
-        createdAt: {
-          lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Older than 7 days
-        },
-      },
-    });
-
-    // Create new insights
-    await prisma.aIInsight.createMany({
-      data: insights.map((insight) => ({
-        type: insight.type,
-        scope,
-        priority: insight.priority,
-        title: insight.title,
-        description: insight.description,
-        confidence: insight.confidence,
-        data: insight.data || {},
-        userId,
-        classroomId,
-        licenseId,
-        generatedBy: "ai",
-        modelVersion: openaiModel,
-        validUntil: insight.validUntil,
-      })),
-    });
-  } catch (error) {
-    console.error("Error saving insights:", error);
-    throw error;
-  }
 }
 
 export async function generateLicenseInsights(
@@ -448,6 +400,7 @@ function generateFallbackLicenseInsights(
         vi: "Theo dõi việc sử dụng giấy phép và tham gia trong tổ chức của bạn.",
       },
       confidence: 0.75,
+      data: "fallback",
       validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   ];
@@ -495,6 +448,10 @@ export async function generateTeacherInsights(
 
     if (!teacher) {
       throw new Error("Teacher not found");
+    }
+
+    if (teacher.ClassroomTeachers.length === 0) {
+      return generateFallbackTeacherInsights(userId);
     }
 
     // Calculate metrics

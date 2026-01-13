@@ -8,13 +8,11 @@ export const GET = withAuth(
     try {
       const { searchParams } = new URL(req.url);
       const kind = searchParams.get("kind") || "";
-      const contextId = searchParams.get("contextId") || "";
-      const refresh = searchParams.get("refresh") || "";
+      const contextId = searchParams.get("contextId") || null;
 
       const aiSummary = await fetchAISummaryController(
         kind,
         contextId,
-        refresh,
         user as AuthenticatedUser,
       );
 

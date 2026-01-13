@@ -2,18 +2,17 @@ import { AIInsightScope } from "@prisma/client";
 import { AuthenticatedUser } from "../utils/middleware";
 import {
   generateSystemInsights,
-  saveInsights,
   generateLicenseInsights,
   generateTeacherInsights,
   generateStudentInsights,
   generateClassroomInsights,
 } from "../utils/genaretors/ai-generator";
-import { AIInsight, AISummaryResponse } from "@/types/dashboard";
+import { AIInsight } from "@/types/dashboard";
+import { getAiInsigthsFromDB, saveInsights } from "../models/aiModel";
 
 export async function fetchAISummaryController(
   kind?: string,
-  contextId?: string,
-  refresh?: string,
+  contextId?: string | null,
   user?: AuthenticatedUser,
 ) {
   const startTime = Date.now();
@@ -21,40 +20,50 @@ export async function fetchAISummaryController(
   try {
     let insights: any[] = [];
     let scope: AIInsightScope;
+    let classroomId: string | undefined | null;
+    let licenseId: string | undefined | null;
+    let userId: string | undefined;
 
     if (kind === "system") {
       scope = AIInsightScope.SYSTEM;
     } else if (kind === "license") {
       scope = AIInsightScope.LICENSE;
+      licenseId = contextId;
     } else if (kind === "student") {
       scope = AIInsightScope.STUDENT;
+      userId = contextId || user?.id;
     } else if (kind === "teacher") {
       scope = AIInsightScope.TEACHER;
+      userId = contextId || user?.id;
     } else if (kind === "classroom") {
       scope = AIInsightScope.CLASSROOM;
+      classroomId = contextId;
     } else {
       scope = AIInsightScope.STUDENT;
     }
 
+    //check for cached insights in DB
+    insights = await getAiInsigthsFromDB(scope, contextId, user);
+
     // If no cached insights or forced refresh, generate new ones
-    if (insights.length === 0) {
+    if (!insights.length) {
       let generatedInsights: any[] = [];
 
       switch (scope) {
         case AIInsightScope.STUDENT:
-          generatedInsights = await generateStudentInsights(
-            contextId || user?.id || "",
-          );
+          generatedInsights = await generateStudentInsights(userId || "");
           break;
         case AIInsightScope.TEACHER:
-          generatedInsights = await generateTeacherInsights(contextId || "");
+          generatedInsights = await generateTeacherInsights(userId || "");
           break;
         case AIInsightScope.CLASSROOM:
-          generatedInsights = await generateClassroomInsights(contextId || "");
+          generatedInsights = await generateClassroomInsights(
+            classroomId || "",
+          );
           break;
         case AIInsightScope.LICENSE:
           // ADMIN sees only their school's license
-          generatedInsights = await generateLicenseInsights(contextId || "");
+          generatedInsights = await generateLicenseInsights(licenseId || "");
           break;
         case AIInsightScope.SYSTEM:
           // SYSTEM sees all schools - generate system-wide insights
@@ -65,9 +74,20 @@ export async function fetchAISummaryController(
       }
 
       // Save insights to database
-      if (generatedInsights.length > 0) {
-        await saveInsights(generatedInsights, scope);
+      if (
+        generatedInsights.length > 0 &&
+        generatedInsights[0].data !== "fallback"
+      ) {
+        await saveInsights(
+          generatedInsights,
+          scope,
+          user?.id || null,
+          classroomId || null,
+          licenseId || null,
+        );
 
+        insights = generatedInsights;
+      } else if (generatedInsights[0].data === "fallback") {
         insights = generatedInsights;
       }
     }
