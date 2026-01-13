@@ -11,6 +11,7 @@ import {
   fetchAdminDashboardApi,
   fetchAISummaryApi,
   fetchLicensesApi,
+  fetchSchoolsListApi,
 } from "@/utils/api-request";
 import { currentUser } from "@/lib/session";
 import { Role } from "@/types/enum";
@@ -38,7 +39,7 @@ export default async function AdminDashboardPage() {
   if (user?.role === Role.system) {
     await queryClient.prefetchQuery({
       queryKey: ["system-school-list", user?.id],
-      queryFn: () => fetchLicensesApi(),
+      queryFn: () => fetchSchoolsListApi(),
       staleTime: 60 * 60 * 1000,
     });
   }

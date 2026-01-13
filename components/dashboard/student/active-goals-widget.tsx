@@ -60,7 +60,7 @@ export function ActiveGoalsWidget() {
     );
   }
 
-  if (data?.length === 0) {
+  if (filteredGoals?.length === 0) {
     return (
       <Card>
         <CardHeader>

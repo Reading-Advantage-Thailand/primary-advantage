@@ -17,6 +17,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { FileTextIcon } from "lucide-react";
+import ExportWorkbookButton from "@/components/export-workbook-button";
 
 export async function generateMetadata({
   params,
@@ -86,6 +87,7 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
                   article={articleResponse.article}
                 /> */}
                 <AssignButton article={article} />
+                <ExportWorkbookButton {...article} />
               </>
             )}
             {/* {isAboveTeacher(user.role) && (

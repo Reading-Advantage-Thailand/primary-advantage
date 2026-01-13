@@ -59,6 +59,13 @@ export const fetchSystemActivityChartsApi = async (
   return response;
 };
 
+export const fetchSchoolsListApi = async () => {
+  const response = await fetch(`/api/system/dashboard/schools`).then((res) =>
+    res.json(),
+  );
+  return response;
+};
+
 //---------------------------------
 // Admin Dashboard API
 //---------------------------------

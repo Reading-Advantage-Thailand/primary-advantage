@@ -56,6 +56,7 @@
     "schoolProfile": "โปรไฟล์โรงเรียน",
     "studentsandclasses": "นักเรียนและชั้นเรียน",
     "articlecreation": "การสร้างบทความ",
+    "workbookGenerator": "สร้างเวิร์กบุ๊ก",
     "back": "กลับ",
     "subItem": {
       "admin": "ผู้ดูแลระบบ",
@@ -1409,6 +1410,45 @@
         "totalTime": "เวลาทั้งหมด:",
         "min": "นาที"
       }
+    },
+    "workbookGeneratorPage": {
+      "title": "เครื่องมือสร้างเวิร์กบุ๊ก",
+      "description": "สร้างแบบเวิร์กบุ๊กที่สวยงามและพิมพ์ได้จากเทมเพลตและเนื้อหาของคุณ",
+      "cardTitle": "สร้างแบบเวิร์กบุ๊กของคุณ",
+      "cardDescription": "อัปโหลดเทมเพลต HTML และเนื้อหา JSON เพื่อสร้างแบบเวิร์กบุ๊กแบบกำหนดเอง",
+      "step1": {
+        "title": "อัปโหลดเทมเพลต (HTML)",
+        "placeholder": "เลือก `workbook_template.html`"
+      },
+      "step2": {
+        "title": "อัปโหลดเนื้อหา (JSON)",
+        "placeholder": "เลือก `content_*.json`"
+      },
+      "selectButton": "เลือก",
+      "generateButton": "สร้างและดูตัวอย่างแบบเวิร์กบุ๊ก",
+      "howToUse": {
+        "title": "วิธีการใช้งาน",
+        "step1Title": "อัปโหลดเทมเพลต:",
+        "step1Description": "เลือกไฟล์เทมเพลต HTML (workbook_template.html) ที่มีเลย์เอาต์และโครงสร้าง",
+        "step2Title": "อัปโหลดเนื้อหา:",
+        "step2Description": "เลือกไฟล์ JSON ที่มีเนื้อหาบทความ คำถาม และคำศัพท์",
+        "step3Title": "สร้าง:",
+        "step3Description": "คลิกปุ่มสร้างเพื่อสร้างและดูตัวอย่างแบบเวิร์กบุ๊กของคุณในแท็บใหม่"
+      },
+      "messages": {
+        "uploadBothFiles": "โปรดอัปโหลดทั้งไฟล์เทมเพลตและไฟล์ข้อมูล JSON",
+        "popupBlocked": "ป๊อปอัปถูกบล็อก โปรดอนุญาตป๊อปอัปสำหรับไซต์นี้เพื่อดูแบบเวิร์กบุ๊ก",
+        "successGenerated": "สร้างแบบเวิร์กบุ๊กสำเร็จแล้ว! เปิดในแท็บใหม่",
+        "errorGenerating": "เกิดข้อผิดพลาดในการสร้างแบบเวิร์กบุ๊ก:",
+        "success": "สำเร็จ",
+        "error": "ข้อผิดพลาด"
+      }
+    },
+    "exportWorkbookButton": {
+      "buttonText": "ส่งออกเวิร์กบุ๊ก",
+      "exporting": "กำลังส่งออก...",
+      "success": "ส่งออกเวิร์กบุ๊กสำเร็จ!",
+      "error": "ไม่สามารถส่งออกเวิร์กบุ๊กได้"
     }
   },
   "WordList": {

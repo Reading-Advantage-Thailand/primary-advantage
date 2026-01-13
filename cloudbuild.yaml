@@ -42,12 +42,10 @@ steps:
       - |
         echo "================ DEBUG START ================"
 
-        # 1. ติดตั้ง Proxy
         echo "[1] Installing Cloud SQL Proxy..."
         wget -q https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
         chmod +x cloud_sql_proxy
 
-        # 2. รัน Proxy (TCP Mode)
         echo "[2] Starting Proxy on 127.0.0.1:5432..."
         ./cloud_sql_proxy -instances=${_CLOUD_SQL_INSTANCE}=tcp:5432 &
         PROXY_PID=$$!
@@ -55,7 +53,6 @@ steps:
         echo "Waiting for proxy to stabilize (5s)..."
         sleep 5
 
-        # 3. เตรียม URL
         echo "[3] Preparing Connection String..."
 
         if [ -z "$$MIGRATE_DB_URL" ]; then
@@ -63,30 +60,16 @@ steps:
            exit 1
         fi
 
-        # สร้างตัวแปร DATABASE_URL (สังเกต $$)
         export DATABASE_URL=$(echo $$MIGRATE_DB_URL | sed -E 's/@[^:]+:[0-9]+/@127.0.0.1:5432/')
 
-        # [แก้ปัญหาจุดเดิม] ปริ้นแบบไม่ต้องสร้างตัวแปร SAFE_URL ให้ Cloud Build งง
         echo "✅ Target URL (Masked):"
         echo $$DATABASE_URL | sed -E 's/:[^@]+@/:****@/'
 
-        # 4. ทดสอบ Connection
-        echo "[4] Checking Port Connectivity..."
-        if nc -z 127.0.0.1 5432; then
-            echo "✅ Connectivity OK: Port 5432 is open."
-        else
-            echo "❌ Connectivity FAIL: Cannot reach 127.0.0.1:5432."
-            # ปริ้น Log Proxy ออกมาดูถ้าพัง
-            cat cloud_sql_proxy.log 2>/dev/null || echo "No proxy log found."
-        fi
-
         echo "================ STARTING PRISMA ================"
 
-        # 5. รันคำสั่งจริง
         npx prisma@6.19.0 migrate deploy
         EXIT_CODE=$$?
 
-        # 6. เก็บกวาด
         kill $$PROXY_PID
 
         if [ $$EXIT_CODE -eq 0 ]; then

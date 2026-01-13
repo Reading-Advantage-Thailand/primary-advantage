@@ -37,6 +37,7 @@ import ModernActiveUsers from "@/components/dashboard/system/modern-active-users
 import { useTranslations } from "next-intl";
 import { fetchSystemDashboardApi } from "@/utils/api-request";
 import { useQuery } from "@tanstack/react-query";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 // Types for dashboard data
 interface DashboardData {
@@ -76,6 +77,7 @@ interface DashboardData {
 export default function SystemDashboard() {
   const t = useTranslations("System.Dashboard");
   const [dateRange, setDateRange] = useState("30");
+  const user = useCurrentUser();
 
   const { data, isPending, isError, error, refetch, isRefetching } = useQuery({
     queryKey: ["system-dashboard", dateRange],
@@ -558,7 +560,7 @@ export default function SystemDashboard() {
               </TabsContent>
 
               <TabsContent value="insights" className="mt-6 space-y-6">
-                <AIInsights scope="system" />
+                <AIInsights scope="system" contextId={user?.id} />
               </TabsContent>
             </Tabs>
           </div>

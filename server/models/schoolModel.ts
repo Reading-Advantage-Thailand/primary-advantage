@@ -341,3 +341,21 @@ export const getSchoolLeaderboardModel = async (
     return { success: false, error: "Failed to fetch school leaderboard" };
   }
 };
+
+export const getSchoolsListModel = async () => {
+  try {
+    const schools = await prisma.school.findMany({
+      select: {
+        id: true,
+        name: true,
+        _count: {
+          select: { users: true },
+        },
+      },
+    });
+    return schools;
+  } catch (error) {
+    console.error("School Model: Error fetching schools list:", error);
+    return { success: false, error: "Failed to fetch schools list" };
+  }
+};

@@ -164,13 +164,13 @@ export default function ActivityCharts({
     },
   ];
 
-  const { data, isPending, isError, error, refetch, isRefetching } = useQuery({
-    queryKey: ["activity-charts", dateRange],
+  const { data, isPending, isError, error, refetch } = useQuery({
+    queryKey: ["system-activity-charts", dateRange],
     queryFn: () => fetchSystemActivityChartsApi(dateRange),
   });
 
   const table = useReactTable({
-    data: data ? data.timelineEvents : [],
+    data: data?.timelineEvents || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
