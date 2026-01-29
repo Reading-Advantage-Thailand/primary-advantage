@@ -10,6 +10,27 @@ import path from "path";
 import { generateWordList } from "./wordlist-generator";
 import { uploadToBucket } from "@/utils/storage";
 
+export type sentenceTranslation = {
+  sentence: string;
+  translation: {
+    th: string;
+    cn: string;
+    tw: string;
+    vi: string;
+  };
+};
+
+export type wordTranslation = {
+  vocabulary: string;
+  definition: {
+    en: string;
+    th: string;
+    cn: string;
+    tw: string;
+    vi: string;
+  };
+};
+
 export type SentencesResponse = {
   sentence: string;
   translation: {
@@ -34,9 +55,10 @@ export type WordsResponse = {
 };
 
 export type GenerateAudioParams = {
-  sentences: SentencesResponse[];
-  words: WordsResponse[];
-  articleId: string;
+  sentences: sentenceTranslation[];
+  words: wordTranslation[];
+  contentId: string;
+  job: "article" | "story";
 };
 
 // export type GenerateChapterAudioParams = {
@@ -65,11 +87,14 @@ function contentToSSML(content: string[]): string {
 export async function generateAudioForFlashcard({
   sentences,
   words,
-  articleId,
+  contentId,
+  job,
 }: GenerateAudioParams): Promise<void> {
   try {
     const voice =
       AVAILABLE_VOICES[Math.floor(Math.random() * AVAILABLE_VOICES.length)];
+
+    const urlPath = job === "article" ? "audios" : "audios/story";
 
     // Extract sentence strings for audio generation
     const sentenceTexts: string[] = Array.isArray(sentences)
@@ -130,12 +155,12 @@ export async function generateAudioForFlashcard({
         fs.mkdirSync(sentencesDir, { recursive: true });
       }
 
-      const sentenceLocalPath = path.join(sentencesDir, `${articleId}.mp3`);
+      const sentenceLocalPath = path.join(sentencesDir, `${contentId}.mp3`);
       fs.writeFileSync(sentenceLocalPath, sentenceMP3);
 
       await uploadToBucket(
         sentenceLocalPath,
-        `audios/sentences/${articleId}.mp3`,
+        `${urlPath}/sentences/${contentId}.mp3`,
       );
 
       fs.unlinkSync(sentenceLocalPath);
@@ -187,16 +212,20 @@ export async function generateAudioForFlashcard({
         fs.mkdirSync(wordsDir, { recursive: true });
       }
 
-      const wordLocalPath = path.join(wordsDir, `${articleId}.mp3`);
+      const wordLocalPath = path.join(wordsDir, `${contentId}.mp3`);
       fs.writeFileSync(wordLocalPath, wordMP3);
 
-      await uploadToBucket(wordLocalPath, `audios/words/${articleId}.mp3`);
+      await uploadToBucket(wordLocalPath, `${urlPath}/words/${contentId}.mp3`);
 
       fs.unlinkSync(wordLocalPath);
     }
 
     // Store both sentence and word data with their respective audio URLs
-    await prisma.sentencsAndWordsForFlashcard.create({
+    await prisma.sentencsAndWordsForFlashcard.updateMany({
+      where: {
+        articleId: job === "article" ? contentId : undefined,
+        storyChapterId: job === "story" ? contentId : undefined,
+      },
       data: {
         sentence:
           sentenceTimePoints.length > 0
@@ -204,15 +233,16 @@ export async function generateAudioForFlashcard({
             : null,
         audioSentencesUrl:
           sentenceTimePoints.length > 0
-            ? `/audios/sentences/${articleId}.mp3`
+            ? `${urlPath}/sentences/${contentId}.mp3`
             : null,
         words:
           wordTimePoints.length > 0
             ? JSON.parse(JSON.stringify(wordTimePoints))
             : null,
         wordsUrl:
-          wordTimePoints.length > 0 ? `/audios/words/${articleId}.mp3` : null,
-        articleId: articleId,
+          wordTimePoints.length > 0
+            ? `${urlPath}/words/${contentId}.mp3`
+            : null,
       },
     });
 

@@ -9,7 +9,7 @@ import {
 import { LAQFeedback, LAQFeedbackResponse, SAQFeedbackResponse } from "@/types";
 import { ActivityType } from "@/types/enum";
 import { google, googleModel, googleModelLite } from "@/utils/google";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import fs from "fs";
 import path from "path";
 
@@ -64,9 +64,9 @@ export async function getSaqFeedback(req: {
       .replace("{suggestedResponse}", validatedInput.suggestedResponse)
       .replace("{studentResponse}", validatedInput.studentResponse);
 
-    const { object } = await generateObject({
+    const { output: object } = await generateText({
       model: google(googleModel),
-      schema: saqFeedbackOutputSchema,
+      output: Output.object({ schema: saqFeedbackOutputSchema }),
       system: saqeution_system,
       prompt,
     });
@@ -126,9 +126,9 @@ export async function getLaqFeedback(req: {
       .replace("{writingPrompt}", validatedInput.writingPrompt)
       .replace("{studentResponse}", validatedInput.studentResponse);
 
-    const { object } = await generateObject({
+    const { output: object } = await generateText({
       model: google(googleModel),
-      schema: laqFeedbackOutputSchema,
+      output: Output.object({ schema: laqFeedbackOutputSchema }),
       system: laquestion_system,
       prompt,
     });

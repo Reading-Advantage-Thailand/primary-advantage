@@ -1,5 +1,5 @@
 import va from "@vercel/analytics";
-import { z } from "zod";
+import { z } from 'zod';
 
 const eventSchema = z.object({
   name: z.enum([
@@ -19,7 +19,7 @@ const eventSchema = z.object({
   ]),
   // declare type AllowedPropertyValues = string | number | boolean | null
   properties: z
-    .record(z.union([z.string(), z.number(), z.boolean(), z.null()]))
+    .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
     .optional(),
 });
 

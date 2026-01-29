@@ -17,7 +17,7 @@ import {
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-import z from "zod";
+import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { classCodeSchema } from "@/lib/zod";
 import {

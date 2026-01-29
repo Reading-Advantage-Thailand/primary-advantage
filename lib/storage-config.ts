@@ -32,6 +32,13 @@ export function getArticleImageUrl(
   return getStorageUrl(`images/${articleId}_${imageNumber}.png`);
 }
 
+export function getStorieImageUrl(
+  storieId: string,
+  chapterNumber: number | string,
+): string {
+  return getStorageUrl(`images/story/${storieId}_${chapterNumber}.png`);
+}
+
 /**
  * Constructs URL for article audio
  * @param audioUrl - The audio URL path (usually starts with '/')

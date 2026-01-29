@@ -6,7 +6,7 @@ import { z } from "zod";
 const schoolSchema = z.object({
   name: z.string().min(2).max(100),
   contactName: z.string().max(100).optional(),
-  contactEmail: z.string().email().optional(),
+  contactEmail: z.email().optional(),
 });
 
 // GET /api/users/me/school - Get current user's school
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input data", details: error.errors },
+        { error: "Invalid input data", details: error },
         { status: 400 },
       );
     }
@@ -384,7 +384,7 @@ export async function PATCH(request: NextRequest) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input data", details: error.errors },
+        { error: "Invalid input data", details: error },
         { status: 400 },
       );
     }

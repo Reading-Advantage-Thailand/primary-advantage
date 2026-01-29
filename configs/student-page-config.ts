@@ -31,12 +31,12 @@ export const studentPageConfig: PageConfig = {
       icon: "BookIcon",
       requiredPermissions: ["STUDENT_ACCESS"],
     },
-    // {
-    //   title: "stories",
-    //   href: "/student/stories",
-    //   icon: "BookAIcon",
-    //   requiredPermissions: ["STUDENT_ACCESS"],
-    // },
+    {
+      title: "stories",
+      href: "/student/stories",
+      icon: "BookAIcon",
+      requiredPermissions: ["STUDENT_ACCESS"],
+    },
     {
       title: "assignments",
       href: "/student/assignments",

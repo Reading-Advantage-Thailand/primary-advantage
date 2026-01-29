@@ -1,8 +1,8 @@
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { google, googleModelLite } from "@/utils/google";
 import { prisma } from "@/lib/prisma";
 import { SentenceTimepoint } from "@/types";
-import z from "zod";
+import { z } from "zod";
 
 // Translation schema matching your existing pattern
 const sentenceTranslationSchema = z.object({
@@ -54,34 +54,34 @@ async function translateSentencesWithAI(
 
   const systemPrompt = `You are a professional translator specializing in educational content for language learners. Translate the following sentences accurately while maintaining:
 
-1. Appropriate language level${cefrLevel ? ` for CEFR level ${cefrLevel}` : ""}
-2. Natural flow and readability
-3. Educational context and meaning
-4. Cultural appropriateness
+        1. Appropriate language level${cefrLevel ? ` for CEFR level ${cefrLevel}` : ""}
+        2. Natural flow and readability
+        3. Educational context and meaning
+        4. Cultural appropriateness
 
-Translate each sentence to:
-- th: Thai
-- cn: Simplified Chinese  
-- tw: Traditional Chinese
-- vi: Vietnamese
+        Translate each sentence to:
+        - th: Thai
+        - cn: Simplified Chinese  
+        - tw: Traditional Chinese
+        - vi: Vietnamese
 
-Maintain the same number of sentences in each translation as the original.`;
+        Maintain the same number of sentences in each translation as the original.`;
 
   const userPrompt = `Translate these sentences:
 
-${sentenceList}
+          ${sentenceList}
 
-Provide translations in the exact same order, maintaining sentence structure and meaning appropriate for language learners.`;
+          Provide translations in the exact same order, maintaining sentence structure and meaning appropriate for language learners.`;
 
   try {
-    const result = await generateObject({
+    const result = await generateText({
       model: google(googleModelLite),
-      schema: sentenceTranslationSchema,
+      output: Output.object({ schema: sentenceTranslationSchema }),
       system: systemPrompt,
       prompt: userPrompt,
     });
 
-    return result.object.translatedSentences;
+    return result.output.translatedSentences;
   } catch (error) {
     console.error("Error translating AI :", error);
     throw new Error("Failed to translate sentences with both AI providers");
@@ -179,6 +179,86 @@ export async function translateAndStoreSentences({
   } catch (error: any) {
     console.error(
       `Failed to translate sentences for article ${articleId}:`,
+      error,
+    );
+    throw new Error(`Failed to translate sentences: ${error.message}`);
+  }
+}
+
+export async function translateAndStoreSentencesForStory({
+  sentences,
+  storyId,
+  chapterNumber,
+  targetLanguages = ["th", "cn", "tw", "vi"],
+  forceRetranslate = true,
+}: {
+  sentences: string[];
+  storyId: string;
+  chapterNumber: number;
+  targetLanguages?: string[];
+  forceRetranslate?: boolean;
+}): Promise<void> {
+  try {
+    const story = await prisma.story.findUnique({
+      where: { id: storyId },
+      select: {
+        cefrLevel: true,
+      },
+    });
+
+    if (!story) {
+      throw new Error(`Story with ID ${storyId} not found`);
+    }
+
+    // Check if translations already exist and forceRetranslate is false
+    if (sentences.length === 0 && !forceRetranslate) {
+      console.log(
+        `Translations already exist for article. Use forceRetranslate=true to retranslate.`,
+      );
+      return;
+    }
+
+    // Translate sentences
+    const translatedSentences = await translateSentencesWithAI(
+      sentences,
+      targetLanguages,
+      story.cefrLevel || "",
+    );
+
+    // Validate that all translations have the same number of sentences
+    const originalCount = sentences.length;
+    const translationCounts = {
+      th: translatedSentences.th.length,
+      cn: translatedSentences.cn.length,
+      tw: translatedSentences.tw.length,
+      vi: translatedSentences.vi.length,
+    };
+
+    const invalidCounts = Object.entries(translationCounts).filter(
+      ([_, count]) => count !== originalCount,
+    );
+
+    if (invalidCounts.length > 0) {
+      console.warn(`Translation count mismatch for article ${storyId}:`, {
+        original: originalCount,
+        translations: translationCounts,
+      });
+    }
+
+    // Store translations in database
+    await prisma.storyChapter.updateMany({
+      where: { storyId, chapterNumber },
+      data: {
+        translatedSentences: JSON.parse(JSON.stringify(translatedSentences)),
+      },
+    });
+
+    console.log(
+      `Successfully translated and stored sentences for article ${storyId}`,
+    );
+  } catch (error: any) {
+    console.error(
+      `Failed to translate sentences for article ${storyId}:`,
       error,
     );
     throw new Error(`Failed to translate sentences: ${error.message}`);

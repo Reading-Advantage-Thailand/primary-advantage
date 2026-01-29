@@ -4,13 +4,17 @@ import { routing } from "./routing";
 
 export default getRequestConfig(async ({ requestLocale }) => {
   // Typically corresponds to the `[locale]` segment
-  const requested = await requestLocale;
-  const locale = hasLocale(routing.locales, requested)
-    ? requested
-    : routing.defaultLocale;
+  let locale = await requestLocale;
+
+  if (!locale || !routing.locales.includes(locale as any)) {
+    locale = routing.defaultLocale;
+  }
+  // const locale = hasLocale(routing.locales, requested)
+  //   ? requested
+  //   : routing.defaultLocale;
 
   return {
     locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
+    messages: (await import(`../messages/${locale}/index.ts`)).default,
   };
 });

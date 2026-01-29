@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { z } from 'zod';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -39,37 +39,35 @@ const FormSchema = z.object({
   name: z
     .string()
     .min(3, {
-      message: "License name must be at least 3 characters.",
+        error: "License name must be at least 3 characters."
     })
     .max(100, {
-      message: "License name must be at most 100 characters.",
+        error: "License name must be at most 100 characters."
     }),
   description: z
     .string()
     .max(500, {
-      message: "Description must be at most 500 characters.",
+        error: "Description must be at most 500 characters."
     })
     .optional(),
-  maxUsers: z
-    .number()
-    .int()
+  maxUsers: z.int()
     .min(1, {
-      message: "Maximum users must be at least 1.",
+        error: "Maximum users must be at least 1."
     })
     .max(10000, {
-      message: "Maximum users cannot exceed 10,000.",
+        error: "Maximum users cannot exceed 10,000."
     }),
   startDate: z.date({
-    required_error: "Start date is required.",
-  }),
-  expiryDays: z.number().int().positive().optional(),
+      error: (issue) => issue.input === undefined ? "Start date is required." : undefined
+}),
+  expiryDays: z.int().positive().optional(),
   status: z.enum(["active", "inactive", "expired"], {
-    required_error: "Please select a status.",
-  }),
+      error: (issue) => issue.input === undefined ? "Please select a status." : undefined
+}),
   schoolId: z.string().optional(),
   subscriptionType: z.enum(["basic", "premium", "enterprise"], {
-    required_error: "Please select a subscription type.",
-  }),
+      error: (issue) => issue.input === undefined ? "Please select a subscription type." : undefined
+}),
 });
 
 export function CreateLicenseForm() {

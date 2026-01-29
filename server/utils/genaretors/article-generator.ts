@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { google, googleModel } from "@/utils/google";
 import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
 import { articleGeneratorSchema } from "@/lib/zod";
@@ -72,9 +72,9 @@ export async function generateArticle(
       `${params.cefrLevel} generating article model ID: ${googleModel} type: ${params.type}`,
     );
 
-    const { object: article } = await generateObject({
+    const { output: article } = await generateText({
       model: google(googleModel),
-      schema: articleGeneratorSchema,
+      output: Output.object({ schema: articleGeneratorSchema }),
       system: levelConfig.systemPrompt,
       prompt: userPrompt,
       seed: Math.floor(Math.random() * 1000),

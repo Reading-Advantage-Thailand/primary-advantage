@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { openai, openaiModel } from "@/utils/openai";
 import { google, googleModel } from "@/utils/google";
 import path from "path";
@@ -33,7 +33,7 @@ interface PromptFileType {
 }
 
 export async function generateQuestion<T>(
-  params: GenerateQuestionParams<T>
+  params: GenerateQuestionParams<T>,
 ): Promise<GenerateQuestionResponse<T>> {
   try {
     const dataFilePath = path.join(process.cwd(), "data", params.promptFile);
@@ -41,16 +41,16 @@ export async function generateQuestion<T>(
     const prompt: PromptFileType = JSON.parse(rawData);
 
     const prompts = prompt[params.type].find(
-      (item) => item.level === params.cefrlevel
+      (item) => item.level === params.cefrlevel,
     );
 
     const userPrompt = `${prompts?.user_prompt}\n\nPassage: ${params.passage}\nTitle: ${params.title}\nSummary: ${params.summary}\nImage Description: ${params.imageDesc}`;
-    const { object: question } = await generateObject({
+    const { output: question } = await generateText({
       model: google(googleModel),
-      schema: params.schema,
+      output: Output.object({ schema: params.schema }),
       system: prompts?.system_prompt,
       prompt: userPrompt,
-      maxTokens: 4000,
+      maxOutputTokens: 4000,
     });
     return {
       question,

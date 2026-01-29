@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Icons } from "../icons";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
+import { z } from 'zod';
 import {
   Form,
   FormControl,

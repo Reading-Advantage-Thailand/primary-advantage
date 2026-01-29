@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { z } from 'zod';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,8 +23,8 @@ import { useTranslations } from "next-intl";
 
 const FormSchema = z.object({
   name: z.string().min(5, {
-    message: "Username must be at least 5 characters.",
-  }),
+      error: "Username must be at least 5 characters."
+}),
 });
 
 export function ChangeUsernameForm({

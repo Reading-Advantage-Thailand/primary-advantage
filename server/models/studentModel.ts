@@ -269,11 +269,14 @@ export const createStudent = async (params: {
     params;
 
   try {
-    console.log("Student Model: Creating student with email:", email);
+    // Normalize email to lowercase
+    const normalizedEmail = email.toLowerCase().trim();
+
+    console.log("Student Model: Creating student with email:", normalizedEmail);
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (existingUser) {
@@ -321,7 +324,7 @@ export const createStudent = async (params: {
     const newStudent = await prisma.user.create({
       data: {
         name,
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
         cefrLevel,
         schoolId,
@@ -421,8 +424,9 @@ export const updateStudent = async (
 
     // Check if email is being updated and doesn't conflict
     if (updateData.email && updateData.email !== existingStudent.email) {
+      const normalizedEmail = updateData.email.toLowerCase().trim();
       const emailExists = await prisma.user.findUnique({
-        where: { email: updateData.email },
+        where: { email: normalizedEmail },
       });
 
       if (emailExists) {
@@ -455,7 +459,8 @@ export const updateStudent = async (
     // Prepare update data
     const updatePayload: any = {};
     if (updateData.name) updatePayload.name = updateData.name;
-    if (updateData.email) updatePayload.email = updateData.email;
+    if (updateData.email)
+      updatePayload.email = updateData.email.toLowerCase().trim();
     if (updateData.cefrLevel) updatePayload.cefrLevel = updateData.cefrLevel;
     if (updateData.password) {
       updatePayload.password = bcrypt.hashSync(updateData.password, 10);
@@ -1414,7 +1419,7 @@ export const getActivityTimeline = async ({
             gte: startDate,
           },
           activityType: {
-            in: ["ARTICLE_READ", "STORIES_READ", "CHAPTER_READ"],
+            in: ["ARTICLE_READ", "STORIES_READ", "STORIES_CHAPTER_READ"],
           },
         },
         orderBy: { createdAt: "desc" },

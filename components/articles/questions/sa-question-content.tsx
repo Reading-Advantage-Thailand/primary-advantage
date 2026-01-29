@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Icons } from "@/components/icons";
 import { finishQuiz, getFeedback } from "@/actions/question";
-import { z } from "zod";
+import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {

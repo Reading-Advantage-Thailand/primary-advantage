@@ -265,7 +265,7 @@ export async function POST(request: NextRequest) {
 
       // Prepare user data with default values and school assignment
       const userData = {
-        email: row.email.trim(),
+        email: row.email.toLowerCase().trim(),
         name: row.name.trim(),
         password: null, // No password from CSV, will need to be set later
         cefrLevel: "A0-", // Default CEFR level
@@ -283,7 +283,7 @@ export async function POST(request: NextRequest) {
           userId: "",
           classroomName,
           role,
-          email: row.email.trim(), // Store email for later mapping
+          email: row.email.toLowerCase().trim(), // Store email for later mapping
         });
       }
     }

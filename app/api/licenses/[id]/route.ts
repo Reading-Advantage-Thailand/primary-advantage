@@ -7,9 +7,9 @@ import { SubscriptionType } from "@prisma/client";
 const UpdateLicenseSchema = z.object({
   name: z.string().min(3).max(100),
   description: z.string().max(500).optional(),
-  maxUsers: z.number().int().min(1).max(10000),
-  startDate: z.string().datetime(),
-  expiryDays: z.number().int().positive().optional(),
+  maxUsers: z.int().min(1).max(10000),
+  startDate: z.iso.datetime(),
+  expiryDays: z.int().positive().optional(),
   status: z.enum(["active", "inactive", "expired"]),
   schoolId: z.string().optional().nullable(),
   subscriptionType: z.enum(["basic", "premium", "enterprise"]),
@@ -141,7 +141,7 @@ export async function PUT(
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Invalid input data", details: error.errors },
+        { error: "Invalid input data", details: error },
         { status: 400 },
       );
     }

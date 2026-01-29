@@ -203,3 +203,89 @@ export const fetchDashboardHeatmapApi = async (
   );
   return response;
 };
+
+//---------------------------------
+// Stories API
+//---------------------------------
+
+import {
+  StoriesQueryParams,
+  StoryListResponse,
+  StoryDetailResponse,
+  ChapterDetailResponse,
+} from "@/types/story";
+
+export const fetchStoriesApi = async (
+  params: StoriesQueryParams = {},
+): Promise<StoryListResponse> => {
+  const queryParams = new URLSearchParams();
+
+  if (params.page) queryParams.set("page", params.page.toString());
+  if (params.limit) queryParams.set("limit", params.limit.toString());
+  if (params.search) queryParams.set("search", params.search);
+  if (params.genre) queryParams.set("genre", params.genre);
+  if (params.cefrLevel) queryParams.set("cefrLevel", params.cefrLevel);
+  if (params.raLevel !== undefined)
+    queryParams.set("raLevel", params.raLevel.toString());
+  if (params.type) queryParams.set("type", params.type);
+  if (params.isPublished !== undefined)
+    queryParams.set("isPublished", params.isPublished.toString());
+  if (params.sortBy) queryParams.set("sortBy", params.sortBy);
+  if (params.sortOrder) queryParams.set("sortOrder", params.sortOrder);
+
+  const queryString = queryParams.toString();
+  const url = queryString ? `/api/stories?${queryString}` : "/api/stories";
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch stories");
+  }
+
+  return response.json();
+};
+
+export const fetchStoriesGenresApi = async (): Promise<{
+  genres: string[];
+}> => {
+  const response = await fetch("/api/stories?getGenres=true");
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch genres");
+  }
+
+  return response.json();
+};
+
+export const fetchStoryByIdApi = async (
+  storyId: string,
+): Promise<StoryDetailResponse> => {
+  const response = await fetch(`/api/stories/${storyId}`);
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Story not found");
+    }
+    throw new Error("Failed to fetch story");
+  }
+
+  return response.json();
+};
+
+export const fetchChapterApi = async (
+  storyId: string,
+  chapterNumber: number,
+): Promise<ChapterDetailResponse> => {
+  const response = await fetch(
+    `/api/stories/${storyId}/chapters/${chapterNumber}`,
+  );
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Chapter not found");
+    }
+    throw new Error("Failed to fetch chapter");
+  }
+
+  return response.json();
+};
