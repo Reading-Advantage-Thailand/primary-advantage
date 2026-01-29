@@ -146,7 +146,7 @@ export interface SAQuestion {
 export interface LAQuestion {
   id: string;
   question: string;
-  articleId: string;
+  articleId?: string;
   storyChapterId?: string;
 }
 

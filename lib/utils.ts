@@ -127,3 +127,12 @@ export function formatDate(createdAt: Date): string {
 export function generateLicenseKey() {
   return `${generateSecureCode(6)}-${generateSecureCode(6)}-${generateSecureCode(6)}`;
 }
+
+export function getRandomItems<T>(array: T[], count: number): T[] {
+  const shuffled = [...array]; // copy array เพื่อไม่ให้กระทบตัวเดิม
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // สลับตำแหน่ง
+  }
+  return shuffled.slice(0, count); // ตัดเอาเท่าที่ต้องการ
+}

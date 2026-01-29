@@ -30,6 +30,7 @@ build
 *.swo
 *~
 .DS_Store
+.cursor
 
 # Logs
 logs
@@ -68,3 +69,6 @@ cloud-sql-proxy
 .turbo
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# Prisma
+/prisma/migrations-scripts*

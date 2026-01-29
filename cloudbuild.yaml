@@ -2,6 +2,8 @@ steps:
   # Step 1: Build Docker image
   - name: "gcr.io/cloud-builders/docker"
     id: "build-image"
+    env:
+      - "DOCKER_BUILDKIT=1"
     args:
       - "build"
       - "--build-arg"
@@ -22,7 +24,8 @@ steps:
     id: "push-image"
     args:
       - "push"
-      - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
+      - "--all-tags"
+      - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app"
 
   # Step 3: Run database migrations
   # - name: "gcr.io/google-appengine/exec-wrapper"

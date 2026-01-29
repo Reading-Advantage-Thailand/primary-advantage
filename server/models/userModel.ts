@@ -9,7 +9,10 @@ export const createUser = async (data: {
   password: string;
 }) => {
   try {
-    const existingUser = await getUserByEmail(data.email);
+    // Normalize email to lowercase
+    const normalizedEmail = data.email.toLowerCase().trim();
+
+    const existingUser = await getUserByEmail(normalizedEmail);
 
     if (existingUser) {
       return {
@@ -35,7 +38,7 @@ export const createUser = async (data: {
       const user = await tx.user.create({
         data: {
           name: data.name,
-          email: data.email,
+          email: normalizedEmail,
           password: hashedPassword,
         },
       });
@@ -97,9 +100,15 @@ export const updateUserActivity = async (
 
 export const getUserByEmail = async (email: string) => {
   try {
-    const user = await prisma.user.findUnique({
+    // Normalize email to lowercase for case-insensitive lookup
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const user = await prisma.user.findFirst({
       where: {
-        email: email,
+        email: {
+          equals: normalizedEmail,
+          mode: "insensitive",
+        },
       },
       include: {
         roles: {
@@ -126,7 +135,7 @@ export const getUserByEmail = async (email: string) => {
 
         // Return updated user
         return await tx.user.findUnique({
-          where: { email },
+          where: { email: normalizedEmail },
           include: {
             roles: {
               include: {

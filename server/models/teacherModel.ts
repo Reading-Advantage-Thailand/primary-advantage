@@ -293,9 +293,12 @@ export const createTeacher = async (params: {
     params;
 
   try {
+    // Normalize email to lowercase
+    const normalizedEmail = email.toLowerCase().trim();
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
       include: {
         School: {
           select: {
@@ -398,7 +401,7 @@ export const createTeacher = async (params: {
       const user = await tx.user.create({
         data: {
           name,
-          email,
+          email: normalizedEmail,
           password: hashedPassword,
           schoolId,
           roles: {
@@ -744,8 +747,9 @@ export const updateTeacher = async (
 
     // Check if email is being updated and doesn't conflict
     if (updateData.email && updateData.email !== existingTeacher.email) {
+      const normalizedEmail = updateData.email.toLowerCase().trim();
       const emailExists = await prisma.user.findUnique({
-        where: { email: updateData.email },
+        where: { email: normalizedEmail },
       });
 
       if (emailExists) {
@@ -773,7 +777,8 @@ export const updateTeacher = async (
     // Prepare update data
     const updatePayload: any = {};
     if (updateData.name) updatePayload.name = updateData.name;
-    if (updateData.email) updatePayload.email = updateData.email;
+    if (updateData.email)
+      updatePayload.email = updateData.email.toLowerCase().trim();
     if (updateData.cefrLevel) updatePayload.cefrLevel = updateData.cefrLevel;
     if (updateData.password) {
       updatePayload.password = bcrypt.hashSync(updateData.password, 10);

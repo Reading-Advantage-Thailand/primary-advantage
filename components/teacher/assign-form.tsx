@@ -34,7 +34,7 @@ const formSchema = z.object({
   description: z.string(),
   students: z.array(z.string()).min(1, "Students are required"),
   articleId: z.string(),
-  dueDate: z.coerce.date(),
+  dueDate: z.date(),
 });
 
 interface Student {

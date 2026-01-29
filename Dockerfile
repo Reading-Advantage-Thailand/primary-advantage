@@ -14,7 +14,7 @@ RUN npm ci --only=production && \
 RUN npm ci
 
 # Stage 2: Build application
-FROM node:22-alpine AS builder
+FROM deps AS builder
 WORKDIR /app
 
 # Copy dependencies from deps stage
@@ -27,13 +27,13 @@ ENV DATABASE_URL=${DATABASE_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Fix Memory issue during build
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 # Generate Prisma client and run Next.js build
 RUN npm run prisma:generate && npm run build
 
 # Stage 3: Production runner
-FROM node:22-alpine AS runner
+FROM deps AS runner
 WORKDIR /app
 
 # Add non-root user

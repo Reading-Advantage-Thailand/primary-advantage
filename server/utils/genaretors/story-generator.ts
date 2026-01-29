@@ -1,53 +1,77 @@
-import { generateObject } from "ai";
-import { google, googleModel } from "@/utils/google";
+import { generateText, Output, generateImage } from "ai";
+import {
+  google,
+  googleImage,
+  googleModel,
+  googleNewModel,
+  googleImageModel,
+} from "@/utils/google";
+import { openai, newModel } from "@/utils/openai";
 import { storyGeneratorSchema } from "@/lib/zod";
 import { z } from "zod";
+import path from "path";
+import fs from "fs";
+import { createLogFile } from "../logging";
+import sharp from "sharp";
+import { uploadToBucket } from "@/utils/storage";
 
 export interface GenerateStoryParams {
   cefrLevel: string;
-  genre?: string;
-  topic?: string;
+  genre: string;
+  topic: string;
 }
+
+type CefrLevelPromptType = {
+  levels: CefrLevelType[];
+};
+
+type CefrLevelType = {
+  level: string;
+  systemPrompt: string;
+  modelId: string;
+  userPromptTemplate: string;
+};
 
 export type GenerateStoryResponse = z.infer<typeof storyGeneratorSchema>;
 
-const SYSTEM_PROMPT = `You are an expert creative writer and language educator specializing in creating engaging stories for English language learners. Your task is to generate a complete story with multiple chapters, characters, and educational exercises tailored to a specific CEFR level.
-
-Guidelines:
-1.  **CEFR Level Compliance:** The vocabulary, grammar, sentence structure, and story complexity must strictly adhere to the specified CEFR level.
-2.  **Story Structure:** Create a cohesive narrative with a clear beginning, middle, and end, divided into chapters.
-3.  **Engagement:** The story should be interesting, age-appropriate, and culturally inclusive.
-4.  **Educational Content:**
-    *   **Vocabulary:** Identify key vocabulary words appropriate for the level.
-    *   **Questions:** Create multiple-choice, short-answer, and long-answer questions that test comprehension and critical thinking.
-    *   **Translations:** Provide accurate translations for summaries, sentences, and vocabulary in Thai (th), Simplified Chinese (cn), Traditional Chinese (tw), and Vietnamese (vi).
-
-Output Format:
-Generate a JSON object matching the provided schema. Ensure all fields are populated and formatted correctly.`;
+const aiModel = googleNewModel;
 
 export async function generateStoryContent(
   params: GenerateStoryParams,
 ): Promise<GenerateStoryResponse> {
   try {
-    console.log(
-      `${params.cefrLevel} generating story model ID: ${googleModel}`,
+    console.log(`${params.cefrLevel} generating story model ID: ${aiModel}`);
+
+    const dataFilePath = path.join(
+      process.cwd(),
+      "data",
+      "storie-prompts.json",
     );
 
-    const userPrompt = `Create a story for English learners at CEFR level ${
-      params.cefrLevel
-    }.
-    ${params.genre ? `Genre: ${params.genre}` : ""}
-    ${params.topic ? `Topic: ${params.topic}` : ""}
-    
-    The story should have engaging characters and a compelling plot. Include 3-5 chapters.`;
+    // read prompts from file
+    const rawData = fs.readFileSync(dataFilePath, "utf-8");
+    const prompts: CefrLevelPromptType = JSON.parse(rawData);
 
-    const { object: story } = await generateObject({
-      model: google(googleModel),
-      schema: storyGeneratorSchema,
-      system: SYSTEM_PROMPT,
+    const levelConfig = prompts?.levels.find(
+      (lvl: CefrLevelType) => lvl.level === params.cefrLevel,
+    );
+
+    if (!levelConfig) {
+      throw new Error(`level config not found for ${params.cefrLevel}`);
+    }
+
+    const userPrompt = levelConfig.userPromptTemplate
+      .replace("{genre}", params?.genre)
+      .replace("{topic}", params?.topic);
+
+    const { output: story } = await generateText({
+      model: google(aiModel),
+      // model: openai(aiModel),
+      output: Output.object({ schema: storyGeneratorSchema }),
+      system: levelConfig.systemPrompt,
       prompt: userPrompt,
-      temperature: 1,
-      maxTokens: 8192, // Increase max tokens for longer content
+      // seed: Math.floor(Math.random() * 1000),
+      temperature: 0.7,
     });
 
     return story;
@@ -56,3 +80,247 @@ export async function generateStoryContent(
     throw new Error(`Failed to generate story: ${error}`);
   }
 }
+
+export const generateStoryTopic = async (
+  genre: string,
+  amountPerGenre: number,
+) => {
+  const prompts = `Please provide ${amountPerGenre} reading passage topics in the ${genre} genre and appropriate for secondary school students. 
+    ### Requirements:
+  - **Only return the book title** (no explanations, no descriptions, no genre labels).
+  - **Do NOT return general genre labels like 'Fantasy YA', 'Science Fiction', 'Mystery Thriller'**.
+  - **Do NOT include the words 'genre', or any similar category names.**
+  - **Each title must sound like a real book title.**
+  - **Keep each title short (maximum 8 words).**
+  - **Output must be a JSON array of strings ONLY.**
+  Output as a JSON array.`;
+  try {
+    const { output } = await generateText({
+      model: google(aiModel),
+      // model: openai(aiModel),
+      output: Output.object({
+        schema: z.object({
+          topics: z
+            .array(z.string())
+            .describe("An array of topics")
+            .length(amountPerGenre),
+        }),
+      }),
+      prompt: prompts,
+    });
+
+    return {
+      topics: output.topics,
+    };
+  } catch (error) {
+    throw new Error(`Failed to generate topic: ${error}`);
+  }
+};
+
+export const evaluateStoryContent = async (
+  chapter: string[],
+  cefrLevel: string,
+) => {
+  try {
+    const rawPromptsPath = [
+      {
+        level: "A0",
+        systemPrompt:
+          "You are an expert in children's literacy and language assessment for elementary students (grades 3-6). Your task is to evaluate fiction and nonfiction articles for young language learners at the CEFR A0 level. A0 level requires:\n- Very basic vocabulary with familiar, everyday words children would know\n- Very short, simple sentences (4-5 words on average) that young readers can easily follow\n- Simple present tense and basic grammar that beginning readers can handle\n- Concrete, relatable topics about familiar things like family, pets, school, or toys\n- Colorful, engaging content with clear meaning for young readers\n\nDetermine if the article matches the CEFR A0 level for children. You may add a '+' or '-' to the level if it's slightly above or below standard (e.g., more than five difficult words or no difficult words for that level).\n\nProvide a star rating based on how engaging the content would be for young readers:\n1 star: Not appealing to children, too difficult, or inappropriate content\n2 stars: Somewhat interesting but misses the mark for young readers\n3 stars: Decent content that children could understand and somewhat enjoy\n4 stars: Engaging content that would interest most children in this age group\n5 stars: Excellent, highly engaging content that would captivate young readers\n\nConsider factors such as: child-friendly vocabulary, simple sentence structure, interesting characters or facts, colorful descriptions, relatable situations, and overall appeal to young readers.\n\nProvide your assessment as a JSON object with two keys: 'cefr_level' and 'star_rating'. The 'cefr_level' value should be a string representing the CEFR level (e.g., 'A0' ,'A0+','A0-'), and the 'star_rating' value should be an integer from 1 to 5.",
+      },
+      {
+        level: "A1",
+        systemPrompt:
+          "You are an expert in children's literacy and language assessment for elementary students (grades 3-6). Your task is to evaluate fiction and nonfiction articles for young language learners at the CEFR A1 level. A1 level requires:\n- Very basic vocabulary with familiar, everyday words children would know\n- Very short, simple sentences (4-5 words on average) that young readers can easily follow\n- Simple present tense and basic grammar that beginning readers can handle\n- Concrete, relatable topics about familiar things like family, pets, school, or toys\n- Colorful, engaging content with clear meaning for young readers\n\nDetermine if the article matches the CEFR A1 level for children. You may add a '+' or '-' to the level if it's slightly above or below standard (e.g., more than five difficult words or no difficult words for that level).\n\nProvide a star rating based on how engaging the content would be for young readers:\n1 star: Not appealing to children, too difficult, or inappropriate content\n2 stars: Somewhat interesting but misses the mark for young readers\n3 stars: Decent content that children could understand and somewhat enjoy\n4 stars: Engaging content that would interest most children in this age group\n5 stars: Excellent, highly engaging content that would captivate young readers\n\nConsider factors such as: child-friendly vocabulary, simple sentence structure, interesting characters or facts, colorful descriptions, relatable situations, and overall appeal to young readers.\n\nProvide your assessment as a JSON object with two keys: 'cefr_level' and 'star_rating'. The 'cefr_level' value should be a string representing the CEFR level (e.g., 'A1' ,'A1+', 'A1-'), and the 'star_rating' value should be an integer from 1 to 5.",
+      },
+      {
+        level: "A2",
+        systemPrompt:
+          "You are an expert in children's literacy and language assessment for elementary students (grades 3-6). Your task is to evaluate fiction and nonfiction articles for young language learners at the CEFR A2 level. A2 level requires:\n- Common, everyday vocabulary with some new words that elementary students can learn\n- Short, simple sentences (6-7 words on average) with basic joining words like 'and' and 'but'\n- Simple present and past tenses that young readers can follow\n- Familiar topics about school, friends, family, animals, or everyday adventures\n- Content that's interesting and relatable for children ages 8-10\n\nDetermine if the article matches the CEFR A2 level for children. You may add a '+' or '-' to the level if it's slightly above or below standard (e.g., more than five difficult words or no difficult words for that level).\n\nProvide a star rating based on how engaging the content would be for young readers:\n1 star: Not appealing to children, too difficult, or inappropriate content\n2 stars: Somewhat interesting but misses the mark for young readers\n3 stars: Decent content that children could understand and somewhat enjoy\n4 stars: Engaging content that would interest most children in this age group\n5 stars: Excellent, highly engaging content that would captivate young readers\n\nConsider factors such as: appropriate vocabulary for young readers, clear sentence structure, interesting characters or facts, colorful descriptions, relatable situations for children, and overall appeal to elementary students.\n\nProvide your assessment as a JSON object with two keys: 'cefr_level' and 'star_rating'. The 'cefr_level' value should be a string representing the CEFR level (e.g., 'A2' ,'A2+', 'A2-'), and the 'star_rating' value should be an integer from 1 to 5.",
+      },
+      {
+        level: "B1",
+        systemPrompt:
+          "You are an expert in children's literacy and language assessment for elementary students (grades 3-6). Your task is to evaluate fiction and nonfiction articles for young language learners at the CEFR B1 level. B1 level requires:\n- A range of common words with some interesting vocabulary that upper elementary students would enjoy learning\n- Sentences of moderate length (8-10 words on average) with some variety in structure\n- A range of tenses and some complex structures that advanced young readers can follow\n- Topics that engage curious 9-11 year olds, with both concrete and some abstract ideas\n- Content that stimulates thinking while remaining appropriate for upper elementary readers\n\nDetermine if the article matches the CEFR B1 level for children. You may add a '+' or '-' to the level if it's slightly above or below standard (e.g., more than five difficult words or no difficult words for that level).\n\nProvide a star rating based on how engaging the content would be for young readers:\n1 star: Not appealing to children, too difficult, or inappropriate content\n2 stars: Somewhat interesting but misses the mark for young readers\n3 stars: Decent content that children could understand and somewhat enjoy\n4 stars: Engaging content that would interest most children in this age group\n5 stars: Excellent, highly engaging content that would captivate young readers\n\nConsider factors such as: vocabulary that challenges but doesn't overwhelm, sentence variety that flows well, interesting characters or concepts, descriptive language, relatable situations for upper elementary students, and overall appeal to curious young minds.\n\nProvide your assessment as a JSON object with two keys: 'cefr_level' and 'star_rating'. The 'cefr_level' value should be a string representing the CEFR level (e.g., 'B1' ,'B1+', 'B1-'), and the 'star_rating' value should be an integer from 1 to 5.",
+      },
+      {
+        level: "B2",
+        systemPrompt:
+          "You are an expert in children's literacy and language assessment for elementary students (grades 3-6). Your task is to evaluate fiction and nonfiction articles for young language learners at the CEFR B2 level. B2 level requires:\n- Wider range of vocabulary, including some interesting expressions that advanced 10-12 year olds would enjoy\n- Varied sentence length and structure (10-12 words on average) with good flow\n- Variety of complex structures and tenses used in ways that challenge but don't confuse advanced young readers\n- Clear, detailed text on interesting topics that intellectually curious upper elementary students would find engaging\n- Content that presents multiple perspectives or ideas while remaining appropriate for children\n\nDetermine if the article matches the CEFR B2 level for children. You may add a '+' or '-' to the level if it's slightly above or below standard (e.g., more than five difficult words or no difficult words for that level).\n\nProvide a star rating based on how engaging the content would be for young readers:\n1 star: Not appealing to children, too difficult, or inappropriate content\n2 stars: Somewhat interesting but misses the mark for young readers\n3 stars: Decent content that children could understand and somewhat enjoy\n4 stars: Engaging content that would interest most children in this age group\n5 stars: Excellent, highly engaging content that would captivate young readers\n\nConsider factors such as: rich vocabulary that expands children's language, well-constructed sentences, interesting characters or concepts, vivid descriptions, content that sparks curiosity, and overall appeal to advanced elementary students.\n\nProvide your assessment as a JSON object with two keys: 'cefr_level' and 'star_rating'. The 'cefr_level' value should be a string representing the CEFR level (e.g., 'B2' ,'B2+', 'B2-'), and the 'star_rating' value should be an integer from 1 to 5.",
+      },
+    ];
+
+    // read prompts from file
+
+    const levelConfig = rawPromptsPath.find((lvl) => lvl.level === cefrLevel);
+
+    if (!levelConfig) {
+      throw new Error(`level config not found for ${cefrLevel}`);
+    }
+
+    const userPrompt = `Please evaluate the following story chapter for its CEFR level and provide a star rating based on how engaging the content would be for young readers:
+    ### Story Chapter:
+    ${chapter.join("\n")}
+
+    ### Instructions:
+    - Determine if the article matches the CEFR ${cefrLevel} level for children. You may add a '+' or '-' to the level if it's slightly above or below standard (e.g., more than five difficult words or no difficult words for that level).
+    - Provide a star rating based on how engaging the content would be for young readers:
+      1 star: Not appealing to children, too difficult, or inappropriate content
+      2 stars: Somewhat interesting but misses the mark for young readers
+      3 stars: Decent content that children could understand and somewhat enjoy
+      4 stars: Engaging content that would interest most children in this age group
+      5 stars: Excellent, highly engaging content that would captivate young readers
+    - Consider factors such as: vocabulary, sentence structure, interesting characters or facts, descriptions, relatable situations, and overall appeal to young
+
+    Provide your assessment as a JSON object with two keys: 'cefr_level' and 'star_rating'. The 'cefr_level' value should be a string representing the CEFR level (e.g., '${cefrLevel}' ,'${cefrLevel}+', '${cefrLevel}-'), and the 'star_rating' value should be an integer from 1 to 5.`;
+
+    const { output: evaluation } = await generateText({
+      model: google(aiModel),
+      // model: openai(aiModel),
+      output: Output.object({
+        schema: z.object({
+          rating: z.number().describe("The rating of the story"),
+          cefrLevel: z.string().describe("The CEFR level of the story"),
+        }),
+      }),
+      system: levelConfig.systemPrompt,
+      prompt: userPrompt,
+      // seed: Math.floor(Math.random() * 1000),
+      temperature: 0.7,
+    });
+
+    return evaluation;
+  } catch (error) {
+    throw new Error(`Failed to evaluate story content: ${error}`);
+  }
+};
+
+export const generateStotyImage = async (
+  character: Record<string, string>[],
+  imagesDesc: string[],
+  storyId: string,
+) => {
+  const errors: string[] = [];
+
+  // Ensure the local images directory exists
+  const imagesDir = path.join(process.cwd(), "data/images");
+  if (!fs.existsSync(imagesDir)) {
+    fs.mkdirSync(imagesDir, { recursive: true });
+  }
+
+  const outDir = path.join(process.cwd(), "public/story");
+  if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir, { recursive: true });
+  }
+
+  const imageLabels = ["Cover", "1", "2", "3", "4", "5", "6", "7", "8"];
+  const generatedImages: string[] = [];
+
+  const characterDescription = character
+    .map((char) => {
+      return Object.entries(char)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(", ");
+    })
+    .join("\n");
+
+  const styleGuide = `
+        STYLE REQUIREMENTS (MUST BE CONSISTENT):
+        - Art style: Bright, colorful cartoon illustration in children's storybook style
+        - Character design: Keep exact same character features, proportions, and colors
+        - Color palette: Consistent warm, vibrant colors
+        - Line style: Clean, smooth outlines with soft shading
+        - Background: Simple, colorful backgrounds
+
+        CHARACTER (MUST LOOK IDENTICAL):
+        ${characterDescription}`;
+
+  const tempFiles: string[] = [];
+
+  for (let i = 0; i < 9; i++) {
+    let attempts = 0;
+    const maxRetries = 3;
+    let success = false;
+
+    while (attempts < maxRetries && !success) {
+      try {
+        console.log(
+          `Generating image ${i + 1}/9 (${imageLabels[i]}) for story ${storyId}, attempt ${attempts + 1}`,
+        );
+
+        const { images } = await generateImage({
+          model: google.image(googleImageModel),
+          prompt: `${styleGuide}
+
+          Create ONE illustration for a children's storybook.
+
+          Scene: ${imageLabels[i]} - ${imagesDesc[i]}
+
+          IMPORTANT:
+          - Don't have text in the image.
+          - Don't have multiple same characters in one image.
+
+          The character must look exactly as described above. Generate exactly 1 image.`,
+          aspectRatio: "4:3",
+          n: 1,
+        });
+
+        const file = images[0];
+        const base64Image: Buffer = Buffer.from(file.base64, "base64");
+        const localPath = path.join(
+          imagesDir,
+          `${storyId}_${imageLabels[i]}.png`,
+        );
+        fs.writeFileSync(localPath, base64Image as Uint8Array);
+        tempFiles.push(localPath);
+
+        await uploadToBucket(
+          localPath,
+          `images/story/${storyId}_${imageLabels[i]}.png`,
+        );
+        generatedImages.push(`images/story/${storyId}_${imageLabels[i]}.png`);
+        success = true;
+        console.log(`✓ Image ${i + 1}/9 generated successfully`);
+      } catch (error) {
+        const errorMsg = `Image ${i + 1} attempt ${attempts + 1} failed: ${error}`;
+        console.error(errorMsg);
+        errors.push(errorMsg);
+        attempts++;
+
+        if (attempts < maxRetries) {
+          const delay = Math.pow(2, attempts) * 1000;
+          console.log(`Waiting ${delay}ms before retry...`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    if (!success) {
+      createLogFile(storyId, errors, "error");
+      return {
+        success: false,
+        error: `Failed to generate image ${i + 1} (${imageLabels[i]}) after ${maxRetries} attempts`,
+        imageUrls: generatedImages,
+      };
+    }
+
+    // Rate limiting - wait between requests
+    if (i < 8) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+
+  // Clean up temporary local files after successful upload
+  for (const tempFile of tempFiles) {
+    try {
+      fs.unlinkSync(tempFile);
+    } catch (cleanupError) {
+      console.warn(`Failed to clean up local file ${tempFile}:`, cleanupError);
+    }
+  }
+
+  return {
+    success: true,
+    imageUrls: generatedImages,
+  };
+};

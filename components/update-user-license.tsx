@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { z } from 'zod';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,7 +22,9 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 const FormSchema = z.object({
-  license: z.string().uuid({ message: "Invalid UUID format" }),
+  license: z.uuid({
+          error: "Invalid UUID format"
+    }),
 });
 
 export function UpdateUserLicenseForm({

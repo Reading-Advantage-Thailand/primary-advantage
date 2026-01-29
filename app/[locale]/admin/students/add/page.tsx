@@ -37,7 +37,7 @@ export default function AddStudentPage() {
 
   const studentFormSchema = z.object({
     name: z.string().min(2, t("errors.nameMin")).max(100, t("errors.nameMax")),
-    email: z.string().email(t("errors.emailInvalid")),
+    email: z.email(t("errors.emailInvalid")),
   });
 
   type StudentFormData = z.infer<typeof studentFormSchema>;

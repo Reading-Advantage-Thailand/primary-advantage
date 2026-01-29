@@ -1,6 +1,6 @@
 "use server";
 
-import { z } from "zod";
+import { z } from 'zod';
 import { signUpSchema } from "@/lib/zod";
 import { createUser } from "@/server/models/userModel";
 

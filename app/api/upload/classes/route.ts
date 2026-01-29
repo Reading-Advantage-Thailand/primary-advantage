@@ -33,7 +33,7 @@ const userCsvRowSchema = z.object({
       (val) => /^[\p{L}\p{M}\s\-']+$/u.test(val),
       "Name can only contain letters, spaces, hyphens, and apostrophes",
     ),
-  email: z.string().email("Invalid email format").toLowerCase().trim(),
+  email: z.email("Invalid email format").toLowerCase().trim(),
   classroom_name: z
     .string()
     .min(1, "Classroom name is required")
@@ -44,7 +44,7 @@ const userCsvRowSchema = z.object({
       "Classroom names can only contain letters, numbers, spaces, hyphens, underscores, parentheses, and commas",
     ),
   role: z.enum(["student", "teacher", "admin"], {
-    errorMap: () => ({ message: "Role must be Student, Teacher, or Admin" }),
+    error: () => "Role must be Student, Teacher, or Admin",
   }),
 });
 
@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
       );
     } catch (validationError) {
       if (validationError instanceof z.ZodError) {
-        const errorDetails = validationError.errors.map((err) => err.message);
+        const errorDetails = validationError.issues.map((err) => err.message);
         return NextResponse.json(
           {
             error: errorDetails,
@@ -322,7 +322,7 @@ export async function POST(request: NextRequest) {
       const expectedHeadersUsers = ["name", "email", "classroom_name", "role"];
 
       let expectedHeaders: string[] = [];
-      let headerSchema: z.ZodSchema;
+      let headerSchema: z.ZodType;
 
       if (filename === "students.csv" || filename === "teachers.csv") {
         expectedHeaders = expectedHeadersUsers;
@@ -375,7 +375,7 @@ export async function POST(request: NextRequest) {
           validatedRows.push({ row, rowNumber, validatedData: validatedRow });
         } catch (validationError) {
           if (validationError instanceof z.ZodError) {
-            const errorMessage = validationError.errors
+            const errorMessage = validationError.issues
               .map((err) => err.message)
               .join("; ");
             validatedRows.push({
@@ -585,7 +585,7 @@ export async function POST(request: NextRequest) {
           validatedRows.push({ row, rowNumber, validatedData: validatedRow });
         } catch (validationError) {
           if (validationError instanceof z.ZodError) {
-            const errorMessage = validationError.errors
+            const errorMessage = validationError.issues
               .map((err) => err.message)
               .join("; ");
             validatedRows.push({

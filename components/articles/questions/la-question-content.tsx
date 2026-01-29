@@ -94,7 +94,9 @@ export default function LAQuestionContent({
           (user?.level as number) * 30
         } character...`,
       })
-      .max(2000, { message: "Answer must be less than 2000 characters..." }),
+      .max(2000, {
+        error: "Answer must be less than 2000 characters...",
+      }),
     method: z.string(),
   });
 
@@ -110,7 +112,7 @@ export default function LAQuestionContent({
     startTransition(async () => {
       await getFeedback({
         data: {
-          articleId: questions.articleId,
+          articleId: articleId,
           question: questions.question,
           answer: value.answer,
           preferredLanguage: convertLocaleFull(locale),

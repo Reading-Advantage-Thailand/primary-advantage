@@ -1,7 +1,7 @@
 import path from "path";
 import { z } from "zod";
 import fs from "fs";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { google, googleModel } from "@/utils/google";
 import {
   ArticleBaseCefrLevel,
@@ -48,11 +48,13 @@ export async function evaluateRating(
   )?.systemPrompt;
 
   try {
-    const { object: evaluated } = await generateObject({
+    const { output: evaluated } = await generateText({
       model: google(googleModel),
-      schema: z.object({
-        cefrLevel: z.string(),
-        rating: z.number(),
+      output: Output.object({
+        schema: z.object({
+          cefrLevel: z.string(),
+          rating: z.number(),
+        }),
       }),
       system: systemPrompt,
       prompt: JSON.stringify({

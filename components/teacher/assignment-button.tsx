@@ -96,7 +96,7 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
   selectedStudents: z.array(z.string()).min(1, "Students are required"),
   articleId: z.string().min(1, "Article is required"),
-  dueDate: z.coerce.date(),
+  dueDate: z.date(),
 });
 
 export default function AssignmentButton({

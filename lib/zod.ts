@@ -1,12 +1,16 @@
-import z from "zod";
+import { z } from "zod";
 
 export const signInSchema = z.object({
   email: z
-    .string({ required_error: "Email is required" })
+    .email("Invalid email")
     .min(1, "Email is required")
-    .email("Invalid email"),
+    .toLowerCase()
+    .trim(),
   password: z
-    .string({ required_error: "Password is required" })
+    .string({
+      error: (issue) =>
+        issue.input === undefined ? "Password is required" : undefined,
+    })
     .min(1, "Password is required")
     .min(8, "Password must be more than 8 characters")
     .max(32, "Password must be less than 32 characters"),
@@ -17,29 +21,39 @@ export const signUpSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
     email: z
-      .string({ required_error: "Email is required" })
+      .email("Invalid email")
       .min(1, "Email is required")
-      .email("Invalid email"),
+      .toLowerCase()
+      .trim(),
     password: z
-      .string({ required_error: "Password is required" })
+      .string({
+        error: (issue) =>
+          issue.input === undefined ? "Password is required" : undefined,
+      })
       .min(1, "Password is required")
       .min(8, "Password must be more than 8 characters")
       .max(32, "Password must be less than 32 characters"),
     confirmPassword: z
-      .string({ required_error: "Confirm password is required" })
+      .string({
+        error: (issue) =>
+          issue.input === undefined
+            ? "Confirm password is required"
+            : undefined,
+      })
       .min(1, "Confirm password is required")
       .min(8, "Confirm password must be more than 8 characters")
       .max(32, "Confirm password must be less than 32 characters"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
     path: ["confirmPassword"],
+    error: "Passwords do not match",
   });
 
 export const classCodeSchema = z.object({
   classroomCode: z
     .string({
-      required_error: "Classroom code is required",
+      error: (issue) =>
+        issue.input === undefined ? "Classroom code is required" : undefined,
     })
     .min(1, "Classroom code is required"),
 });
@@ -52,7 +66,8 @@ export const MCQuestionSchema = z.object({
       answer: z.string().describe("The correct answer"),
       options: z
         .array(z.string())
-        .length(4)
+        .min(4)
+        .max(4)
         .describe(
           "Exactly 4 options including 1 correct answer. An incorrect but plausible answer that is approximately the same length as the correct answer.",
         ),
@@ -78,7 +93,8 @@ export const SAQuestionSchema = z.object({
         answer: z.string(),
       }),
     )
-    .length(5),
+    .min(5)
+    .max(5),
 });
 
 export const VocabularySchema = z.array(
@@ -115,11 +131,11 @@ export const laqFeedbackInputSchema = z.object({
 export const laqFeedbackOutputSchema = z.object({
   feedback: z.object({
     scores: z.object({
-      vocabularyUse: z.number().int().min(1).max(5),
-      grammarAccuracy: z.number().int().min(1).max(5),
-      clarityAndCoherence: z.number().int().min(1).max(5),
-      complexityAndStructure: z.number().int().min(1).max(5),
-      contentAndDevelopment: z.number().int().min(1).max(5),
+      vocabularyUse: z.int().min(1).max(5),
+      grammarAccuracy: z.int().min(1).max(5),
+      clarityAndCoherence: z.int().min(1).max(5),
+      complexityAndStructure: z.int().min(1).max(5),
+      contentAndDevelopment: z.int().min(1).max(5),
     }),
     overallImpression: z.string(),
     detailedFeedback: z.object({
@@ -170,7 +186,7 @@ export const saqFeedbackInputSchema = z.object({
 
 export const saqFeedbackOutputSchema = z.object({
   feedback: z.string().describe("A single sentence feedback in student's L1"),
-  score: z.number().int().min(1).max(5),
+  score: z.int().min(1).max(5),
 });
 
 export const articleGeneratorSchema = z.object({
@@ -309,6 +325,7 @@ export const storyGeneratorSchema = z.object({
         chapterNumber: z.number().describe("The chapter number"),
         title: z.string().describe("The title of the chapter"),
         summary: z.string().describe("The summary of the chapter"),
+        imageDesc: z.string().describe("The image description of the chapter"),
         translatedSummary: z.object({
           th: z.string().describe("The Thai translation of the summary"),
           cn: z
@@ -320,17 +337,39 @@ export const storyGeneratorSchema = z.object({
           vi: z.string().describe("The Vietnamese translation of the summary"),
         }),
         passage: z.string().describe("The passage of the chapter"),
+        sentences: z
+          .array(z.string())
+          .describe("The sentences of the passage of the chapter"),
         wordlist: z
           .array(
             z.object({
               vocabulary: z.string().describe("The vocabulary of the chapter"),
-              definition: z
-                .string()
-                .describe("The definition of the vocabulary"),
+              definition: z.object({
+                en: z
+                  .string()
+                  .describe("The English definition of the vocabulary"),
+                th: z
+                  .string()
+                  .describe("The Thai translation of the vocabulary"),
+                cn: z
+                  .string()
+                  .describe(
+                    "The Simplified Chinese translation of the vocabulary",
+                  ),
+                tw: z
+                  .string()
+                  .describe(
+                    "The Traditional Chinese translation of the vocabulary",
+                  ),
+                vi: z
+                  .string()
+                  .describe("The Vietnamese translation of the vocabulary"),
+              }),
             }),
           )
-          .describe("The wordlist of the chapter"),
-        sentences: z.array(z.string()).describe("The sentences of the chapter"),
+          .describe(
+            "Extract the 3 to 5 most difficult vocabulary words, phrases, or idioms from the chapter",
+          ),
         sentencesFlashcard: z
           .array(
             z.object({
@@ -353,18 +392,27 @@ export const storyGeneratorSchema = z.object({
               }),
             }),
           )
-          .describe("The sentences flashcard of the chapter"),
+          .describe(
+            "Extract the 3 to 5 most difficult sentence, phrases, or idioms from the chapter",
+          ),
+
         multipleChoiceQuestions: z
           .array(
             z.object({
               question: z.string().describe("The question of the chapter"),
               options: z
                 .array(z.string())
-                .describe("The options of the question"),
+                .describe("The options of the question with 4 choices")
+                .min(4)
+                .max(4),
               answer: z.string().describe("The answer of the question"),
             }),
           )
-          .describe("The multiple choice questions of the chapter"),
+          .min(10)
+          .max(10)
+          .describe(
+            "Create a series of 10 multiple-choice questions based on the content of the chapter",
+          ),
         shortAnswerQuestions: z
           .array(
             z.object({
@@ -372,14 +420,22 @@ export const storyGeneratorSchema = z.object({
               answer: z.string().describe("The answer of the question"),
             }),
           )
-          .describe("The short answer questions of the chapter"),
+          .min(5)
+          .max(5)
+          .describe(
+            "Create a series of 5 short answer questions based on the content of the chapter",
+          ),
         longAnswerQuestions: z
           .array(
             z.object({
               question: z.string().describe("The question of the chapter"),
             }),
           )
-          .describe("The long answer questions of the chapter"),
+          .min(5)
+          .max(5)
+          .describe(
+            "Create a series of 5 long answer questions based on the content of the chapter",
+          ),
       }),
     )
     .describe("The chapters of the story"),

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { z } from 'zod';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -31,22 +31,20 @@ const schoolFormSchema = z.object({
   name: z
     .string()
     .min(2, {
-      message: "School name must be at least 2 characters.",
+        error: "School name must be at least 2 characters."
     })
     .max(100, {
-      message: "School name must be at most 100 characters.",
+        error: "School name must be at most 100 characters."
     }),
   contactName: z
     .string()
     .max(100, {
-      message: "Contact name must be at most 100 characters.",
+        error: "Contact name must be at most 100 characters."
     })
     .optional(),
-  contactEmail: z
-    .string()
-    .email({
-      message: "Please enter a valid email address.",
-    })
+  contactEmail: z.email({
+          error: "Please enter a valid email address."
+      })
     .optional()
     .or(z.literal("")),
 });

@@ -57,7 +57,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         } catch (error) {
           if (error instanceof ZodError) {
-            console.error("Validation error:", error.errors);
+            console.error("Validation error:", error);
             return null;
           }
           console.error("Sign-in error:", error);
@@ -113,8 +113,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       // Handle Google OAuth users
       if (account?.provider === "google" && user?.email) {
+        // Normalize email to lowercase
+        const normalizedEmail = user.email.toLowerCase().trim();
+
         // Fetch user from database to get role
-        const dbUser = await getUserByEmail(user.email);
+        const dbUser = await getUserByEmail(normalizedEmail);
 
         const role = await prisma.role.findFirst({
           where: { name: "user" },
@@ -124,7 +127,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const newUser = await prisma.user.create({
             data: {
               name: user.name || "",
-              email: user.email!,
+              email: normalizedEmail,
               image: user.image,
               emailVerified: new Date(),
             },

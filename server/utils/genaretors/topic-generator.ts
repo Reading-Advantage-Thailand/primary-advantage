@@ -1,4 +1,4 @@
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { z } from "zod";
 import { google, googleModel } from "@/utils/google";
 import { ArticleType } from "@/types/enum";
@@ -17,17 +17,19 @@ export interface GenerateTopicResponse {
 }
 
 export async function generateTopic(
-  params: GenerateTopicParams
+  params: GenerateTopicParams,
 ): Promise<GenerateTopicResponse> {
   const prompts = {
     fiction: `Please provide 1 reading passage topics in the ${params.type} ${params.genre} genre and ${params.subgenre} subgenre appropriate for secondary school students. Output as a JSON array.`,
     nonfiction: `Please provide 1 reading passage topics in the ${params.type} ${params.genre} genre and ${params.subgenre} subgenre appropriate for secondary school students. Output as a JSON array.`,
   };
   try {
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: google(googleModel),
-      schema: z.object({
-        topics: z.string(),
+      output: Output.object({
+        schema: z.object({
+          topics: z.string(),
+        }),
       }),
       prompt: prompts[params.type],
     });
@@ -35,7 +37,7 @@ export async function generateTopic(
     return {
       genre: params.genre,
       subgenre: params.subgenre,
-      topics: object.topics,
+      topics: output.topics,
     };
   } catch (error) {
     throw new Error(`failed to generate topic: ${error}`);

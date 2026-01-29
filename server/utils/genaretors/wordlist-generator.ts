@@ -1,5 +1,5 @@
 // import { WordListResponse } from "./audio-words-generator";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { openai, openaiModel } from "@/utils/openai";
 import { google, googleModel, googleModelLite } from "@/utils/google";
 import { VocabularySchema } from "@/lib/zod";
@@ -29,14 +29,14 @@ export async function generateWordList(
   try {
     const userPrompt = `Extract the ten most difficult vocabulary words, phrases, or idioms from the following passage: ${params.passage}`;
 
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: google(googleModelLite),
-      schema: VocabularySchema,
+      output: Output.object({ schema: VocabularySchema }),
       system: "You are an article database assisstant.",
       prompt: userPrompt,
     });
 
-    return object;
+    return output;
   } catch (error) {
     console.log(error);
     throw `failed to generate audio: ${

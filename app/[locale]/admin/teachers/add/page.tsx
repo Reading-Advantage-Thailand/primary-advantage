@@ -54,7 +54,7 @@ export default function AddTeacherPage() {
         .string()
         .min(2, t("schema.nameMin"))
         .max(100, t("schema.nameMax")),
-      email: z.string().email(t("schema.emailInvalid")),
+      email: z.email(t("schema.emailInvalid")),
       role: z.string().min(1, t("schema.roleRequired")),
       password: z
         .string()

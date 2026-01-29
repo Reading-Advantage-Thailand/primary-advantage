@@ -1,10 +1,10 @@
 import base64 from "base64-js";
 import fs from "fs";
 import path from "path";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { openai, openaiModel } from "@/utils/openai";
 import { google, googleModelLite } from "@/utils/google";
-import z from "zod";
+import { z } from "zod";
 import ffmpeg from "fluent-ffmpeg";
 import {
   AUDIO_URL,
@@ -15,7 +15,10 @@ import {
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { SentenceTimepoint, WordTimestamp } from "@/types";
-import { translateAndStoreSentences } from "./sentence-translator";
+import {
+  translateAndStoreSentences,
+  translateAndStoreSentencesForStory,
+} from "./sentence-translator";
 import { log } from "console";
 import { createLogFile } from "../logging";
 import { SENTENCE_SPLITTER_SYSTEM_PROMPT } from "@/data/prompts-ai";
@@ -30,9 +33,10 @@ interface GenerateAudioParams {
 }
 
 interface GenerateChapterAudioParams {
-  content: string;
+  passage: string;
+  sentences: string[];
   storyId: string;
-  chapterNumber: string;
+  chapterNumber: number;
 }
 
 // Simple and reliable sentence splitting that handles abbreviations AND quotes
@@ -245,29 +249,33 @@ async function splitIntoSentences(passage: string): Promise<string[]> {
     const userPrompt = `Split the following text into complete sentences, keeping dialogue and attribution together:${passage}`;
 
     //and Add a <speak> tag before and end article only.
-    const { object } = await generateObject({
+    const { output: object } = await generateText({
       model: google(googleModelLite),
-      schema: z.object({
-        input: z
-          .object({
-            article: z
-              .string()
-              .min(10)
-              .describe(
-                "The input article as a string. Must be at least 10 characters long.",
-              ),
-          })
-          .describe("The input object containing the article to be processed."),
+      output: Output.object({
+        schema: z.object({
+          input: z
+            .object({
+              article: z
+                .string()
+                .min(10)
+                .describe(
+                  "The input article as a string. Must be at least 10 characters long.",
+                ),
+            })
+            .describe(
+              "The input object containing the article to be processed.",
+            ),
 
-        output: z
-          .object({
-            sentences: z
-              .array(z.string().min(1))
-              .describe(
-                "An array of sentences extracted from the article. Each sentence must be a non-empty string.",
-              ),
-          })
-          .describe("The output object containing the extracted sentences."),
+          output: z
+            .object({
+              sentences: z
+                .array(z.string().min(1))
+                .describe(
+                  "An array of sentences extracted from the article. Each sentence must be a non-empty string.",
+                ),
+            })
+            .describe("The output object containing the extracted sentences."),
+        }),
       }),
       system: SENTENCE_SPLITTER_SYSTEM_PROMPT,
       prompt: userPrompt,
@@ -500,113 +508,92 @@ export async function generateAudio({
   }
 }
 
-// export async function generateChapterAudio({
-//   content,
-//   storyId,
-//   chapterNumber,
-// }: GenerateChapterAudioParams): Promise<void> {
-//   try {
-//     const voice =
-//       AVAILABLE_VOICES[Math.floor(Math.random() * AVAILABLE_VOICES.length)];
-//     const newVoice =
-//       NEW_MODEL_VOICES[Math.floor(Math.random() * NEW_MODEL_VOICES.length)];
+export async function generateChapterAudio({
+  passage,
+  sentences,
+  storyId,
+  chapterNumber,
+}: GenerateChapterAudioParams): Promise<void> {
+  try {
+    const voice = VOICES_AI[Math.floor(Math.random() * VOICES_AI.length)];
 
-//     const { sentences, chunks } = await splitTextIntoChunks(content, 5000);
-//     let currentIndex = 0;
-//     let cumulativeTime = 0;
+    const response = await fetch("https://api.lemonfox.ai/v1/audio/speech", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.AUDIO_API_KEY}`,
+      },
+      body: JSON.stringify({
+        input: passage,
+        voice: voice,
+        response_format: "mp3",
+        speed: 0.7,
+        word_timestamps: true,
+      }),
+    });
 
-//     const result: Array<{
-//       markName: string;
-//       timeSeconds: number;
-//       index: number;
-//       file: string;
-//       sentences: string;
-//     }> = [];
-//     [];
-//     const audioPaths: string[] = [];
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-//     for (let i = 0; i < chunks.length; i++) {
-//       const ssml = chunks[i];
-//       const response = await fetch(
-//         `${BASE_TEXT_TO_SPEECH_URL}/v1beta1/text:synthesize?key=${process.env.GOOGLE_TEXT_TO_SPEECH_API_KEY}`,
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({
-//             input: {
-//               ssml: ssml,
-//             },
-//             voice: {
-//               languageCode: "en-US",
-//               name: voice,
-//             },
-//             audioConfig: {
-//               audioEncoding: "MP3",
-//             },
-//             enableTimePointing: ["SSML_MARK"],
-//           }),
-//         }
-//       );
+    if (!response.body) {
+      throw new Error("Response body is null");
+    }
 
-//       if (!response.ok) {
-//         throw new Error(`Error: ${response.statusText}`);
-//       }
+    const json = await response.json();
 
-//       const data = await response.json();
-//       const audio = data.audioContent;
-//       const MP3 = base64.toByteArray(audio);
+    const MP3 = base64.toByteArray(json.audio);
 
-//       const localPath = `${process.cwd()}/data/audios/${storyId}-${chapterNumber}_${i}.mp3`;
-//       fs.writeFileSync(localPath, MP3);
-//       audioPaths.push(localPath);
+    const localPath = `${process.cwd()}/data/audios/${storyId}-${chapterNumber}.mp3`;
+    fs.writeFileSync(localPath, MP3);
 
-//       // Process timepoints and build the result array
-//       data.timepoints.forEach((tp: any) => {
-//         result.push({
-//           markName: `sentence${currentIndex++}`,
-//           timeSeconds: tp.timeSeconds + cumulativeTime,
-//           index: currentIndex - 1,
-//           file: `${storyId}-${chapterNumber}.mp3`, // Final combined file name
-//           sentences: sentences[currentIndex - 1],
-//         });
-//       });
+    await uploadToBucket(
+      localPath,
+      `audios/story/chapter/${storyId}-${chapterNumber}.mp3`,
+    );
 
-//       // Update the cumulative time with the duration of the current chunk
-//       // const chunkDuration = data.timepoints[data.timepoints.length - 1]?.timeSeconds || 0;
-//       const chunkDuration = await getAudioDuration(localPath);
-//       cumulativeTime += chunkDuration;
-//     }
+    fs.unlinkSync(localPath);
 
-//     // Combine MP3 files using FFmpeg
-//     const combinedAudioPath = `${process.cwd()}/data/audios/${storyId}-${chapterNumber}.mp3`;
-//     await mergeAudioFiles(audioPaths, combinedAudioPath);
+    // const nlp = winkNLP(model);
+    // const doc = nlp.readDoc(passage);
+    // const its = nlp.its;
+    // const sentences: string[] = doc.sentences().out(its.value);
 
-//     // Cleanup
-//     audioPaths.forEach((p) => fs.unlinkSync(p));
+    // Process word timestamps into sentence timepoints
+    const sentenceTimepoints = processWordTimestampsIntoSentences(
+      json.word_timestamps,
+      sentences,
+      storyId,
+    );
 
-//     await uploadToBucket(
-//       combinedAudioPath,
-//       `${AUDIO_URL}/${storyId}-${chapterNumber}.mp3`
-//     );
+    // Update the database with sentence timepoints
+    await prisma.storyChapter.updateMany({
+      where: { storyId, chapterNumber },
+      data: {
+        sentences: JSON.parse(JSON.stringify(sentenceTimepoints)),
+        audioSentencesUrl: `audios/story/chapter/${storyId}-${chapterNumber}.mp3`,
+      },
+    });
 
-//     // Update the database with all timepoints
+    // Automatically translate sentences after audio generation
+    try {
+      await translateAndStoreSentencesForStory({
+        sentences,
+        storyId,
+        chapterNumber,
+      });
+    } catch (translationError) {
+      console.error(
+        `Failed to translate sentences for story ${storyId}:`,
+        translationError,
+      );
+      // Don't throw here - audio generation was successful
+    }
 
-//     await db
-//       .collection("stories")
-//       .doc(storyId)
-//       .collection("timepoints")
-//       .doc(chapterNumber)
-//       .set({
-//         timepoints: result,
-//         id: storyId,
-//         chapterNumber: chapterNumber,
-//       });
-//   } catch (error: any) {
-//     console.log(error);
-//     // throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(
-//     //   error.response.data
-//     // )}`;
-//   }
-// }
+    return;
+  } catch (error: any) {
+    console.log(error);
+    throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(
+      error.response.data,
+    )}`;
+  }
+}

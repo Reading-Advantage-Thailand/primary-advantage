@@ -1,4 +1,4 @@
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { google, googleModel } from "@/utils/google";
 import { openai, newModel, openaiModel4o } from "@/utils/openai";
 import { articleGeneratorSchema } from "@/lib/zod";
@@ -70,10 +70,10 @@ export const generateArticleNew = async (
     let article: any = null;
     while (attempts < MAX_ATTEMPTS) {
       try {
-        const { object: article } = await generateObject({
+        const { output: article } = await generateText({
           // model: openai(newModel),
           model: google(googleModel),
-          schema: articleGeneratorSchema,
+          output: Output.object({ schema: articleGeneratorSchema }),
           system: filteredPrompts.systemPrompt,
           prompt: userPrompt,
           temperature: 1, //openai model does not support temperature 0
@@ -169,7 +169,8 @@ export const generateArticleNew = async (
                   vocabulary: word.vocabulary,
                   definition: word.definitions,
                 })),
-                articleId: createdArticle.id,
+                contentId: createdArticle.id,
+                job: "article",
               }),
             ]);
           });

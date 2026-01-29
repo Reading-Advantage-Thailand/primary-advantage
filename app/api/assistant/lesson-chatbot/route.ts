@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import z from "zod";
+import { z } from "zod";
 import { openai, openaiModel } from "@/utils/openai";
 import { streamText } from "ai";
 
@@ -15,8 +15,8 @@ const createLessonChatbotQuestionSchema = z.object({
   passage: z.string(),
   summary: z.string(),
   image_description: z.string(),
-  blacklistedQuestions: z.array(z.string()).optional().default([]),
-  isInitial: z.boolean().optional().default(false),
+  blacklistedQuestions: z.array(z.string()).optional().prefault([]),
+  isInitial: z.boolean().optional().prefault(false),
 });
 
 export async function POST(request: NextRequest) {
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     //console.log("Chat Messages:", chatMessages);
 
     // ส่ง prompt เข้า OpenAI พร้อมประวัติ
-    const { textStream } = await streamText({
+    const { textStream } = streamText({
       model: openai(openaiModel),
       messages: [systemMessage, ...chatMessages],
     });
@@ -137,8 +137,8 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error("Validation Error:", error.errors);
-      return NextResponse.json({ errors: error.errors }, { status: 400 });
+      console.error("Validation Error:", error);
+      return NextResponse.json({ errors: error }, { status: 400 });
     }
 
     console.error("ChatBot API Error:", error);
