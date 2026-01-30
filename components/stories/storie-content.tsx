@@ -256,7 +256,7 @@ export default function StorieContent({ chapter }: StorieContentProps) {
         <div className="relative aspect-square w-full overflow-hidden rounded-xl shadow-lg sm:aspect-video md:aspect-[16/10]">
           <Image
             className="object-cover"
-            src={getStorieImageUrl(chapter.storyId, chapter.chapterNumber)}
+            src={getStorieImageUrl(chapter.id)}
             alt={chapter.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 70vw"
@@ -354,10 +354,12 @@ export default function StorieContent({ chapter }: StorieContentProps) {
           translationLanguage={translationLanguage}
           currentTime={currentTime}
           duration={duration}
+          playbackRate={playbackRate}
           onPlayPause={togglePlay}
           onToggleTranslation={() => setShowTranslation(!showTranslation)}
           onLanguageChange={setTranslationLanguage}
           onSeek={seekTo}
+          onPlaybackRateChange={setPlaybackRate}
           onClose={() => {
             reset();
             setIsAudioMode(false);

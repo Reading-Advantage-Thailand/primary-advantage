@@ -197,8 +197,7 @@ export const evaluateStoryContent = async (
 
 export const generateStotyImage = async (
   character: Record<string, string>[],
-  imagesDesc: string[],
-  storyId: string,
+  imagesDesc: Record<string, string>[],
 ) => {
   const errors: string[] = [];
 
@@ -245,7 +244,7 @@ export const generateStotyImage = async (
     while (attempts < maxRetries && !success) {
       try {
         console.log(
-          `Generating image ${i + 1}/9 (${imageLabels[i]}) for story ${storyId}, attempt ${attempts + 1}`,
+          `Generating image ${i + 1}/9 (${imageLabels[i]}) for story ${imagesDesc[i].id}, attempt ${attempts + 1}`,
         );
 
         const { images } = await generateImage({
@@ -254,9 +253,9 @@ export const generateStotyImage = async (
 
           Create ONE illustration for a children's storybook.
 
-          Scene: ${imageLabels[i]} - ${imagesDesc[i]}
+          Scene: ${imageLabels[i]} - ${imagesDesc[i].description}
 
-          IMPORTANT:
+          IMPORTANT AND MUST FOLLOW:
           - Don't have text in the image.
           - Don't have multiple same characters in one image.
 
@@ -267,18 +266,12 @@ export const generateStotyImage = async (
 
         const file = images[0];
         const base64Image: Buffer = Buffer.from(file.base64, "base64");
-        const localPath = path.join(
-          imagesDir,
-          `${storyId}_${imageLabels[i]}.png`,
-        );
+        const localPath = path.join(imagesDir, `${imagesDesc[i].id}.png`);
         fs.writeFileSync(localPath, base64Image as Uint8Array);
         tempFiles.push(localPath);
 
-        await uploadToBucket(
-          localPath,
-          `images/story/${storyId}_${imageLabels[i]}.png`,
-        );
-        generatedImages.push(`images/story/${storyId}_${imageLabels[i]}.png`);
+        await uploadToBucket(localPath, `images/story/${imagesDesc[i].id}.png`);
+        generatedImages.push(`images/story/${imagesDesc[i].id}.png`);
         success = true;
         console.log(`✓ Image ${i + 1}/9 generated successfully`);
       } catch (error) {
@@ -296,7 +289,7 @@ export const generateStotyImage = async (
     }
 
     if (!success) {
-      createLogFile(storyId, errors, "error");
+      createLogFile(imagesDesc[i].id, errors, "error");
       return {
         success: false,
         error: `Failed to generate image ${i + 1} (${imageLabels[i]}) after ${maxRetries} attempts`,

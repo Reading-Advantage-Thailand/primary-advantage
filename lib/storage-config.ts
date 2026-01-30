@@ -33,10 +33,10 @@ export function getArticleImageUrl(
 }
 
 export function getStorieImageUrl(
-  storieId: string,
-  chapterNumber: number | string,
+  chapterId: string,
+  chapterNumber?: number | string,
 ): string {
-  return getStorageUrl(`images/story/${storieId}_${chapterNumber}.png`);
+  return getStorageUrl(`images/story/${chapterId}.png`);
 }
 
 /**

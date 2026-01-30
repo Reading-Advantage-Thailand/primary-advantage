@@ -15,6 +15,14 @@ function validateSchedulerRequest(req: NextRequest): boolean {
   const apiKey = req.headers.get("x-api-key");
   const schedulerApiKey = process.env.ACCESS_KEY;
 
+  // Debug logging
+  console.log("[Story Generate] Checking scheduler auth:", {
+    hasApiKey: !!apiKey,
+    hasSchedulerApiKey: !!schedulerApiKey,
+    contentType: req.headers.get("content-type"),
+    userAgent: req.headers.get("user-agent"),
+  });
+
   if (!apiKey || !schedulerApiKey) {
     return false;
   }
@@ -65,9 +73,22 @@ async function handleGeneration(
 ) {
   try {
     // Parse and validate request body
+    // Handle both application/json and application/octet-stream (Cloud Scheduler default)
     let amountPerGen = 1;
     try {
-      const body = await req.json().catch(() => ({}));
+      const contentType = req.headers.get("content-type") || "";
+      let body: Record<string, unknown> = {};
+
+      if (contentType.includes("application/json")) {
+        body = await req.json();
+      } else {
+        // Handle octet-stream or other content types (Cloud Scheduler sends octet-stream)
+        const text = await req.text();
+        if (text) {
+          body = JSON.parse(text);
+        }
+      }
+
       const parsed = generateStorySchema.parse(body);
       amountPerGen = parsed.amountPerGen;
     } catch (error) {
@@ -80,7 +101,8 @@ async function handleGeneration(
           { status: 400 },
         );
       }
-      // Default to 1 if no body provided
+      // Default to 1 if no body provided or parse failed
+      console.warn("[Story Generate] Body parse failed, using default:", error);
       amountPerGen = 1;
     }
 

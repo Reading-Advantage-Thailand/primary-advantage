@@ -187,28 +187,30 @@ export async function translateAndStoreSentences({
 
 export async function translateAndStoreSentencesForStory({
   sentences,
-  storyId,
+  chapterId,
   chapterNumber,
+  cefrLevel,
   targetLanguages = ["th", "cn", "tw", "vi"],
   forceRetranslate = true,
 }: {
   sentences: string[];
-  storyId: string;
+  chapterId: string;
   chapterNumber: number;
+  cefrLevel?: string;
   targetLanguages?: string[];
   forceRetranslate?: boolean;
 }): Promise<void> {
   try {
-    const story = await prisma.story.findUnique({
-      where: { id: storyId },
-      select: {
-        cefrLevel: true,
-      },
-    });
+    // const story = await prisma.story.findUnique({
+    //   where: { id: storyId },
+    //   select: {
+    //     cefrLevel: true,
+    //   },
+    // });
 
-    if (!story) {
-      throw new Error(`Story with ID ${storyId} not found`);
-    }
+    // if (!story) {
+    //   throw new Error(`Story with ID ${storyId} not found`);
+    // }
 
     // Check if translations already exist and forceRetranslate is false
     if (sentences.length === 0 && !forceRetranslate) {
@@ -222,7 +224,7 @@ export async function translateAndStoreSentencesForStory({
     const translatedSentences = await translateSentencesWithAI(
       sentences,
       targetLanguages,
-      story.cefrLevel || "",
+      cefrLevel,
     );
 
     // Validate that all translations have the same number of sentences
@@ -239,7 +241,7 @@ export async function translateAndStoreSentencesForStory({
     );
 
     if (invalidCounts.length > 0) {
-      console.warn(`Translation count mismatch for article ${storyId}:`, {
+      console.warn(`Translation count mismatch for article ${chapterId}:`, {
         original: originalCount,
         translations: translationCounts,
       });
@@ -247,18 +249,18 @@ export async function translateAndStoreSentencesForStory({
 
     // Store translations in database
     await prisma.storyChapter.updateMany({
-      where: { storyId, chapterNumber },
+      where: { id: chapterId, chapterNumber },
       data: {
         translatedSentences: JSON.parse(JSON.stringify(translatedSentences)),
       },
     });
 
     console.log(
-      `Successfully translated and stored sentences for article ${storyId}`,
+      `Successfully translated and stored sentences for article ${chapterId}`,
     );
   } catch (error: any) {
     console.error(
-      `Failed to translate sentences for article ${storyId}:`,
+      `Failed to translate sentences for article ${chapterId}:`,
       error,
     );
     throw new Error(`Failed to translate sentences: ${error.message}`);

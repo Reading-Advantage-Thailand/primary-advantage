@@ -11,6 +11,7 @@ import {
   getStoriesGenresModel,
   getStoryByIdModel,
   getChapterByNumberModel,
+  deleteStoryByIdModel,
 } from "../models/storieModel";
 import { NextRequest } from "next/server";
 import { AuthenticatedUser } from "../utils/middleware";
@@ -106,7 +107,6 @@ export const generateStoryContentController = async (amountPerGen: number) => {
               const imagePromise = generateStotyImage(
                 savedStory.character,
                 savedStory.imagesDesc,
-                savedStory.storyId,
               );
 
               // 2. เตรียม Promise สำหรับทำ Audio ทุกบท (ใช้ .map จะไวกว่า for loop)
@@ -114,8 +114,9 @@ export const generateStoryContentController = async (amountPerGen: number) => {
                 generateChapterAudio({
                   passage: chapter.passage,
                   sentences: chapter.sentences as string[],
-                  storyId: savedStory.storyId,
+                  chapterId: chapter.id,
                   chapterNumber: chapter.chapterNumber,
+                  cefrLevel: level,
                 }),
                   generateAudioForFlashcard({
                     sentences: chapter.sentencsAndWordsForFlashcards
@@ -303,6 +304,18 @@ export const getChapterByNumberController = async (
     return chapter;
   } catch (error) {
     console.error("Error in getChapterByNumberController:", error);
+    throw error;
+  }
+};
+
+export const deleteStoryByIdController = async (
+  storyId: string,
+): Promise<void> => {
+  try {
+    // Placeholder for delete story logic
+    await deleteStoryByIdModel(storyId);
+  } catch (error) {
+    console.error("Error in deleteStoryByIdController:", error);
     throw error;
   }
 };

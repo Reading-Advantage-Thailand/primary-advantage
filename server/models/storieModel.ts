@@ -16,6 +16,7 @@ import {
 } from "@/types/story";
 import { ActivityType, Prisma } from "@prisma/client";
 import { AuthenticatedUser } from "../utils/middleware";
+import { deleteStoryFiles } from "@/utils/storage";
 
 export const saveStoryToDB = async (
   story: GenerateStoryResponse,
@@ -87,8 +88,14 @@ export const saveStoryToDB = async (
 
     // Build imagesDesc array: first is main story, rest are chapters
     const imagesDesc = [
-      story.imageDesc,
-      ...story.chapters.map((chapter) => chapter.imageDesc),
+      {
+        id: newStory.id,
+        description: newStory.imageDescription,
+      },
+      ...newStory.storyChapters.map((chapter) => ({
+        id: chapter.id,
+        description: chapter.imageDescription,
+      })),
     ];
 
     // Build chapters data
@@ -560,6 +567,42 @@ export const getChapterByNumberModel = async (
     };
   } catch (error) {
     console.error("Error in getChapterByNumberModel:", error);
+    throw error;
+  }
+};
+
+export const deleteStoryByIdModel = async (storyId: string) => {
+  try {
+    const story = await prisma.story.findUnique({
+      where: { id: storyId },
+      select: { id: true, storyChapters: { select: { id: true } } },
+    });
+
+    if (!story) {
+      throw new Error("Story not found");
+    }
+
+    const allIdsToDelete = [
+      story.id,
+      ...story.storyChapters.map((chapter) => chapter.id),
+    ];
+
+    const deleteResults = await Promise.all(
+      allIdsToDelete.map((id) => deleteStoryFiles(id)),
+    );
+
+    if (deleteResults.some((res) => res.failed.length > 0)) {
+      console.warn(
+        "Some files failed to delete:",
+        deleteResults.map((res) => res.failed).flat(),
+      );
+    }
+
+    await prisma.story.delete({
+      where: { id: storyId },
+    });
+  } catch (error) {
+    console.error("Error in deleteStoryByIdModel:", error);
     throw error;
   }
 };

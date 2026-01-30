@@ -17,4 +17,6 @@ export default {
   copylink: "Copy Link",
   close: "Close",
   saved: "Saved",
+  delete: "Delete",
+  cancel: "Cancel",
 } as const;

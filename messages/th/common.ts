@@ -17,4 +17,6 @@ export default {
   copylink: "คัดลอกลิงก์",
   close: "ปิด",
   saved: "บันทึกแล้ว",
+  delete: "ลบ",
+  cancel: "ยกเลิก",
 } as const;

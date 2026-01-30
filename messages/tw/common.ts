@@ -17,4 +17,6 @@ export default {
   copylink: "複製連結",
   close: "關閉",
   saved: "已儲存",
+  delete: "刪除",
+  cancel: "取消",
 } as const;
