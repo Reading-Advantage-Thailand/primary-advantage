@@ -154,7 +154,7 @@ export default function StorieSelection() {
                     onClick={() => router.push(`/student/stories/${story.id}`)}
                     className="flex h-[20rem] w-full cursor-pointer flex-col justify-between gap-2 rounded-md bg-black bg-cover bg-center p-4 transition-all duration-300 hover:scale-105"
                     style={{
-                      backgroundImage: `url(${getStorieImageUrl(story.id, "Cover")})`,
+                      backgroundImage: `url(${getStorieImageUrl(story.id)})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                     }}

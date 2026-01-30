@@ -194,7 +194,7 @@ export default function HighlightedPassage({
         {paragraphs.map((paragraph, paragraphIndex) => (
           <p
             key={paragraphIndex}
-            className="text-lg leading-[2] text-gray-800 first-letter:text-gray-900 md:text-xl md:leading-[2] dark:text-gray-200 dark:first-letter:text-gray-100"
+            className="text-muted-foreground text-lg leading-[2] md:text-xl md:leading-[2]"
           >
             {paragraph.map((sentence, sentenceInParagraphIndex) => {
               const sentenceIndex = sentence.originalIndex;
@@ -284,7 +284,7 @@ export default function HighlightedPassage({
                             "cursor-pointer",
                             isWordActive &&
                               isPlaying &&
-                              "rounded bg-yellow-200 ring-2 ring-yellow-400 dark:bg-yellow-300/80",
+                              "rounded bg-yellow-200 text-gray-800 first-letter:text-gray-900 dark:bg-yellow-300/80",
                             isWordActive &&
                               !isPlaying &&
                               "bg-primary/20 dark:bg-primary/30 rounded",
@@ -318,7 +318,7 @@ export default function HighlightedPassage({
                           // Active word highlight - use solid color without text color override
                           isWordActive &&
                             isPlaying &&
-                            "bg-yellow-200 ring-2 ring-yellow-400/50 dark:bg-yellow-300/80",
+                            "bg-yellow-200 text-gray-800 dark:bg-yellow-300/80 dark:first-letter:text-gray-900",
                           // Active word when paused
                           isWordActive &&
                             !isPlaying &&

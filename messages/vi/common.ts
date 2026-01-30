@@ -17,4 +17,6 @@ export default {
   copylink: "Sao chép Liên kết",
   close: "Đóng",
   saved: "Đã lưu",
+  delete: "Xóa",
+  cancel: "Hủy",
 } as const;

@@ -16,19 +16,69 @@ import StorieChapterList from "@/components/stories/storie-chapter-list";
 import { BookOpen, Users } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useStory } from "@/hooks/use-story";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { getStorieImageUrl } from "@/lib/storage-config";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { toast } from "sonner";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 export default function StorieChapterSelectionPage() {
   const tCommon = useTranslations("common");
   const params = useParams();
   const storyId = params.storieId as string;
   const locale = useLocale();
+  const pathname = usePathname();
+  const user = useCurrentUser();
+  const router = useRouter();
 
   const { story, isLoading, isError, error } = useStory({
     storyId,
   });
+
+  const queryClient = useQueryClient();
+  const deleteStoryMutation = useMutation({
+    mutationFn: async (storyId: string) => {
+      const res = await fetch(`/api/stories/${storyId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to delete story");
+      }
+      return true;
+    },
+    onSuccess: () => {
+      toast.success("Story deleted successfully", {
+        description: "The story has been removed from the system.",
+        richColors: true,
+      });
+      queryClient.invalidateQueries({ queryKey: ["stories"] });
+      router.push(`/student/stories`);
+    },
+    onError: () => {
+      toast.error("Failed to delete story", {
+        description: "Please try again later.",
+        richColors: true,
+      });
+    },
+  });
+
+  const handleStoryDelete = (storyId: string) => {
+    deleteStoryMutation.mutate(storyId);
+  };
 
   if (isLoading) {
     return (
@@ -66,7 +116,7 @@ export default function StorieChapterSelectionPage() {
       {/* Hero Section with Image */}
       <div className="relative mb-8 h-[400px] w-full overflow-hidden rounded-2xl shadow-2xl md:h-[500px]">
         <Image
-          src={getStorieImageUrl(story.id, "Cover")}
+          src={getStorieImageUrl(story.id)}
           alt={story.title}
           className="object-cover"
           fill
@@ -111,10 +161,58 @@ export default function StorieChapterSelectionPage() {
               </CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button>{tCommon("copylink")}</Button>
-              {/* <Button>Export Story WorkBook</Button>
-              <Button>Delete</Button>
-              <Button>Approve</Button> */}
+              <Button
+                onClick={async () => {
+                  const currentUrl = `${window.location.origin}${pathname}`;
+                  await navigator.clipboard
+                    .writeText(currentUrl)
+                    .then(() =>
+                      toast.success("Link copied to clipboard", {
+                        description: "successfully copied to clipboard",
+                        richColors: true,
+                      }),
+                    )
+                    .catch(() =>
+                      toast.error("Failed to copy link", {
+                        description: "Please try again",
+                        richColors: true,
+                      }),
+                    );
+                }}
+              >
+                {tCommon("copylink")}
+              </Button>
+              {/* <Button>Export Story WorkBook</Button> */}
+              {user?.role === "system" && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive">{tCommon("delete")}</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your story from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+                      <AlertDialogAction
+                        className={cn(
+                          buttonVariants({ variant: "destructive" }),
+                        )}
+                        onClick={() => handleStoryDelete(story.id)}
+                      >
+                        {tCommon("delete")}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              {/* <Button>Approve</Button> */}
             </div>
           </div>
         </CardHeader>

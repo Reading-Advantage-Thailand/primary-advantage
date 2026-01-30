@@ -96,3 +96,45 @@ export async function deleteFile(fileName: string): Promise<{
     return { deleted: [], failed: [] };
   }
 }
+
+export async function deleteStoryFiles(fileName: string): Promise<{
+  deleted: string[];
+  failed: string[];
+}> {
+  try {
+    const filePatterns = [
+      `images/story/${fileName}.png`,
+      `audios/story/chapter/${fileName}.mp3`,
+      `audios/story/words/${fileName}.mp3`,
+      `audios/story/sentences/${fileName}.mp3`,
+    ];
+
+    const results = { deleted: [] as string[], failed: [] as string[] };
+
+    const deletePromises = filePatterns.map(async (filePath) => {
+      try {
+        const file = bucket
+          .bucket(process.env.STORAGE_BUCKET_NAME as string)
+          .file(filePath);
+        const [exists] = await file.exists();
+
+        if (exists) {
+          await file.delete();
+          results.deleted.push(filePath);
+          console.log(`✅ Deleted: ${filePath}`);
+        } else {
+          console.log(`⚠️  File not found: ${filePath}`);
+        }
+      } catch (error) {
+        results.failed.push(filePath);
+        console.error(`❌ Failed to delete ${filePath}:`, error);
+      }
+    });
+
+    await Promise.all(deletePromises);
+    return results;
+  } catch (error) {
+    console.error("ERROR FINDING FILES:", error);
+    return { deleted: [], failed: [] };
+  }
+}

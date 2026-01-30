@@ -25,10 +25,12 @@ interface FloatingAudioControlsProps {
   translationLanguage: "th" | "cn" | "tw" | "vi";
   currentTime: number;
   duration: number;
+  playbackRate: number;
   onPlayPause: () => void;
   onToggleTranslation: () => void;
   onLanguageChange: (language: "th" | "cn" | "tw" | "vi") => void;
   onSeek: (time: number) => void;
+  onPlaybackRateChange: (rate: number) => void;
   onClose: () => void;
   onScrollToTop: () => void;
   className?: string;
@@ -39,6 +41,14 @@ const LANGUAGE_OPTIONS = [
   { value: "cn", label: "🇨🇳 中文" },
   { value: "tw", label: "🇹🇼 繁體" },
   { value: "vi", label: "🇻🇳 Việt" },
+] as const;
+
+const SPEED_OPTIONS = [
+  { value: 0.5, label: "🐢 0.5x" },
+  { value: 0.75, label: "🐌 0.75x" },
+  { value: 1, label: "🚶 1x" },
+  { value: 1.25, label: "🏃 1.25x" },
+  { value: 1.5, label: "🚀 1.5x" },
 ] as const;
 
 // Format seconds to mm:ss
@@ -56,10 +66,12 @@ export default function FloatingAudioControls({
   translationLanguage,
   currentTime,
   duration,
+  playbackRate,
   onPlayPause,
   onToggleTranslation,
   onLanguageChange,
   onSeek,
+  onPlaybackRateChange,
   onClose,
   onScrollToTop,
   className,
@@ -271,6 +283,27 @@ export default function FloatingAudioControls({
                 </SelectContent>
               </Select>
             )}
+
+            {/* Speed selector */}
+            <Select
+              value={playbackRate.toString()}
+              onValueChange={(value) => onPlaybackRateChange(parseFloat(value))}
+            >
+              <SelectTrigger className="h-10 w-16 rounded-full border-0 bg-gray-100 text-xs sm:h-11 sm:w-20 sm:text-sm dark:bg-gray-800">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SPEED_OPTIONS.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value.toString()}
+                    className="text-sm"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Scroll to top button */}
             <Button

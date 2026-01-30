@@ -35,8 +35,9 @@ interface GenerateAudioParams {
 interface GenerateChapterAudioParams {
   passage: string;
   sentences: string[];
-  storyId: string;
+  chapterId: string;
   chapterNumber: number;
+  cefrLevel?: string;
 }
 
 // Simple and reliable sentence splitting that handles abbreviations AND quotes
@@ -511,8 +512,9 @@ export async function generateAudio({
 export async function generateChapterAudio({
   passage,
   sentences,
-  storyId,
+  chapterId,
   chapterNumber,
+  cefrLevel,
 }: GenerateChapterAudioParams): Promise<void> {
   try {
     const voice = VOICES_AI[Math.floor(Math.random() * VOICES_AI.length)];
@@ -543,13 +545,10 @@ export async function generateChapterAudio({
 
     const MP3 = base64.toByteArray(json.audio);
 
-    const localPath = `${process.cwd()}/data/audios/${storyId}-${chapterNumber}.mp3`;
+    const localPath = `${process.cwd()}/data/audios/${chapterId}.mp3`;
     fs.writeFileSync(localPath, MP3);
 
-    await uploadToBucket(
-      localPath,
-      `audios/story/chapter/${storyId}-${chapterNumber}.mp3`,
-    );
+    await uploadToBucket(localPath, `audios/story/chapter/${chapterId}.mp3`);
 
     fs.unlinkSync(localPath);
 
@@ -562,15 +561,15 @@ export async function generateChapterAudio({
     const sentenceTimepoints = processWordTimestampsIntoSentences(
       json.word_timestamps,
       sentences,
-      storyId,
+      chapterId,
     );
 
     // Update the database with sentence timepoints
     await prisma.storyChapter.updateMany({
-      where: { storyId, chapterNumber },
+      where: { id: chapterId, chapterNumber },
       data: {
         sentences: JSON.parse(JSON.stringify(sentenceTimepoints)),
-        audioSentencesUrl: `audios/story/chapter/${storyId}-${chapterNumber}.mp3`,
+        audioSentencesUrl: `audios/story/chapter/${chapterId}.mp3`,
       },
     });
 
@@ -578,12 +577,13 @@ export async function generateChapterAudio({
     try {
       await translateAndStoreSentencesForStory({
         sentences,
-        storyId,
+        chapterId,
         chapterNumber,
+        cefrLevel,
       });
     } catch (translationError) {
       console.error(
-        `Failed to translate sentences for story ${storyId}:`,
+        `Failed to translate sentences for story ${chapterId}:`,
         translationError,
       );
       // Don't throw here - audio generation was successful
