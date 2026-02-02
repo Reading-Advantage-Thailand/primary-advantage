@@ -13,7 +13,7 @@ import StarRating from "@/components/ui/rating";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
 import StorieChapterList from "@/components/stories/storie-chapter-list";
-import { BookOpen, Users } from "lucide-react";
+import { BookOpen, CopyIcon, Trash2Icon, Users } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useStory } from "@/hooks/use-story";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -35,6 +35,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import ExportStoryWorkbooksButton from "@/components/export-storie-wookbook-button";
 
 export default function StorieChapterSelectionPage() {
   const tCommon = useTranslations("common");
@@ -180,37 +181,48 @@ export default function StorieChapterSelectionPage() {
                     );
                 }}
               >
+                <CopyIcon className="h-4 w-4" />
                 {tCommon("copylink")}
               </Button>
-              {/* <Button>Export Story WorkBook</Button> */}
               {user?.role === "system" && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive">{tCommon("delete")}</Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Are you absolutely sure?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your story from our servers.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
-                      <AlertDialogAction
-                        className={cn(
-                          buttonVariants({ variant: "destructive" }),
-                        )}
-                        onClick={() => handleStoryDelete(story.id)}
-                      >
+                <>
+                  <ExportStoryWorkbooksButton
+                    storyId={story.id}
+                    storyTitle={story.title}
+                  />
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">
+                        <Trash2Icon className="h-4 w-4" />
                         {tCommon("delete")}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete your story from our servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>
+                          {tCommon("cancel")}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          className={cn(
+                            buttonVariants({ variant: "destructive" }),
+                          )}
+                          onClick={() => handleStoryDelete(story.id)}
+                        >
+                          {tCommon("delete")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
               )}
               {/* <Button>Approve</Button> */}
             </div>

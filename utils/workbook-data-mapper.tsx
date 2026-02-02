@@ -10,7 +10,7 @@ export interface WorkbookJSON {
     phonetic: string;
     definition: string;
   }[];
-  article_image_url: string[];
+  article_image_url: string[] | string;
   article_caption: string;
   article_url?: string;
   article_paragraphs: {

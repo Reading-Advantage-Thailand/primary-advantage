@@ -16,11 +16,12 @@ function validateSchedulerRequest(req: NextRequest): boolean {
   const schedulerApiKey = process.env.ACCESS_KEY;
 
   // Debug logging
-  console.log("[Story Generate] Checking scheduler auth:", {
-    hasApiKey: !!apiKey,
-    hasSchedulerApiKey: !!schedulerApiKey,
-    contentType: req.headers.get("content-type"),
-    userAgent: req.headers.get("user-agent"),
+  console.log("[Story Generate] Debug Auth:", {
+    serverKeyLength: schedulerApiKey?.length,
+    receivedKeyLength: apiKey?.length,
+    match: apiKey === schedulerApiKey,
+    serverStart: schedulerApiKey?.substring(0, 2),
+    receivedStart: apiKey?.substring(0, 2),
   });
 
   if (!apiKey || !schedulerApiKey) {

@@ -606,3 +606,46 @@ export const deleteStoryByIdModel = async (storyId: string) => {
     throw error;
   }
 };
+
+export const getExportStoryWorkbookModel = async (storyId: string) => {
+  try {
+    // Placeholder for export story workbook logic
+    const chapter = await prisma.storyChapter.findMany({
+      where: { storyId },
+      select: {
+        id: true,
+        chapterNumber: true,
+        title: true,
+        summary: true,
+        passage: true,
+        sentences: true,
+        translatedSentences: true,
+        multipleChoiceQuestions: true,
+        shortAnswerQuestions: true,
+        longAnswerQuestions: true,
+        sentencsAndWordsForFlashcards: {
+          select: {
+            sentence: true,
+            words: true,
+          },
+        },
+        story: {
+          select: {
+            id: true,
+            title: true,
+            type: true,
+            genre: true,
+            cefrLevel: true,
+            raLevel: true,
+          },
+        },
+      },
+      orderBy: { chapterNumber: "asc" },
+    });
+
+    return chapter;
+  } catch (error) {
+    console.error("Error in getExportStoryWorkbookModel:", error);
+    throw error;
+  }
+};
