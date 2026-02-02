@@ -6,10 +6,6 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install production dependencies only
-RUN npm ci --only=production && \
-    cp -R node_modules /tmp/node_modules
-
 # Install all dependencies for build
 RUN npm ci
 
@@ -22,8 +18,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variables for build
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/mydb"
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Fix Memory issue during build
@@ -33,15 +28,17 @@ ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN npm run prisma:generate && npm run build
 
 # Stage 3: Production runner
-FROM deps AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
+
+RUN apk add --no-cache libc6-compat openssl curl bash ca-certificates
 
 # Add non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Set environment variables for Next.js production
-ENV NODE_ENV=production
+ENV NODE_ENV=production 
 ENV NEXT_TELEMETRY_DISABLED=1
 # Set host to 0.0.0.0 for Cloud Run
 ENV HOSTNAME="0.0.0.0"
