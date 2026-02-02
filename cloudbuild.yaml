@@ -121,8 +121,6 @@ substitutions:
 # Secrets
 availableSecrets:
   secretManager:
-    - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/21
-      env: "DATABASE_URL"
     - versionName: projects/${_PROJECT_ID}/secrets/${_DATABASE_URL}/versions/latest
       env: "MIGRATE_DB_URL"
 
