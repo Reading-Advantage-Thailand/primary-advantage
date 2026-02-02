@@ -1,13 +1,13 @@
-import { generateExportWorkbook } from "@/server/controllers/articleController";
+import { getExportStoryWorkbookController } from "@/server/controllers/storieController";
 import { withAuth } from "@/server/utils/middleware";
 import { NextResponse } from "next/server";
 
 export const GET = withAuth(
   async (req, context, user) => {
     try {
-      const { articleId } = await context.params;
+      const { storyId } = await context.params;
 
-      const workbookData = await generateExportWorkbook(articleId);
+      const workbookData = await getExportStoryWorkbookController(storyId);
 
       return NextResponse.json(
         { message: "Workbook exported successfully", data: workbookData },

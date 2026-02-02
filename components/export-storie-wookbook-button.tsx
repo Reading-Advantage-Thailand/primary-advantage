@@ -1,80 +1,62 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, LoaderCircleIcon } from "lucide-react";
 import { useState } from "react";
-
-interface Chapter {
-  id: string;
-  title: string;
-  chapterNumber: number;
-}
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
+import { toast } from "sonner";
 
 interface ExportStoryWorkbooksButtonProps {
-  chapters: Chapter[];
+  storyId: string;
   storyTitle: string;
 }
 
 export default function ExportStoryWorkbooksButton({
-  chapters,
+  storyId,
   storyTitle,
 }: ExportStoryWorkbooksButtonProps) {
   const [loading, setLoading] = useState(false);
-  const [currentChapter, setCurrentChapter] = useState(0);
 
   const handleExport = async () => {
-    if (!chapters || chapters.length === 0) return;
-
     setLoading(true);
-    setCurrentChapter(0);
 
-    const exportPromises = chapters.map(async (chapter, index) => {
-      try {
-        const response = await fetch(
-          `/api/v1/articles/${chapter.id}/export-workbook`,
-        );
+    try {
+      const zip = new JSZip();
+      const folderName = storyTitle + " " + "Workbooks";
+      const folder = zip.folder(folderName)!;
 
-        if (!response.ok) {
-          console.error(
-            `Failed to export workbook for chapter ${chapter.chapterNumber}`,
-          );
-          return;
-        }
+      const response = await fetch(`/api/stories/${storyId}/export-workbook`);
+      if (!response.ok) throw new Error("Failed to fetch data");
 
-        const workbookData = await response.json();
-        const dataStr =
-          "data:text/json;charset=utf-8," +
-          encodeURIComponent(JSON.stringify(workbookData, null, 2));
+      const allChapters = await response.json();
 
-        const downloadAnchorNode = document.createElement("a");
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute(
-          "download",
-          `${storyTitle.replace(/\s+/g, "_")}_Ch${chapter.chapterNumber}_${chapter.title.replace(/\s+/g, "_")}_workbook.json`,
-        );
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+      allChapters.data.forEach((chapter: any) => {
+        const fileName = `${chapter.lesson_number} ${chapter.lesson_title}.json`;
 
-        // Update progress just for visual feedback, though it might jump around
-        setCurrentChapter((prev) => prev + 1);
-      } catch (e) {
-        console.error("Export failed for chapter", chapter.id, e);
-      }
-    });
+        folder.file(fileName, JSON.stringify(chapter, null, 2));
+      });
 
-    await Promise.all(exportPromises);
-
-    setLoading(false);
-    setCurrentChapter(0);
+      const content = await folder.generateAsync({ type: "blob" });
+      saveAs(content, `${folderName}.zip`);
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred while exporting the workbooks.", {
+        richColors: true,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Button onClick={handleExport} disabled={loading}>
-      <Download className="mr-2 h-4 w-4" />
-      {loading
-        ? `Exporting... (${currentChapter}/${chapters.length})`
-        : "Export Story Workbooks"}
+      {loading ? (
+        <LoaderCircleIcon className="h-4 w-4 animate-spin" />
+      ) : (
+        <Download className="h-4 w-4" />
+      )}
+      Export Story Workbooks
     </Button>
   );
 }
