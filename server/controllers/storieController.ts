@@ -35,10 +35,10 @@ export const generateStoryContentController = async (amountPerGen: number) => {
   try {
     const CEFRLevels = [
       ArticleBaseCefrLevel.A0,
-      // ArticleBaseCefrLevel.A1,
-      // ArticleBaseCefrLevel.A2,
-      // ArticleBaseCefrLevel.B1,
-      // ArticleBaseCefrLevel.B2,
+      ArticleBaseCefrLevel.A1,
+      ArticleBaseCefrLevel.A2,
+      ArticleBaseCefrLevel.B1,
+      ArticleBaseCefrLevel.B2,
     ];
 
     const genres = [

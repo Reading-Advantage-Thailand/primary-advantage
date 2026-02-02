@@ -7,7 +7,7 @@ steps:
     args:
       - "build"
       - "--build-arg"
-      - "DATABASE_URL=$$DATABASE_URL"
+      - "DATABASE_URL=postgresql://dummy:dummy@localhost:5432/mydb"
       - "--build-arg"
       - "BUILDKIT_INLINE_CACHE=1"
       - "--cache-from"
@@ -17,7 +17,6 @@ steps:
       - "-t"
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:latest"
       - "."
-    secretEnv: ["DATABASE_URL"]
 
   # Step 2: Push Docker image
   - name: "gcr.io/cloud-builders/docker"
@@ -27,36 +26,23 @@ steps:
       - "--all-tags"
       - "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app"
 
-  # Step 3: Run database migrations
-  # - name: "gcr.io/google-appengine/exec-wrapper"
-  #   id: "migrate-db"
-  #   entrypoint: "bash"
-  #   args:
-  #     - "-c"
-  #     - "/buildstep/execute.sh -i asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID -s ${_CLOUD_SQL_INSTANCE} -e DATABASE_URL=$$MIGRATE_DB_URL -- npx prisma@6.19.0 migrate deploy"
-  #   secretEnv: ["MIGRATE_DB_URL"]
-
   # Step 3: Manual Proxy & Migrate (No-Variable Version)
-  - name: "node:20"
+  - name: "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
     id: "migrate-db"
     entrypoint: "bash"
     args:
       - "-c"
       - |
-        echo "================ DEBUG START ================"
+        echo "=== [1] Setup Proxy ==="
+        curl -o /tmp/cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64
+        chmod +x /tmp/cloud_sql_proxy
 
-        echo "[1] Installing Cloud SQL Proxy..."
-        wget -q https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-        chmod +x cloud_sql_proxy
-
-        echo "[2] Starting Proxy on 127.0.0.1:5432..."
-        ./cloud_sql_proxy -instances=${_CLOUD_SQL_INSTANCE}=tcp:5432 &
-        PROXY_PID=$$!
-
-        echo "Waiting for proxy to stabilize (5s)..."
+        echo "=== [2] Start Proxy ==="
+        /tmp/cloud_sql_proxy -instances=${_CLOUD_SQL_INSTANCE}=tcp:5432 &
+        PROXY_PID=$$!       
         sleep 5
 
-        echo "[3] Preparing Connection String..."
+        echo "=== [3] Run Migration ==="
 
         if [ -z "$$MIGRATE_DB_URL" ]; then
            echo "❌ ERROR: MIGRATE_DB_URL is empty!"
@@ -64,11 +50,6 @@ steps:
         fi
 
         export DATABASE_URL=$(echo $$MIGRATE_DB_URL | sed -E 's/@[^:]+:[0-9]+/@127.0.0.1:5432/')
-
-        echo "✅ Target URL (Masked):"
-        echo $$DATABASE_URL | sed -E 's/:[^@]+@/:****@/'
-
-        echo "================ STARTING PRISMA ================"
 
         npx prisma@6.19.0 migrate deploy
         EXIT_CODE=$$?
@@ -78,11 +59,13 @@ steps:
         if [ $$EXIT_CODE -eq 0 ]; then
             echo "✅ MIGRATION SUCCESS"
         else
-            echo "❌ MIGRATION FAILED (Exit Code: $$EXIT_CODE)"
+            echo "❌ MIGRATION FAILED"
             exit $$EXIT_CODE
         fi
 
     secretEnv: ["MIGRATE_DB_URL"]
+    env:
+      - "HOME=/app"
 
   # Step 4: Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
@@ -109,10 +92,10 @@ steps:
       - "--set-secrets=STORAGE_BUCKET_NAME=${_STORAGE_BUCKET_NAME}:latest"
       - "--set-secrets=STORAGE_CLIENT_EMAIL=${_STORAGE_CLIENT_EMAIL}:latest"
       - "--set-secrets=STORAGE_PRIVATE_KEY=${_STORAGE_PRIVATE_KEY}:latest"
+      - "--set-secrets=ACCESS_KEY=${_ACCESS_KEY}:latest"
       - "--set-env-vars=PROJECT_ID=${_PROJECT_ID}"
       - "--set-env-vars=NODE_ENV=${_NODE_ENV}"
       - "--set-env-vars=AUTH_TRUST_HOST=true"
-      - "--set-env-vars=ACCESS_KEY=${_ACCESS_KEY}"
 
 # Substitutions
 substitutions:
