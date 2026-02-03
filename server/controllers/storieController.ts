@@ -3,7 +3,7 @@ import {
   generateStoryTopic,
   generateStoryContent,
   evaluateStoryContent,
-  generateStotyImage,
+  generateStoryImage,
 } from "../utils/genaretors/story-generator";
 import {
   saveStoryToDB,
@@ -106,7 +106,7 @@ export const generateStoryContentController = async (amountPerGen: number) => {
               );
 
               // 1. สั่งทำรูป (เก็บ Promise ไว้ก่อน)
-              const imagePromise = generateStotyImage(
+              const imagePromise = generateStoryImage(
                 savedStory.character,
                 savedStory.imagesDesc,
               );

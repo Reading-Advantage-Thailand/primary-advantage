@@ -195,125 +195,192 @@ export const evaluateStoryContent = async (
   }
 };
 
-export const generateStotyImage = async (
-  character: Record<string, string>[],
-  imagesDesc: Record<string, string>[],
-) => {
-  const errors: string[] = [];
+// Constants
+const MAX_RETRIES = 3;
+const RETRY_DELAY_BASE = 1000;
+const CONCURRENCY_LIMIT = 5;
+const IMAGES_DIR = path.join(process.cwd(), "data/images");
 
-  // Ensure the local images directory exists
-  const imagesDir = path.join(process.cwd(), "data/images");
-  if (!fs.existsSync(imagesDir)) {
-    fs.mkdirSync(imagesDir, { recursive: true });
-  }
+interface StoryImageResult {
+  success: boolean;
+  imageUrls: string[];
+  error?: string;
+}
 
-  const outDir = path.join(process.cwd(), "public/story");
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
+interface SingleImageResult {
+  index: number;
+  url: string | null;
+  error: string | null;
+  tempFile: string | null;
+}
 
-  const imageLabels = ["Cover", "1", "2", "3", "4", "5", "6", "7", "8"];
-  const generatedImages: string[] = [];
-
-  const characterDescription = character
-    .map((char) => {
-      return Object.entries(char)
+// Helper: Format Character Description
+const formatCharacterDescription = (
+  characters: Record<string, string>[],
+): string => {
+  return characters
+    .map((char) =>
+      Object.entries(char)
         .map(([key, value]) => `${key}: ${value}`)
-        .join(", ");
-    })
+        .join(", "),
+    )
     .join("\n");
+};
 
-  const styleGuide = `
-        STYLE REQUIREMENTS (MUST BE CONSISTENT):
-        - Art style: Bright, colorful cartoon illustration in children's storybook style
-        - Character design: Keep exact same character features, proportions, and colors
-        - Color palette: Consistent warm, vibrant colors
-        - Line style: Clean, smooth outlines with soft shading
-        - Background: Simple, colorful backgrounds
+// Helper: Construct Prompt
+const constructPrompt = (sceneDesc: string, charDesc: string): string => {
+  return `
+    STYLE REQUIREMENTS (MUST BE CONSISTENT):
+    - Art style: Bright, colorful cartoon illustration in children's storybook style
+    - Character design: Keep exact same character features, proportions, and colors
+    - Color palette: Consistent warm, vibrant colors
+    - Line style: Clean, smooth outlines with soft shading
+    - Background: Simple, colorful backgrounds
 
-        CHARACTER (MUST LOOK IDENTICAL):
-        ${characterDescription}`;
+    CHARACTER (MUST LOOK IDENTICAL):
+    ${charDesc}
 
-  const tempFiles: string[] = [];
+    Create ONE illustration for a children's storybook.
+    Scene: ${sceneDesc}
 
-  for (let i = 0; i < 9; i++) {
-    let attempts = 0;
-    const maxRetries = 3;
-    let success = false;
+    IMPORTANT AND MUST FOLLOW:
+    - Don't have text or description in the image.
+    - Don't have multiple same characters in one image.
+    - The character must look exactly as described above. 
+    - Generate exactly 1 image.
+  `;
+};
 
-    while (attempts < maxRetries && !success) {
-      try {
-        console.log(
-          `Generating image ${i + 1}/9 (${imageLabels[i]}) for story ${imagesDesc[i].id}, attempt ${attempts + 1}`,
-        );
+// ★ Helper: Core Logic (ทำงานเงียบๆ ไม่ต้องตะโกน Log)
+const processSingleImage = async (
+  index: number,
+  scene: Record<string, string>,
+  charDesc: string,
+): Promise<SingleImageResult> => {
+  const imageLabel = index === 0 ? "Cover" : `${index}`;
+  let attempts = 0;
+  let success = false;
+  let tempFilePath: string | null = null;
 
-        const { images } = await generateImage({
-          model: google.image(googleImageModel),
-          prompt: `${styleGuide}
+  while (attempts < MAX_RETRIES && !success) {
+    try {
+      // 1. Generate
+      const { images } = await generateImage({
+        model: google.image(googleImageModel),
+        prompt: constructPrompt(scene.description, charDesc),
+        aspectRatio: "4:3",
+        n: 1,
+      });
 
-          Create ONE illustration for a children's storybook.
+      // 2. Save Local
+      const file = images[0];
+      const base64Image = Buffer.from(file.base64, "base64");
+      const localPath = path.join(IMAGES_DIR, `${scene.id}.png`);
+      fs.writeFileSync(localPath, base64Image);
+      tempFilePath = localPath;
 
-          Scene: ${imageLabels[i]} - ${imagesDesc[i].description}
+      // 3. Upload
+      const cloudPath = `images/story/${scene.id}.png`;
+      await uploadToBucket(localPath, cloudPath);
 
-          IMPORTANT AND MUST FOLLOW:
-          - Don't have text in the image.
-          - Don't have multiple same characters in one image.
+      return { index, url: cloudPath, error: null, tempFile: tempFilePath };
+    } catch (error) {
+      attempts++;
+      // เก็บ Error เงียบๆ ไว้ก่อน รอส่งออกไปทีเดียว
+      if (attempts >= MAX_RETRIES) {
+        return {
+          index,
+          url: null,
+          error: `Failed image ${index} (${imageLabel}): ${error}`,
+          tempFile: tempFilePath,
+        };
+      }
+      // Retry delay logic (silent)
+      const delay = Math.pow(2, attempts) * RETRY_DELAY_BASE;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  return { index, url: null, error: "Unknown error", tempFile: null };
+};
 
-          The character must look exactly as described above. Generate exactly 1 image.`,
-          aspectRatio: "4:3",
-          n: 1,
-        });
+// ★ Main Function
+export const generateStoryImage = async (
+  characters: Record<string, string>[],
+  imagesDesc: Record<string, string>[],
+): Promise<StoryImageResult> => {
+  if (!fs.existsSync(IMAGES_DIR)) {
+    fs.mkdirSync(IMAGES_DIR, { recursive: true });
+  }
 
-        const file = images[0];
-        const base64Image: Buffer = Buffer.from(file.base64, "base64");
-        const localPath = path.join(imagesDir, `${imagesDesc[i].id}.png`);
-        fs.writeFileSync(localPath, base64Image as Uint8Array);
-        tempFiles.push(localPath);
+  const charDesc = formatCharacterDescription(characters);
+  const allTempFiles: string[] = [];
+  const finalUrls: string[] = new Array(imagesDesc.length).fill("");
+  const errorDetails: string[] = [];
 
-        await uploadToBucket(localPath, `images/story/${imagesDesc[i].id}.png`);
-        generatedImages.push(`images/story/${imagesDesc[i].id}.png`);
-        success = true;
-        console.log(`✓ Image ${i + 1}/9 generated successfully`);
-      } catch (error) {
-        const errorMsg = `Image ${i + 1} attempt ${attempts + 1} failed: ${error}`;
-        console.error(errorMsg);
-        errors.push(errorMsg);
-        attempts++;
+  // Counters
+  let successCount = 0;
+  let failCount = 0;
 
-        if (attempts < maxRetries) {
-          const delay = Math.pow(2, attempts) * 1000;
-          console.log(`Waiting ${delay}ms before retry...`);
-          await new Promise((resolve) => setTimeout(resolve, delay));
+  console.log(
+    `🚀 Starting generation for ${imagesDesc.length} images... (Please wait)`,
+  );
+  const startTime = Date.now();
+
+  try {
+    for (let i = 0; i < imagesDesc.length; i += CONCURRENCY_LIMIT) {
+      const batch = imagesDesc.slice(i, i + CONCURRENCY_LIMIT);
+
+      // สร้าง Promise แต่ไม่ต้อง Log ว่าเริ่ม Batch ไหน
+      const promiseBatch = batch.map((scene, batchIndex) => {
+        const globalIndex = i + batchIndex;
+        return processSingleImage(globalIndex, scene, charDesc);
+      });
+
+      const results = await Promise.all(promiseBatch);
+
+      for (const res of results) {
+        if (res.tempFile) allTempFiles.push(res.tempFile);
+
+        if (res.error || !res.url) {
+          failCount++;
+          errorDetails.push(res.error || `Unknown error at index ${res.index}`);
+        } else {
+          successCount++;
+          finalUrls[res.index] = res.url;
         }
       }
     }
 
-    if (!success) {
-      createLogFile(imagesDesc[i].id, errors, "error");
+    const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+    // ★★★ SUMMARY LOG (โชว์ทีเดียวตอนจบ) ★★★
+    console.log("\n===========================================");
+    console.log(`📊 GENERATION SUMMARY (${duration}s)`);
+    console.log("===========================================");
+    console.log(`   ✅ Success : ${successCount}`);
+    console.log(`   ❌ Failed  : ${failCount}`);
+    console.log("===========================================\n");
+
+    if (failCount > 0) {
+      createLogFile(imagesDesc[0].id, errorDetails, "error");
       return {
         success: false,
-        error: `Failed to generate image ${i + 1} (${imageLabels[i]}) after ${maxRetries} attempts`,
-        imageUrls: generatedImages,
+        error: `Generated ${successCount}/${imagesDesc.length} images. Failures: ${failCount}`,
+        imageUrls: finalUrls.filter((u) => u !== ""),
       };
     }
 
-    // Rate limiting - wait between requests
-    if (i < 8) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    return {
+      success: true,
+      imageUrls: finalUrls,
+    };
+  } finally {
+    // Cleanup แบบเงียบๆ
+    for (const file of allTempFiles) {
+      if (fs.existsSync(file))
+        try {
+          fs.unlinkSync(file);
+        } catch (e) {}
     }
   }
-
-  // Clean up temporary local files after successful upload
-  for (const tempFile of tempFiles) {
-    try {
-      fs.unlinkSync(tempFile);
-    } catch (cleanupError) {
-      console.warn(`Failed to clean up local file ${tempFile}:`, cleanupError);
-    }
-  }
-
-  return {
-    success: true,
-    imageUrls: generatedImages,
-  };
 };
