@@ -860,6 +860,7 @@ export default function StudentsPage() {
                 <Input
                   id="edit-email"
                   type="email"
+                  disabled
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className="col-span-3"

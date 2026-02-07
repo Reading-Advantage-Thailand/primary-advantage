@@ -204,7 +204,7 @@ export default function LAQuestionContent({
       }
       return {
         score: activity.laScore ?? 0,
-        xpEarned: (activity.laScore ?? 0) * UserXpEarned.LAQuestion,
+        xpEarned: activity.laScore ?? 0,
         timer: activity.laTimer ?? 0,
         feedback: parsedFeedback,
         answer: activity.laAnswer ?? "",

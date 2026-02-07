@@ -135,7 +135,7 @@ export default function SAQuestionContent({
     if (activity.isShortAnswerCompleted && activity.saScore !== null) {
       return {
         score: activity.saScore ?? 0,
-        xpEarned: (activity.saScore ?? 0) * UserXpEarned.SAQuestion,
+        xpEarned: activity.saScore ?? 0,
         timer: activity.saTimer ?? 0,
         feedback: activity.saFeedback ?? "",
         answer: activity.saAnswer ?? "",

@@ -80,10 +80,10 @@ function calculateXpEarned(activityType: ActivityType, score: number): number {
       return score * UserXpEarned.MCQuestion;
     case ActivityType.STORIES_SA_QUESTION:
       // SAQ: score is AI score (1-5), multiply by XP value
-      return score * UserXpEarned.SAQuestion;
+      return score;
     case ActivityType.STORIES_LA_QUESTION:
       // LAQ: score is average AI score (1-5), multiply by XP value
-      return Math.round(score * UserXpEarned.LAQuestion);
+      return score;
     default:
       return 0;
   }
