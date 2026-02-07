@@ -39,6 +39,7 @@ model User {
   learningGoals         LearningGoal[]
   receivedNotifications AssignmentNotification[] @relation("StudentNotifications")
   sentNotifications     AssignmentNotification[] @relation("TeacherNotifications")
+  aiinsights            AIInsight[]
 
   @@map("users")
 }
@@ -643,6 +644,7 @@ model AIInsight {
 
   // Context references
   userId      String? @map("user_id")
+  user        User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   classroomId String? @map("classroom_id")
   licenseId   String? @map("license_id")
 

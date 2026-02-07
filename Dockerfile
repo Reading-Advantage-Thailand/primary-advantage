@@ -14,7 +14,7 @@ FROM deps AS builder
 WORKDIR /app
 
 # Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+# COPY --from=deps /app/node_modules ./node_modules # Not needed as we are using multi-stage build and node_modules is already in /app
 COPY . .
 
 # Set environment variables for build

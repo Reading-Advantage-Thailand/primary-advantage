@@ -60,6 +60,7 @@ export default async function middleware(request: NextRequest) {
       const defaultRedirect =
         roleDefaultRedirects[userRole as keyof typeof roleDefaultRedirects];
       if (defaultRedirect) {
+        console.log(defaultRedirect);
         return NextResponse.redirect(
           new URL(`/${locale}${defaultRedirect}`, request.url),
         );

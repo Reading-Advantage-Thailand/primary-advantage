@@ -201,17 +201,6 @@ export async function translateAndStoreSentencesForStory({
   forceRetranslate?: boolean;
 }): Promise<void> {
   try {
-    // const story = await prisma.story.findUnique({
-    //   where: { id: storyId },
-    //   select: {
-    //     cefrLevel: true,
-    //   },
-    // });
-
-    // if (!story) {
-    //   throw new Error(`Story with ID ${storyId} not found`);
-    // }
-
     // Check if translations already exist and forceRetranslate is false
     if (sentences.length === 0 && !forceRetranslate) {
       console.log(

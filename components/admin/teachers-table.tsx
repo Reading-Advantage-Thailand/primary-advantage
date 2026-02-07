@@ -746,6 +746,7 @@ export function TeachersTable() {
                 id="edit-email"
                 type="email"
                 value={formData.email}
+                disabled
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }

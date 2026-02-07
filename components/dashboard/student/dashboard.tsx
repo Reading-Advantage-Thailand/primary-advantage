@@ -73,9 +73,9 @@ export default function StudentDashboardContent() {
     router.push("/student/goals");
   };
 
-  const handleGenreClick = (genre: string) => {
-    router.push(`/student/articles?genre=${encodeURIComponent(genre)}`);
-  };
+  // const handleGenreClick = (genre: string) => {
+  //   router.push(`/student/articles?genre=${encodeURIComponent(genre)}`);
+  // };
 
   if (isPending && velocityPending && genresPending) {
     return (
@@ -121,7 +121,7 @@ export default function StudentDashboardContent() {
           data={genresData || null}
           loading={genresPending}
           onRefresh={() => refetchGenres()}
-          onGenreClick={handleGenreClick}
+          // onGenreClick={handleGenreClick}
         />
 
         {/* Activity Timeline */}
