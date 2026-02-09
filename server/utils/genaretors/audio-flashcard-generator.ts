@@ -6,6 +6,7 @@ import {
 } from "../constants";
 import base64 from "base64-js";
 import fs from "fs";
+import fsPromises from "fs/promises";
 import path from "path";
 import { generateWordList } from "./wordlist-generator";
 import { uploadToBucket } from "@/utils/storage";
@@ -156,14 +157,14 @@ export async function generateAudioForFlashcard({
       }
 
       const sentenceLocalPath = path.join(sentencesDir, `${contentId}.mp3`);
-      fs.writeFileSync(sentenceLocalPath, sentenceMP3);
+      await fsPromises.writeFile(sentenceLocalPath, sentenceMP3);
 
       await uploadToBucket(
         sentenceLocalPath,
         `${urlPath}/sentences/${contentId}.mp3`,
       );
 
-      fs.unlinkSync(sentenceLocalPath);
+      await fsPromises.unlink(sentenceLocalPath);
     }
 
     // Generate audio for words
@@ -213,11 +214,11 @@ export async function generateAudioForFlashcard({
       }
 
       const wordLocalPath = path.join(wordsDir, `${contentId}.mp3`);
-      fs.writeFileSync(wordLocalPath, wordMP3);
+      await fsPromises.writeFile(wordLocalPath, wordMP3);
 
       await uploadToBucket(wordLocalPath, `${urlPath}/words/${contentId}.mp3`);
 
-      fs.unlinkSync(wordLocalPath);
+      await fsPromises.unlink(wordLocalPath);
     }
 
     // Store both sentence and word data with their respective audio URLs

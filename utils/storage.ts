@@ -41,11 +41,6 @@ export const uploadToBucket = async (
         .makePublic();
     }
 
-    // delete the file from the local file system
-    // if (isDeleteLocal) {
-    //   fs.unlinkSync(filePath);
-    // }
-
     console.log(`✅ Uploaded to bucket: ${destination}`);
   } catch (error) {
     console.error("ERROR UPLOADING TO BUCKET: ", error);

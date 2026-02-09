@@ -108,36 +108,39 @@ async function handleGeneration(
       timestamp,
     });
 
-    // Start generation in background (fire and forget)
-    setImmediate(async () => {
-      try {
-        console.log(
-          `[Story Generate] Request ${requestId} - Generation starting...`,
-        );
+    console.log(
+      `[Story Generate] Request ${requestId} - Generation starting...`,
+    );
 
-        await generateStoryContentController(amountPerGen);
+    if (source === "scheduler") {
+      await generateStoryContentController(amountPerGen);
+    } else if (source === "session") {
+      setImmediate(async () => {
+        try {
+          await generateStoryContentController(amountPerGen);
+        } catch (error) {
+          console.error(
+            `[Story Generate] Request ${requestId} - Generation failed:`,
+            error,
+          );
+        }
+      });
+    }
 
-        console.log(
-          `[Story Generate] Request ${requestId} - Generation completed successfully`,
-        );
-      } catch (error) {
-        console.error(
-          `[Story Generate] Request ${requestId} - Generation failed:`,
-          error,
-        );
-      }
-    });
+    console.log(
+      `[Story Generate] Request ${requestId} - Generation completed successfully`,
+    );
 
-    // Return 202 Accepted immediately
+    // Return 200 OK after generation completes
     return NextResponse.json(
       {
-        message: "Story generation started",
+        message: "Story generation completed successfully",
         requestId,
         amountPerGen,
         source,
         timestamp,
       },
-      { status: 202 },
+      { status: 200 },
     );
   } catch (error) {
     console.error("[Story Generate] Unexpected error:", error);
