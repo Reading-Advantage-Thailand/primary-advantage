@@ -31,136 +31,187 @@ import {
 } from "../utils/genaretors/audio-flashcard-generator";
 import { WorkbookJSON } from "@/utils/workbook-data-mapper";
 
-export const generateStoryContentController = async (amountPerGen: number) => {
+// CEFR level batches for parallel processing (2-3 levels per batch to avoid API rate limits)
+const CEFR_BATCHES = [
+  [ArticleBaseCefrLevel.A0, ArticleBaseCefrLevel.A1, ArticleBaseCefrLevel.A2],
+  [ArticleBaseCefrLevel.B1, ArticleBaseCefrLevel.B2],
+];
+
+const ALL_CEFR_LEVELS = CEFR_BATCHES.flat();
+
+const GENRES = [
+  "Children's Relationship",
+  "Children's Sci-Fi",
+  "Children's Mystery",
+  "Children's Adventure",
+  "Children's Fantasy",
+  "Children's Realistic Fiction",
+  "Children's Animal Stories",
+  "Children's Sports",
+  "Children's Friendship",
+  "Children's Family",
+  "Children's Humor",
+];
+
+const MAX_RETRY_ATTEMPTS = 3;
+const MIN_RATING = 2;
+const RETRY_DELAY_MS = 1000;
+
+interface GenerationSummary {
+  total: number;
+  succeeded: number;
+  failed: number;
+  errors: { level: string; genre: string; error: string }[];
+}
+
+/**
+ * Process a single CEFR level: generate content → evaluate → save → image + audio
+ */
+const processCefrLevel = async (
+  level: string,
+  genre: string,
+  topic: string,
+): Promise<void> => {
+  let attempt = 0;
+
+  while (attempt < MAX_RETRY_ATTEMPTS) {
+    try {
+      const result = await generateStoryContent({
+        cefrLevel: level,
+        genre,
+        topic,
+      });
+
+      // Process evaluation of story
+      const evaluationData = result.chapters.map((chapter) => chapter.passage);
+
+      const evaluation = await evaluateStoryContent(evaluationData, level);
+
+      if (evaluation.rating < MIN_RATING) {
+        throw new Error("Story rating below minimum threshold");
+      }
+
+      const savedStory = await saveStoryToDB(
+        result,
+        genre,
+        evaluation.cefrLevel,
+        evaluation.rating,
+      );
+
+      console.log(`Save Story Completed CefrLevel: ${evaluation.cefrLevel}`);
+
+      // 1. สั่งทำรูป (เก็บ Promise ไว้ก่อน)
+      const imagePromise = generateStoryImage(
+        savedStory.character,
+        savedStory.imagesDesc,
+      );
+
+      // 2. เตรียม Promise สำหรับทำ Audio ทุกบท
+      // FIX: ใช้ flatMap + return array เพื่อให้ Promise ทั้งสองถูก await จริง
+      const audioPromises = savedStory.chapters.flatMap((chapter) => [
+        generateChapterAudio({
+          passage: chapter.passage,
+          sentences: chapter.sentences as string[],
+          chapterId: chapter.id,
+          chapterNumber: chapter.chapterNumber,
+          cefrLevel: level,
+        }),
+        generateAudioForFlashcard({
+          sentences: chapter.sentencsAndWordsForFlashcards
+            .sentence as sentenceTranslation[],
+          words: chapter.sentencsAndWordsForFlashcards
+            .words as wordTranslation[],
+          contentId: chapter.id,
+          job: "story",
+        }),
+      ]);
+
+      // 3. สั่งรอทุกอย่าง (รูป + เสียงทุกบท) ให้เสร็จพร้อมกัน
+      await Promise.all([imagePromise, ...audioPromises]);
+
+      return; // Success — exit retry loop
+    } catch (error) {
+      attempt++;
+      console.error(
+        `[${level}] Retry attempt ${attempt}/${MAX_RETRY_ATTEMPTS} failed:`,
+        error,
+      );
+      if (attempt >= MAX_RETRY_ATTEMPTS) {
+        throw new Error(
+          `Max retry attempts reached for level ${level}: ${error}`,
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+    }
+  }
+};
+
+export const generateStoryContentController = async (
+  amountPerGen: number,
+): Promise<GenerationSummary> => {
+  const totalArticles = ALL_CEFR_LEVELS.length * amountPerGen;
+  let completedStory = 0;
+  const summary: GenerationSummary = {
+    total: totalArticles,
+    succeeded: 0,
+    failed: 0,
+    errors: [],
+  };
+
   try {
-    const CEFRLevels = [
-      ArticleBaseCefrLevel.A0,
-      ArticleBaseCefrLevel.A1,
-      ArticleBaseCefrLevel.A2,
-      ArticleBaseCefrLevel.B1,
-      ArticleBaseCefrLevel.B2,
-    ];
-
-    const genres = [
-      "Children's Relationship",
-      "Children's Sci-Fi",
-      "Children's Mystery",
-      "Children's Adventure",
-      "Children's Fantasy",
-      "Children's Realistic Fiction",
-      "Children's Animal Stories",
-      "Children's Sports",
-      "Children's Friendship",
-      "Children's Family",
-      "Children's Humor",
-    ];
-
-    const totalArticles = CEFRLevels.length * amountPerGen;
-    let completedStory = 0;
-    let result;
-    let attempt = 0;
-    const MAX_RETRY_ATTEMPTS = 3;
-    const MIN_RATING = 2;
-
     for (let i = 0; i < amountPerGen; i++) {
-      for (const level of CEFRLevels) {
-        try {
-          const genre = genres[Math.floor(Math.random() * genres.length)];
+      const genre = GENRES[Math.floor(Math.random() * GENRES.length)];
+      const topicResult = await generateStoryTopic(genre, amountPerGen);
 
-          const topic = await generateStoryTopic(genre, 10);
+      // Process CEFR levels in batches (parallel within each batch)
+      for (const batch of CEFR_BATCHES) {
+        const batchResults = await Promise.allSettled(
+          batch.map((level) => {
+            const topic =
+              topicResult.topics![
+                Math.floor(Math.random() * topicResult.topics!.length)
+              ];
+            return processCefrLevel(level, genre, topic);
+          }),
+        );
 
-          while (attempt < MAX_RETRY_ATTEMPTS) {
-            try {
-              result = await generateStoryContent({
-                cefrLevel: level,
-                genre,
-                topic:
-                  topic.topics![
-                    Math.floor(Math.random() * topic.topics!.length)
-                  ],
-              });
+        // Process batch results
+        for (let j = 0; j < batchResults.length; j++) {
+          const result = batchResults[j];
+          const level = batch[j];
 
-              //Process evaluation of story
-              const evaluationData = result.chapters.map(
-                (chapter) => chapter.passage,
-              );
-
-              const evaluation = await evaluateStoryContent(
-                evaluationData,
-                level,
-              );
-
-              if (evaluation.rating < MIN_RATING) {
-                throw new Error("Story rating below minimum threshold");
-              }
-
-              const savedStory = await saveStoryToDB(
-                result,
-                genre,
-                evaluation.cefrLevel,
-                evaluation.rating,
-              );
-
-              console.log(
-                `Save Story Completed CefrLevel: ${evaluation.cefrLevel}`,
-              );
-
-              // 1. สั่งทำรูป (เก็บ Promise ไว้ก่อน)
-              const imagePromise = generateStoryImage(
-                savedStory.character,
-                savedStory.imagesDesc,
-              );
-
-              // 2. เตรียม Promise สำหรับทำ Audio ทุกบท (ใช้ .map จะไวกว่า for loop)
-              const audioPromises = savedStory.chapters.map((chapter) => {
-                generateChapterAudio({
-                  passage: chapter.passage,
-                  sentences: chapter.sentences as string[],
-                  chapterId: chapter.id,
-                  chapterNumber: chapter.chapterNumber,
-                  cefrLevel: level,
-                }),
-                  generateAudioForFlashcard({
-                    sentences: chapter.sentencsAndWordsForFlashcards
-                      .sentence as sentenceTranslation[],
-                    words: chapter.sentencsAndWordsForFlashcards
-                      .words as wordTranslation[],
-                    contentId: chapter.id,
-                    job: "story",
-                  });
-              });
-
-              // 3. สั่งรอทุกอย่าง (รูป + เสียงทุกบท) ให้เสร็จพร้อมกัน
-              // results[0] คือผลลัพธ์รูป, ที่เหลือคือผลลัพธ์เสียง
-              const results = await Promise.all([
-                imagePromise,
-                ...audioPromises,
-              ]);
-
-              break; // Exit retry loop on success
-            } catch (error) {
-              console.error(`Retry attempt ${attempt + 1} failed:`, error);
-              attempt++;
-              if (attempt >= MAX_RETRY_ATTEMPTS) {
-                throw new Error("Max retry attempts reached");
-              }
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-            }
+          if (result.status === "fulfilled") {
+            summary.succeeded++;
+          } else {
+            summary.failed++;
+            summary.errors.push({
+              level,
+              genre,
+              error: result.reason?.message || String(result.reason),
+            });
+            console.error(
+              `Failed to generate story (Level: ${level}, Genre: ${genre}):`,
+              result.reason,
+            );
           }
 
           completedStory++;
           console.log(
-            `Progress: ${completedStory}/${totalArticles} articles generated (Level: ${level})`,
+            `Progress: ${completedStory}/${totalArticles} articles processed (Level: ${level})`,
           );
-        } catch (error: any) {
-          console.error(`Failed to generate article (Level: ${level}):`, error);
-          throw new Error(`Failed to generate article: ${error.message}`);
         }
       }
     }
+
+    console.log(
+      `\n=== Generation Complete ===\n` +
+        `Total: ${summary.total} | Succeeded: ${summary.succeeded} | Failed: ${summary.failed}\n`,
+    );
   } catch (error) {
     console.error("Error in generateStoryContentController:", error);
   }
+
+  return summary;
 };
 
 export const fetchStorieSelectionController = async () => {

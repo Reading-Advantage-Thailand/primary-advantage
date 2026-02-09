@@ -11,6 +11,7 @@ import { storyGeneratorSchema } from "@/lib/zod";
 import { z } from "zod";
 import path from "path";
 import fs from "fs";
+import fsPromises from "fs/promises";
 import { createLogFile } from "../logging";
 import sharp from "sharp";
 import { uploadToBucket } from "@/utils/storage";
@@ -36,21 +37,29 @@ export type GenerateStoryResponse = z.infer<typeof storyGeneratorSchema>;
 
 const aiModel = googleNewModel;
 
+// Cache prompt file in memory (lazy-loaded singleton)
+let cachedPrompts: CefrLevelPromptType | null = null;
+
+function getStoryPrompts(): CefrLevelPromptType {
+  if (!cachedPrompts) {
+    const dataFilePath = path.join(
+      process.cwd(),
+      "data",
+      "storie-prompts.json",
+    );
+    const rawData = fs.readFileSync(dataFilePath, "utf-8");
+    cachedPrompts = JSON.parse(rawData);
+  }
+  return cachedPrompts!;
+}
+
 export async function generateStoryContent(
   params: GenerateStoryParams,
 ): Promise<GenerateStoryResponse> {
   try {
     console.log(`${params.cefrLevel} generating story model ID: ${aiModel}`);
 
-    const dataFilePath = path.join(
-      process.cwd(),
-      "data",
-      "storie-prompts.json",
-    );
-
-    // read prompts from file
-    const rawData = fs.readFileSync(dataFilePath, "utf-8");
-    const prompts: CefrLevelPromptType = JSON.parse(rawData);
+    const prompts = getStoryPrompts();
 
     const levelConfig = prompts?.levels.find(
       (lvl: CefrLevelType) => lvl.level === params.cefrLevel,
@@ -85,11 +94,11 @@ export const generateStoryTopic = async (
   genre: string,
   amountPerGenre: number,
 ) => {
-  const prompts = `Please provide ${amountPerGenre} reading passage topics in the ${genre} genre and appropriate for secondary school students. 
+  const prompts = `Please provide ${amountPerGenre} reading passage topics in the fiction ${genre} genre and appropriate for secondary school students. 
     ### Requirements:
   - **Only return the book title** (no explanations, no descriptions, no genre labels).
   - **Do NOT return general genre labels like 'Fantasy YA', 'Science Fiction', 'Mystery Thriller'**.
-  - **Do NOT include the words 'genre', or any similar category names.**
+  - **Do NOT include the words 'fiction', 'genre', or any similar category names.**
   - **Each title must sound like a real book title.**
   - **Keep each title short (maximum 8 words).**
   - **Output must be a JSON array of strings ONLY.**
@@ -276,7 +285,7 @@ const processSingleImage = async (
       const file = images[0];
       const base64Image = Buffer.from(file.base64, "base64");
       const localPath = path.join(IMAGES_DIR, `${scene.id}.png`);
-      fs.writeFileSync(localPath, base64Image);
+      await fsPromises.writeFile(localPath, base64Image);
       tempFilePath = localPath;
 
       // 3. Upload
@@ -377,10 +386,9 @@ export const generateStoryImage = async (
   } finally {
     // Cleanup แบบเงียบๆ
     for (const file of allTempFiles) {
-      if (fs.existsSync(file))
-        try {
-          fs.unlinkSync(file);
-        } catch (e) {}
+      try {
+        await fsPromises.unlink(file);
+      } catch (e) {}
     }
   }
 };

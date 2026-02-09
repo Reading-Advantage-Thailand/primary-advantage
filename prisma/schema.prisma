@@ -743,3 +743,25 @@ model AssignmentNotification {
   @@index([teacherId])
   @@map("assignment_notifications")
 }
+
+model Logs {
+  id          String   @id @default(cuid())
+  serviceName String   @map("service_name")
+  message     String
+  stackTrace  String?  @map("stack_trace")
+  traceId     String?  @map("trace_id")
+  userId      String?  @map("user_id")
+  level       LogLevel
+  meta        Json?
+  timestamp   DateTime @default(now())
+
+  @@index([serviceName, level, timestamp])
+  @@map("logs")
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+  DEBUG
+}

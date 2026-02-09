@@ -10,6 +10,9 @@ down:
 restart:
 	docker compose restart web
 
+ิีbuild:
+	docker compose build web
+
 logs:
 	docker compose logs -f web
 

@@ -1,5 +1,6 @@
 import base64 from "base64-js";
 import fs from "fs";
+import fsPromises from "fs/promises";
 import path from "path";
 import { generateText, Output } from "ai";
 import { openai, openaiModel } from "@/utils/openai";
@@ -460,11 +461,11 @@ export async function generateAudio({
     const MP3 = base64.toByteArray(json.audio);
 
     const localPath = `${process.cwd()}/data/audios/${articleId}.mp3`;
-    fs.writeFileSync(localPath, MP3);
+    await fsPromises.writeFile(localPath, MP3);
 
     await uploadToBucket(localPath, `audios/articles/${articleId}.mp3`);
 
-    fs.unlinkSync(localPath);
+    await fsPromises.unlink(localPath);
 
     // const sentences = await splitIntoSentences(passage);
     // const sentence: string[] = sentencize(passage);
@@ -546,11 +547,11 @@ export async function generateChapterAudio({
     const MP3 = base64.toByteArray(json.audio);
 
     const localPath = `${process.cwd()}/data/audios/${chapterId}.mp3`;
-    fs.writeFileSync(localPath, MP3);
+    await fsPromises.writeFile(localPath, MP3);
 
     await uploadToBucket(localPath, `audios/story/chapter/${chapterId}.mp3`);
 
-    fs.unlinkSync(localPath);
+    await fsPromises.unlink(localPath);
 
     // const nlp = winkNLP(model);
     // const doc = nlp.readDoc(passage);
