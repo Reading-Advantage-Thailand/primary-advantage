@@ -330,11 +330,6 @@ export const generateStoryImage = async (
   let successCount = 0;
   let failCount = 0;
 
-  console.log(
-    `🚀 Starting generation for ${imagesDesc.length} images... (Please wait)`,
-  );
-  const startTime = Date.now();
-
   try {
     for (let i = 0; i < imagesDesc.length; i += CONCURRENCY_LIMIT) {
       const batch = imagesDesc.slice(i, i + CONCURRENCY_LIMIT);
@@ -360,18 +355,8 @@ export const generateStoryImage = async (
       }
     }
 
-    const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-
-    // ★★★ SUMMARY LOG (โชว์ทีเดียวตอนจบ) ★★★
-    console.log("\n===========================================");
-    console.log(`📊 GENERATION SUMMARY (${duration}s)`);
-    console.log("===========================================");
-    console.log(`   ✅ Success : ${successCount}`);
-    console.log(`   ❌ Failed  : ${failCount}`);
-    console.log("===========================================\n");
-
     if (failCount > 0) {
-      createLogFile(imagesDesc[0].id, errorDetails, "error");
+      // createLogFile(imagesDesc[0].id, errorDetails, "error");
       return {
         success: false,
         error: `Generated ${successCount}/${imagesDesc.length} images. Failures: ${failCount}`,

@@ -58,6 +58,7 @@ export const generateAllArticleNew = async (amountPerGenre: number) => {
 export const generateAllArticle = async (amountPerGenre: number) => {
   const types: ArticleType[] = [ArticleType.FICTION, ArticleType.NONFICTION];
   const levels: ArticleBaseCefrLevel[] = [
+    ArticleBaseCefrLevel.A0,
     ArticleBaseCefrLevel.A1,
     ArticleBaseCefrLevel.A2,
     ArticleBaseCefrLevel.B1,

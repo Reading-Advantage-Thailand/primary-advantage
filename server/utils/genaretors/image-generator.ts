@@ -142,13 +142,13 @@ export async function generateImage(
   }
 
   // Check final result
-  if (generatedImages.length !== 3) {
-    createLogFile(articleId, errors, "error");
-    return {
-      success: false,
-      error: `Failed to generate exactly 3 images after ${maxRetries} attempts. Generated ${generatedImages.length} images. Errors: ${errors.join(", ")}`,
-    };
-  }
+  // if (generatedImages.length !== 3) {
+  //   createLogFile(articleId, errors, "error");
+  //   return {
+  //     success: false,
+  //     error: `Failed to generate exactly 3 images after ${maxRetries} attempts. Generated ${generatedImages.length} images. Errors: ${errors.join(", ")}`,
+  //   };
+  // }
 
   return {
     success: true,

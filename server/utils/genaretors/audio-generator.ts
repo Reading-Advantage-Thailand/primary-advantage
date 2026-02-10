@@ -403,25 +403,25 @@ function processWordTimestampsIntoSentences(
     }
   });
   // Only create log file if there are problems
-  if (hasProblems) {
-    createLogFile(
-      articleId,
-      {
-        status: "PROBLEMS_DETECTED",
-        wordTimestampsCount: wordTimestamps.length,
-        sentencesCount: sentences.length,
-        problemsCount: problemsLog.length,
-        problems: problemsLog,
-        wordTimestamps: wordTimestamps,
-        sentences: sentences,
-      },
-      "problems",
-    );
+  // if (hasProblems) {
+  //   createLogFile(
+  //     articleId,
+  //     {
+  //       status: "PROBLEMS_DETECTED",
+  //       wordTimestampsCount: wordTimestamps.length,
+  //       sentencesCount: sentences.length,
+  //       problemsCount: problemsLog.length,
+  //       problems: problemsLog,
+  //       wordTimestamps: wordTimestamps,
+  //       sentences: sentences,
+  //     },
+  //     "problems",
+  //   );
 
-    console.log(
-      `⚠️  Processing completed with problems. Log file created for article: ${articleId}`,
-    );
-  }
+  //   console.log(
+  //     `⚠️  Processing completed with problems. Log file created for article: ${articleId}`,
+  //   );
+  // }
 
   return sentenceTimepoints;
 }
@@ -516,7 +516,12 @@ export async function generateChapterAudio({
   chapterId,
   chapterNumber,
   cefrLevel,
-}: GenerateChapterAudioParams): Promise<void> {
+}: GenerateChapterAudioParams): Promise<{
+  translationSuccess: boolean;
+  translationError?: string;
+  uploadSuccess: boolean;
+  uploadError?: string;
+}> {
   try {
     const voice = VOICES_AI[Math.floor(Math.random() * VOICES_AI.length)];
 
@@ -549,14 +554,18 @@ export async function generateChapterAudio({
     const localPath = `${process.cwd()}/data/audios/${chapterId}.mp3`;
     await fsPromises.writeFile(localPath, MP3);
 
-    await uploadToBucket(localPath, `audios/story/chapter/${chapterId}.mp3`);
+    // Upload to bucket — track separately
+    let uploadSuccess = true;
+    let uploadError: string | undefined;
+    try {
+      await uploadToBucket(localPath, `audios/story/chapter/${chapterId}.mp3`);
+    } catch (err: any) {
+      uploadSuccess = false;
+      uploadError = err?.message || String(err);
+      console.error(`Failed to upload chapter audio ${chapterId}:`, err);
+    }
 
     await fsPromises.unlink(localPath);
-
-    // const nlp = winkNLP(model);
-    // const doc = nlp.readDoc(passage);
-    // const its = nlp.its;
-    // const sentences: string[] = doc.sentences().out(its.value);
 
     // Process word timestamps into sentence timepoints
     const sentenceTimepoints = processWordTimestampsIntoSentences(
@@ -582,19 +591,25 @@ export async function generateChapterAudio({
         chapterNumber,
         cefrLevel,
       });
-    } catch (translationError) {
+    } catch (translationError: any) {
       console.error(
         `Failed to translate sentences for story ${chapterId}:`,
         translationError,
       );
       // Don't throw here - audio generation was successful
+      return {
+        translationSuccess: false,
+        translationError: translationError?.message || String(translationError),
+        uploadSuccess,
+        uploadError,
+      };
     }
 
-    return;
+    return { translationSuccess: true, uploadSuccess, uploadError };
   } catch (error: any) {
     console.log(error);
     throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(
-      error.response.data,
+      error.response?.data,
     )}`;
   }
 }
