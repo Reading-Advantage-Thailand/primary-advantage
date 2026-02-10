@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { signInSchema } from "./zod";
 import { ZodError } from "zod";
-import { getUserByEmail } from "@/server/models/userModel";
+import { getUserByEmail, getUserById } from "@/server/models/userModel";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -83,6 +83,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session: {
     strategy: "jwt",
+    maxAge: 12 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user, account, trigger }) {
@@ -154,15 +155,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
+      if (token?.sub) {
         session.user.id = token.id;
-        session.user.email = token.email;
-        session.user.name = token.name;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
         session.user.role = token.role;
         session.user.xp = token.xp;
         session.user.level = token.level;
-        session.user.cefrLevel = token.cefrLevel;
-        session.user.schoolId = token.schoolId;
+        session.user.cefrLevel = token.cefrLevel as string;
+        session.user.schoolId = token.schoolId as string;
       }
       return session;
     },

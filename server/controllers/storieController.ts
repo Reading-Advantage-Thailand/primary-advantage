@@ -30,6 +30,7 @@ import {
   wordTranslation,
 } from "../utils/genaretors/audio-flashcard-generator";
 import { WorkbookJSON } from "@/utils/workbook-data-mapper";
+import { StoryGenerationLogger } from "@/lib/logger";
 
 // CEFR level batches for parallel processing (2-3 levels per batch to avoid API rate limits)
 const CEFR_BATCHES = [
@@ -61,61 +62,110 @@ interface GenerationSummary {
   total: number;
   succeeded: number;
   failed: number;
-  errors: { level: string; genre: string; error: string }[];
+  errors: { level: string; genre: string; error: string; storyId?: string }[];
 }
 
 /**
  * Process a single CEFR level: generate content → evaluate → save → image + audio
+ * Returns storyId if saved successfully. Logs all issues via StoryGenerationLogger.
  */
 const processCefrLevel = async (
   level: string,
   genre: string,
   topic: string,
-): Promise<void> => {
+  logger: StoryGenerationLogger,
+): Promise<{ storyId?: string }> => {
   let attempt = 0;
+  let storyId: string | undefined;
 
   while (attempt < MAX_RETRY_ATTEMPTS) {
     try {
-      const result = await generateStoryContent({
-        cefrLevel: level,
-        genre,
-        topic,
-      });
+      // Step 1: Generate story content
+      let result;
+      try {
+        result = await generateStoryContent({
+          cefrLevel: level,
+          genre,
+          topic,
+        });
+      } catch (err: any) {
+        logger.addIssue({
+          step: "content_generation",
+          severity: "WARN",
+          message: `Attempt ${attempt + 1}: ${err?.message || String(err)}`,
+          attempt: attempt + 1,
+        });
+        throw err;
+      }
 
-      // Process evaluation of story
+      // Step 2: Evaluate story content
       const evaluationData = result.chapters.map((chapter) => chapter.passage);
+      let evaluation;
+      try {
+        evaluation = await evaluateStoryContent(evaluationData, level);
+      } catch (err: any) {
+        logger.addIssue({
+          step: "evaluation",
+          severity: "WARN",
+          message: `Attempt ${attempt + 1}: ${err?.message || String(err)}`,
+          attempt: attempt + 1,
+        });
+        throw err;
+      }
 
-      const evaluation = await evaluateStoryContent(evaluationData, level);
-
+      // Step 3: Check rating threshold
       if (evaluation.rating < MIN_RATING) {
+        logger.addIssue({
+          step: "rating_check",
+          severity: "WARN",
+          message: `Attempt ${attempt + 1}: Rating ${evaluation.rating} below minimum ${MIN_RATING}`,
+          attempt: attempt + 1,
+        });
         throw new Error("Story rating below minimum threshold");
       }
 
-      const savedStory = await saveStoryToDB(
-        result,
-        genre,
-        evaluation.cefrLevel,
-        evaluation.rating,
-      );
+      // Step 4: Save to database
+      let savedStory;
+      try {
+        savedStory = await saveStoryToDB(
+          result,
+          genre,
+          evaluation.cefrLevel,
+          evaluation.rating,
+        );
+        storyId = savedStory.storyId;
+      } catch (err: any) {
+        logger.addIssue({
+          step: "save_to_db",
+          severity: "WARN",
+          message: `Attempt ${attempt + 1}: ${err?.message || String(err)}`,
+          attempt: attempt + 1,
+        });
+        throw err;
+      }
 
       console.log(`Save Story Completed CefrLevel: ${evaluation.cefrLevel}`);
 
-      // 1. สั่งทำรูป (เก็บ Promise ไว้ก่อน)
+      // ─── Steps 5-7: Image + Audio (Promise.allSettled — partial failure = warning) ───
+
+      // Step 5: Generate images
       const imagePromise = generateStoryImage(
         savedStory.character,
         savedStory.imagesDesc,
       );
 
-      // 2. เตรียม Promise สำหรับทำ Audio ทุกบท
-      // FIX: ใช้ flatMap + return array เพื่อให้ Promise ทั้งสองถูก await จริง
-      const audioPromises = savedStory.chapters.flatMap((chapter) => [
+      // Step 6 & 7: Chapter audio (+ translation) and Flashcard audio
+      const chapterAudioPromises = savedStory.chapters.map((chapter) =>
         generateChapterAudio({
           passage: chapter.passage,
           sentences: chapter.sentences as string[],
           chapterId: chapter.id,
           chapterNumber: chapter.chapterNumber,
           cefrLevel: level,
-        }),
+        }).then((res) => ({ ...res, chapterId: chapter.id })),
+      );
+
+      const flashcardAudioPromises = savedStory.chapters.map((chapter) =>
         generateAudioForFlashcard({
           sentences: chapter.sentencsAndWordsForFlashcards
             .sentence as sentenceTranslation[],
@@ -123,20 +173,124 @@ const processCefrLevel = async (
             .words as wordTranslation[],
           contentId: chapter.id,
           job: "story",
-        }),
-      ]);
+        }).then((res) => ({ ...res, chapterId: chapter.id })),
+      );
 
-      // 3. สั่งรอทุกอย่าง (รูป + เสียงทุกบท) ให้เสร็จพร้อมกัน
-      await Promise.all([imagePromise, ...audioPromises]);
+      const [imageResults, chapterAudioResults, flashcardAudioResults] =
+        await Promise.all([
+          Promise.allSettled([imagePromise]),
+          Promise.allSettled(chapterAudioPromises),
+          Promise.allSettled(flashcardAudioPromises),
+        ]);
 
-      return; // Success — exit retry loop
-    } catch (error) {
+      // Check image result
+      if (imageResults[0].status === "rejected") {
+        logger.addIssue({
+          step: "image_generation",
+          severity: "WARN",
+          message:
+            imageResults[0].reason?.message || String(imageResults[0].reason),
+        });
+      } else if (!imageResults[0].value.success) {
+        logger.addIssue({
+          step: "image_upload",
+          severity: "WARN",
+          message:
+            imageResults[0].value.error ??
+            "Image generation/upload partially failed",
+        });
+      }
+
+      // Check chapter audio results
+      for (let c = 0; c < chapterAudioResults.length; c++) {
+        const audioResult = chapterAudioResults[c];
+        const chId = savedStory.chapters[c].id;
+
+        if (audioResult.status === "rejected") {
+          logger.addIssue({
+            step: "chapter_audio",
+            severity: "WARN",
+            message: audioResult.reason?.message || String(audioResult.reason),
+            chapterId: chId,
+          });
+        } else {
+          if (!audioResult.value.uploadSuccess) {
+            logger.addIssue({
+              step: "chapter_audio_upload",
+              severity: "WARN",
+              message:
+                audioResult.value.uploadError ?? "Chapter audio upload failed",
+              chapterId: chId,
+            });
+          }
+          if (!audioResult.value.translationSuccess) {
+            logger.addIssue({
+              step: "sentence_translation",
+              severity: "WARN",
+              message:
+                audioResult.value.translationError ?? "Translation failed",
+              chapterId: chId,
+            });
+          }
+        }
+      }
+
+      // Check flashcard audio results
+      for (let c = 0; c < flashcardAudioResults.length; c++) {
+        const flashResult = flashcardAudioResults[c];
+        const chId = savedStory.chapters[c].id;
+
+        if (flashResult.status === "rejected") {
+          logger.addIssue({
+            step: "flashcard_audio",
+            severity: "WARN",
+            message: flashResult.reason?.message || String(flashResult.reason),
+            chapterId: chId,
+          });
+        } else {
+          if (!flashResult.value.sentenceUploadSuccess) {
+            logger.addIssue({
+              step: "flashcard_audio_upload",
+              severity: "WARN",
+              message:
+                flashResult.value.sentenceUploadError ??
+                "Flashcard sentence audio upload failed",
+              chapterId: chId,
+            });
+          }
+          if (!flashResult.value.wordUploadSuccess) {
+            logger.addIssue({
+              step: "flashcard_audio_upload",
+              severity: "WARN",
+              message:
+                flashResult.value.wordUploadError ??
+                "Flashcard word audio upload failed",
+              chapterId: chId,
+            });
+          }
+        }
+      }
+
+      if (logger.hasIssues()) {
+        console.warn(
+          `⚠️ Story [${storyId}] completed with issues — check logs table for details`,
+        );
+      }
+
+      return { storyId }; // Success — exit retry loop
+    } catch (error: any) {
       attempt++;
       console.error(
         `[${level}] Retry attempt ${attempt}/${MAX_RETRY_ATTEMPTS} failed:`,
         error,
       );
       if (attempt >= MAX_RETRY_ATTEMPTS) {
+        logger.addIssue({
+          step: "content_generation",
+          severity: "ERROR",
+          message: `Max retry attempts reached for level ${level}: ${error?.message || String(error)}`,
+          attempt,
+        });
         throw new Error(
           `Max retry attempts reached for level ${level}: ${error}`,
         );
@@ -144,6 +298,8 @@ const processCefrLevel = async (
       await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
     }
   }
+
+  return { storyId };
 };
 
 export const generateStoryContentController = async (
@@ -160,18 +316,64 @@ export const generateStoryContentController = async (
 
   try {
     for (let i = 0; i < amountPerGen; i++) {
-      const genre = GENRES[Math.floor(Math.random() * GENRES.length)];
-      const topicResult = await generateStoryTopic(genre, amountPerGen);
-
       // Process CEFR levels in batches (parallel within each batch)
       for (const batch of CEFR_BATCHES) {
         const batchResults = await Promise.allSettled(
-          batch.map((level) => {
-            const topic =
-              topicResult.topics![
-                Math.floor(Math.random() * topicResult.topics!.length)
-              ];
-            return processCefrLevel(level, genre, topic);
+          batch.map(async (level) => {
+            // สุ่ม genre + สร้าง topic ใหม่ทุก level
+            const genre = GENRES[Math.floor(Math.random() * GENRES.length)];
+            let topic: string;
+
+            const logger = new StoryGenerationLogger();
+
+            try {
+              const topicResult = await generateStoryTopic(genre, 1);
+              topic =
+                topicResult.topics![
+                  Math.floor(Math.random() * topicResult.topics!.length)
+                ];
+            } catch (err: any) {
+              logger.addIssue({
+                step: "topic_generation",
+                severity: "ERROR",
+                message: err?.message || String(err),
+              });
+              await logger.flush({
+                cefrLevel: level,
+                genre,
+                topic: "N/A",
+                totalAttempts: 0,
+                finalStatus: "failed",
+              });
+              throw err;
+            }
+
+            let result: { storyId?: string };
+            try {
+              result = await processCefrLevel(level, genre, topic, logger);
+            } catch (err) {
+              await logger.flush({
+                storyId: undefined,
+                cefrLevel: level,
+                genre,
+                topic,
+                totalAttempts: MAX_RETRY_ATTEMPTS,
+                finalStatus: "failed",
+              });
+              throw err;
+            }
+
+            // Flush log (only writes if there are issues)
+            await logger.flush({
+              storyId: result.storyId,
+              cefrLevel: level,
+              genre,
+              topic,
+              totalAttempts: 1,
+              finalStatus: "succeeded",
+            });
+
+            return { level, genre, storyId: result.storyId };
           }),
         );
 
@@ -186,11 +388,11 @@ export const generateStoryContentController = async (
             summary.failed++;
             summary.errors.push({
               level,
-              genre,
+              genre: "unknown",
               error: result.reason?.message || String(result.reason),
             });
             console.error(
-              `Failed to generate story (Level: ${level}, Genre: ${genre}):`,
+              `Failed to generate story (Level: ${level}):`,
               result.reason,
             );
           }

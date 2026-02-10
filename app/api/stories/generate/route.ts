@@ -99,18 +99,9 @@ async function handleGeneration(
     }
 
     // Log the generation request
-    const requestId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
 
-    console.log(`[Story Generate] Request ${requestId} started`, {
-      source,
-      amountPerGen,
-      timestamp,
-    });
-
-    console.log(
-      `[Story Generate] Request ${requestId} - Generation starting...`,
-    );
+    console.log(`[Story Generate] Generation starting...`);
 
     if (source === "scheduler") {
       await generateStoryContentController(amountPerGen);
@@ -119,23 +110,17 @@ async function handleGeneration(
         try {
           await generateStoryContentController(amountPerGen);
         } catch (error) {
-          console.error(
-            `[Story Generate] Request ${requestId} - Generation failed:`,
-            error,
-          );
+          console.error(`[Story Generate] Generation failed:`, error);
         }
       });
     }
 
-    console.log(
-      `[Story Generate] Request ${requestId} - Generation completed successfully`,
-    );
+    console.log(`[Story Generate] Generation completed successfully`);
 
     // Return 200 OK after generation completes
     return NextResponse.json(
       {
         message: "Story generation completed successfully",
-        requestId,
         amountPerGen,
         source,
         timestamp,
@@ -143,7 +128,7 @@ async function handleGeneration(
       { status: 200 },
     );
   } catch (error) {
-    console.error("[Story Generate] Unexpected error:", error);
+    console.error(`[Story Generate] Unexpected error:`, error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

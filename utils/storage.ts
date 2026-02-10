@@ -41,7 +41,7 @@ export const uploadToBucket = async (
         .makePublic();
     }
 
-    console.log(`✅ Uploaded to bucket: ${destination}`);
+    // console.log(`✅ Uploaded to bucket: ${destination}`);
   } catch (error) {
     console.error("ERROR UPLOADING TO BUCKET: ", error);
     throw error;

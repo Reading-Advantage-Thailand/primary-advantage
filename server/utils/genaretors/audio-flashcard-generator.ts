@@ -90,8 +90,18 @@ export async function generateAudioForFlashcard({
   words,
   contentId,
   job,
-}: GenerateAudioParams): Promise<void> {
+}: GenerateAudioParams): Promise<{
+  sentenceUploadSuccess: boolean;
+  sentenceUploadError?: string;
+  wordUploadSuccess: boolean;
+  wordUploadError?: string;
+}> {
   try {
+    let sentenceUploadSuccess = true;
+    let sentenceUploadError: string | undefined;
+    let wordUploadSuccess = true;
+    let wordUploadError: string | undefined;
+
     const voice =
       AVAILABLE_VOICES[Math.floor(Math.random() * AVAILABLE_VOICES.length)];
 
@@ -159,10 +169,19 @@ export async function generateAudioForFlashcard({
       const sentenceLocalPath = path.join(sentencesDir, `${contentId}.mp3`);
       await fsPromises.writeFile(sentenceLocalPath, sentenceMP3);
 
-      await uploadToBucket(
-        sentenceLocalPath,
-        `${urlPath}/sentences/${contentId}.mp3`,
-      );
+      try {
+        await uploadToBucket(
+          sentenceLocalPath,
+          `${urlPath}/sentences/${contentId}.mp3`,
+        );
+      } catch (err: any) {
+        sentenceUploadSuccess = false;
+        sentenceUploadError = err?.message || String(err);
+        console.error(
+          `Failed to upload flashcard sentence audio ${contentId}:`,
+          err,
+        );
+      }
 
       await fsPromises.unlink(sentenceLocalPath);
     }
@@ -216,7 +235,19 @@ export async function generateAudioForFlashcard({
       const wordLocalPath = path.join(wordsDir, `${contentId}.mp3`);
       await fsPromises.writeFile(wordLocalPath, wordMP3);
 
-      await uploadToBucket(wordLocalPath, `${urlPath}/words/${contentId}.mp3`);
+      try {
+        await uploadToBucket(
+          wordLocalPath,
+          `${urlPath}/words/${contentId}.mp3`,
+        );
+      } catch (err: any) {
+        wordUploadSuccess = false;
+        wordUploadError = err?.message || String(err);
+        console.error(
+          `Failed to upload flashcard word audio ${contentId}:`,
+          err,
+        );
+      }
 
       await fsPromises.unlink(wordLocalPath);
     }
@@ -247,7 +278,12 @@ export async function generateAudioForFlashcard({
       },
     });
 
-    return;
+    return {
+      sentenceUploadSuccess,
+      sentenceUploadError,
+      wordUploadSuccess,
+      wordUploadError,
+    };
   } catch (error: any) {
     const errorDetails = error.response?.data || error.message || error;
     throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(errorDetails)}`;

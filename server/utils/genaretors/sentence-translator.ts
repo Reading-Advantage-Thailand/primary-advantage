@@ -50,8 +50,6 @@ async function translateSentencesWithAI(
   targetLanguages: string[],
   cefrLevel?: string,
 ): Promise<TranslatedSentences> {
-  const sentenceList = sentences.join("\n");
-
   const systemPrompt = `You are a professional translator specializing in educational content for language learners. Translate the following sentences accurately while maintaining:
 
         1. Appropriate language level${cefrLevel ? ` for CEFR level ${cefrLevel}` : ""}
@@ -69,7 +67,7 @@ async function translateSentencesWithAI(
 
   const userPrompt = `Translate these sentences:
 
-          ${sentenceList}
+          ${sentences.map((s, i) => `sentences ${i + 1}: ${s}`).join("\n")}
 
           Provide translations in the exact same order, maintaining sentence structure and meaning appropriate for language learners.`;
 
@@ -209,31 +207,45 @@ export async function translateAndStoreSentencesForStory({
       return;
     }
 
-    // Translate sentences
-    const translatedSentences = await translateSentencesWithAI(
-      sentences,
-      targetLanguages,
-      cefrLevel,
-    );
+    let attempts = 0;
+    const maxAttempts = 3;
+    let translatedSentences: TranslatedSentences | null = null;
 
-    // Validate that all translations have the same number of sentences
-    const originalCount = sentences.length;
-    const translationCounts = {
-      th: translatedSentences.th.length,
-      cn: translatedSentences.cn.length,
-      tw: translatedSentences.tw.length,
-      vi: translatedSentences.vi.length,
-    };
+    while (attempts < maxAttempts) {
+      try {
+        translatedSentences = await translateSentencesWithAI(
+          sentences,
+          targetLanguages,
+          cefrLevel,
+        );
 
-    const invalidCounts = Object.entries(translationCounts).filter(
-      ([_, count]) => count !== originalCount,
-    );
+        const originalCount = sentences.length;
+        const translationCounts = {
+          th: translatedSentences.th.length,
+          cn: translatedSentences.cn.length,
+          tw: translatedSentences.tw.length,
+          vi: translatedSentences.vi.length,
+        };
 
-    if (invalidCounts.length > 0) {
-      console.warn(`Translation count mismatch for article ${chapterId}:`, {
-        original: originalCount,
-        translations: translationCounts,
-      });
+        const invalidCounts = Object.entries(translationCounts).filter(
+          ([_, count]) => count !== originalCount,
+        );
+
+        if (invalidCounts.length > 0) {
+          const errorMsg = `Translation count mismatch for article ${chapterId}: Original ${originalCount}, Got ${JSON.stringify(translationCounts)}`;
+          throw new Error(errorMsg);
+        }
+
+        break; // Exit loop if successful
+      } catch (error) {
+        attempts++;
+        console.warn(`Attempt ${attempts} failed: ${error}. Retrying...`);
+        if (attempts === maxAttempts) {
+          throw new Error(
+            `Failed to translate sentences after ${maxAttempts} attempts`,
+          );
+        }
+      }
     }
 
     // Store translations in database
@@ -243,10 +255,6 @@ export async function translateAndStoreSentencesForStory({
         translatedSentences: JSON.parse(JSON.stringify(translatedSentences)),
       },
     });
-
-    console.log(
-      `Successfully translated and stored sentences for article ${chapterId}`,
-    );
   } catch (error: any) {
     console.error(
       `Failed to translate sentences for article ${chapterId}:`,
@@ -255,65 +263,3 @@ export async function translateAndStoreSentencesForStory({
     throw new Error(`Failed to translate sentences: ${error.message}`);
   }
 }
-
-/**
- * Get translated sentences for an article
- */
-// export async function getTranslatedSentences(
-//   articleId: string,
-//   language: "th" | "cn" | "tw" | "vi",
-// ): Promise<string[]> {
-//   const article = await prisma.article.findUnique({
-//     where: { id: articleId },
-//     select: {
-//       translatedSentences: true,
-//     },
-//   });
-
-//   if (!article?.translatedSentences) {
-//     throw new Error(`No translated sentences found for article ${articleId}`);
-//   }
-
-//   const translations = article.translatedSentences as TranslatedSentences;
-//   return translations[language] || [];
-// }
-
-// /**
-//  * Batch translate sentences for multiple articles
-//  */
-// export async function batchTranslateSentences(
-//   articleIds: string[],
-//   options?: Omit<TranslateSentencesParams, "articleId">,
-// ): Promise<void> {
-//   console.log(
-//     `Starting batch translation for ${articleIds.length} articles...`,
-//   );
-
-//   const results = await Promise.allSettled(
-//     articleIds.map((articleId) =>
-//       translateAndStoreSentences({ articleId, ...options }),
-//     ),
-//   );
-
-//   const successful = results.filter(
-//     (result) => result.status === "fulfilled",
-//   ).length;
-//   const failed = results.filter(
-//     (result) => result.status === "rejected",
-//   ).length;
-
-//   console.log(
-//     `Batch translation completed: ${successful} successful, ${failed} failed`,
-//   );
-
-//   if (failed > 0) {
-//     const errors = results
-//       .filter(
-//         (result): result is PromiseRejectedResult =>
-//           result.status === "rejected",
-//       )
-//       .map((result) => result.reason);
-
-//     console.error("Batch translation errors:", errors);
-//   }
-// }

@@ -158,6 +158,13 @@ export const getUserById = async (id: string) => {
       where: {
         id: id,
       },
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
     return user;
   } catch (error) {
