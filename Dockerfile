@@ -20,6 +20,9 @@ COPY . .
 # Set environment variables for build
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/mydb"
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV BETTER_AUTH_SECRET="build-time-dummy-secret-not-used-in-production"
+ENV BETTER_AUTH_URL="http://localhost:3000"
+ENV NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
 
 # Fix Memory issue during build
 ENV NODE_OPTIONS="--max-old-space-size=8192"
