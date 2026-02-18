@@ -1,6 +1,6 @@
 import LessonCard from "@/components/lesson/lesson-card";
 import StandaloneLessonCard from "@/components/lesson/standalone-lesson-card";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import React from "react";
 import { getTranslations } from "next-intl/server";
@@ -29,7 +29,7 @@ export default async function LessonPage({
 }) {
   const { id } = await params;
   const search = await searchParams;
-  const user = await currentUser();
+  const user = await getCurrentUser();
   if (!user) return redirect("/auth/signin");
 
   // Check if there's a 'type' parameter to explicitly indicate lesson type

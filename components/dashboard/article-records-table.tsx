@@ -59,7 +59,7 @@ export function ArticleRecordsTable() {
     totalPages: 0,
   });
 
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   // Fetch data function
   const fetchData = React.useCallback(

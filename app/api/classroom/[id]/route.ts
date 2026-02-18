@@ -4,7 +4,7 @@ import {
   updateClassroomController,
   deleteClassroomController,
 } from "@/server/controllers/classroomController";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 
 // GET /api/classroom/[id] - Get a specific classroom with students
 export async function GET(
@@ -28,7 +28,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

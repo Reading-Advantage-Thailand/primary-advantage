@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import {
   createStudent,
   getStudents,
@@ -45,7 +45,7 @@ export const getStudentsController = async (
   request: NextRequest,
 ): Promise<NextResponse<StudentsResponse | { error: string }>> => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -117,7 +117,7 @@ export const createStudentController = async (
   NextResponse<{ success: boolean; student?: StudentData } | { error: string }>
 > => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -200,7 +200,7 @@ export const getStudentByIdController = async (
   try {
     const { id } = await params;
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -248,7 +248,7 @@ export const updateStudentController = async (
   try {
     const { id } = await params;
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -304,7 +304,7 @@ export const deleteStudentController = async (
   try {
     const { id } = await params;
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -365,7 +365,7 @@ export const getVelocityMetricsController = async (
   request: NextRequest,
 ): Promise<NextResponse<VelocityMetrics | { error: string }>> => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -433,7 +433,7 @@ export const getGenreEngagementController = async (
   try {
     const { id } = await params;
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -496,7 +496,7 @@ export const getActivityTimelineController = async (
   try {
     const { id } = await params;
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -566,7 +566,7 @@ export const getSRSHealthController = async (
   { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse> => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -7,9 +7,6 @@ import { siteConfig } from "@/configs/site-config";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Cabin_Sketch, Inter as FontSans, Quicksand } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
-import { SessionProvider } from "next-auth/react";
-import { auth } from "@/lib/auth";
-import { LayoutProvider } from "@/hooks/use-layout";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import QueryProvider from "@/components/providers/query-provider";
 import localFont from "next/font/local";
@@ -84,30 +81,26 @@ export default async function RootLayout({
     notFound();
   }
 
-  const session = await auth();
-
   return (
-    <SessionProvider session={session}>
-      <html lang={locale} suppressHydrationWarning className="overscroll-none">
-        <body
-          className={`${fontSans.variable} ${cabinSketch.variable} ${quicksand.variable} ${winkyRough.variable} bg-background min-h-screen font-sans antialiased [--header-height:calc(var(--spacing)*14)]`}
-        >
-          <NextIntlClientProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-              enableColorScheme
-            >
-              <QueryProvider>
-                <NuqsAdapter>{children}</NuqsAdapter>
-                <Toaster />
-              </QueryProvider>
-            </ThemeProvider>
-          </NextIntlClientProvider>
-        </body>
-      </html>
-    </SessionProvider>
+    <html lang={locale} suppressHydrationWarning className="overscroll-none">
+      <body
+        className={`${fontSans.variable} ${cabinSketch.variable} ${quicksand.variable} ${winkyRough.variable} bg-background min-h-screen font-sans antialiased [--header-height:calc(var(--spacing)*14)]`}
+      >
+        <NextIntlClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            enableColorScheme
+          >
+            <QueryProvider>
+              <NuqsAdapter>{children}</NuqsAdapter>
+              <Toaster />
+            </QueryProvider>
+          </ThemeProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
   );
 }

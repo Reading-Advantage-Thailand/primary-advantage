@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/session";
 
 // Debug endpoint to check school data
 export async function GET() {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
       include: {
         School: {
           include: {
@@ -22,7 +22,7 @@ export async function GET() {
       },
     });
 
-    if (!user) {
+    if (!dbUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -39,19 +39,19 @@ export async function GET() {
     return NextResponse.json({
       user: {
         id: user.id,
-        schoolId: user.schoolId,
+        schoolId: dbUser.schoolId,
       },
-      school: user.School
+      school: dbUser.School
         ? {
-            id: user.School.id,
-            name: user.School.name,
-            licenses: user.School.licenses,
+            id: dbUser.School.id,
+            name: dbUser.School.name,
+            licenses: dbUser.School.licenses,
           }
         : null,
       allLicenses,
       debug: {
-        hasSchool: !!user.School,
-        hasLicenses: !!user.School?.licenses,
+        hasSchool: !!dbUser.School,
+        hasLicenses: !!dbUser.School?.licenses,
       },
     });
   } catch (error) {

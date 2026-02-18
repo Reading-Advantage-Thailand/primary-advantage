@@ -1,7 +1,7 @@
 // app/api/flashcards/decks/[deckId]/due/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { fsrsService } from "@/lib/fsrs-service";
 
 export async function GET(
@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ deckId: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

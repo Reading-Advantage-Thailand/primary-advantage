@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 
 // Language options for translation matching
 const TRANSLATION_LANGUAGES = {
@@ -131,7 +131,7 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
   const [activeGameData, setActiveGameData] =
     useState<MatchingGameData[]>(gameData);
   const [audioHintsEnabled, setAudioHintsEnabled] = useState(false);
-  const { data: session, update } = useSession();
+  const { data: session } = authClient.useSession();
 
   // Callback hooks - always called in the same order
   const generatePairsForGame = useCallback(
@@ -244,11 +244,6 @@ export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
         }),
       });
       setIsPlaying(false);
-      update({
-        user: {
-          ...session?.user,
-        },
-      });
     }
   }, [currentIndex, activeGameData.length, deckId, score, timer]);
 

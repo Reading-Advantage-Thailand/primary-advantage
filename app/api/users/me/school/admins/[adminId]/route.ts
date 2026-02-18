@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/session";
 
 // DELETE /api/users/me/school/admins/[adminId] - Remove a school admin
 export async function DELETE(
@@ -8,9 +8,9 @@ export async function DELETE(
   { params }: { params: Promise<{ adminId: string }> },
 ) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -18,7 +18,7 @@ export async function DELETE(
 
     // Get current user's school and verify they are the owner
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       include: {
         School: true,
       },
@@ -36,7 +36,7 @@ export async function DELETE(
     }
 
     // Check if current user is the school owner
-    if (currentUser.School.ownerId !== session.user.id) {
+    if (currentUser.School.ownerId !== user.id) {
       return NextResponse.json(
         { error: "Only the school owner can remove admins" },
         { status: 403 },
@@ -67,7 +67,7 @@ export async function DELETE(
     }
 
     // Prevent owner from removing themselves
-    if (adminRecord.userId === session.user.id) {
+    if (adminRecord.userId === user.id) {
       return NextResponse.json(
         { error: "School owner cannot remove themselves as admin" },
         { status: 400 },
@@ -90,22 +90,13 @@ export async function DELETE(
       // Get user's current roles
       const userWithRoles = await prisma.user.findUnique({
         where: { id: adminRecord.userId },
-        include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
-        },
       });
 
       if (userWithRoles) {
-        const hasAdminRole = userWithRoles.roles.some(
-          (ur) => ur.role.name === "admin",
-        );
+        const hasAdminRole = userWithRoles.role === "admin";
 
         // Only downgrade if they only have Admin role and no other admin responsibilities
-        if (hasAdminRole && userWithRoles.roles.length === 1) {
+        if (hasAdminRole) {
           // Find or create Teacher role as default
           let teacherRole = await prisma.role.findFirst({
             where: { name: "teacher" },
@@ -117,16 +108,9 @@ export async function DELETE(
             });
           }
 
-          // Remove all roles and set Teacher role
-          await prisma.userRole.deleteMany({
-            where: { userId: adminRecord.userId },
-          });
-
-          await prisma.userRole.create({
-            data: {
-              userId: adminRecord.userId,
-              roleId: teacherRole.id,
-            },
+          await prisma.user.update({
+            where: { id: adminRecord.userId },
+            data: { role: teacherRole.name, roleId: teacherRole.id },
           });
         }
       }

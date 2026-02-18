@@ -9,18 +9,17 @@ import { Icons } from "@/components/icons";
 import { redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import ChangeRole from "@/components/shared/change-role";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { Role } from "@/types/enum";
 import { getTranslations } from "next-intl/server";
 
 export default async function UserProfileSettingsPage() {
-  const session = await auth();
   const t = await getTranslations("Settings.userProfile");
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // check if user is not logged in and redirect to signin page
   if (!session) {
-    return redirect("/auth/signin");
+    return redirect("/");
   }
 
   return (

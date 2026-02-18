@@ -39,7 +39,7 @@ import { useRouter } from "@/i18n/navigation";
 import { getLessonOrderingWords } from "@/actions/flashcard";
 import { ActivityType, UserXpEarned } from "@/types/enum";
 import { updateUserActivity } from "@/actions/user";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 
 interface OrderWordData {
   id: string;
@@ -116,7 +116,7 @@ export default function LessonSentenceOrderWord({
   const [timer, setTimer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: session, update } = useSession();
+  const { data: session } = authClient.useSession();
   // Add flag to track if user has made any moves
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [isPlayingHintAudio, setIsPlayingHintAudio] = useState(false);
@@ -283,11 +283,6 @@ export default function LessonSentenceOrderWord({
         },
       );
       setIsPlaying(false);
-      update({
-        user: {
-          ...session?.user,
-        },
-      });
     }
   }, [currentIndex, activeSentences.length]);
 

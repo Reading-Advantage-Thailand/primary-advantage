@@ -1,171 +1,174 @@
-import NextAuth from "next-auth";
-import { User } from "next-auth";
-import Google from "next-auth/providers/google";
-import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import bcrypt from "bcryptjs";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
-import { signInSchema } from "./zod";
-import { ZodError } from "zod";
-import { getUserByEmail, getUserById } from "@/server/models/userModel";
+import { nextCookies } from "better-auth/next-js";
+import { verifyPassword, hashPassword, isBcryptHash } from "@/lib/password";
+import { admin, createAuthEndpoint } from "better-auth/plugins";
+import { setSessionCookie } from "better-auth/cookies";
+import { z } from "zod";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  trustHost: true,
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    Credentials({
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-        type: { label: "Type", type: "text" },
-      },
-      authorize: async (credentials): Promise<User | null> => {
-        try {
-          if (!credentials) return null;
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+  emailAndPassword: {
+    enabled: true,
+    password: {
+      hash: hashPassword,
+      verify: async ({ hash, password }) => {
+        const isValid = await verifyPassword({ hash, password });
 
-          const { email, password, type } =
-            await signInSchema.parseAsync(credentials);
-
-          const user = await getUserByEmail(email);
-
-          if (!user) return null;
-
-          const userData = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.roles.map((role) => role.role.name).join(", "),
-            xp: user.xp,
-            level: user.level,
-            cefrLevel: user.cefrLevel,
-            schoolId: user.schoolId,
-          } as User;
-
-          if (type === "student") {
-            return userData;
-          }
-
-          if (type === "other") {
-            const isPasswordValid = await bcrypt.compare(
-              password,
-              user.password ?? "",
+        // Lazy re-hash: migrate bcrypt → scrypt on successful login
+        if (isValid && isBcryptHash(hash)) {
+          const newHash = await hashPassword(password);
+          // Update the account password in the background (don't block login)
+          prisma.account
+            .updateMany({
+              where: {
+                password: hash,
+                providerId: "credential",
+              },
+              data: { password: newHash },
+            })
+            .catch((err) =>
+              console.error("Failed to re-hash bcrypt password:", err),
             );
-            if (isPasswordValid) {
-              return userData;
-            }
-          }
-          return null;
-        } catch (error) {
-          if (error instanceof ZodError) {
-            console.error("Validation error:", error);
-            return null;
-          }
-          console.error("Sign-in error:", error);
-          return null;
         }
+
+        return isValid;
       },
-    }),
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          scope: "openid profile email",
+    },
+  },
+  advanced: {
+    database: {
+      generateId: false,
+    },
+  },
+  socialProviders: {
+    google: {
+      clientId: process.env.AUTH_GOOGLE_ID as string,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET as string,
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+      },
+      xp: {
+        type: "number",
+        required: false,
+      },
+      level: {
+        type: "number",
+        required: false,
+      },
+      cefrLevel: {
+        type: "string",
+        required: false,
+      },
+      schoolId: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          const defaultRole = await prisma.role.upsert({
+            where: { name: "user" },
+            update: {},
+            create: { name: "user" },
+          });
+
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              roleId: defaultRole.id,
+              role: defaultRole.name,
+            },
+          });
         },
       },
-    }),
+    },
+  },
+  plugins: [
+    nextCookies(),
+    admin(),
+    {
+      id: "student-auth",
+      endpoints: {
+        signInStudent: createAuthEndpoint(
+          {
+            method: "POST",
+            body: z.object({
+              id: z.string(),
+              classroomCode: z.string(),
+            }),
+          },
+          async (ctx) => {
+            const { id, classroomCode } = ctx.body;
+
+            // 1. Verify the classroom code exists and hasn't expired
+            const classroom = await prisma.classroom.findFirst({
+              where: { passwordStudents: classroomCode },
+              select: { id: true, codeExpiresAt: true, students: true },
+            });
+
+            if (!classroom) {
+              return { error: "Invalid classroom code" };
+            } else if (
+              classroom.codeExpiresAt &&
+              new Date() > classroom.codeExpiresAt
+            ) {
+              return { error: "Classroom code has expired" };
+            }
+
+            const isStudentInClass = classroom.students.some(
+              (student) => student.studentId === id,
+            );
+
+            if (!isStudentInClass) {
+              return { error: "Student not found in this classroom" };
+            }
+
+            const student = await prisma.user.findUnique({
+              where: { id },
+            });
+
+            if (!student) {
+              return { error: "Student user not found" };
+            }
+
+            const session = await ctx.context.internalAdapter.createSession(
+              student.id,
+              false,
+            );
+
+            if (!session) {
+              return { error: "Failed to create session" };
+            }
+
+            await setSessionCookie(ctx, { session, user: student }, false);
+
+            return ctx.json({
+              user: student,
+              session,
+            });
+          },
+        ),
+      },
+    },
   ],
-  pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
-  },
   session: {
-    strategy: "jwt",
-    maxAge: 12 * 60 * 60,
-  },
-  callbacks: {
-    async jwt({ token, user, account, trigger }) {
-      if (user) {
-        token.id = user.id as string;
-        token.email = user.email as string;
-        token.name = user.name as string;
-        token.role = user.role;
-        token.xp = user.xp;
-        token.level = user.level;
-        token.cefrLevel = user.cefrLevel;
-        token.schoolId = user.schoolId;
-      }
-
-      if (trigger === "update" && token.email) {
-        const dbUser = await getUserByEmail(token.email as string);
-        if (dbUser) {
-          token.id = dbUser.id;
-          token.email = dbUser.email as string;
-          token.name = dbUser.name as string;
-          token.xp = dbUser.xp;
-          token.level = dbUser.level;
-          token.cefrLevel = dbUser.cefrLevel as string;
-          token.role = dbUser.roles.map((role) => role.role.name).join(", ");
-          token.schoolId = dbUser.schoolId as string;
-        }
-      }
-
-      // Handle Google OAuth users
-      if (account?.provider === "google" && user?.email) {
-        // Normalize email to lowercase
-        const normalizedEmail = user.email.toLowerCase().trim();
-
-        // Fetch user from database to get role
-        const dbUser = await getUserByEmail(normalizedEmail);
-
-        const role = await prisma.role.findFirst({
-          where: { name: "user" },
-        });
-
-        if (!dbUser) {
-          const newUser = await prisma.user.create({
-            data: {
-              name: user.name || "",
-              email: normalizedEmail,
-              image: user.image,
-              emailVerified: new Date(),
-            },
-          });
-
-          await prisma.userRole.create({
-            data: {
-              userId: newUser.id,
-              roleId: role?.id as string,
-            },
-          });
-        }
-
-        if (dbUser) {
-          token.id = dbUser.id;
-          token.role = dbUser.roles.map((role) => role.role.name).join(", ");
-          token.xp = dbUser.xp;
-          token.level = dbUser.level;
-          token.cefrLevel = dbUser.cefrLevel as string;
-          token.schoolId = dbUser.schoolId as string;
-        }
-      }
-
-      return token;
+    cookieCache: {
+      enabled: false,
+      maxAge: 5 * 60, // 5 minutes in seconds
     },
-    async session({ session, token }) {
-      if (token?.sub) {
-        session.user.id = token.id;
-        session.user.email = token.email as string;
-        session.user.name = token.name as string;
-        session.user.role = token.role;
-        session.user.xp = token.xp;
-        session.user.level = token.level;
-        session.user.cefrLevel = token.cefrLevel as string;
-        session.user.schoolId = token.schoolId as string;
-      }
-      return session;
-    },
+    expiresIn: 5 * 60, // 5 minutes in seconds
+    // updateAge: 60 * 60, // 1 hour in seconds
   },
 });

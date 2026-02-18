@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchUserActivity } from "@/server/controllers/userController";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

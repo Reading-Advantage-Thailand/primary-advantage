@@ -51,7 +51,7 @@ interface GoalCardProps {
 }
 
 export function GoalCard({ goal, onUpdate, onDelete }: GoalCardProps) {
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   const queryClient = useQueryClient();
 

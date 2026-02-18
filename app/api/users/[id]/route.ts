@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@/lib/session";
-import bcrypt from "bcryptjs";
+import { getCurrentUser } from "@/lib/session";
+import { hashPassword } from "@/lib/password";
 
 // Replace lines 31-47 in your current API with this corrected version:
 
@@ -10,7 +10,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const currentUserData = await currentUser();
+    const currentUserData = await getCurrentUser();
     if (!currentUserData) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -51,8 +51,7 @@ export async function PATCH(
 
     // Handle password hashing if password is provided
     if (password !== undefined) {
-      const saltRounds = 12;
-      updateData.password = await bcrypt.hash(password, saltRounds);
+      updateData.password = await hashPassword(password);
     }
 
     // Use transaction to handle both user data and role updates
@@ -61,9 +60,6 @@ export async function PATCH(
       const user = await tx.user.update({
         where: { id: userId },
         data: updateData,
-        include: {
-          roles: { include: { role: true } },
-        },
       });
 
       // Handle role update if specified
@@ -77,27 +73,20 @@ export async function PATCH(
           throw new Error(`Role '${role}' not found`);
         }
 
-        // Remove existing roles for this user
-        await tx.userRole.deleteMany({
-          where: { userId: userId },
-        });
-
         // Assign the new role
-        await tx.userRole.create({
+        await tx.user.update({
+          where: { id: userId },
           data: {
-            userId: userId,
+            role: roleRecord.name,
             roleId: roleRecord.id,
           },
         });
-      }
 
-      // Return updated user with roles
-      return await tx.user.findUnique({
-        where: { id: userId },
-        include: {
-          roles: { include: { role: true } },
-        },
-      });
+        // Return updated user with roles
+        return await tx.user.findUnique({
+          where: { id: userId },
+        });
+      }
     });
 
     return NextResponse.json(
@@ -110,7 +99,7 @@ export async function PATCH(
           xp: updatedUser?.xp,
           level: updatedUser?.level,
           cefrLevel: updatedUser?.cefrLevel,
-          roles: updatedUser?.roles.map((ur) => ur.role.name),
+          role: updatedUser?.role,
         },
       },
       { status: 200 },

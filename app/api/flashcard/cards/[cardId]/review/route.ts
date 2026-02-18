@@ -1,7 +1,7 @@
 // app/api/flashcards/cards/[cardId]/review/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { fsrsService } from "@/lib/fsrs-service";
 import { Rating } from "ts-fsrs";
 import { ActivityType } from "@/types/enum";
@@ -12,7 +12,7 @@ export async function POST(
   { params }: { params: Promise<{ cardId: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -41,7 +41,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { AddAdminDialog } from "./add-admin-dialog";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
@@ -100,13 +100,12 @@ export function SchoolDetail({
   onDelete,
   onRefresh,
 }: SchoolDetailProps) {
-  const currentUser = useCurrentUser();
+  const { user } = useCurrentUser();
   const [isDeleting, setIsDeleting] = useState(false);
   const [removingAdminId, setRemovingAdminId] = useState<string | null>(null);
-  const { data: session, update } = useSession();
   const router = useRouter();
   const t = useTranslations("Settings.schoolProfile");
-  const isOwner = currentUser?.id === school.ownerId;
+  const isOwner = user?.id === school.ownerId;
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -121,10 +120,7 @@ export function SchoolDetail({
       }
 
       if (response.ok) {
-        await update({
-          ...session,
-          user: { ...session?.user, role: "User" },
-        });
+        // Session will auto-refresh with updated role via better-auth
       }
 
       toast.success("School deleted successfully!");
@@ -501,10 +497,10 @@ export function SchoolDetail({
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">Admin</Badge>
-                    {isOwner && admin.user.id === currentUser?.id && (
+                    {isOwner && admin.user.id === user?.id && (
                       <Badge>Owner</Badge>
                     )}
-                    {isOwner && admin.user.id !== currentUser?.id && (
+                    {isOwner && admin.user.id !== user?.id && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button

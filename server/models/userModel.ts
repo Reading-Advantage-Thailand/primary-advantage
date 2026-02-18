@@ -1,7 +1,7 @@
-import { auth } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { ActivityType } from "@/types/enum";
-import bcrypt from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 
 export const createUser = async (data: {
   name: string;
@@ -20,38 +20,16 @@ export const createUser = async (data: {
       };
     }
 
-    const hashedPassword = bcrypt.hashSync(data.password, 10);
+    const hashedPassword = await hashPassword(data.password);
 
-    // Find the User role
-    const userRole = await prisma.role.findFirst({
-      where: { name: "user" },
-    });
-
-    if (!userRole) {
-      return {
-        error: "Default user role not found",
-      };
-    }
-
-    // Create user with transaction to ensure role assignment
-    const newUser = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          name: data.name,
-          email: normalizedEmail,
-          password: hashedPassword,
-        },
-      });
-
-      // Assign the User role to the new user
-      await tx.userRole.create({
-        data: {
-          userId: user.id,
-          roleId: userRole.id,
-        },
-      });
-
-      return user;
+    // Create user with default role
+    const newUser = await prisma.user.create({
+      data: {
+        name: data.name,
+        email: normalizedEmail,
+        password: hashedPassword,
+        role: "user",
+      },
     });
 
     return {
@@ -77,11 +55,11 @@ export const updateUserActivity = async (
   xpEarned?: number,
 ) => {
   try {
-    const session = await auth();
-    const userId = session?.user.id;
+    const user = await getCurrentUser();
+    const userId = user?.id;
 
     if (!userId) {
-      throw new Error("Plase login");
+      throw new Error("Please login");
     }
 
     return await prisma.userActivity.create({
@@ -94,7 +72,8 @@ export const updateUserActivity = async (
       },
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error in updateUserActivity model:", error);
+    throw error;
   }
 };
 
@@ -110,40 +89,13 @@ export const getUserByEmail = async (email: string) => {
           mode: "insensitive",
         },
       },
-      include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
-      },
     });
 
-    if (user?.roles.length === 0) {
-      return await prisma.$transaction(async (tx) => {
-        const role = await tx.role.findFirst({
-          where: { name: "user" },
-        });
-
-        if (!role) {
-          throw new Error("Default user role not found");
-        }
-
-        await tx.userRole.create({
-          data: { userId: user.id, roleId: role.id },
-        });
-
-        // Return updated user
-        return await tx.user.findUnique({
-          where: { email: normalizedEmail },
-          include: {
-            roles: {
-              include: {
-                role: true,
-              },
-            },
-          },
-        });
+    // If user exists but has no role, assign default role
+    if (user && !user.role) {
+      return await prisma.user.update({
+        where: { id: user.id },
+        data: { role: "user" },
       });
     }
 
@@ -157,13 +109,6 @@ export const getUserById = async (id: string) => {
     const user = await prisma.user.findUnique({
       where: {
         id: id,
-      },
-      include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
       },
     });
     return user;

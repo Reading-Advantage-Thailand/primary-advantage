@@ -38,7 +38,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 
 interface SAQFeedback {
   score: number;
@@ -59,7 +59,7 @@ export default function SAQuestionContent({
   const t = useTranslations("Question");
   const tc = useTranslations("Components");
   const router = useRouter();
-  const { data: session, update } = useSession();
+  const { data: session } = authClient.useSession();
 
   const formSchema = z.object({
     answer: z
@@ -111,11 +111,6 @@ export default function SAQuestionContent({
               richColors: true,
             });
             setIsOpenModal(false);
-            update({
-              user: {
-                ...session?.user,
-              },
-            });
             router.refresh();
           } else {
             toast.error(res.error, { richColors: true });

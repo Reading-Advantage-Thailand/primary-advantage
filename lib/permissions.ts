@@ -82,7 +82,7 @@ const PERMISSION_REQUIREMENTS: Record<
 
 // User type for permission checking
 export interface UserForPermissions {
-  role?: string;
+  role?: string | null;
   roles?: Array<{
     role: {
       name: string;

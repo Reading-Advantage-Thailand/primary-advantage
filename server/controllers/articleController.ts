@@ -13,7 +13,7 @@ import {
   updateAprovedCustomArticle,
 } from "../models/articleModel";
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { generateArticle } from "../utils/genaretors/article-generator";
 import { evaluateRating } from "../utils/genaretors/evaluate-rating-generator";
 import { generateMCQuestion } from "../utils/genaretors/mc-question-generator";
@@ -159,13 +159,13 @@ export const deleteArticleById = async (articleId: string) => {
 
 export const fetchAllFlashcards = async (req: URLSearchParams) => {
   try {
-    const userId = await currentUser();
+    const user = await getCurrentUser();
 
-    if (!userId) {
+    if (!user) {
       throw new Error("User not found");
     }
 
-    return getAllFlashcards(userId.id);
+    return getAllFlashcards(user.id);
   } catch (error) {
     console.error("Error in fetchAllFlashcards:", error);
     throw new Error("Failed to fetch all flashcards");
@@ -188,7 +188,7 @@ export const deleteFlashcardByIdAction = async (flashcardId: string) => {
 
 export const generateCustomArticle = async (req: NextRequest) => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -226,7 +226,7 @@ export const generateCustomArticle = async (req: NextRequest) => {
 
 export const saveArticleAndPublish = async (req: NextRequest) => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -258,7 +258,7 @@ export const saveArticleAndPublish = async (req: NextRequest) => {
 
 export const saveArticleAsDraft = async (req: NextRequest) => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -282,7 +282,7 @@ export const saveArticleAsDraft = async (req: NextRequest) => {
 
 export const fetchCustomArticleController = async (req: NextRequest) => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

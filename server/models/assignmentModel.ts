@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { AssignmentStatus } from "@prisma/client";
 import { endOfDay } from "date-fns";
 
@@ -14,7 +14,7 @@ interface createAssignmentData {
 
 export async function createAssignment(data: createAssignmentData) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       throw new Error("User is not authenticated");
@@ -194,7 +194,7 @@ export async function getStudentAssignments(
 
 export default async function getAssignmentById(id: string) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       throw new Error("User is not authenticated");
     }

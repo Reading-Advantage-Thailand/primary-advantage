@@ -7,7 +7,6 @@ import {
   getAdminHeatmapModel,
 } from "../models/adminModel";
 import { convertRaLevelToCefr } from "@/lib/utils";
-import { currentUser } from "@/lib/session";
 
 export async function fetchAdminDashboardController(
   schoolId?: string,

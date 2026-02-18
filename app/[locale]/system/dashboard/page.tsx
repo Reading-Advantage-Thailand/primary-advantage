@@ -12,11 +12,11 @@ import {
   HydrationBoundary,
   dehydrate,
 } from "@tanstack/react-query";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 
 export default async function SystemDashboardPage() {
   const t = await getTranslations("System.Dashboard");
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   const queryClient = new QueryClient();
 

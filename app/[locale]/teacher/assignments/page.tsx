@@ -1,10 +1,10 @@
 import React from "react";
 import AuthErrorPage from "../../auth/error/page";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import Assignments from "@/components/teacher/assignments";
 
 export default async function AssignmentsPage() {
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return <AuthErrorPage />;

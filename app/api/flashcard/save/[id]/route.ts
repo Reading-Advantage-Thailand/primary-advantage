@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(
@@ -7,7 +7,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const user = await currentUser();
+  const user = await getCurrentUser();
   const body = await req.json();
 
   if (!user) {

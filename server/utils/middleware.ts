@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { validateUser, UserWithRoles } from "@/server/utils/auth";
 import { hasPermission, Permission } from "@/lib/permissions";
 import { decodeJwt, jwtVerify } from "jose";
@@ -46,7 +46,7 @@ export function withAuth<T = any>(
           if (dbUser) {
             const userForPermissions: AuthenticatedUser = {
               ...dbUser,
-              role: dbUser.roles[0].role.name?.toLowerCase() || "user",
+              role: dbUser.role || "user",
             };
 
             return handler(req, context, userForPermissions);
@@ -55,7 +55,7 @@ export function withAuth<T = any>(
       }
 
       // 1. Check if user is authenticated via session
-      const sessionUser = await currentUser();
+      const sessionUser = await getCurrentUser();
 
       if (!sessionUser || !sessionUser.id) {
         return NextResponse.json(

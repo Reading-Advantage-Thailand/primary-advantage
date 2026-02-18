@@ -29,7 +29,7 @@ import {
 } from "@/types";
 import { cleanGenre, convertCefrLevel } from "@/lib/utils";
 import { deleteFile } from "@/utils/storage";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { FlashcardType } from "@/types/enum";
 
 interface GenerateArticleParams {
@@ -397,9 +397,9 @@ export const getQuestionsByArticleId = async (
   result: QuestionResult;
   questionStatus: QuestionState;
 }> => {
-  const userId = await currentUser();
+  const user = await getCurrentUser();
 
-  if (!userId) {
+  if (!user) {
     throw new Error("User not found");
   }
 
@@ -420,7 +420,7 @@ export const getQuestionsByArticleId = async (
     // Check if questions are already completed
     const activities = await prisma.userActivity.findMany({
       where: {
-        userId: userId.id,
+        userId: user.id,
         targetId: articleId,
         activityType: type,
         completed: true,
@@ -538,7 +538,7 @@ export const deleteFlashcardById = async (flashcardId: string) => {
 
 export const getArticleActivity = async (articleId: string) => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       throw new Error("User not found");
@@ -597,7 +597,7 @@ export const saveArticleAsDraftModel = async (
   subgenre: string,
 ) => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       throw new Error("User not found");
@@ -648,7 +648,7 @@ export const createdArticleCustom = async (
   article: GeneratedContent["article"],
 ) => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       throw new Error("User not found");

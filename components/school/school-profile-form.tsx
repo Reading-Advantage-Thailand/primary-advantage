@@ -25,7 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
@@ -63,7 +63,7 @@ export function SchoolProfileForm({
   onCancel,
 }: SchoolProfileFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { data: session, update } = useSession();
+  const { data: session } = authClient.useSession();
   const router = useRouter();
   const form = useForm<SchoolFormData>({
     resolver: zodResolver(schoolFormSchema),
@@ -102,10 +102,7 @@ export function SchoolProfileForm({
       const school = await response.json();
 
       if (school.roleUpgraded) {
-        await update({
-          ...session,
-          user: { ...session?.user, role: "admin" },
-        });
+        // Session will auto-refresh with updated role via better-auth
       }
 
       toast.success("School created successfully!", {

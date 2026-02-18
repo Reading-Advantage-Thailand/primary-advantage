@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Bot, MessageSquare, Send, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Article } from "@/types";
 import { useTranslations } from "next-intl";
@@ -28,7 +28,7 @@ export default function LessonLanguageQuestion({
   article: Article;
 }) {
   const t = useTranslations("LessonLanguageQuestion");
-  const { data: session } = useSession();
+  const { data: session } = authClient.useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);

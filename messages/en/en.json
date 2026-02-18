@@ -3856,5 +3856,10 @@
         "description": "Try adjusting your filters or refresh the page"
       }
     }
+  },
+  "UnauthorizedPage": {
+    "title": "Access Denied",
+    "description": "You do not have permission to access this page. Please contact your administrator if you believe this is an error.",
+    "backHome": "Back to Home"
   }
 }

@@ -6,8 +6,7 @@ import {
   getUserReminderReread,
 } from "../models/userModel";
 import { ActivityType, UserXpEarned } from "@/types/enum";
-import { error } from "console";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 
 export const handleUpdateUserActivity = async (
   body: {
@@ -37,7 +36,7 @@ export const handleUpdateUserActivity = async (
 
 export const fetchUserActivity = async (id: string) => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       throw new Error("User not found");
@@ -46,7 +45,8 @@ export const fetchUserActivity = async (id: string) => {
     const result = await getUserActivity(id);
     return result;
   } catch (error) {
-    console.log(error);
+    console.error("Error in fetchUserActivity controller:", error);
+    throw error;
   }
 };
 

@@ -1,7 +1,7 @@
 // prisma/seed.ts
 import { PrismaClient, ActivityType } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-import bcrypt from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 import { LEVELS_XP } from "../lib/utils";
 
 const prisma = new PrismaClient();
@@ -86,7 +86,6 @@ async function main() {
   await prisma.xPLogs.deleteMany();
   await prisma.userActivity.deleteMany();
   await prisma.schoolAdmins.deleteMany();
-  await prisma.userRole.deleteMany();
   await prisma.account.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
@@ -167,7 +166,7 @@ async function main() {
 
   // 4. Create System Admin
   console.log("🔐 Creating system admin...");
-  const hashedPassword = await bcrypt.hash("asdfasdf", 10);
+  const hashedPassword = await hashPassword("asdfasdf");
 
   const systemAdminXp = 180000; // High XP for system admin
   const systemAdminLevelData = getLevelAndCefrFromXP(systemAdminXp);
@@ -180,12 +179,7 @@ async function main() {
       cefrLevel: systemAdminLevelData.cefrLevel,
       level: systemAdminLevelData.level,
       xp: systemAdminXp,
-    },
-  });
-
-  await prisma.userRole.create({
-    data: {
-      userId: systemAdmin.id,
+      role: systemRole.name,
       roleId: systemRole.id,
     },
   });
@@ -212,11 +206,9 @@ async function main() {
         level: schoolAdminLevelData.level,
         xp: schoolAdminXp,
         schoolId: school.id,
+        role: adminRole.name,
+        roleId: adminRole.id,
       },
-    });
-
-    await prisma.userRole.create({
-      data: { userId: schoolAdmin.id, roleId: adminRole.id },
     });
 
     await prisma.schoolAdmins.create({
@@ -241,11 +233,9 @@ async function main() {
             level: teacherLevelData.level,
             xp: teacherXp,
             schoolId: school.id,
+            role: teacherRole.name,
+            roleId: teacherRole.id,
           },
-        });
-
-        await prisma.userRole.create({
-          data: { userId: teacher.id, roleId: teacherRole.id },
         });
 
         return teacher;
@@ -269,11 +259,9 @@ async function main() {
             level: studentLevelData.level,
             xp: studentXp,
             schoolId: school.id,
+            role: studentRole.name,
+            roleId: studentRole.id,
           },
-        });
-
-        await prisma.userRole.create({
-          data: { userId: student.id, roleId: studentRole.id },
         });
 
         return student;
@@ -708,13 +696,7 @@ async function main() {
   // Update lastActiveAt for school admins
   const schoolAdmins = await prisma.user.findMany({
     where: {
-      roles: {
-        some: {
-          role: {
-            name: "admin",
-          },
-        },
-      },
+      role: adminRole.name,
     },
   });
 

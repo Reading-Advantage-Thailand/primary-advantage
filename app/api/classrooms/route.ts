@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 interface ClassroomData {
@@ -14,7 +14,7 @@ export async function GET(
   request: NextRequest,
 ): Promise<NextResponse<ClassroomData[] | { error: string }>> {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -24,11 +24,6 @@ export async function GET(
     const userWithRoles = await prisma.user.findUnique({
       where: { id: user.id },
       include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
         SchoolAdmins: true,
       },
     });
@@ -37,10 +32,8 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const isAdmin = userWithRoles.roles.some(
-      (userRole) =>
-        userRole.role.name === "admin" || userRole.role.name === "system",
-    );
+    const isAdmin =
+      userWithRoles.role === "admin" || userWithRoles.role === "system";
 
     if (!isAdmin && userWithRoles.SchoolAdmins.length === 0) {
       return NextResponse.json(
@@ -55,7 +48,7 @@ export async function GET(
     // If user is school admin, only show classrooms from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r) => r.role.name === "system")
+      userWithRoles.role !== "system"
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -66,15 +59,7 @@ export async function GET(
       include: {
         students: {
           include: {
-            student: {
-              include: {
-                roles: {
-                  include: {
-                    role: true,
-                  },
-                },
-              },
-            },
+            student: true,
           },
         },
       },
@@ -88,8 +73,8 @@ export async function GET(
       id: classroom.id,
       name: classroom.name,
       grade: classroom.grade,
-      studentCount: classroom.students.filter((cs) =>
-        cs.student.roles.some((r) => r.role.name === "student"),
+      studentCount: classroom.students.filter(
+        (cs) => cs.student.role === "student",
       ).length,
     }));
 

@@ -1,121 +1,299 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 import createIntlMiddleware from "next-intl/middleware";
-import { getPathname } from "./i18n/navigation";
-import { routing } from "./i18n/routing";
-import { currentUser } from "./lib/session";
+import { routing } from "@/i18n/routing";
 
-// Define protected routes and their required roles
-const protectedRoutes = {
-  "/admin": ["admin", "system"],
-  "/teacher": ["teacher", "admin", "system"],
+// ===== next-intl middleware instance =====
+const intlMiddleware = createIntlMiddleware(routing);
+
+// ===== Configuration =====
+
+const LOCALES = routing.locales as unknown as string[];
+const DEFAULT_LOCALE = routing.defaultLocale;
+
+/**
+ * Route-to-role mapping
+ * Key: route prefix (without locale)
+ * Value: array of roles allowed to access routes under that prefix
+ */
+const ROUTE_ROLES: Record<string, string[]> = {
   "/student": ["student", "teacher", "admin", "system"],
+  "/teacher": ["teacher", "admin", "system"],
+  "/admin": ["admin", "system"],
   "/system": ["system"],
-  "/settings": ["user", "student", "teacher", "admin", "system"],
 };
 
-// Define role-based default redirects after login
-const roleDefaultRedirects = {
-  user: "/",
+/**
+ * Protected routes that require authentication but allow any role
+ */
+const AUTH_ONLY_ROUTES = ["/settings"];
+
+/**
+ * Public path prefixes — accessible without authentication
+ */
+const PUBLIC_PREFIXES = [
+  "/auth",
+  "/about",
+  "/authors",
+  "/contact",
+  "/privacy-policy",
+  "/terms",
+  "/unauthorized",
+];
+
+/**
+ * Public exact paths
+ */
+const PUBLIC_EXACT = ["/"];
+
+/**
+ * Role-to-dashboard mapping
+ * After login, users are redirected to their role-specific dashboard
+ */
+const ROLE_DASHBOARDS: Record<string, string> = {
   student: "/student/read",
-  teacher: "/teacher/my-classes",
+  teacher: "/teacher/dashboard",
   admin: "/admin/dashboard",
   system: "/system/dashboard",
 };
 
-// Create the intl middleware
-const intlMiddleware = createIntlMiddleware(routing);
+/**
+ * Auth page prefixes — if already logged in, redirect to role dashboard
+ */
+const AUTH_PAGES = ["/auth/signin", "/auth/signup"];
+
+/**
+ * Auth callback path — used after OAuth login to redirect based on role
+ */
+const AUTH_CALLBACK = "/auth/callback";
+
+// ===== Helpers =====
+
+/**
+ * Strip locale prefix from pathname
+ * e.g. /th/admin/dashboard → /admin/dashboard
+ *      /admin/dashboard → /admin/dashboard
+ */
+function stripLocale(pathname: string): string {
+  for (const locale of LOCALES) {
+    const prefix = `/${locale}`;
+    if (pathname === prefix) return "/";
+    if (pathname.startsWith(`${prefix}/`)) {
+      return pathname.slice(prefix.length);
+    }
+  }
+  return pathname;
+}
+
+/**
+ * Extract locale from pathname, fallback to default
+ */
+function getLocale(pathname: string): string {
+  for (const locale of LOCALES) {
+    if (pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)) {
+      return locale;
+    }
+  }
+  return DEFAULT_LOCALE;
+}
+
+/**
+ * Check if a path (without locale) is public
+ */
+function isPublicPath(path: string): boolean {
+  if (PUBLIC_EXACT.includes(path)) return true;
+  return PUBLIC_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
+}
+
+/**
+ * Check if the path is an auth page (signin/signup)
+ */
+function isAuthPage(path: string): boolean {
+  return AUTH_PAGES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
+}
+
+/**
+ * Get the dashboard URL for a given role
+ */
+function getDashboardForRole(role: string): string {
+  return ROLE_DASHBOARDS[role] || "/";
+}
+
+/**
+ * Find the matching role-protected route and return its allowed roles.
+ * Returns null if the path is not role-protected.
+ */
+function getAllowedRoles(path: string): string[] | null {
+  for (const [prefix, roles] of Object.entries(ROUTE_ROLES)) {
+    if (path === prefix || path.startsWith(`${prefix}/`)) {
+      return roles;
+    }
+  }
+  return null;
+}
+
+/**
+ * Check if a path requires authentication only (any role)
+ */
+function isAuthOnlyPath(path: string): boolean {
+  return AUTH_ONLY_ROUTES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
+}
+
+/**
+ * Check if pathname already has a locale prefix
+ */
+function hasLocale(pathname: string): boolean {
+  for (const locale of LOCALES) {
+    if (pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// ===== Middleware =====
+
+/**
+ * Fetch and validate the current session from the auth API.
+ * Returns the session object if valid, or null if expired/invalid.
+ */
+async function getValidSession(
+  request: NextRequest,
+): Promise<{ user: { role?: string; [key: string]: unknown } } | null> {
+  try {
+    const res = await fetch(new URL("/api/auth/get-session", request.url), {
+      headers: { cookie: request.headers.get("cookie") || "" },
+    });
+    if (!res.ok) return null;
+    const session = await res.json();
+    if (!session?.user) return null;
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Build a redirect URL to the signin page with callbackUrl and optional reason.
+ * callbackUrl is stored WITHOUT locale prefix so next-intl router can handle it correctly.
+ */
+function buildSigninRedirect(
+  request: NextRequest,
+  locale: string,
+  pathname: string,
+  reason?: "expired",
+): NextResponse {
+  const signinUrl = new URL(`/${locale}/auth/signin`, request.url);
+  // Strip locale from callback so the signin form can use router.push()
+  // without next-intl doubling the locale prefix
+  const callbackPath = stripLocale(pathname);
+  signinUrl.searchParams.set("callbackUrl", callbackPath);
+  if (reason) {
+    signinUrl.searchParams.set("session", reason);
+  }
+  return NextResponse.redirect(signinUrl);
+}
 
 export default async function middleware(request: NextRequest) {
-  // Get the pathname without locale
+  const { pathname } = request.nextUrl;
 
-  const pathname = request.nextUrl.pathname;
-  const locale = request.nextUrl.pathname.split("/")[1];
-  const pathWithoutLocale = pathname.replace(`/${locale}`, "") || "/";
-
-  // Handle post-login redirects
-  if (pathWithoutLocale === "/auth/signin") {
-    const session = await currentUser();
-    const token = session;
-
-    if (token) {
-      const userRole = token.role as string;
-      const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
-
-      if (callbackUrl) {
-        // Check if user has access to the callback URL
-        const callbackPathWithoutLocale =
-          callbackUrl.replace(`/${locale}`, "") || "/";
-        const requiredRoles = Object.entries(protectedRoutes).find(([route]) =>
-          callbackPathWithoutLocale.startsWith(route),
-        )?.[1];
-
-        if (requiredRoles && requiredRoles.includes(userRole)) {
-          // If user has access to callback URL, redirect there
-          return NextResponse.redirect(new URL(callbackUrl, request.url));
-        }
-      }
-
-      // If no callback URL or user doesn't have access, use default redirect
-      const defaultRedirect =
-        roleDefaultRedirects[userRole as keyof typeof roleDefaultRedirects];
-      if (defaultRedirect) {
-        return NextResponse.redirect(
-          new URL(`/${locale}${defaultRedirect}`, request.url),
-        );
-      }
-      // Fallback redirect to home page
-      return NextResponse.redirect(new URL(`/${locale}/`, request.url));
-    }
+  // 0. If no locale prefix, let next-intl handle the redirect
+  if (!hasLocale(pathname)) {
+    return intlMiddleware(request);
   }
 
-  //handle i18n routing
-  const response = intlMiddleware(request);
+  const locale = getLocale(pathname);
+  const path = stripLocale(pathname);
 
-  // Check if the route is protected
-  const isProtectedRoute = Object.keys(protectedRoutes).some((route) =>
-    pathWithoutLocale.startsWith(route),
-  );
-
-  if (isProtectedRoute) {
-    const session = await currentUser();
-    const token = session;
-
-    // If no token, redirect to login
-    if (!token) {
-      const loginUrl = new URL(`/${locale}/auth/signin`, request.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    // Check if user has required role for the route
-    const userRole = token.role as string;
-    const requiredRoles = Object.entries(protectedRoutes).find(([route]) =>
-      pathWithoutLocale.startsWith(route),
-    )?.[1];
-
-    if (requiredRoles && !requiredRoles.includes(userRole)) {
-      // Redirect to unauthorized page if user doesn't have required role
+  // 1. Auth callback — after OAuth, redirect to role-based dashboard
+  if (path === AUTH_CALLBACK) {
+    const session = getSessionCookie(request)
+      ? await getValidSession(request)
+      : null;
+    if (session?.user) {
+      const role = (session.user.role as string) || "user";
+      const dashboard = getDashboardForRole(role);
       return NextResponse.redirect(
-        new URL(`/${locale}/unauthorized`, request.url),
+        new URL(`/${locale}${dashboard}`, request.url),
       );
     }
+    return NextResponse.redirect(
+      new URL(`/${locale}/auth/signin`, request.url),
+    );
   }
 
-  return response;
+  // 2. If user is logged in and visits auth pages → redirect to role dashboard
+  if (isAuthPage(path)) {
+    if (getSessionCookie(request)) {
+      const session = await getValidSession(request);
+      if (session?.user) {
+        const role = (session.user.role as string) || "user";
+        const dashboard = getDashboardForRole(role);
+        return NextResponse.redirect(
+          new URL(`/${locale}${dashboard}`, request.url),
+        );
+      }
+    }
+    return intlMiddleware(request);
+  }
+
+  // 3. Public paths — allow access without authentication
+  if (isPublicPath(path)) {
+    return intlMiddleware(request);
+  }
+
+  // 4. Check for session cookie (fast path — no network call if no cookie)
+  //    No cookie at all → never had a session or it was fully cleared
+  if (!getSessionCookie(request)) {
+    return buildSigninRedirect(request, locale, pathname);
+  }
+
+  // 5. Validate session against the auth API
+  //    Cookie exists but session may be expired server-side
+  const session = await getValidSession(request);
+
+  if (!session?.user) {
+    // Session cookie exists but session is expired/invalid
+    // → redirect to signin with expired reason so client can show a message
+    return buildSigninRedirect(request, locale, pathname, "expired");
+  }
+
+  // 6. Determine if this route needs role checking
+  const allowedRoles = getAllowedRoles(path);
+  const authOnly = isAuthOnlyPath(path);
+
+  // If the path is neither role-protected nor auth-only,
+  // let Next.js handle it (will hit [...not-found] catch-all if no page exists)
+  if (!allowedRoles && !authOnly) {
+    return intlMiddleware(request);
+  }
+
+  // 7. Auth-only route — user is authenticated, allow access
+  if (authOnly && !allowedRoles) {
+    return intlMiddleware(request);
+  }
+
+  // 8. Role-based access check
+  const userRole = (session.user.role as string) || "user";
+
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
+    // Role doesn't match — redirect to their own dashboard
+    const dashboard = getDashboardForRole(userRole);
+    return NextResponse.redirect(
+      new URL(`/${locale}${dashboard}`, request.url),
+    );
+  }
+
+  // Authorized — proceed
+  return intlMiddleware(request);
 }
 
 export const config = {
-  // Match all pathnames except for
-  // - API routes
-  // - Next.js internals
-  // - Static files
-  matcher: [
-    "/((?!api|trpc|_next|_next/image|favicon.ico|_vercel|.*\\..*).*)",
-    // "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
-    // Skip Next.js internals and all static files, unless found in search params
-    // "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // // Always run for API routes
-    // "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!api|trpc|_next|_next/image|favicon.ico|_vercel|.*\\..*).*)"],
 };

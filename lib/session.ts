@@ -1,11 +1,10 @@
+import { headers } from "next/headers";
 import { auth } from "./auth";
 
-export const currentUser = async () => {
-  const session = await auth();
-  return session?.user;
-};
+export const getCurrentUser = async () => {
+  const session = await auth.api.getSession({ headers: await headers() });
 
-export const currentRole = async () => {
-  const session = await auth();
-  return session?.user?.role;
+  if (!session) return null;
+
+  return session.user;
 };

@@ -22,11 +22,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  roles: Array<{
-    role: {
-      name: string;
-    };
-  }>;
+  role: string;
 }
 
 interface AddAdminDialogProps {
@@ -167,7 +163,10 @@ export function AddAdminDialog({
                           {user.email}
                         </p>
                         <div className="mt-1 flex gap-1">
-                          {user.roles.map((userRole, index) => (
+                          <Badge variant="secondary" className="text-xs">
+                            {user.role}
+                          </Badge>
+                          {/* {user.roles.map((userRole, index) => (
                             <Badge
                               key={index}
                               variant="secondary"
@@ -175,7 +174,7 @@ export function AddAdminDialog({
                             >
                               {userRole.role.name}
                             </Badge>
-                          ))}
+                          ))} */}
                         </div>
                       </div>
                     </div>

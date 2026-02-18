@@ -1,5 +1,5 @@
 import { ClassDetailDashboard } from "@/components/dashboard/teacher/class-detail-dashboard";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import AuthErrorPage from "@/app/[locale]/auth/error/page";
 import {
   QueryClient,
@@ -16,7 +16,7 @@ export default async function ClassDetailReportsPage({
 }: {
   params: Promise<{ classroomId: string }>;
 }) {
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return <AuthErrorPage />;

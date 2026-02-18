@@ -5,6 +5,7 @@ import path from "path";
 import { parse } from "csv/sync";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/session";
 /**
  * CSV Upload API Route
  *
@@ -34,21 +35,16 @@ import { auth } from "@/lib/auth";
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get current user with school information
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       include: {
         School: true,
-        roles: {
-          include: {
-            role: true,
-          },
-        },
       },
     });
 
@@ -57,11 +53,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has permission to upload (admin, system, or teacher roles)
-    const currentUserRoles = currentUser.roles.map((ur) => ur.role.name);
+    // const currentUserRoles = currentUser.roles.map((ur) => ur.role.name);
     const allowedRoles = ["admin", "system", "teacher"];
-    const hasPermission = currentUserRoles.some((role) =>
-      allowedRoles.includes(role),
-    );
+    const hasPermission = allowedRoles.includes(currentUser.role as string);
 
     if (!hasPermission) {
       return NextResponse.json(
@@ -70,14 +64,14 @@ export async function POST(request: NextRequest) {
           details: [
             "Only Admin, System, or Teacher roles can upload CSV files",
           ],
-          userRoles: currentUserRoles,
+          userRoles: currentUser.role,
         },
         { status: 403 },
       );
     }
 
     // For non-system users, require school association
-    if (!currentUserRoles.includes("system") && !currentUser.schoolId) {
+    if (currentUser.role !== "system" && !currentUser.schoolId) {
       return NextResponse.json(
         {
           error: "School association required",
@@ -141,7 +135,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename with timestamp
     const timestamp = Date.now();
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${session.user.id}_${originalName}`;
+    const fileName = `${user.id}_${originalName}`;
     const filePath = path.join(tempDir, fileName);
 
     // Convert file to buffer and save
@@ -271,7 +265,7 @@ export async function POST(request: NextRequest) {
         cefrLevel: "A0-", // Default CEFR level
         level: 1, // Default level
         xp: 0, // Default XP
-        schoolId: currentUser.schoolId, // Assign to current user's school (null for system users)
+        schoolId: user.schoolId, // Assign to current user's school (null for system users)
       };
 
       processedUsers.push(userData);
@@ -358,14 +352,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create role assignments in batches
-    if (roleAssignments.length > 0) {
-      await prisma.userRole.createMany({
-        data: roleAssignments,
-        skipDuplicates: true, // Skip duplicate role assignments
-      });
-    }
-
     // Handle classroom assignments
     let classroomsCreated = 0;
     let studentAssignments = 0;
@@ -405,7 +391,7 @@ export async function POST(request: NextRequest) {
         let classroom = await prisma.classroom.findFirst({
           where: {
             name: classroomName,
-            schoolId: currentUser.schoolId,
+            schoolId: user.schoolId,
           },
         });
 
@@ -414,7 +400,7 @@ export async function POST(request: NextRequest) {
           classroom = await prisma.classroom.create({
             data: {
               name: classroomName,
-              schoolId: currentUser.schoolId,
+              schoolId: user.schoolId,
             },
           });
           classroomsCreated++;

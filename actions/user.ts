@@ -1,9 +1,11 @@
 "use server";
 
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { ActivityType } from "@/types/enum";
 import { calculateLevelAndCefrLevel } from "@/lib/utils";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function updateUserActivity(
   articleId: string,
@@ -15,7 +17,7 @@ export async function updateUserActivity(
     details?: Record<string, any>;
   } = {},
 ) {
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return { error: "User not found" };
@@ -96,3 +98,29 @@ export async function updateUserActivity(
 
   return { success: true };
 }
+
+export const updateRoleAction = async (roleName: string) => {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session || !session.user) {
+    return { error: "User not authenticated" };
+  }
+
+  const roleChanged = await prisma.role.findUnique({
+    where: { name: roleName },
+  });
+
+  if (!roleChanged) {
+    return { error: "Role not found" };
+  }
+
+  await prisma.user.update({
+    where: { id: session.user.id as string },
+    data: {
+      roleId: roleChanged.id,
+      role: roleChanged.name,
+    },
+  });
+
+  return { success: true };
+};

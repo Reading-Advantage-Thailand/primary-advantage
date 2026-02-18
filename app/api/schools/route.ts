@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { getCurrentUser } from "@/lib/session";
 
 const createSchoolSchema = z.object({
   name: z.string().min(2).max(100),
@@ -11,14 +11,14 @@ const createSchoolSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user has system role (only system admins can create schools)
-    if (session.user.role !== "system") {
+    if (user.role !== "system") {
       return NextResponse.json(
         {
           error: "Forbidden. Only system administrators can create schools.",
@@ -73,14 +73,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user has system role
-    if (session.user.role !== "system") {
+    if (user.role !== "system") {
       return NextResponse.json(
         {
           error: "Forbidden. Only system administrators can view schools.",

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 import {
   StudentData,
   CreateStudentInput,
@@ -88,7 +88,7 @@ export const getStudents = async (
     // If user is school admin, only show students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "system")
+      userWithRoles.role !== "system"
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -130,11 +130,6 @@ export const getStudents = async (
       prisma.user.findMany({
         where: whereClause,
         include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
           studentClassroom: {
             include: {
               classroom: {
@@ -164,9 +159,7 @@ export const getStudents = async (
       email: student.email,
       cefrLevel: student.cefrLevel,
       xp: student.xp,
-      role:
-        student.roles.find((r) => r.role.name === "student")?.role.name ||
-        "student",
+      role: student.role || "student",
       createdAt: student.createdAt.toISOString().split("T")[0],
       className: student.studentClassroom[0]?.classroom.name || null,
       classroomId: student.studentClassroom[0]?.classroom.id || null,
@@ -202,7 +195,7 @@ export const getStudentById = async (
     // If user is school admin, only show students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "system")
+      userWithRoles.role !== "system"
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -210,11 +203,6 @@ export const getStudentById = async (
     const student = await prisma.user.findFirst({
       where: whereClause,
       include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
         studentClassroom: {
           include: {
             classroom: {
@@ -240,9 +228,7 @@ export const getStudentById = async (
       email: student.email,
       cefrLevel: student.cefrLevel,
       xp: student.xp,
-      role:
-        student.roles.find((r) => r.role.name === "student")?.role.name ||
-        "student",
+      role: student.role || "student",
       createdAt: student.createdAt.toISOString().split("T")[0],
       className: student.studentClassroom[0]?.classroom.name || null,
       classroomId: student.studentClassroom[0]?.classroom.id || null,
@@ -316,9 +302,9 @@ export const createStudent = async (params: {
     }
 
     // Generate password if not provided
-    const hashedPassword = password
-      ? bcrypt.hashSync(password, 10)
-      : bcrypt.hashSync(Math.random().toString(36).slice(-8), 10);
+    const hashedPassword = await hashPassword(
+      password || Math.random().toString(36).slice(-8),
+    );
 
     // Create the new student
     const newStudent = await prisma.user.create({
@@ -330,11 +316,8 @@ export const createStudent = async (params: {
         schoolId,
         xp: 0,
         level: 1,
-        roles: {
-          create: {
-            roleId: roleRecord.id,
-          },
-        },
+        role: "student",
+        roleId: roleRecord.id,
         ...(classroomId && {
           studentClassroom: {
             create: {
@@ -344,11 +327,6 @@ export const createStudent = async (params: {
         }),
       },
       include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
         studentClassroom: {
           include: {
             classroom: {
@@ -369,7 +347,7 @@ export const createStudent = async (params: {
       email: newStudent.email,
       cefrLevel: newStudent.cefrLevel,
       xp: newStudent.xp,
-      role: newStudent.roles[0]?.role.name || "student",
+      role: newStudent.role || "student",
       createdAt: newStudent.createdAt.toISOString().split("T")[0],
       className: newStudent.studentClassroom[0]?.classroom.name || null,
       classroomId: newStudent.studentClassroom[0]?.classroom.id || null,
@@ -407,7 +385,7 @@ export const updateStudent = async (
     // If user is school admin, only allow updates to students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "system")
+      userWithRoles.role !== "system"
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -463,7 +441,7 @@ export const updateStudent = async (
       updatePayload.email = updateData.email.toLowerCase().trim();
     if (updateData.cefrLevel) updatePayload.cefrLevel = updateData.cefrLevel;
     if (updateData.password) {
-      updatePayload.password = bcrypt.hashSync(updateData.password, 10);
+      updatePayload.password = await hashPassword(updateData.password);
     }
 
     // Update the student
@@ -471,11 +449,6 @@ export const updateStudent = async (
       where: { id },
       data: updatePayload,
       include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
         studentClassroom: {
           include: {
             classroom: {
@@ -510,11 +483,6 @@ export const updateStudent = async (
       const finalStudent = await prisma.user.findUnique({
         where: { id },
         include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
           studentClassroom: {
             include: {
               classroom: {
@@ -536,9 +504,7 @@ export const updateStudent = async (
           email: finalStudent.email,
           cefrLevel: finalStudent.cefrLevel,
           xp: finalStudent.xp,
-          role:
-            finalStudent.roles.find((r) => r.role.name === "student")?.role
-              .name || "student",
+          role: finalStudent.role || "student",
           createdAt: finalStudent.createdAt.toISOString().split("T")[0],
           className: finalStudent.studentClassroom[0]?.classroom.name || null,
           classroomId: finalStudent.studentClassroom[0]?.classroom.id || null,
@@ -559,9 +525,7 @@ export const updateStudent = async (
       email: updatedStudent.email,
       cefrLevel: updatedStudent.cefrLevel,
       xp: updatedStudent.xp,
-      role:
-        updatedStudent.roles.find((r) => r.role.name === "student")?.role
-          .name || "student",
+      role: updatedStudent.role || "student",
       createdAt: updatedStudent.createdAt.toISOString().split("T")[0],
       className: updatedStudent.studentClassroom[0]?.classroom.name || null,
       classroomId: updatedStudent.studentClassroom[0]?.classroom.id || null,
@@ -586,19 +550,13 @@ export const deleteStudent = async (
     // Build where clause based on user's permissions
     let whereClause: any = {
       id,
-      roles: {
-        some: {
-          role: {
-            name: "student",
-          },
-        },
-      },
+      role: "student",
     };
 
     // If user is school admin, only allow deletion of students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "system")
+      userWithRoles.role !== "system"
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }
@@ -612,11 +570,6 @@ export const deleteStudent = async (
       console.log("Student Model: Student not found or no permission:", id);
       return { success: false, error: "Student not found" };
     }
-
-    // Delete related records first
-    await prisma.userRole.deleteMany({
-      where: { userId: id },
-    });
 
     await prisma.classroomStudent.deleteMany({
       where: { studentId: id },
@@ -648,19 +601,13 @@ export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
   try {
     // Build where clause based on user's permissions
     let whereClause: any = {
-      roles: {
-        some: {
-          role: {
-            name: "student",
-          },
-        },
-      },
+      role: "student",
     };
 
     // If user is school admin, only show students from their school
     if (
       userWithRoles.SchoolAdmins.length > 0 &&
-      !userWithRoles.roles.some((r: any) => r.role.name === "system")
+      userWithRoles.role !== "system"
     ) {
       whereClause.schoolId = userWithRoles.schoolId;
     }

@@ -11,9 +11,9 @@ datasource db {
 
 model User {
   id                    String                   @id @default(cuid())
-  name                  String?
-  email                 String?                  @unique
-  emailVerified         DateTime?                @map("email_verified")
+  name                  String
+  email                 String                   @unique
+  emailVerified         Boolean                  @default(false) @map("email_verified")
   image                 String?
   createdAt             DateTime                 @default(now())
   updatedAt             DateTime                 @updatedAt
@@ -23,17 +23,22 @@ model User {
   level                 Int                      @default(1)
   xp                    Int                      @default(0)
   schoolId              String?                  @map("school_id")
+  School                School?                  @relation(fields: [schoolId], references: [id])
+  role                  String?                  @default("user")
+  roleId                String?                  @map("role_id")
+  roleRef               Role?                    @relation(fields: [roleId], references: [id])
+  banned                Boolean?
+  banReason             String?
+  banExpires            DateTime?
   accounts              Account[]
+  sessions              Session[]
   ArticleActivityLog    ArticleActivityLog[]
   AssignmentStudent     AssignmentStudent[]
   studentClassroom      ClassroomStudent[]
   ClassroomTeachers     ClassroomTeachers[]
   FlashcardDeck         FlashcardDeck[]
   SchoolAdmins          SchoolAdmins[]
-  sessions              Session[]
   userActivity          UserActivity[]
-  roles                 UserRole[]
-  School                School?                  @relation(fields: [schoolId], references: [id])
   XpLogs                XPLogs[]
   userLessonProgress    UserLessonProgress[]
   learningGoals         LearningGoal[]
@@ -45,58 +50,53 @@ model User {
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String  @map("user_id")
-  type              String
-  provider          String
-  providerAccountId String  @map("provider_account_id")
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    String    @id @default(cuid())
+  userId                String    @map("user_id")
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  idToken               String?   @map("id_token")
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
   @@map("accounts")
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique @map("session_token")
-  userId       String   @map("user_id")
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  token     String   @unique @map("session_token")
+  expiresAt DateTime @map("expires_at")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
 
-model VerificationToken {
+model Verification {
+  id         String   @id @default(cuid())
   identifier String
-  token      String
-  expires    DateTime
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
-model UserRole {
-  id     String @id @default(cuid())
-  userId String
-  roleId String
-  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, roleId])
-  @@map("user_roles")
+  @@map("verifications")
 }
 
 model Role {
-  id    String     @id @default(cuid())
-  name  String
-  users UserRole[]
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
 
   @@map("roles")
 }

@@ -170,7 +170,7 @@ export default function LAQuestionContent({
   const { timer, setPaused } = useContext(QuizContext);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
   const locale = useLocale();
   const t = useTranslations("Question");
   const tc = useTranslations("Components");

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { addDays } from "date-fns";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { UserWithRoles } from "@/server/utils/auth";
 
 export const createClassCode = async (
@@ -40,7 +40,7 @@ export const createClassroom = async (data: {
   teacherId?: string;
   classCode?: string;
   grade?: string;
-  role?: string;
+  role?: string | null;
 }) => {
   try {
     let created = false;
@@ -136,13 +136,7 @@ export const enrollStudentInClassroom = async (
     const student = await prisma.user.findFirst({
       where: {
         id: studentId,
-        roles: {
-          some: {
-            role: {
-              name: "student",
-            },
-          },
-        },
+        role: "student",
       },
     });
 
@@ -278,13 +272,7 @@ export const getAvailableStudentsForClassroom = async (
     // Get all students who are not enrolled in this classroom
     const availableStudents = await prisma.user.findMany({
       where: {
-        roles: {
-          some: {
-            role: {
-              name: "student",
-            },
-          },
-        },
+        role: "student",
         studentClassroom: {
           none: {
             classroomId,
@@ -315,17 +303,11 @@ export const getAvailableStudentsForClassroom = async (
 export const getAllClassrooms = async (userWithRoles: UserWithRoles) => {
   try {
     // Check user roles to determine access level
-    const isSystemAdmin = userWithRoles.roles.some(
-      (userRole) => userRole.role.name === "system",
-    );
+    const isSystemAdmin = userWithRoles.role === "system";
 
-    const isAdmin = userWithRoles.roles.some(
-      (userRole) => userRole.role.name === "admin",
-    );
+    const isAdmin = userWithRoles.role === "admin";
 
-    const isTeacher = userWithRoles.roles.some(
-      (userRole) => userRole.role.name === "teacher",
-    );
+    const isTeacher = userWithRoles.role === "teacher";
 
     const isSchoolAdmin = userWithRoles.SchoolAdmins.length > 0;
 
@@ -455,7 +437,7 @@ export const updateClassroom = async (
 export const deleteClassroom = async (
   classroomId: string,
   teacherId: string,
-  role?: string,
+  role?: string | null,
 ) => {
   try {
     if (role === "teacher") {
@@ -656,13 +638,7 @@ export const getAllStudentsInSystem = async () => {
     // Get all users with STUDENT role
     const students = await prisma.user.findMany({
       where: {
-        roles: {
-          some: {
-            role: {
-              name: "student",
-            },
-          },
-        },
+        role: "student",
       },
       select: {
         id: true,
