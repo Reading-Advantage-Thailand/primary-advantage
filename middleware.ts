@@ -199,7 +199,11 @@ function buildSigninRedirect(
   pathname: string,
   reason?: "expired",
 ): NextResponse {
-  const signinUrl = new URL(`/${locale}/auth/signin`, request.url);
+  const baseUrl =
+    process.env.BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
+    request.nextUrl.origin;
+  const signinUrl = new URL(`/${locale}/auth/signin`, baseUrl);
   // Strip locale from callback so the signin form can use router.push()
   // without next-intl doubling the locale prefix
   const callbackPath = stripLocale(pathname);
@@ -222,6 +226,11 @@ export default async function middleware(request: NextRequest) {
   const path = stripLocale(pathname);
 
   // 1. Auth callback — after OAuth, redirect to role-based dashboard
+  const publicBaseUrl =
+    process.env.BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
+    request.nextUrl.origin;
+
   if (path === AUTH_CALLBACK) {
     const session = getSessionCookie(request)
       ? await getValidSession(request)
@@ -230,11 +239,11 @@ export default async function middleware(request: NextRequest) {
       const role = (session.user.role as string) || "user";
       const dashboard = getDashboardForRole(role);
       return NextResponse.redirect(
-        new URL(`/${locale}${dashboard}`, request.url),
+        new URL(`/${locale}${dashboard}`, publicBaseUrl),
       );
     }
     return NextResponse.redirect(
-      new URL(`/${locale}/auth/signin`, request.url),
+      new URL(`/${locale}/auth/signin`, publicBaseUrl),
     );
   }
 
@@ -246,7 +255,7 @@ export default async function middleware(request: NextRequest) {
         const role = (session.user.role as string) || "user";
         const dashboard = getDashboardForRole(role);
         return NextResponse.redirect(
-          new URL(`/${locale}${dashboard}`, request.url),
+          new URL(`/${locale}${dashboard}`, publicBaseUrl),
         );
       }
     }
@@ -296,7 +305,7 @@ export default async function middleware(request: NextRequest) {
     // Role doesn't match — redirect to their own dashboard
     const dashboard = getDashboardForRole(userRole);
     return NextResponse.redirect(
-      new URL(`/${locale}${dashboard}`, request.url),
+      new URL(`/${locale}${dashboard}`, publicBaseUrl),
     );
   }
 
