@@ -167,9 +167,19 @@ async function getValidSession(
   request: NextRequest,
 ): Promise<{ user: { role?: string; [key: string]: unknown } } | null> {
   try {
-    const res = await fetch(new URL("/api/auth/get-session", request.url), {
-      headers: { cookie: request.headers.get("cookie") || "" },
+    const baseUrl =
+      process.env.BETTER_AUTH_URL ||
+      process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
+      request.nextUrl.origin;
+
+    const res = await fetch(`${baseUrl}/api/auth/get-session`, {
+      headers: {
+        cookie: request.headers.get("cookie") || "",
+        "x-forwarded-host": request.headers.get("host") || "",
+        "x-forwarded-proto": "https",
+      },
     });
+
     if (!res.ok) return null;
     const session = await res.json();
     if (!session?.user) return null;
