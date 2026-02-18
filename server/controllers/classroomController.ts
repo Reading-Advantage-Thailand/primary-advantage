@@ -13,13 +13,13 @@ import {
   generateClassCode,
   getAllStudentsByAdmin,
 } from "@/server/models/classroomModel";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { validateUser } from "../utils/auth";
 
 // GET /api/classroom - Get all classrooms for a teacher
 export async function fetchClassrooms() {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -46,7 +46,7 @@ export async function getClassroomController(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -92,7 +92,7 @@ export async function createClassroomController(
   userId?: string,
   grade?: string,
   classCode?: string,
-  role?: string,
+  role?: string | null,
 ) {
   try {
     await createClassroom({
@@ -115,7 +115,7 @@ export async function updateClassroomController(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -158,7 +158,7 @@ export async function updateClassroomController(
 export async function deleteClassroomController(
   classroomId: string,
   userId: string,
-  role?: string,
+  role?: string | null,
 ) {
   try {
     const result = await deleteClassroom(classroomId, userId, role);
@@ -177,7 +177,7 @@ export async function deleteClassroomController(
 // GET /api/classroom/students - Get students based on user role
 export async function fetchStudentsByRole() {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -223,7 +223,7 @@ export async function enrollStudentController(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -273,7 +273,7 @@ export async function unenrollStudentController(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -327,7 +327,7 @@ export async function getAvailableStudentsController(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -366,7 +366,7 @@ export async function generateClassCodeController(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

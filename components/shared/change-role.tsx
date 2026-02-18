@@ -12,10 +12,11 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { UserCircle, GraduationCap, School, Ghost } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@/i18n/navigation";
 import React, { useState } from "react";
 import { Role } from "@/types/enum";
+import { updateRoleAction } from "@/actions/user";
 
 type Props = {
   userId: string;
@@ -63,21 +64,28 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
   }
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role>(userRole);
-  const { update } = useSession();
+  // const { update } = useSession();
+  const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
 
   async function handleRoleChange() {
     try {
       setIsLoading(true);
-      // Update the user's role
-      const response = await fetch(`/api/users/${userId}`, {
-        method: "PATCH",
-        body: JSON.stringify({ role: selectedRole }),
-      });
 
-      if (!response.ok) {
-        throw new Error("Failed to update role.");
-      }
+      await updateRoleAction(selectedRole);
+
+      await authClient.getSession();
+
+      router.refresh();
+      // Update the user's role
+      // const response = await fetch(`/api/users/${userId}`, {
+      //   method: "PATCH",
+      //   body: JSON.stringify({ role: selectedRole }),
+      // });
+
+      // if (!response.ok) {
+      //   throw new Error("Failed to update role.");
+      // }
 
       // update user session token
       //   await update({ user: { role: selectedRole } })
@@ -90,9 +98,9 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
 
       //   // refresh the page
       //   router.refresh();
-      await update({
-        user: { role: selectedRole },
-      });
+      // await update({
+      //   user: { role: selectedRole },
+      // });
 
       toast("Role updated.", {
         description: `Changed role to ${selectedRole}.`,
@@ -113,7 +121,7 @@ export default function ChangeRole({ userId, userRole, className }: Props) {
         <CardDescription>
           Each role in our system has specific permissions and responsibilities
           associated with it. And your current role is{" "}
-          <strong className="dark:text-blue-500">{userRole}</strong>.
+          <strong className="capitalize dark:text-blue-500">{userRole}</strong>.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-4">

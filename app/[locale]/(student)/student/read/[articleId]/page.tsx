@@ -9,7 +9,7 @@ import { Article, WordListTimestamp } from "@/types";
 import Sentence, {
   Sentence as SentenceType,
 } from "@/components/articles/sentence";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { saveArticleToFlashcard } from "@/actions/flashcard";
 import AssignButton from "@/components/teacher/assign-button";
@@ -36,7 +36,7 @@ export async function generateMetadata({
 type Params = Promise<{ articleId: string }>;
 
 export default async function ArticleQuizPage({ params }: { params: Params }) {
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return redirect("/auth/signin");

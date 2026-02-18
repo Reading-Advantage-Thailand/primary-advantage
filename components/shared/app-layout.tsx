@@ -12,6 +12,8 @@ import Leaderboard from "@/components/leaderboard";
 import { getLocale } from "next-intl/server";
 import { Role } from "@/types/enum";
 import { getSchoolLeaderboardController } from "@/server/controllers/schoolController";
+import { headers } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 
 interface AppLayoutProps {
   children?: React.ReactNode;
@@ -34,20 +36,20 @@ export default async function AppLayout({
   disableSidebar = false,
   disableLeaderboard = false,
 }: AppLayoutProps) {
-  const session = await auth();
+  const user = await getCurrentUser();
   const locale = await getLocale();
 
   // Redirect to sign in page if user is not logged in
-  if (!session) {
+  if (!user) {
     return redirect({ href: "/auth/signin", locale });
   }
 
   let leaderboardData: any | null = null;
 
-  // if (session?.user?.role === Role.student) {
+  // if (user?.role === Role.student) {
   //   const leaderboard = await getSchoolLeaderboardController(
-  //     session?.user?.schoolId,
-  //     session?.user?.id,
+  //     user?.schoolId,
+  //     user?.id,
   //   );
   //   if (leaderboard?.success) {
   //     leaderboardData = leaderboard?.data;
@@ -64,16 +66,13 @@ export default async function AppLayout({
       <header className="bg-background sticky top-0 z-40 border-b">
         <div className="container flex h-16 items-center justify-between">
           <MainNav items={mainNavConfig} />
-          {!disableProgressBar && session?.user?.role === Role.student && (
-            <ProgressBar
-              currentXP={session.user.xp!}
-              currentLevel={session.user.level!}
-            />
+          {!disableProgressBar && user?.role === Role.student && (
+            <ProgressBar currentXP={user.xp!} currentLevel={user.level!} />
           )}
           <div className="flex items-center justify-center gap-2">
             <LocaleSwitcher />
             <ThemeToggle />
-            <UserAccountNav user={session?.user} />
+            <UserAccountNav user={user} />
           </div>
         </div>
       </header>
@@ -87,12 +86,12 @@ export default async function AppLayout({
       >
         {!disableSidebar && (
           <aside className="lg:flex lg:w-[230px] lg:flex-col">
-            <SidebarNav items={sidebarNavConfig || []} user={session?.user} />
-            {!disableLeaderboard && session?.user?.role === Role.student ? (
+            <SidebarNav items={sidebarNavConfig || []} user={user} />
+            {!disableLeaderboard && user?.role === Role.student ? (
               <Leaderboard
                 data={leaderboardData?.results || []}
                 schoolName={leaderboardData?.schoolName || ""}
-                userId={session?.user?.id || ""}
+                userId={user?.id || ""}
               />
             ) : null}
           </aside>

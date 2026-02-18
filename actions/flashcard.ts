@@ -1,6 +1,6 @@
 "use server";
 
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { createEmptyCard, Card, State, Rating } from "ts-fsrs";
 import { prisma } from "@/lib/prisma";
 import { ActivityType, FlashcardType } from "@/types/enum";
@@ -160,7 +160,7 @@ export async function saveFlashcard(
   sentences?: Sentence[],
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return {
@@ -297,7 +297,7 @@ export async function saveFlashcard(
 
 export async function getUserFlashcardDecks(userId?: string) {
   try {
-    const user = userId ? { id: userId } : await currentUser();
+    const user = userId ? { id: userId } : await getCurrentUser();
 
     if (!user) {
       return {
@@ -346,7 +346,7 @@ export async function getUserFlashcardDecks(userId?: string) {
 
 export async function getDashboardData(deckType?: "VOCABULARY" | "SENTENCE") {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return {
         success: false,
@@ -482,7 +482,7 @@ export async function getDashboardData(deckType?: "VOCABULARY" | "SENTENCE") {
 
 export async function getDeckCards(deckId: string) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -529,7 +529,7 @@ export async function getDeckCards(deckId: string) {
 
 export async function getAllSentenceCards() {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return {
         success: false,
@@ -564,7 +564,7 @@ export async function getAllSentenceCards() {
 
 export async function deleteFlashcardCard(cardId: string) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return {
         success: false,
@@ -621,7 +621,7 @@ export async function reviewCard(
   timeSpent?: number,
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -723,7 +723,7 @@ export async function saveArticleToFlashcard(
   ArticleActivityLogId?: string,
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -815,7 +815,7 @@ export async function getLessonFlashcards(
   type: FlashcardType,
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -851,7 +851,7 @@ export async function getLessonFlashcards(
 
 export async function getLessonOrderingSentences(articleId: string) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -990,7 +990,7 @@ export async function getLessonClozeTestSentences(
   difficulty: "easy" | "medium" | "hard",
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -1063,7 +1063,7 @@ export async function getLessonClozeTestSentences(
 
 export async function getLessonOrderingWords(articleId: string) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

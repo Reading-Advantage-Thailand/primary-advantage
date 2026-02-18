@@ -17,7 +17,7 @@ interface SRSHealthCardProps {
 
 export function SRSHealthCard({ onPracticeClick }: SRSHealthCardProps) {
   const t = useTranslations("Student.Dashboard.srsHealth");
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   // Fetch SRS health data using TanStack Query
   const {

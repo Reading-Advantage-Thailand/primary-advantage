@@ -44,7 +44,7 @@ export default function AdoptionWidget({
   onDrillDown,
   className,
 }: AdoptionWidgetProps) {
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
   const [viewMode, setViewMode] = useState<"grade" | "cefr">("cefr");
   const t = useTranslations("Components.adoptionWidget");
 

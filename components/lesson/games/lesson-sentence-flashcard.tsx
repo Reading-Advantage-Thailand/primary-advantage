@@ -65,7 +65,7 @@ import { reviewCard } from "@/actions/flashcard";
 import { QuizContext, QuizContextProvider } from "@/contexts/question-context";
 import { updateUserActivity } from "@/actions/user";
 import { useTranslations } from "next-intl";
-import { useSession } from "next-auth/react";
+import { authClient } from "@/lib/auth-client";
 
 enum GameState {
   LOADING = "LOADING",
@@ -134,7 +134,7 @@ function LessonSentenceFlashcardCardContent({
     {},
   );
   const { timer, setPaused } = useContext(QuizContext);
-  const { data: session, update } = useSession();
+  const { data: session } = authClient.useSession();
 
   // Computed values
   const currentCard = words[currentCardIndex];
@@ -227,11 +227,6 @@ function LessonSentenceFlashcardCardContent({
                 score: UserXpEarned.SENTENCE_FLASHCARDS,
               },
             );
-            update({
-              user: {
-                ...session?.user,
-              },
-            });
           } else {
             toast.error("Failed to save ratings");
           }

@@ -17,7 +17,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 export function TeacherDashboardContent() {
   const t = useTranslations("Teacher.Dashboard");
   const [mounted, setMounted] = useState(false);
-  const user = useCurrentUser();
+  const { user, isLoading } = useCurrentUser();
 
   const {
     data,
@@ -30,6 +30,7 @@ export function TeacherDashboardContent() {
   } = useQuery({
     queryKey: ["teacher-dashboard", user?.id],
     queryFn: () => fetchTeacherDashboardApi(),
+    enabled: !!user?.id,
   });
 
   if (isPending) {

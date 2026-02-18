@@ -43,7 +43,7 @@ export default function StorieChapterSelectionPage() {
   const storyId = params.storieId as string;
   const locale = useLocale();
   const pathname = usePathname();
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
   const router = useRouter();
 
   const { story, isLoading, isError, error } = useStory({

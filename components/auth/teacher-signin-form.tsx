@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Icons } from "../icons";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from 'zod';
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -16,12 +16,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { signInSchema } from "@/lib/zod";
-import { signIn } from "next-auth/react";
 import { useState, useTransition } from "react";
-import { signInAction } from "@/actions/singinAction";
 import { FormError } from "../form-error";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { signInAction } from "@/actions/auth";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "@/i18n/navigation";
 
 export function TeacherSignInForm({
   className,
@@ -35,7 +36,16 @@ export function TeacherSignInForm({
       : "";
   const [error, setError] = useState<string | undefined>("");
   const t = useTranslations("AuthPage.signin");
-  const [isPanding, startTransition] = useTransition();
+  const locale = useLocale();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const ROLE_DASHBOARDS: Record<string, string> = {
+    student: "/student/dashboard",
+    teacher: "/teacher/dashboard",
+    admin: "/admin/dashboard",
+    system: "/system/dashboard",
+  };
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -47,39 +57,25 @@ export function TeacherSignInForm({
   const onSubmit = async (value: z.infer<typeof signInSchema>) => {
     setError("");
 
+    // const { data, error: signInError } = await authClient.signIn.email({
+    //   email: value.email,
+    //   password: value.password,
+    //   callbackURL: "/",
+    // });
+
+    // setError(signInError?.message);
+
     startTransition(async () => {
-      // try {
-      //   const response = await fetch("/api/auth/signin", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       ...value,
-      //       type: "other",
-      //     }),
-      //   });
-      //   const data = await response.json();
-      //   if (data.success) {
-      //     // Handle successful login - redirect manually
-      //     const redirectUrl = callbackUrl || "/auth/signin";
-      //     window.location.href = redirectUrl;
-      //   } else {
-      //     setError(data.error);
-      //   }
-      // } catch (error) {
-      //   setError("An unexpected error occurred");
-      //   console.error("Login error:", error);
-      // }
-      signInAction(
-        {
-          ...value,
-          type: "other",
-        },
-        // callbackUrl || undefined,
-      ).then((data) => {
+      signInAction({
+        ...value,
+        type: "other",
+      }).then((data) => {
         if (data?.error) {
-          setError(data?.error);
+          setError(data.error);
+        } else if (data?.success) {
+          const role = data.role || "user";
+          const dashboard = ROLE_DASHBOARDS[role] || "/";
+          router.push(callbackUrl || dashboard);
         }
       });
     });
@@ -108,7 +104,7 @@ export function TeacherSignInForm({
                 <Input
                   type="email"
                   placeholder="name@example.com"
-                  disabled={isPanding}
+                  disabled={isPending}
                   {...field}
                 />
               </FormControl>
@@ -138,7 +134,7 @@ export function TeacherSignInForm({
                 <Input
                   type="password"
                   placeholder="********"
-                  disabled={isPanding}
+                  disabled={isPending}
                   {...field}
                 />
               </FormControl>
@@ -149,7 +145,7 @@ export function TeacherSignInForm({
 
         <FormError message={error || urlError} />
         <div className="grid gap-6">
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isPending}>
             Login
           </Button>
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -161,11 +157,15 @@ export function TeacherSignInForm({
             variant="outline"
             type="button"
             className="w-full cursor-pointer"
-            onClick={() => {
-              signIn("google", {
-                callbackUrl: callbackUrl || "/auth/signin",
-              });
-            }}
+            disabled={isPending}
+            onClick={async () =>
+              startTransition(async () => {
+                await authClient.signIn.social({
+                  provider: "google",
+                  callbackURL: `/${locale}/auth/callback`,
+                });
+              })
+            }
           >
             <Icons.google className="mr-2 h-4 w-4" />
             Login with Google

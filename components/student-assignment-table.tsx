@@ -74,7 +74,7 @@ export default function StudentAssignmentTable() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({

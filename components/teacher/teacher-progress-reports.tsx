@@ -21,7 +21,17 @@ import UserRecentActivity from "@/components/dashboard/user-recent-activity";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Users, BookOpen, TrendingUp, Clock } from "lucide-react";
-import { User } from "next-auth";
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role?: string | null;
+  level?: number | null;
+  xp?: number | null;
+  cefrLevel?: string | null;
+  schoolId?: string | null;
+}
 
 interface Classroom {
   id: string;
@@ -52,7 +62,7 @@ interface Student {
 interface TeacherProgressReportsProps {
   classrooms: Classroom[];
   students: Student[];
-  currentUser: User;
+  currentUser: AuthUser;
 }
 
 export default function TeacherProgressReports({

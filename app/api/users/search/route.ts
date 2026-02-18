@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/session";
 
 // GET /api/users/search - Search for users by name or email
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -40,22 +40,14 @@ export async function GET(request: NextRequest) {
         ],
         // Exclude the current user from results
         NOT: {
-          id: session.user.id,
+          id: user.id,
         },
       },
       select: {
         id: true,
         name: true,
         email: true,
-        roles: {
-          include: {
-            role: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
+        role: true,
       },
       take: 10, // Limit results to 10 users
     });

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { generateRandomClassCode } from "@/lib/utils";
-
+import { getCurrentUser } from "@/lib/session";
 // Zod validation schemas
 const classroomCsvRowSchema = z.object({
   classroom_name: z
@@ -147,22 +147,17 @@ export async function POST(request: NextRequest) {
 
   try {
     const authTimer = createTimer("AUTH_CHECK");
-    const session = await auth();
+    const user = await getCurrentUser();
     authTimer.log("Session validation completed");
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get current user with school information
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       include: {
         School: true,
-        roles: {
-          include: {
-            role: true,
-          },
-        },
       },
     });
     authTimer.log("User data fetched");
@@ -172,11 +167,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has permission to upload (Admin, System, or Teacher roles)
-    const currentUserRoles = currentUser.roles.map((ur) => ur.role.name);
+    const currentUserRoles = currentUser.role;
     const allowedRoles = ["admin", "system", "teacher"];
-    const hasPermission = currentUserRoles.some((role) =>
-      allowedRoles.includes(role),
-    );
+    const hasPermission = allowedRoles.includes(currentUserRoles as string);
 
     if (!hasPermission) {
       return NextResponse.json(
@@ -192,7 +185,7 @@ export async function POST(request: NextRequest) {
     }
 
     // For non-system users, require school association
-    if (!currentUserRoles.includes("system") && !currentUser.schoolId) {
+    if (currentUserRoles !== "system" && !currentUser.schoolId) {
       return NextResponse.json(
         {
           error: "School association required",
@@ -253,7 +246,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename with timestamp
     const timestamp = Date.now();
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${session.user.id}_${originalName}`;
+    const fileName = `${currentUser.id}_${originalName}`;
     const filePath = path.join(tempDir, fileName);
 
     // Convert file to buffer and save
@@ -795,20 +788,6 @@ export async function POST(request: NextRequest) {
         if (userId && roleId) {
           roleAssignments.push({ userId, roleId });
         }
-      }
-
-      // Create role assignments in batches
-      if (roleAssignments.length > 0) {
-        const roleTimer = createTimer("ROLE_ASSIGNMENTS");
-        await prisma.userRole.createMany({
-          data: roleAssignments,
-          skipDuplicates: true,
-        });
-        roleTimer.end("Role assignments completed");
-        dbTimer.log(
-          "Role assignments created",
-          `Total assignments: ${roleAssignments.length}`,
-        );
       }
 
       // Handle classroom assignments for non-Admin roles

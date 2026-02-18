@@ -14,35 +14,34 @@ import {
  * Provides convenient access to permission utilities with current user context
  */
 export function usePermissions() {
-  const currentUser = useCurrentUser();
+  const { user } = useCurrentUser();
 
   return {
     // Core permission checks
-    hasPermission: (permission: Permission) =>
-      hasPermission(currentUser, permission),
+    hasPermission: (permission: Permission) => hasPermission(user, permission),
     hasAnyPermission: (permissions: Permission[]) =>
-      hasAnyPermission(currentUser, permissions),
+      hasAnyPermission(user, permissions),
     hasAllPermissions: (permissions: Permission[]) =>
-      hasAllPermissions(currentUser, permissions),
-    canAccessRoute: (route: string) => canAccessRoute(currentUser, route),
+      hasAllPermissions(user, permissions),
+    canAccessRoute: (route: string) => canAccessRoute(user, route),
 
     // User info
-    getEffectiveRole: () => getEffectiveRole(currentUser),
-    currentUser,
+    getEffectiveRole: () => getEffectiveRole(user),
+    user,
 
     // Common permission checks for UI components
-    canManageUsers: () => hasPermission(currentUser, "USER_MANAGEMENT"),
-    canCreateArticles: () => hasPermission(currentUser, "ARTICLE_CREATION"),
-    canImportData: () => hasPermission(currentUser, "IMPORT_DATA"),
-    canAccessReports: () => hasPermission(currentUser, "REPORTS_ACCESS"),
-    canManageClasses: () => hasPermission(currentUser, "CLASS_MANAGEMENT"),
+    canManageUsers: () => hasPermission(user, "USER_MANAGEMENT"),
+    canCreateArticles: () => hasPermission(user, "ARTICLE_CREATION"),
+    canImportData: () => hasPermission(user, "IMPORT_DATA"),
+    canAccessReports: () => hasPermission(user, "REPORTS_ACCESS"),
+    canManageClasses: () => hasPermission(user, "CLASS_MANAGEMENT"),
 
     // Role checks
-    isStudent: () => hasPermission(currentUser, "STUDENT_ACCESS"),
-    isTeacher: () => hasPermission(currentUser, "TEACHER_ACCESS"),
-    isAdmin: () => hasPermission(currentUser, "ADMIN_ACCESS"),
-    isSystem: () => hasPermission(currentUser, "SYSTEM_ACCESS"),
-    isSchoolAdmin: () => hasPermission(currentUser, "SCHOOL_ADMIN_ACCESS"),
+    isStudent: () => hasPermission(user, "STUDENT_ACCESS"),
+    isTeacher: () => hasPermission(user, "TEACHER_ACCESS"),
+    isAdmin: () => hasPermission(user, "ADMIN_ACCESS"),
+    isSystem: () => hasPermission(user, "SYSTEM_ACCESS"),
+    isSchoolAdmin: () => hasPermission(user, "SCHOOL_ADMIN_ACCESS"),
   };
 }
 

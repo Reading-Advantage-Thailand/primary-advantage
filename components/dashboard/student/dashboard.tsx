@@ -35,7 +35,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 export default function StudentDashboardContent() {
   const t = useTranslations("Student.Dashboard");
   const router = useRouter();
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   const {
     data,

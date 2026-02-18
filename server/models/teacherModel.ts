@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 import {
   TeacherData,
   CreateTeacherInput,
@@ -100,6 +100,7 @@ export const getTeachers = async (
       whereClause.OR = [
         { name: { contains: search, mode: "insensitive" } },
         { email: { contains: search, mode: "insensitive" } },
+        { role: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -108,11 +109,6 @@ export const getTeachers = async (
       prisma.user.findMany({
         where: whereClause,
         include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
           ClassroomTeachers: {
             include: {
               classroom: {
@@ -143,10 +139,7 @@ export const getTeachers = async (
     // Transform data to match the expected interface
     const teachersData: TeacherData[] = teachers.map((teacher) => {
       // Get primary role (first role or most important one)
-      const primaryRole =
-        teacher.roles.find((r) => r.role.name === "admin")?.role.name ||
-        teacher.roles[0]?.role.name ||
-        "teacher";
+      const primaryRole = teacher.role === "admin" || teacher.role || "teacher";
 
       // Calculate total students across all classrooms
       const totalStudents = teacher.ClassroomTeachers.reduce((sum, ct) => {
@@ -160,7 +153,7 @@ export const getTeachers = async (
         id: teacher.id,
         name: teacher.name,
         email: teacher.email,
-        role: primaryRole,
+        role: primaryRole as string,
         createdAt: teacher.createdAt.toISOString(),
         image: teacher.image,
         schoolId: teacher.schoolId,
@@ -198,22 +191,11 @@ export const getTeacherById = async (
       where: {
         id,
         ...schoolFilter,
-        roles: {
-          some: {
-            role: {
-              name: {
-                in: ["teacher", "admin"],
-              },
-            },
-          },
+        role: {
+          in: ["teacher", "admin"],
         },
       },
       include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
         ClassroomTeachers: {
           include: {
             classroom: {
@@ -237,10 +219,7 @@ export const getTeacherById = async (
     }
 
     // Transform data
-    const primaryRole =
-      teacher.roles.find((r) => r.role.name === "admin")?.role.name ||
-      teacher.roles[0]?.role.name ||
-      "teacher";
+    const primaryRole = teacher.role === "admin" || teacher.role || "teacher";
 
     const totalStudents = teacher.ClassroomTeachers.reduce((sum, ct) => {
       return sum + ct.classroom.students.length;
@@ -252,7 +231,7 @@ export const getTeacherById = async (
       id: teacher.id,
       name: teacher.name,
       email: teacher.email,
-      role: primaryRole,
+      role: primaryRole as string,
       createdAt: teacher.createdAt.toISOString(),
       image: teacher.image,
       schoolId: teacher.schoolId,
@@ -304,11 +283,6 @@ export const createTeacher = async (params: {
           select: {
             id: true,
             name: true,
-          },
-        },
-        roles: {
-          include: {
-            role: true,
           },
         },
       },
@@ -374,9 +348,9 @@ export const createTeacher = async (params: {
     }
 
     // Generate password if not provided
-    const hashedPassword = password
-      ? bcrypt.hashSync(password, 10)
-      : bcrypt.hashSync(Math.random().toString(36).slice(-8), 10);
+    const hashedPassword = await hashPassword(
+      password || Math.random().toString(36).slice(-8),
+    );
 
     // Validate classroom IDs if provided
     if (classroomIds && classroomIds.length > 0) {
@@ -404,18 +378,8 @@ export const createTeacher = async (params: {
           email: normalizedEmail,
           password: hashedPassword,
           schoolId,
-          roles: {
-            create: {
-              roleId: roleRecord.id,
-            },
-          },
-        },
-        include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
+          role: roleRecord.name,
+          roleId: roleRecord.id,
         },
       });
 
@@ -434,11 +398,6 @@ export const createTeacher = async (params: {
       const completeTeacher = await tx.user.findUnique({
         where: { id: user.id },
         include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
           ClassroomTeachers: {
             include: {
               classroom: {
@@ -469,7 +428,7 @@ export const createTeacher = async (params: {
       id: newTeacher.id,
       name: newTeacher.name,
       email: newTeacher.email,
-      role: newTeacher.roles[0]?.role.name || "teacher",
+      role: newTeacher.role || "teacher",
       createdAt: newTeacher.createdAt.toISOString(),
       image: newTeacher.image,
       schoolId: newTeacher.schoolId,
@@ -553,77 +512,30 @@ async function updateExistingTeacherToSchool(params: {
 
       // Update password if provided
       if (password) {
-        updateData.password = bcrypt.hashSync(password, 10);
+        updateData.password = await hashPassword(password);
       }
 
       // Update the user
       const user = await tx.user.update({
         where: { id: existingUser.id },
         data: updateData,
-        include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
-        },
       });
 
       // Check if user has the role, if not add it
-      const hasRole = user.roles.some((r) => r.role.name === role);
+      const hasRole = user.role;
       if (!hasRole) {
-        // Get teacher and admin role IDs
-        const teacherAdminRoles = await tx.role.findMany({
-          where: {
-            name: {
-              in: ["teacher", "admin"],
-            },
-          },
-        });
-
-        const roleIds = teacherAdminRoles.map((r) => r.id);
-
-        // Remove existing teacher/admin roles and add the new one
-        await tx.userRole.deleteMany({
-          where: {
-            userId: user.id,
-            roleId: {
-              in: roleIds,
-            },
-          },
-        });
-
-        await tx.userRole.create({
+        await tx.user.update({
+          where: { id: user.id },
           data: {
-            userId: user.id,
+            role: roleRecord.name,
             roleId: roleRecord.id,
           },
         });
-      } else if (user.roles[0]?.role.name !== role) {
-        // Role exists but different, update it
-        // Get teacher and admin role IDs
-        const teacherAdminRoles = await tx.role.findMany({
-          where: {
-            name: {
-              in: ["teacher", "admin"],
-            },
-          },
-        });
-
-        const roleIds = teacherAdminRoles.map((r) => r.id);
-
-        await tx.userRole.deleteMany({
-          where: {
-            userId: user.id,
-            roleId: {
-              in: roleIds,
-            },
-          },
-        });
-
-        await tx.userRole.create({
+      } else if (user.role !== role) {
+        await tx.user.update({
+          where: { id: user.id },
           data: {
-            userId: user.id,
+            role: roleRecord.name,
             roleId: roleRecord.id,
           },
         });
@@ -652,11 +564,6 @@ async function updateExistingTeacherToSchool(params: {
       const completeTeacher = await tx.user.findUnique({
         where: { id: user.id },
         include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
           ClassroomTeachers: {
             include: {
               classroom: {
@@ -687,10 +594,7 @@ async function updateExistingTeacherToSchool(params: {
       id: updatedTeacher.id,
       name: updatedTeacher.name,
       email: updatedTeacher.email,
-      role:
-        updatedTeacher.roles.find((r) => r.role.name === role)?.role.name ||
-        updatedTeacher.roles[0]?.role.name ||
-        "teacher",
+      role: updatedTeacher.role || "teacher",
       createdAt: updatedTeacher.createdAt.toISOString(),
       image: updatedTeacher.image,
       schoolId: updatedTeacher.schoolId,
@@ -781,7 +685,7 @@ export const updateTeacher = async (
       updatePayload.email = updateData.email.toLowerCase().trim();
     if (updateData.cefrLevel) updatePayload.cefrLevel = updateData.cefrLevel;
     if (updateData.password) {
-      updatePayload.password = bcrypt.hashSync(updateData.password, 10);
+      updatePayload.password = await hashPassword(updateData.password);
     }
 
     // Update the teacher and handle classroom assignments in a transaction
@@ -790,13 +694,6 @@ export const updateTeacher = async (
       const user = await tx.user.update({
         where: { id },
         data: updatePayload,
-        include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
-        },
       });
 
       // Handle role update if specified
@@ -807,13 +704,10 @@ export const updateTeacher = async (
 
         if (roleRecord) {
           // Remove existing roles and add new one
-          await tx.userRole.deleteMany({
-            where: { userId: id },
-          });
-
-          await tx.userRole.create({
+          await tx.user.update({
+            where: { id },
             data: {
-              userId: id,
+              role: roleRecord.name,
               roleId: roleRecord.id,
             },
           });
@@ -843,11 +737,6 @@ export const updateTeacher = async (
       const completeTeacher = await tx.user.findUnique({
         where: { id },
         include: {
-          roles: {
-            include: {
-              role: true,
-            },
-          },
           ClassroomTeachers: {
             include: {
               classroom: {
@@ -868,10 +757,7 @@ export const updateTeacher = async (
     });
 
     // Format response
-    const primaryRole =
-      updatedTeacher.roles.find((r) => r.role.name === "admin")?.role.name ||
-      updatedTeacher.roles[0]?.role.name ||
-      "teacher";
+    const primaryRole = updatedTeacher.role || "teacher";
 
     const totalStudents = updatedTeacher.ClassroomTeachers.reduce((sum, ct) => {
       return sum + ct.classroom.students.length;
@@ -921,14 +807,8 @@ export const deleteTeacher = async (
       where: {
         id,
         ...schoolFilter,
-        roles: {
-          some: {
-            role: {
-              name: {
-                in: ["teacher", "admin"],
-              },
-            },
-          },
+        role: {
+          in: ["teacher", "admin"],
         },
       },
     });
@@ -936,11 +816,6 @@ export const deleteTeacher = async (
     if (!existingTeacher) {
       return { success: false, error: "Teacher not found" };
     }
-
-    // Delete related records first
-    await prisma.userRole.deleteMany({
-      where: { userId: id },
-    });
 
     await prisma.classroomTeachers.deleteMany({
       where: { userId: id },

@@ -1,14 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { calculateLevelAndCefrLevel } from "@/lib/utils";
 import { getLaqFeedback, getSaqFeedback } from "@/server/utils/assistant";
 import { ActivityType, UserXpEarned } from "@/types/enum";
 
 export async function retakeQuiz(articleId: string, type: ActivityType) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return { error: "User not found" };
@@ -53,7 +53,7 @@ export async function finishQuiz(
   },
   type: ActivityType,
 ) {
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return { error: "User not found" };
@@ -171,7 +171,7 @@ export async function getFeedback(value: {
   };
   activityType: ActivityType;
 }) {
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return { error: "User not found" };

@@ -9,10 +9,12 @@ import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ReactNode } from "react";
+import { headers } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 
 export default async function Layout({ children }: { children: ReactNode }) {
-  const session = await auth();
   const t = await getTranslations("MainNav");
+  const user = await getCurrentUser();
 
   // return (
   //   <div className="bg-background relative z-10 flex min-h-svh flex-col">
@@ -22,7 +24,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
   //   </div>
   // );
 
-  if (!session?.user) {
+  if (!user) {
     return (
       <div className="flex min-h-screen flex-col">
         <header className="z-40 container">
@@ -54,7 +56,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
               <MainNav items={indexPageConfig.mainNav} />
               {/* <ProgressBar progress={user.xp} level={user.level!} /> */}
               <nav>
-                <UserAccountNav user={session?.user} />
+                <UserAccountNav user={user} />
               </nav>
             </div>
           </header>

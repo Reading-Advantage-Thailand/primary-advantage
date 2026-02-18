@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { useSession } from "next-auth/react";
 
 interface SubmitQuizParams {
   chapterId: string;
@@ -36,7 +35,6 @@ export function useStoryQuiz(options: UseStoryQuizOptions) {
   } = options;
 
   const queryClient = useQueryClient();
-  const { update } = useSession();
   const t = useTranslations("Question");
 
   // Submit quiz mutation
@@ -66,9 +64,6 @@ export function useStoryQuiz(options: UseStoryQuizOptions) {
         xpEarned: data.xpEarned,
         timer: data.timer,
       };
-
-      // Update session
-      update();
 
       // Invalidate related queries
       queryClient.invalidateQueries({

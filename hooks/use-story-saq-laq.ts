@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { useSession } from "next-auth/react";
 import { SAQFeedbackResponse, LAQFeedbackResponse } from "@/types";
 
 // ==================== Types ====================
@@ -59,7 +58,6 @@ export function useStorySAQ(options: UseStorySAQOptions) {
   const { storyId, chapterNumber, chapterId, onSubmitSuccess } = options;
 
   const queryClient = useQueryClient();
-  const { update } = useSession();
   const t = useTranslations("Question");
 
   // Get SAQ feedback mutation
@@ -115,8 +113,6 @@ export function useStorySAQ(options: UseStorySAQOptions) {
       return res.json() as Promise<QuizResult>;
     },
     onSuccess: (data) => {
-      update();
-
       queryClient.invalidateQueries({
         queryKey: ["chapter", storyId, chapterNumber],
       });
@@ -154,7 +150,6 @@ export function useStoryLAQ(options: UseStoryLAQOptions) {
   const { storyId, chapterNumber, chapterId, onSubmitSuccess } = options;
 
   const queryClient = useQueryClient();
-  const { update } = useSession();
   const t = useTranslations("Question");
 
   // Get LAQ feedback mutation
@@ -209,8 +204,6 @@ export function useStoryLAQ(options: UseStoryLAQOptions) {
       return res.json() as Promise<QuizResult>;
     },
     onSuccess: (data) => {
-      update();
-
       queryClient.invalidateQueries({
         queryKey: ["chapter", storyId, chapterNumber],
       });

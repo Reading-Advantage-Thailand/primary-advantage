@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { randomBytes } from "crypto";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { generateLicenseKey } from "@/lib/utils";
 import { SubscriptionType } from "@prisma/client";
 import { withAuth } from "@/server/utils/middleware";
@@ -21,7 +21,7 @@ const CreateLicenseSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -149,7 +149,7 @@ export const GET = withAuth(async (req, context, user) => {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

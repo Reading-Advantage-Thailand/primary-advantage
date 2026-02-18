@@ -77,7 +77,7 @@ interface DashboardData {
 export default function SystemDashboard() {
   const t = useTranslations("System.Dashboard");
   const [dateRange, setDateRange] = useState("30");
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   const { data, isPending, isError, error, refetch, isRefetching } = useQuery({
     queryKey: ["system-dashboard", dateRange],

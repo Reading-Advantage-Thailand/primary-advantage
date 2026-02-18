@@ -16,7 +16,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { GoToTop } from "@/components/go-to-top";
 import { translateAndStoreSentences } from "@/server/utils/genaretors/sentence-translator";
 import { getTranslations } from "next-intl/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 interface PageProps {
   searchParams: Promise<{
@@ -39,7 +41,7 @@ const genreData = genreDataJson as GenreData;
 
 export default async function ReadPage({ searchParams }: PageProps) {
   const { type, genre, subgenre } = await searchParams;
-  const user = await currentUser();
+  const user = await getCurrentUser();
   const t = await getTranslations();
 
   const initialData = await fetchArticles(

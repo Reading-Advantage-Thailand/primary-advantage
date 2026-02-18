@@ -34,5 +34,8 @@ proxy-off:
 proxy-on:
 	docker compose up -d cloud-sql-proxy
 
+db:
+	docker compose exec -it web npx prisma studio --hostname 0.0.0.0
+
 %:
 	@:

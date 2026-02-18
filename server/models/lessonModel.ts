@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 
 /**
  * Get an article by ID for standalone lesson (without assignment)
  */
 export async function getArticleForLesson(articleId: string) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       throw new Error("User is not authenticated");
     }
@@ -173,4 +173,3 @@ export async function getArticleActivity(articleId: string, userId: string) {
     throw new Error("Failed to get article activity");
   }
 }
-

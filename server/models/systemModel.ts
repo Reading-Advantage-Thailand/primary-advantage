@@ -32,24 +32,12 @@ export const getSystemDashboardModel = async () => {
     const totalSchools = await tx.school.count();
     const totalStudents = await tx.user.count({
       where: {
-        roles: {
-          some: {
-            role: {
-              name: "student",
-            },
-          },
-        },
+        role: "student",
       },
     });
     const totalTeachers = await tx.user.count({
       where: {
-        roles: {
-          some: {
-            role: {
-              name: "teacher",
-            },
-          },
-        },
+        role: "teacher",
       },
     });
     const totalArticles = await tx.article.count();
@@ -95,15 +83,7 @@ export const getRecentActivitiesModel = async (limit: number = 5) => {
           select: {
             id: true,
             name: true,
-            roles: {
-              select: {
-                role: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
+            role: true,
           },
         },
       },
@@ -438,11 +418,7 @@ export const getMetricsCardsModel = async (dateRange?: string | number) => {
           where: {
             createdAt: { gte: currentPeriodStart },
             user: {
-              roles: {
-                some: {
-                  role: { name: "student" },
-                },
-              },
+              role: "student",
             },
             article: {
               raLevel: { not: undefined },
@@ -466,11 +442,7 @@ export const getMetricsCardsModel = async (dateRange?: string | number) => {
         (async () => {
           const students = await prisma.user.findMany({
             where: {
-              roles: {
-                some: {
-                  role: { name: "student" },
-                },
-              },
+              role: "student",
             },
             select: { id: true },
           });
@@ -508,11 +480,7 @@ export const getMetricsCardsModel = async (dateRange?: string | number) => {
         (async () => {
           const students = await prisma.user.findMany({
             where: {
-              roles: {
-                some: {
-                  role: { name: "student" },
-                },
-              },
+              role: "student",
             },
             select: { id: true },
           });
@@ -688,15 +656,7 @@ export const getSystemActivityChartsModel = async (
             id: true,
             name: true,
             email: true,
-            roles: {
-              select: {
-                role: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
+            role: true,
           },
         },
       },

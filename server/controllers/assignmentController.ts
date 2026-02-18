@@ -8,7 +8,7 @@ import getAssignmentById, {
   updateUserLessonProgress,
   getAssignmentActivityById,
 } from "../models/assignmentModel";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 
 export async function fetchAssignments(req: NextRequest) {
   try {
@@ -303,7 +303,7 @@ export async function postUserLessonProgress(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -336,7 +336,7 @@ export async function fetchUserLessonProgress(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -363,7 +363,7 @@ export async function fetchAssignmentActivityById(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

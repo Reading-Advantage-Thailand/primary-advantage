@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { fetchStudentsByClassCode } from "@/actions/classroom";
 import {
   Select,
@@ -14,10 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-import { z } from 'zod';
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { classCodeSchema } from "@/lib/zod";
 import {
@@ -31,6 +30,9 @@ import {
 import { FormError } from "../form-error";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { signInAction, signInStudentAction } from "@/actions/auth";
+import { useRouter } from "@/i18n/navigation";
+import { authClient } from "@/lib/auth-client";
 
 export function StudentSignInForm({
   className,
@@ -50,7 +52,9 @@ export function StudentSignInForm({
   >([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [isPending, startTransition] = useTransition();
   const t = useTranslations("AuthPage.signin");
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof classCodeSchema>>({
     resolver: zodResolver(classCodeSchema),
@@ -92,37 +96,25 @@ export function StudentSignInForm({
   };
 
   async function handleLogin() {
-    // try {
-    //   const response = await fetch("/api/auth/signin", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       type: "student",
-    //       email: selectedStudentId,
-    //       password: code,
-    //     }),
-    //   });
-    //   const data = await response.json();
-    //   if (data.success) {
-    //     // Handle successful login - redirect manually
-    //     const redirectUrl = callbackUrl || "/student/read";
-    //     window.location.href = redirectUrl;
-    //   } else {
-    //     setError(data.error);
-    //     toast.error(data.error);
-    //   }
-    // } catch (error) {
-    //   setError("An unexpected error occurred");
-    //   toast.error("An unexpected error occurred");
-    //   console.error("Login error:", error);
-    // }
-    signIn("credentials", {
-      type: "student",
-      email: selectedStudentId,
-      password: code,
-      // callbackUrl: callbackUrl || undefined,
+    startTransition(async () => {
+      try {
+        const data = await signInStudentAction({
+          id: selectedStudentId,
+          classroomCode: code,
+        });
+
+        if (data?.error) {
+          setError(data.error);
+          toast.error(data.error);
+        } else if (data?.success) {
+          const redirectUrl = callbackUrl || "/student/read";
+          router.push(redirectUrl);
+        }
+      } catch (error) {
+        setError("An unexpected error occurred");
+        toast.error("An unexpected error occurred");
+        console.error("Login error:", error);
+      }
     });
   }
 
@@ -188,7 +180,7 @@ export function StudentSignInForm({
               <SelectContent className="max-h-48 overflow-y-auto">
                 <SelectGroup>
                   {students.map((student) => (
-                    <SelectItem key={student.id} value={student.student.email}>
+                    <SelectItem key={student.id} value={student.student.id}>
                       {student.student.name}
                     </SelectItem>
                   ))}
@@ -199,7 +191,7 @@ export function StudentSignInForm({
 
           <Button
             className="w-full"
-            disabled={!selectedStudentId}
+            disabled={!selectedStudentId || isPending}
             onClick={handleLogin}
           >
             {t("login")}

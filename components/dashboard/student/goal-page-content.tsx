@@ -49,7 +49,7 @@ export default function GoalsPageContent() {
   const [filter, setFilter] = React.useState<"all" | "active" | "completed">(
     "all",
   );
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["student-active-goals", user?.id],

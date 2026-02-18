@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Link } from "@/i18n/navigation";
-import { signOut } from "next-auth/react";
+import { Link, useRouter } from "@/i18n/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +12,25 @@ import { UserAvatar } from "@/components/user-avatar";
 import { Loader2, LogOutIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Role } from "@/types/enum";
-import { User } from "next-auth";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  image?: string | null;
+  role?: string | null;
+  level?: number | null;
+  xp?: number | null;
+  cefrLevel?: string | null;
+  schoolId?: string | null;
+}
+
 interface UserAccountNavProps {
-  user: User;
+  user: AuthUser;
 }
 
 export function UserAccountNav({ user }: UserAccountNavProps) {
@@ -26,6 +38,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
   const t = useTranslations("MainNav.usernav");
   const tr = useTranslations("Overall.roles");
   const queryClient = useQueryClient();
+  const router = useRouter();
   const roles = {
     system: { label: tr("system"), color: "bg-[#FFC107]" },
     admin: { label: tr("admin"), color: "bg-[#DC3545]" },
@@ -155,11 +168,10 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
             event.preventDefault();
             setIsLoading(true);
 
-            await signOut({ callbackUrl: `/` });
-
-            queryClient.removeQueries();
+            await authClient.signOut();
 
             queryClient.clear();
+            router.push("/");
             setIsLoading(false);
           }}
         >

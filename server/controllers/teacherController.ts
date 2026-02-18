@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import {
   createTeacher,
   getTeachers,
@@ -28,7 +28,7 @@ export const getTeachersController = async (
   request: NextRequest,
 ): Promise<NextResponse<TeachersResponse | { error: string }>> => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -105,7 +105,7 @@ export const createTeacherController = async (
   >
 > => {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -200,7 +200,7 @@ export const getTeacherByIdController = async (
   try {
     const { id } = await params;
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -248,7 +248,7 @@ export const updateTeacherController = async (
   try {
     const { id } = await params;
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -304,7 +304,7 @@ export const deleteTeacherController = async (
   try {
     const { id } = await params;
 
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

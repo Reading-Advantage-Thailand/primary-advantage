@@ -33,7 +33,7 @@ export function ActiveGoalsWidget() {
   const t = useTranslations("Student.Dashboard.activeGoals");
   const tc = useTranslations("Components.activeGoalsWidget");
   const router = useRouter();
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["student-active-goals", user?.id],

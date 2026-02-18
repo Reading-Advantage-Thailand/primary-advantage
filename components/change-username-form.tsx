@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from 'zod';
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,14 +17,13 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Icons } from "@/components/icons";
-import { useSession } from "next-auth/react";
-import { useRouter } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 const FormSchema = z.object({
   name: z.string().min(5, {
-      error: "Username must be at least 5 characters."
-}),
+    error: "Username must be at least 5 characters.",
+  }),
 });
 
 export function ChangeUsernameForm({
@@ -35,7 +34,7 @@ export function ChangeUsernameForm({
   userId: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { update: updateSession } = useSession();
+  // const { update: updateSession } = useSession();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -43,7 +42,7 @@ export function ChangeUsernameForm({
     },
   });
   const router = useRouter();
-  const { data: session, update } = useSession();
+  // const { data: session, update } = useSession();
   const t = useTranslations("Settings.userProfile");
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
@@ -62,17 +61,17 @@ export function ChangeUsernameForm({
         form.reset({ name: data.name });
 
         // Update the session with the complete user data
-        await updateSession({
-          user: {
-            ...data,
-          },
-        });
+        // await updateSession({
+        //   user: {
+        //     ...data,
+        //   },
+        // });
 
-        update({
-          user: {
-            ...session?.user,
-          },
-        });
+        // update({
+        //   user: {
+        //     ...session?.user,
+        //   },
+        // });
 
         // refresh the page
         router.refresh();

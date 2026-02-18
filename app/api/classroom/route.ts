@@ -3,7 +3,7 @@ import {
   fetchClassrooms,
   createClassroomController,
 } from "@/server/controllers/classroomController";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 
 // GET /api/classroom - Get all classrooms for a teacher
 export async function GET() {
@@ -13,7 +13,7 @@ export async function GET() {
 // POST /api/classroom - Create a new classroom
 export async function POST(request: NextRequest) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

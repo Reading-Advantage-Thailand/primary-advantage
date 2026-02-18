@@ -38,13 +38,7 @@ export const getAdminDashboardModel = async (
       prisma.user.findMany({
         where: {
           ...schoolFilter,
-          roles: {
-            some: {
-              role: {
-                name: Role.student,
-              },
-            },
-          },
+          role: Role.student,
         },
         select: {
           id: true,
@@ -62,13 +56,7 @@ export const getAdminDashboardModel = async (
       prisma.user.count({
         where: {
           ...schoolFilter,
-          roles: {
-            some: {
-              role: {
-                name: Role.teacher,
-              },
-            },
-          },
+          role: Role.teacher,
         },
       }),
 
@@ -76,13 +64,7 @@ export const getAdminDashboardModel = async (
       prisma.user.count({
         where: {
           ...schoolFilter,
-          roles: {
-            some: {
-              role: {
-                name: Role.student,
-              },
-            },
-          },
+          role: Role.student,
           lastActiveAt: {
             gte: startDate,
           },
@@ -93,14 +75,8 @@ export const getAdminDashboardModel = async (
       prisma.user.count({
         where: {
           ...schoolFilter,
-          roles: {
-            some: {
-              role: {
-                name: {
-                  in: [Role.teacher, Role.admin],
-                },
-              },
-            },
+          role: {
+            in: [Role.teacher, Role.admin],
           },
           lastActiveAt: {
             gte: startDate,
@@ -136,13 +112,7 @@ export const getAdminDashboardModel = async (
       prisma.user.aggregate({
         where: {
           ...schoolFilter,
-          roles: {
-            some: {
-              role: {
-                name: Role.student,
-              },
-            },
-          },
+          role: Role.student,
         },
         _avg: {
           level: true,
@@ -186,13 +156,7 @@ export const getAdminDashboardModel = async (
         where: {
           user: {
             ...schoolFilter,
-            roles: {
-              some: {
-                role: {
-                  name: Role.student,
-                },
-              },
-            },
+            role: Role.student,
           },
           createdAt: {
             gte: startDate,
@@ -208,13 +172,7 @@ export const getAdminDashboardModel = async (
             some: {
               user: {
                 ...schoolFilter,
-                roles: {
-                  some: {
-                    role: {
-                      name: Role.student,
-                    },
-                  },
-                },
+                role: Role.student,
               },
               isRead: true,
               isRated: true,
@@ -255,13 +213,7 @@ export const getAdminDashboardModel = async (
         where: {
           user: {
             ...schoolFilter,
-            roles: {
-              some: {
-                role: {
-                  name: Role.student,
-                },
-              },
-            },
+            role: Role.student,
           },
           // activityType: {
           //   in: [ActivityType.ARTICLE_READ, ActivityType.ARTICLE_RATING],
@@ -345,13 +297,7 @@ export async function getAdoptionDataModel(
     const students = await prisma.user.findMany({
       where: {
         ...schoolFilter,
-        roles: {
-          some: {
-            role: {
-              name: Role.student,
-            },
-          },
-        },
+        role: Role.student,
       },
       select: {
         id: true,
@@ -564,11 +510,7 @@ export async function getAdminAlerts(
         users: {
           select: {
             id: true,
-            roles: {
-              include: {
-                role: true,
-              },
-            },
+            role: true,
             userActivity: {
               select: {
                 createdAt: true,
@@ -593,9 +535,7 @@ export async function getAdminAlerts(
     // Check each school for potential issues
     schools.forEach((school: any) => {
       // Filter students from users
-      const students = school.users.filter((u: any) =>
-        u.roles.some((ur: any) => ur.role.name === Role.student),
-      );
+      const students = school.users.filter((u: any) => u.role === Role.student);
       const activeStudents = students.filter((u: any) =>
         u.userActivity.some(
           (a: { createdAt: Date }) =>
@@ -734,14 +674,8 @@ export async function getTeacherEffectivenessModel(
     const teachers = await prisma.user.findMany({
       where: {
         ...schoolFilter,
-        roles: {
-          some: {
-            role: {
-              name: {
-                in: [Role.teacher, Role.admin],
-              },
-            },
-          },
+        role: {
+          in: [Role.teacher, Role.admin],
         },
       },
       select: {

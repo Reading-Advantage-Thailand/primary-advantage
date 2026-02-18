@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/debug/auth - Debug authentication
 export async function GET(request: NextRequest) {
   try {
     console.log("Debug Auth API: Starting request...");
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     console.log("Debug Auth API: Current user:", user);
 
@@ -24,11 +24,6 @@ export async function GET(request: NextRequest) {
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
       include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
         SchoolAdmins: {
           include: {
             school: true,
@@ -45,7 +40,7 @@ export async function GET(request: NextRequest) {
             id: dbUser.id,
             name: dbUser.name,
             email: dbUser.email,
-            roles: dbUser.roles.map((r) => r.role.name),
+            role: dbUser.role,
             schoolAdmins: dbUser.SchoolAdmins.map((sa) => ({
               schoolId: sa.schoolId,
               schoolName: sa.school.name,

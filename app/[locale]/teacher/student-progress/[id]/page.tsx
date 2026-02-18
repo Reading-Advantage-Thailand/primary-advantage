@@ -2,7 +2,7 @@ import { Header } from "@/components/header";
 import { getTranslations } from "next-intl/server";
 import UserRecentActivity from "@/components/dashboard/user-recent-activity";
 import { fetchUserActivity } from "@/server/controllers/userController";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import AuthErrorPage from "@/app/[locale]/auth/error/page";
 import CEFRLevels from "@/components/dashboard/user-level-indicator";
 import { UserActivityChart } from "@/components/dashboard/user-activity-chart";
@@ -17,7 +17,7 @@ export default async function StudentProgressPage({
 }) {
   const userId = (await params).id;
 
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return <AuthErrorPage />;

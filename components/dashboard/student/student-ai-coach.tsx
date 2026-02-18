@@ -40,7 +40,7 @@ export function AICoachCard({
 }: AICoachCardProps) {
   const t = useTranslations("Student.Dashboard.aiCoach");
   const locale = useLocale();
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
   const getInsightIcon = (type: string) => {
     switch (type) {
       case "trend":

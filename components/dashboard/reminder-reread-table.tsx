@@ -50,7 +50,7 @@ export function ReminderRereadTable() {
   const [data, setData] = React.useState<ReminderRecord[]>([]);
   const [loading, setLoading] = React.useState(true);
 
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
 
   // Fetch data function
   const fetchData = React.useCallback(async () => {

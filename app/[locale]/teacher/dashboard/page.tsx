@@ -10,7 +10,7 @@ import {
   fetchAISummaryApi,
   fetchTeacherDashboardApi,
 } from "@/utils/api-request";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 
 export const metadata = {
   title: "Teacher Dashboard | Primary Advantage",
@@ -20,7 +20,7 @@ export const metadata = {
 
 export default async function TeacherDashboardPage() {
   const t = await getTranslations("Teacher.Dashboard");
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({

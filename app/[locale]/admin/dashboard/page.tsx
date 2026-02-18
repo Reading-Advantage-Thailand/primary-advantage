@@ -13,25 +13,25 @@ import {
   fetchLicensesApi,
   fetchSchoolsListApi,
 } from "@/utils/api-request";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { Role } from "@/types/enum";
 
 export default async function AdminDashboardPage() {
   const t = await getTranslations("Admin.Dashboard");
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   const queryClient = new QueryClient();
 
   if (user?.role === Role.admin) {
     await queryClient.prefetchQuery({
       queryKey: ["admin-dashboard", user?.schoolId, "30"],
-      queryFn: () => fetchAdminDashboardApi(user?.schoolId, "30"),
+      queryFn: () => fetchAdminDashboardApi(user?.schoolId as string, "30"),
       retry: 2,
     });
 
     await queryClient.prefetchQuery({
       queryKey: ["ai-insights", "license", user?.schoolId],
-      queryFn: () => fetchAISummaryApi("license", user?.schoolId),
+      queryFn: () => fetchAISummaryApi("license", user?.schoolId as string),
       retry: 2,
     });
   }

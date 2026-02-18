@@ -52,7 +52,7 @@ export default function TeacherEffectiveness({
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherMetrics | null>(
     null,
   );
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
   const t = useTranslations("Admin.Dashboard.teacherEffectiveness");
 
   // Use TanStack Query to fetch admin dashboard data

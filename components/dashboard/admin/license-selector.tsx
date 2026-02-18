@@ -61,12 +61,12 @@ export default function LicenseSelector({
   const { data, isPending, error, isError } = useQuery({
     queryKey: ["system-school-list"],
     queryFn: () => fetchSchoolsListApi(),
+    enabled: true,
     staleTime: 60 * 60 * 1000, // Cache 1 ชั่วโมง
   });
 
-  const selectedLicense = data?.find(
-    (l: License) => l.id === selectedLicenseId,
-  );
+  const schools: License[] = Array.isArray(data) ? data : [];
+  const selectedLicense = schools.find((l) => l.id === selectedLicenseId);
 
   if (isPending) {
     return <div>Loading...</div>;
@@ -112,7 +112,7 @@ export default function LicenseSelector({
                 {/* <CommandEmpty>{t("noResults")}</CommandEmpty> */}
 
                 <CommandGroup>
-                  {data?.map((school: License, index: number) => (
+                  {schools.map((school, index) => (
                     <CommandItem
                       key={index}
                       value={school.name} // **สำคัญ** ใส่ name เพื่อให้ shadcn ใช้ search

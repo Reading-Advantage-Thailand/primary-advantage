@@ -4,6 +4,7 @@ import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
 import { ThemeToggle } from "@/components/switchers/theme-switcher-toggle";
 import { settingsPageConfig } from "@/configs/settings-page-config";
 import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function NotfoundPageLayout({
@@ -11,16 +12,16 @@ export default async function NotfoundPageLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return redirect("/auth/signin");
   }
   return (
     <div className="flex min-h-screen flex-col space-y-6">
-      <header className="sticky top-0 z-40 border-b bg-background">
+      <header className="bg-background sticky top-0 z-40 border-b">
         <div className="container flex h-16 items-center justify-between py-4">
           <MainNav items={settingsPageConfig.mainNav} />
-          <div className="flex justify-center items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <LocaleSwitcher />
             <ThemeToggle />
             <UserAccountNav user={session?.user} />

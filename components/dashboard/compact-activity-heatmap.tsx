@@ -120,7 +120,7 @@ export default function CompactActivityHeatmap({
   className,
 }: CompactActivityHeatmapProps) {
   const t = useTranslations("Components.compactHeatmap");
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
   const formatTime = useFormatter();
 
   const {

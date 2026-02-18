@@ -1,13 +1,13 @@
 import { Header } from "@/components/header";
 import { getTranslations } from "next-intl/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import AuthErrorPage from "@/app/[locale]/auth/error/page";
 import TeacherProgressReports from "@/components/teacher/teacher-progress-reports";
 import { fetchClassrooms } from "@/server/controllers/classroomController";
 import { fetchStudentsByRole } from "@/server/controllers/classroomController";
 
 export default async function ReportsPage() {
-  const user = await currentUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return <AuthErrorPage />;

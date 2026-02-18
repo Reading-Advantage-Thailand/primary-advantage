@@ -9,7 +9,7 @@ import {
 import { generateWordLists } from "@/server/utils/genaretors/audio-word-generator";
 import { deleteFile, uploadToBucket } from "@/utils/storage";
 import { generateImage } from "@/server/utils/genaretors/image-generator";
-import { generateStotyImage } from "@/server/utils/genaretors/story-generator";
+// import { generateStotyImage } from "@/server/utils/genaretors/story-generator";
 import {
   generateAudioForFlashcard,
   sentenceTranslation,
@@ -20,10 +20,10 @@ export async function generateAudios(articleId: string) {
   try {
     const article = await getArticleById(articleId);
 
-    const audio = await generateAudio({
-      passage: article.article.passage,
-      articleId: articleId,
-    });
+    // const audio = await generateAudio({
+    //   passage: article.article.passage,
+    //   articleId: articleId,
+    // });
 
     return { success: true };
   } catch (error) {
@@ -162,7 +162,7 @@ export async function generateImages(articleId: string) {
     });
 
     const result = await generateImage({
-      imageDesc: articles?.imageDescription as string[],
+      imageDesc: articles?.imageDescription as string,
       articleId: articles?.id as string,
       passage: articles?.passage as string,
     });
@@ -198,11 +198,11 @@ export async function generateStoryImages(articleId: string) {
       .map((chapter) => chapter.imageDescription) as string[]),
   ];
 
-  const images = await generateStotyImage(
-    story?.characters as Record<string, string>[],
-    imagesDesc,
-    story?.id as string,
-  );
+  // const images = await generateStotyImage(
+  //   story?.characters as Record<string, string>[],
+  //   imagesDesc,
+  //   story?.id as string,
+  // );
 
   return { success: true, message: "Not implemented yet" };
 }
@@ -224,11 +224,11 @@ export async function generateStoryAudio(storyId: string) {
     }
 
     for (const chapter of story.storyChapters) {
-      await generateChapterAudio({
-        passage: chapter.passage,
-        storyId: storyId,
-        chapterNumber: chapter.chapterNumber,
-      });
+      // await generateChapterAudio({
+      //   passage: chapter.passage,
+      //   storyId: storyId,
+      //   chapterNumber: chapter.chapterNumber,
+      // });
     }
 
     // for (const chapter of story?.storyChapters as { passage: string }[]) {

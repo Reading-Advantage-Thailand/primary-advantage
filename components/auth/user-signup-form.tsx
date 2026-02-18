@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { z } from 'zod';
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,9 +18,10 @@ import {
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { signUpSchema } from "@/lib/zod";
-import { signUpAction } from "@/actions/signupAction";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
+import { signUpAction } from "@/actions/auth";
+import { redirect } from "next/navigation";
 
 export function SignUpForm({
   className,
@@ -53,7 +54,7 @@ export function SignUpForm({
         setSuccess(data.success);
         if (data.success) {
           setTimeout(() => {
-            router.push("/auth/signin");
+            redirect("/auth/signin");
           }, 1500);
         }
       });

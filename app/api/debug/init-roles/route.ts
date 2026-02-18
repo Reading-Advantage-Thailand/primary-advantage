@@ -53,13 +53,6 @@ export async function GET(request: NextRequest) {
     // Also check some users and their roles
     const usersWithRoles = await prisma.user.findMany({
       take: 5,
-      include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
-      },
     });
 
     return NextResponse.json({
@@ -67,7 +60,7 @@ export async function GET(request: NextRequest) {
       sampleUsers: usersWithRoles.map((user) => ({
         id: user.id,
         email: user.email,
-        roles: user.roles.map((ur) => ur.role.name),
+        role: user.role,
       })),
     });
   } catch (error) {

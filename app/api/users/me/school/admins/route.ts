@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { getCurrentUser } from "@/lib/session";
 
 const addAdminSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
@@ -10,9 +10,9 @@ const addAdminSchema = z.object({
 // POST /api/users/me/school/admins - Add a user as school admin
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     // Get current user's school and verify they are the owner
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       include: {
         School: true,
       },
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if current user is the school owner
-    if (currentUser.School.ownerId !== session.user.id) {
+    if (currentUser.School.ownerId !== user.id) {
       return NextResponse.json(
         { error: "Only the school owner can add admins" },
         { status: 403 },
@@ -50,11 +50,6 @@ export async function POST(request: NextRequest) {
     const targetUser = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
         SchoolAdmins: {
           where: {
             schoolId: currentUser.School.id,
@@ -87,12 +82,10 @@ export async function POST(request: NextRequest) {
     });
 
     // Check if user needs Admin role upgrade
-    const hasAdminRole = targetUser.roles.some(
-      (userRole) => userRole.role.name === "admin",
-    );
+    const hasAdminRole = targetUser.role === "admin";
 
     if (!hasAdminRole) {
-      const currentRoles = targetUser.roles.map((ur) => ur.role.name);
+      const currentRoles = [targetUser.role];
       if (currentRoles.includes("user") || currentRoles.includes("teacher")) {
         // Find or create Admin role
         let adminRole = await prisma.role.findFirst({
@@ -105,15 +98,11 @@ export async function POST(request: NextRequest) {
           });
         }
 
-        // Remove all existing roles and set Admin role only
-        await prisma.userRole.deleteMany({
-          where: { userId: userId },
-        });
-
         // Create new Admin role for user
-        await prisma.userRole.create({
+        await prisma.user.update({
+          where: { id: userId },
           data: {
-            userId: userId,
+            role: adminRole.name,
             roleId: adminRole.id,
           },
         });
@@ -133,9 +122,7 @@ export async function POST(request: NextRequest) {
       adminAdded: true,
       roleUpgraded:
         !hasAdminRole &&
-        targetUser.roles.some(
-          (ur) => ur.role.name === "user" || ur.role.name === "teacher",
-        ),
+        (targetUser.role === "user" || targetUser.role === "teacher"),
     });
   } catch (error) {
     console.error("Error adding school admin:", error);

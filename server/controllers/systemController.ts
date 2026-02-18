@@ -35,7 +35,7 @@ export const fetchSystemDashboardController = async (
         type: activity.activityType,
         userId: activity.userId,
         userName: activity.user.name,
-        userRole: activity.user.roles[0].role.name,
+        userRole: activity.user.role,
         targetId: activity.targetId,
         completed: activity.completed,
         timestamp: activity.createdAt.toISOString(),

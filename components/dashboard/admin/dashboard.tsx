@@ -27,7 +27,7 @@ import { Role } from "@/types/enum";
 
 export function AdminDashboardContent() {
   const t = useTranslations("Admin.Dashboard");
-  const user = useCurrentUser();
+  const { user, isLoading: isSessionLoading } = useCurrentUser();
 
   // State management
   const [selectedSchoolId, setselectedSchoolId] = useState<string>("");
@@ -46,7 +46,8 @@ export function AdminDashboardContent() {
     isPlaceholderData,
   } = useQuery({
     queryKey: ["admin-dashboard", effectiveLicenseId, dateRange],
-    queryFn: () => fetchAdminDashboardApi(effectiveLicenseId, dateRange),
+    queryFn: () =>
+      fetchAdminDashboardApi(effectiveLicenseId as string, dateRange),
     enabled:
       user?.role === Role.admin
         ? true
@@ -96,6 +97,8 @@ export function AdminDashboardContent() {
 
   const timeframeLabel = getTimeframeLabel(dateRange);
 
+  console.log(user);
+
   if (isPending && !isPlaceholderData) {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -118,7 +121,7 @@ export function AdminDashboardContent() {
   return (
     <div className="space-y-6">
       {/* License Selector for SYSTEM users */}
-      {user?.role === Role.system && (
+      {!isSessionLoading && user?.role === Role.system && (
         <div className="mb-4">
           {/* TODO: ใส่ LicenseSelector component ตรงนี้ */}
           <LicenseSelector onLicenseChange={handleLicenseChange} />
@@ -225,22 +228,25 @@ export function AdminDashboardContent() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Adoption Widget */}
         <AdoptionWidget
-          schoolId={effectiveLicenseId}
+          schoolId={effectiveLicenseId as string}
           dateRange={dateRange}
           // onDrillDown={handleDrillDownToLevel}
         />
 
         {/* Alert Center */}
-        <AlertCenter licenseId={effectiveLicenseId} dateRange={dateRange} />
+        <AlertCenter
+          licenseId={effectiveLicenseId as string}
+          dateRange={dateRange}
+        />
 
         {/* Teacher Effectiveness and Activity Heatmap - Side by Side */}
         <TeacherEffectiveness
-          licenseId={effectiveLicenseId}
+          licenseId={effectiveLicenseId as string}
           timeframe={dateRange}
         />
 
         <CompactActivityHeatmap
-          entityIds={effectiveLicenseId}
+          entityIds={effectiveLicenseId as string}
           timeframe={dateRange}
         />
 
@@ -249,7 +255,7 @@ export function AdminDashboardContent() {
           <AIInsights
             key={effectiveLicenseId}
             scope="license"
-            contextId={effectiveLicenseId}
+            contextId={effectiveLicenseId as string}
           />
         </div>
       </div>

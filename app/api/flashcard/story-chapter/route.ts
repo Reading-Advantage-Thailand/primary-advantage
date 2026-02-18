@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import {
   checkStoryChapterFlashcardExistsController,
   saveStoryChapterFlashcardController,
@@ -24,7 +24,7 @@ interface SaveStoryChapterFlashcardRequest
 export async function POST(request: Request) {
   try {
     // Authentication
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     // Authentication
-    const user = await currentUser();
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }

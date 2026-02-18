@@ -1,6 +1,6 @@
 "use server";
 
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 interface OrderSentenceGameData {
@@ -31,7 +31,7 @@ export async function getSentencesForOrderingGame(): Promise<{
   error?: string;
 }> {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return {
@@ -58,10 +58,10 @@ export async function getSentencesForOrderingGame(): Promise<{
 
     // Use the API endpoint we created
     const response = await fetch(
-      `${process.env.NEXTAUTH_URL}/api/flashcard/decks/${deck.id}/sentences-for-ordering`,
+      `${process.env.NEXT_PUBLIC_BETTER_AUTH_URL || process.env.NEXTAUTH_URL}/api/flashcard/decks/${deck.id}/sentences-for-ordering`,
       {
         headers: {
-          Cookie: `next-auth.session-token=${user.id}`, // You might need to adjust this based on your auth setup
+          Cookie: `better-auth.session_token=${user.id}`,
         },
       },
     );
@@ -94,7 +94,7 @@ export async function getFlashcardDeckId(): Promise<{
   error?: string;
 }> {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return {

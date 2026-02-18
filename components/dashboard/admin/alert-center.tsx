@@ -59,7 +59,7 @@ export default function AlertCenter({
     "all" | "critical" | "unacknowledged"
   >("all");
   const t = useTranslations("Components.alertCenter");
-  const user = useCurrentUser();
+  const { user } = useCurrentUser();
   // Fetch dashboard data using TanStack Query
   const {
     data: dashboardData,

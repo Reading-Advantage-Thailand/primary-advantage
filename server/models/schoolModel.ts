@@ -48,13 +48,7 @@ export const updateSchoolRankingModel = async () => {
             },
             user: {
               schoolId: school.id,
-              roles: {
-                some: {
-                  role: {
-                    name: "student",
-                  },
-                },
-              },
+              role: "student",
             },
           },
           select: {
@@ -122,13 +116,7 @@ export const updateSchoolRankingModel = async () => {
           const randomStudents = await prisma.user.findMany({
             where: {
               schoolId: school.id,
-              roles: {
-                some: {
-                  role: {
-                    name: "student",
-                  },
-                },
-              },
+              role: "student",
             },
             select: {
               id: true,
@@ -259,13 +247,7 @@ export const getSchoolLeaderboardModel = async (
             },
             user: {
               schoolId: schoolId,
-              roles: {
-                some: {
-                  role: {
-                    name: "student",
-                  },
-                },
-              },
+              role: "student",
             },
           },
           select: {

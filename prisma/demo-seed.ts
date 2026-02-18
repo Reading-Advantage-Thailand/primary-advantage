@@ -5,13 +5,8 @@ import {
   DEMO_LICENSE_KEY,
   DEMO_SCHOOL_INFO,
 } from "@/configs/demo-account-seed";
-import bcrypt from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 import { ActivityType } from "@prisma/client";
-
-const hashPassword = async (password: string) => {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
-};
 
 export const resetDemoDateSeed = async () => {
   try {
@@ -108,7 +103,8 @@ export const resetDemoDateSeed = async () => {
           password: await hashPassword(DEMO_ACCOUNTS.teachers.password),
           name: DEMO_ACCOUNTS.teachers.name,
           schoolId: school.id,
-          roles: { create: { roleId: roleTeacher?.id! } },
+          role: "teacher",
+          roleId: roleTeacher?.id!,
         },
       });
 
@@ -124,7 +120,8 @@ export const resetDemoDateSeed = async () => {
           password: await hashPassword(DEMO_ACCOUNTS.admin.password),
           name: DEMO_ACCOUNTS.admin.name,
           schoolId: school.id,
-          roles: { create: { roleId: roleAdmin?.id! } },
+          role: "admin",
+          roleId: roleAdmin?.id!,
         },
       });
 
@@ -146,7 +143,8 @@ export const resetDemoDateSeed = async () => {
             cefrLevel: studentData.cefrLevel,
             level: studentData.raLevel,
             schoolId: school.id,
-            roles: { create: { roleId: roleStudent?.id! } },
+            role: "student",
+            roleId: roleStudent?.id!,
           },
         });
         allStudents.push(student);

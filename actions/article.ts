@@ -9,7 +9,7 @@ import {
   getArticleActivity,
 } from "@/server/models/articleModel";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/session";
 import { ActivityType } from "@/types/enum";
 
 export async function generateArticle(amountPerGenre: number) {
@@ -43,7 +43,7 @@ export async function fetchArticleActivity(articleId: string) {
 
 export async function getLessonSummaryData(articleId: string) {
   try {
-    const user = await currentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       return { error: "User not found" };

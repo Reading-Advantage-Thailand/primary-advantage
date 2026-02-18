@@ -372,12 +372,7 @@ export interface UserWithRoles {
   id: string;
   email: string | null;
   schoolId: string | null;
-  roles: Array<{
-    role: {
-      id: string;
-      name: string;
-    };
-  }>;
+  role: string | null;
   SchoolAdmins: Array<{
     id: string;
     schoolId: string;
