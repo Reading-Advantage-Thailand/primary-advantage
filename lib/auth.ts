@@ -8,6 +8,8 @@ import { setSessionCookie } from "better-auth/cookies";
 import { z } from "zod";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL as string,
+  secret: process.env.BETTER_AUTH_SECRET as string,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -168,7 +170,7 @@ export const auth = betterAuth({
       enabled: false,
       maxAge: 5 * 60, // 5 minutes in seconds
     },
-    expiresIn: 5 * 60, // 5 minutes in seconds
-    // updateAge: 60 * 60, // 1 hour in seconds
+    expiresIn: 12 * 60 * 60, // 12 hours in seconds
+    updateAge: 60 * 60, // 1 hour in seconds
   },
 });
