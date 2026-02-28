@@ -45,6 +45,7 @@ model User {
   receivedNotifications AssignmentNotification[] @relation("StudentNotifications")
   sentNotifications     AssignmentNotification[] @relation("TeacherNotifications")
   aiinsights            AIInsight[]
+  gameRankings          GameRanking[]
 
   @@map("users")
 }
@@ -476,6 +477,8 @@ enum ActivityType {
   STORIES_MC_QUESTION
   STORIES_SA_QUESTION
   STORIES_LA_QUESTION
+  RUNE_MATCH
+  RPG_BATTLE
 }
 
 enum FlashcardType {
@@ -764,4 +767,27 @@ enum LogLevel {
   WARN
   ERROR
   DEBUG
+}
+
+enum GameType {
+  RPG_BATTLE
+  RUNE_MATCH
+  ENCHANTED_LIBRARY
+  DRAGON_RIDER
+}
+
+model GameRanking {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  gameType   GameType @map("game_type")
+  difficulty String
+  totalXp    Int      @default(0) @map("total_xp")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameType, difficulty])
+  @@index([gameType, difficulty, totalXp])
+  @@map("game_rankings")
 }

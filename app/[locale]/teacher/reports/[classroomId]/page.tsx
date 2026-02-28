@@ -26,15 +26,16 @@ export default async function ClassDetailReportsPage({
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["teacher-class-report", classroomId],
-    queryFn: () => fetchTeacherClassReportApi(classroomId),
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["teacher-class-goals", classroomId],
-    queryFn: () => fetchTeacherClassGoalsApi(classroomId),
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["teacher-class-report", classroomId],
+      queryFn: () => fetchTeacherClassReportApi(classroomId),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["teacher-class-goals", classroomId],
+      queryFn: () => fetchTeacherClassGoalsApi(classroomId),
+    }),
+  ]);
 
   return (
     <div className="container mx-auto p-6">

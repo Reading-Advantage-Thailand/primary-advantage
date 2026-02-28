@@ -57,6 +57,7 @@
     "studentsandclasses": "Students and Classes",
     "articlecreation": "Article Creation",
     "workbookGenerator": "Workbook Generator",
+    "games": "Games",
     "back": "Back",
     "subItem": {
       "admin": "Admin",
@@ -3854,6 +3855,53 @@
       "noData": {
         "title": "No data available",
         "description": "Try adjusting your filters or refresh the page"
+      }
+    }
+  },
+  "GamesPage": {
+    "heading": "Games",
+    "description": "Play educational games to boost your English skills",
+    "playNow": "Play Now",
+    "clickToPlay": "Click to play",
+    "comingSoon": "Coming Soon",
+    "comingSoonDescription": "More exciting games are on their way. Stay tuned!",
+    "newGames": "New Games",
+    "badges": {
+      "popular": "Popular",
+      "new": "New",
+      "recommended": "Recommended"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "types": {
+      "strategy": "Strategy",
+      "vocabulary": "Vocabulary",
+      "matching": "Matching",
+      "spelling": "Spelling"
+    },
+    "games": {
+      "dragonFlight": {
+        "title": "Dragon Flight",
+        "description": "Soar through the skies on your dragon and answer vocabulary questions to keep flying!"
+      },
+      "magicDefense": {
+        "title": "Magic Defense",
+        "description": "Defend your castle by casting spells — each correct word is a powerful shield!"
+      },
+      "rpgBattle": {
+        "title": "RPG Battle",
+        "description": "Battle monsters in an epic RPG adventure. Use your vocabulary to defeat enemies!"
+      },
+      "runeMatch": {
+        "title": "Rune Match",
+        "description": "Match magical runes with their meanings in this enchanting memory game!"
+      },
+      "wizardVsZombie": {
+        "title": "Wizard vs Zombie",
+        "description": "Spell words correctly to defeat the zombie horde as a mighty wizard!"
       }
     }
   },

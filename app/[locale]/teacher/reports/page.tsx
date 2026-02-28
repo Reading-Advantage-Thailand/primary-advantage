@@ -6,6 +6,11 @@ import TeacherProgressReports from "@/components/teacher/teacher-progress-report
 import { fetchClassrooms } from "@/server/controllers/classroomController";
 import { fetchStudentsByRole } from "@/server/controllers/classroomController";
 
+export const metadata = {
+  title: "Student Progress Reports | Primary Advantage",
+  description: "View detailed reading progress and performance reports for your students.",
+};
+
 export default async function ReportsPage() {
   const user = await getCurrentUser();
 
@@ -19,9 +24,11 @@ export default async function ReportsPage() {
 
   const t = await getTranslations("Reports");
 
-  // Fetch teacher's classrooms and students
-  const classroomsResponse = await fetchClassrooms();
-  const studentsResponse = await fetchStudentsByRole();
+  // Fetch teacher's classrooms and students in parallel
+  const [classroomsResponse, studentsResponse] = await Promise.all([
+    fetchClassrooms(),
+    fetchStudentsByRole(),
+  ]);
 
   const classrooms =
     classroomsResponse instanceof Response

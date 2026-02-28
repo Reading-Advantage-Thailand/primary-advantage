@@ -38,7 +38,7 @@ export default async function LessonPage({
   // If type is explicitly 'article', use standalone lesson
   if (lessonType === "article") {
     return (
-      <div className="rounded-xl bg-gradient-to-b from-gray-50 to-white to-20% dark:from-slate-900 dark:to-[hsl(222.2_90%_4.9%)]">
+      <div className="rounded-xl bg-linear-to-b from-gray-50 to-white to-20% dark:from-slate-900 dark:to-[hsl(222.2_90%_4.9%)]">
         <div className="relative">
           <StandaloneLessonCard articleId={id} />
         </div>
@@ -55,7 +55,7 @@ export default async function LessonPage({
   // If it's an assignment, use the assignment-based lesson
   if (assignment) {
     return (
-      <div className="rounded-xl bg-gradient-to-b from-gray-50 to-white to-20% dark:from-slate-900 dark:to-[hsl(222.2_90%_4.9%)]">
+      <div className="rounded-xl bg-linear-to-b from-gray-50 to-white to-20% dark:from-slate-900 dark:to-[hsl(222.2_90%_4.9%)]">
         <div className="relative">
           <LessonCard id={id} />
         </div>
@@ -65,7 +65,7 @@ export default async function LessonPage({
 
   // If no assignment found, treat it as an article ID for standalone lesson
   return (
-    <div className="rounded-xl bg-gradient-to-b from-gray-50 to-white to-20% dark:from-slate-900 dark:to-[hsl(222.2_90%_4.9%)]">
+    <div className="rounded-xl bg-linear-to-b from-gray-50 to-white to-20% dark:from-slate-900 dark:to-[hsl(222.2_90%_4.9%)]">
       <div className="relative">
         <StandaloneLessonCard articleId={id} />
       </div>

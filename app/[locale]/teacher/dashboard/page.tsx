@@ -23,15 +23,16 @@ export default async function TeacherDashboardPage() {
   const user = await getCurrentUser();
 
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ["teacher-dashboard", user?.id],
-    queryFn: () => fetchTeacherDashboardApi(),
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["ai-insights", "teacher", user?.id],
-    queryFn: () => fetchAISummaryApi("teacher", user?.id),
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["teacher-dashboard", user?.id],
+      queryFn: () => fetchTeacherDashboardApi(),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["ai-insights", "teacher", user?.id],
+      queryFn: () => fetchAISummaryApi("teacher", user?.id),
+    }),
+  ]);
 
   return (
     <div className="container mx-auto space-y-6 pb-6">

@@ -34,6 +34,7 @@
   "Sidebar": {
     "read": "Đọc",
     "stories": "Câu chuyện",
+    "games": "Trò chơi",
     "assignments": "Bài tập",
     "history": "Lịch sử",
     "sentences": "Câu",
@@ -1220,7 +1221,10 @@
         "sentTo": "Đã gửi đến"
       },
       "studentsLabel": "học sinh",
-      "tabs": { "select": "Chọn", "history": "Lịch sử" },
+      "tabs": {
+        "select": "Chọn",
+        "history": "Lịch sử"
+      },
       "cancel": "Hủy",
       "sending": "Đang gửi...",
       "sentSuccess": "Thông báo đã gửi thành công",
@@ -1265,12 +1269,18 @@
         "title": "Mức trung bình",
         "description": "Mức đọc của lớp"
       },
-      "totalXp": { "title": "Tổng XP", "description": "XP tích lũy của lớp" },
+      "totalXp": {
+        "title": "Tổng XP",
+        "description": "XP tích lũy của lớp"
+      },
       "activeAssignments": {
         "title": "Bài tập đang hoạt động",
         "description": "Đang diễn ra"
       },
-      "completed": { "title": "Hoàn thành", "description": "Bài tập đã nộp" }
+      "completed": {
+        "title": "Hoàn thành",
+        "description": "Bài tập đã nộp"
+      }
     },
     "classAccuracyMetrics": {
       "title": "Độ chính xác theo học sinh & loại",
@@ -1300,7 +1310,11 @@
         "totalActivity": "Tổng hoạt động",
         "peakDay": "Ngày cao điểm"
       },
-      "legend": { "title": "Mức hoạt động:", "less": "Ít", "more": "Nhiều" },
+      "legend": {
+        "title": "Mức hoạt động:",
+        "less": "Ít",
+        "more": "Nhiều"
+      },
       "topActiveDays": "Ngày hoạt động nhiều nhất",
       "activities": "hoạt động",
       "dow": {
@@ -1400,7 +1414,11 @@
         "articlesPerMonth": "Bài/Tháng",
         "trend": "Xu hướng"
       },
-      "trend": { "up": "Tăng", "down": "Giảm", "stable": "Ổn định" },
+      "trend": {
+        "up": "Tăng",
+        "down": "Giảm",
+        "stable": "Ổn định"
+      },
       "stats": {
         "totalArticles": "Tổng bài viết:",
         "totalWords": "Tổng từ:",
@@ -3881,6 +3899,53 @@
       "noData": {
         "title": "Không có dữ liệu",
         "description": "Thử điều chỉnh bộ lọc hoặc làm mới trang"
+      }
+    }
+  },
+  "GamesPage": {
+    "heading": "Trò Chơi",
+    "description": "Chơi các trò chơi giáo dục để nâng cao kỹ năng tiếng Anh của bạn",
+    "playNow": "Chơi Ngay",
+    "clickToPlay": "Bấm để chơi",
+    "comingSoon": "Sắp Ra Mắt",
+    "comingSoonDescription": "Nhiều trò chơi thú vị hơn sắp đến. Hãy đón chờ!",
+    "newGames": "Trò Chơi Mới",
+    "badges": {
+      "popular": "Phổ Biến",
+      "new": "Mới",
+      "recommended": "Đề Xuất"
+    },
+    "difficulty": {
+      "easy": "Dễ",
+      "medium": "Trung Bình",
+      "hard": "Khó"
+    },
+    "types": {
+      "strategy": "Chiến Lược",
+      "vocabulary": "Từ Vựng",
+      "matching": "Ghép Nối",
+      "spelling": "Chính Tả"
+    },
+    "games": {
+      "dragonFlight": {
+        "title": "Dragon Flight",
+        "description": "Bay qua bầu trời trên lưng rồng của bạn và trả lời câu hỏi từ vựng để tiếp tục bay!"
+      },
+      "magicDefense": {
+        "title": "Magic Defense",
+        "description": "Bảo vệ lâu đài của bạn bằng cách tung phép — mỗi từ đúng là một chiếc khiên mạnh mẽ!"
+      },
+      "rpgBattle": {
+        "title": "RPG Battle",
+        "description": "Chiến đấu với quái vật trong cuộc phiêu lưu RPG hùng tráng. Dùng từ vựng để đánh bại kẻ thù!"
+      },
+      "runeMatch": {
+        "title": "Rune Match",
+        "description": "Ghép nối các rune phép thuật với nghĩa của chúng trong trò chơi trí nhớ hấp dẫn này!"
+      },
+      "wizardVsZombie": {
+        "title": "Wizard vs Zombie",
+        "description": "Đánh vần từ chính xác để đánh bại đàn zombie với tư cách là một phù thủy hùng mạnh!"
       }
     }
   }

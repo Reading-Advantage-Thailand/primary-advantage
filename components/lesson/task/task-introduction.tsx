@@ -45,7 +45,7 @@ export default function TaskIntroduction({
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header Section */}
-      <div className="space-y-4 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-300 via-indigo-300 to-purple-300 p-8 text-center dark:border-blue-800 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950">
+      <div className="space-y-4 rounded-2xl border border-blue-200 bg-linear-to-br from-blue-300 via-indigo-300 to-purple-300 p-8 text-center dark:border-blue-800 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950">
         <div className="mb-4 inline-flex items-center justify-center rounded-full bg-blue-200 p-3 dark:bg-blue-900">
           <BookOpenIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
         </div>
@@ -60,11 +60,12 @@ export default function TaskIntroduction({
       {/* Article Preview Card */}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-zinc-200 shadow-lg dark:border-gray-700 dark:bg-gray-900">
         {/* Article Image */}
-        <div className="relative h-64 overflow-hidden bg-gradient-to-r from-gray-200 to-gray-300 md:h-80 dark:from-gray-800 dark:to-gray-700">
+        <div className="relative h-64 overflow-hidden bg-linear-to-r from-gray-200 to-gray-300 md:h-80 dark:from-gray-800 dark:to-gray-700">
           <Image
             src={getArticleImageUrl(article.id, 1) || `/nopic.png`}
             alt={article.title}
             fill
+            sizes="(max-width: 768px) 100vw, 800px"
             className="object-cover transition-transform duration-300 hover:scale-105"
             priority
           />
@@ -112,7 +113,7 @@ export default function TaskIntroduction({
           </div>
 
           {/* Learning Objectives */}
-          <div className="rounded-xl border border-green-200 bg-gradient-to-r from-green-300 to-emerald-300 p-4 dark:border-green-800 dark:from-green-950 dark:to-emerald-950">
+          <div className="rounded-xl border border-green-200 bg-linear-to-r from-green-300 to-emerald-300 p-4 dark:border-green-800 dark:from-green-950 dark:to-emerald-950">
             <h3 className="mb-3 flex items-center font-semibold text-green-800 dark:text-green-200">
               <LightbulbIcon className="mr-2 h-5 w-5" />
               {t("learningObjectives")}

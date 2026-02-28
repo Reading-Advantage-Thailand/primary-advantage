@@ -2,6 +2,11 @@ import React from "react";
 import { Header } from "@/components/header";
 import { AdminDashboardContent } from "@/components/dashboard/admin/dashboard";
 import { getTranslations } from "next-intl/server";
+
+export const metadata = {
+  title: "Admin Dashboard | Primary Advantage",
+  description: "Manage your school, track school-wide student progress and AI insights.",
+};
 import {
   QueryClient,
   HydrationBoundary,
@@ -23,17 +28,18 @@ export default async function AdminDashboardPage() {
   const queryClient = new QueryClient();
 
   if (user?.role === Role.admin) {
-    await queryClient.prefetchQuery({
-      queryKey: ["admin-dashboard", user?.schoolId, "30"],
-      queryFn: () => fetchAdminDashboardApi(user?.schoolId as string, "30"),
-      retry: 2,
-    });
-
-    await queryClient.prefetchQuery({
-      queryKey: ["ai-insights", "license", user?.schoolId],
-      queryFn: () => fetchAISummaryApi("license", user?.schoolId as string),
-      retry: 2,
-    });
+    await Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: ["admin-dashboard", user?.schoolId, "30"],
+        queryFn: () => fetchAdminDashboardApi(user?.schoolId as string, "30"),
+        retry: 2,
+      }),
+      queryClient.prefetchQuery({
+        queryKey: ["ai-insights", "license", user?.schoolId],
+        queryFn: () => fetchAISummaryApi("license", user?.schoolId as string),
+        retry: 2,
+      }),
+    ]);
   }
 
   if (user?.role === Role.system) {

@@ -34,6 +34,7 @@
   "Sidebar": {
     "read": "閱讀",
     "stories": "故事",
+    "games": "遊戲",
     "assignments": "作業",
     "history": "歷史",
     "sentences": "句子",
@@ -1211,10 +1212,19 @@
       "selectStudents": "選擇要通知的學生",
       "deselectAll": "取消全選",
       "selectAll": "全選",
-      "studentStatus": { "completed": "已完成", "incomplete": "未完成" },
-      "history": { "empty": "暫無通知歷史", "sentTo": "已發送給" },
+      "studentStatus": {
+        "completed": "已完成",
+        "incomplete": "未完成"
+      },
+      "history": {
+        "empty": "暫無通知歷史",
+        "sentTo": "已發送給"
+      },
       "studentsLabel": "名學生",
-      "tabs": { "select": "選擇", "history": "歷史" },
+      "tabs": {
+        "select": "選擇",
+        "history": "歷史"
+      },
       "cancel": "取消",
       "sending": "發送中...",
       "sentSuccess": "通知發送成功",
@@ -1255,13 +1265,22 @@
         "title": "活躍學生",
         "description": "{rate}% 活躍率"
       },
-      "avgLevel": { "title": "平均等級", "description": "班級閱讀等級" },
-      "totalXp": { "title": "總經驗值", "description": "班級累計經驗值" },
+      "avgLevel": {
+        "title": "平均等級",
+        "description": "班級閱讀等級"
+      },
+      "totalXp": {
+        "title": "總經驗值",
+        "description": "班級累計經驗值"
+      },
       "activeAssignments": {
         "title": "進行中的作業",
         "description": "目前進行中"
       },
-      "completed": { "title": "已完成", "description": "作業提交數" }
+      "completed": {
+        "title": "已完成",
+        "description": "作業提交數"
+      }
     },
     "classAccuracyMetrics": {
       "title": "學生準確率（按類型）",
@@ -1291,7 +1310,11 @@
         "totalActivity": "總活動量",
         "peakDay": "高峰日"
       },
-      "legend": { "title": "活動級別：", "less": "較少", "more": "較多" },
+      "legend": {
+        "title": "活動級別：",
+        "less": "較少",
+        "more": "較多"
+      },
       "topActiveDays": "最活躍日期",
       "activities": "次活動",
       "dow": {
@@ -1391,7 +1414,11 @@
         "articlesPerMonth": "文章/月",
         "trend": "趨勢"
       },
-      "trend": { "up": "上升", "down": "下降", "stable": "穩定" },
+      "trend": {
+        "up": "上升",
+        "down": "下降",
+        "stable": "穩定"
+      },
       "stats": {
         "totalArticles": "文章總數：",
         "totalWords": "總字數：",
@@ -3940,6 +3967,53 @@
       "noData": {
         "title": "暫無資料",
         "description": "請嘗試調整篩選條件或重新整理頁面"
+      }
+    }
+  },
+  "GamesPage": {
+    "heading": "遊戲",
+    "description": "玩教育遊戲提升你的英語技能",
+    "playNow": "立即遊玩",
+    "clickToPlay": "點擊遊玩",
+    "comingSoon": "即將推出",
+    "comingSoonDescription": "更多精彩遊戲即將到來，敬請期待！",
+    "newGames": "新遊戲",
+    "badges": {
+      "popular": "熱門",
+      "new": "新",
+      "recommended": "推薦"
+    },
+    "difficulty": {
+      "easy": "簡單",
+      "medium": "中等",
+      "hard": "困難"
+    },
+    "types": {
+      "strategy": "策略",
+      "vocabulary": "詞彙",
+      "matching": "配對",
+      "spelling": "拼寫"
+    },
+    "games": {
+      "dragonFlight": {
+        "title": "Dragon Flight",
+        "description": "乘著你的龍翱翔天空，回答詞彙問題以繼續飛行！"
+      },
+      "magicDefense": {
+        "title": "Magic Defense",
+        "description": "透過施咒來守衛你的城堡 — 每個正確的單詞都是強大的盾牌！"
+      },
+      "rpgBattle": {
+        "title": "RPG Battle",
+        "description": "在史詩級RPG冒險中與怪物戰鬥，用詞彙擊敗敵人！"
+      },
+      "runeMatch": {
+        "title": "Rune Match",
+        "description": "在這個迷人的記憶遊戲中將魔法符文與其含義配對！"
+      },
+      "wizardVsZombie": {
+        "title": "Wizard vs Zombie",
+        "description": "作為強大巫師，正確拼寫單詞以擊敗殭屍大軍！"
       }
     }
   }

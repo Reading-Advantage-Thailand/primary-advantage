@@ -34,6 +34,7 @@
   "Sidebar": {
     "read": "阅读",
     "stories": "故事",
+    "games": "游戏",
     "assignments": "作业",
     "sentences": "句子",
     "vocabulary": "词汇",
@@ -3939,6 +3940,53 @@
       "noData": {
         "title": "暂无数据",
         "description": "请尝试调整筛选条件或刷新页面"
+      }
+    }
+  },
+  "GamesPage": {
+    "heading": "游戏",
+    "description": "玩教育游戏来提升你的英语技能",
+    "playNow": "立即游玩",
+    "clickToPlay": "点击游玩",
+    "comingSoon": "即将推出",
+    "comingSoonDescription": "更多精彩游戏即将到来，敬请期待！",
+    "newGames": "新游戏",
+    "badges": {
+      "popular": "热门",
+      "new": "新",
+      "recommended": "推荐"
+    },
+    "difficulty": {
+      "easy": "简单",
+      "medium": "中等",
+      "hard": "困难"
+    },
+    "types": {
+      "strategy": "策略",
+      "vocabulary": "词汇",
+      "matching": "配对",
+      "spelling": "拼写"
+    },
+    "games": {
+      "dragonFlight": {
+        "title": "Dragon Flight",
+        "description": "乘坐你的龙翱翔天空，回答词汇问题以继续飞行！"
+      },
+      "magicDefense": {
+        "title": "Magic Defense",
+        "description": "通过施咒来守卫你的城堡 — 每个正确的单词都是强大的盾牌！"
+      },
+      "rpgBattle": {
+        "title": "RPG Battle",
+        "description": "在史诗级RPG冒险中与怪物战斗。用你的词汇击败敌人！"
+      },
+      "runeMatch": {
+        "title": "Rune Match",
+        "description": "在这个迷人的记忆游戏中将魔法符文与其含义配对！"
+      },
+      "wizardVsZombie": {
+        "title": "Wizard vs Zombie",
+        "description": "作为强力巫师，正确拼写单词以击败僵尸大军！"
       }
     }
   }

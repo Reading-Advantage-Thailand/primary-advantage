@@ -74,12 +74,19 @@ export const auth = betterAuth({
         type: "string",
         required: false,
       },
+      roleId: {
+        type: "string",
+        required: false,
+      },
     },
   },
   databaseHooks: {
     user: {
       create: {
         after: async (user) => {
+          // Only assign default role when no role was explicitly set
+          if (user.role && user.role !== "user") return;
+
           const defaultRole = await prisma.role.upsert({
             where: { name: "user" },
             update: {},

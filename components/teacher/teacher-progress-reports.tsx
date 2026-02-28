@@ -12,15 +12,41 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
-import { UserActivityChart } from "@/components/dashboard/user-activity-chart";
-import { UserXpOverAllChart } from "@/components/dashboard/user-xpoverall-chart";
-import ReadingStatsChart from "@/components/dashboard/user-reading-chart";
-import UserActivityHeatMap from "@/components/dashboard/user-heatmap-chart";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
 import CEFRLevels from "@/components/dashboard/user-level-indicator";
 import UserRecentActivity from "@/components/dashboard/user-recent-activity";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Users, BookOpen, TrendingUp, Clock } from "lucide-react";
+
+const ChartSkeleton = () => <Skeleton className="h-75 w-full" />;
+
+const UserActivityChart = dynamic(
+  () =>
+    import("@/components/dashboard/user-activity-chart").then(
+      (m) => m.UserActivityChart,
+    ),
+  { ssr: false, loading: () => <ChartSkeleton /> },
+);
+
+const UserXpOverAllChart = dynamic(
+  () =>
+    import("@/components/dashboard/user-xpoverall-chart").then(
+      (m) => m.UserXpOverAllChart,
+    ),
+  { ssr: false, loading: () => <ChartSkeleton /> },
+);
+
+const ReadingStatsChart = dynamic(
+  () => import("@/components/dashboard/user-reading-chart"),
+  { ssr: false, loading: () => <ChartSkeleton /> },
+);
+
+const UserActivityHeatMap = dynamic(
+  () => import("@/components/dashboard/user-heatmap-chart"),
+  { ssr: false, loading: () => <ChartSkeleton /> },
+);
 
 interface AuthUser {
   id: string;
@@ -176,7 +202,7 @@ export default function TeacherProgressReports({
               value={selectedClassroom}
               onValueChange={setSelectedClassroom}
             >
-              <SelectTrigger className="w-full md:w-[200px]">
+              <SelectTrigger className="w-full md:w-50">
                 <SelectValue placeholder={t("progress.selectClassroom")} />
               </SelectTrigger>
               <SelectContent>
@@ -195,7 +221,7 @@ export default function TeacherProgressReports({
               placeholder={t("progress.searchStudentsPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full md:w-[200px]"
+              className="w-full md:w-50"
             />
           </div>
         )}
