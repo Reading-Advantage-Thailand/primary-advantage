@@ -4,8 +4,14 @@ ARGS = $(filter-out $@,$(MAKECMDGOALS))
 up:
 	docker compose up -d
 
+up-web:
+	docker compose up web -d
+
 down:
 	docker compose down
+
+down-web:
+	docker compose down web	
 
 restart:
 	docker compose restart web
@@ -36,6 +42,9 @@ proxy-on:
 
 db:
 	docker compose exec -it web npx prisma studio --hostname 0.0.0.0
+
+db-reset-skip-seed:
+	docker compose exec web npx prisma migrate reset --skip-seed
 
 %:
 	@:

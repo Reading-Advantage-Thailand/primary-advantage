@@ -9,9 +9,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-.cursor/
 .vscode/
-.github/
 
 # testing
 /coverage
@@ -54,3 +52,8 @@ service-account.json
 
 #prisma
 /prisma/migrations-scripts*
+
+#AI
+.agents/
+.cursor/
+.github/

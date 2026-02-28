@@ -289,3 +289,170 @@ export const fetchChapterApi = async (
 
   return response.json();
 };
+
+//---------------------------------
+// Rune Match Game API
+//---------------------------------
+
+export interface RuneMatchVocabularyResponse {
+  vocabulary: { term: string; translation: string }[];
+}
+
+export interface SubmitRuneMatchResultInput {
+  score: number;
+  correctAnswers: number;
+  totalAttempts: number;
+  accuracy: number;
+  difficulty: string;
+}
+
+export interface SubmitRuneMatchResultResponse {
+  success: boolean;
+  xpEarned?: number;
+}
+
+export const fetchRuneMatchVocabularyApi = async (
+  language: string = "th",
+): Promise<RuneMatchVocabularyResponse> => {
+  const queryParams = new URLSearchParams({ language }).toString();
+  const response = await fetch(
+    `/api/games/rune-match/vocabulary?${queryParams}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch rune match vocabulary");
+  }
+
+  return response.json();
+};
+
+export const submitRuneMatchResultApi = async (
+  data: SubmitRuneMatchResultInput,
+): Promise<SubmitRuneMatchResultResponse> => {
+  const response = await fetch("/api/games/rune-match/complete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to submit rune match results");
+  }
+
+  return response.json();
+};
+
+export interface RuneMatchRankingEntry {
+  rank: number;
+  userId: string;
+  name: string;
+  image: string | null;
+  xp: number;
+  difficulty: string;
+}
+
+export interface RuneMatchRankingResponse {
+  success: boolean;
+  rankings: RuneMatchRankingEntry[];
+  scope: "school" | "global";
+}
+
+export const fetchRuneMatchRankingsApi = async (
+  difficulty?: string,
+): Promise<RuneMatchRankingResponse> => {
+  const queryParams = difficulty
+    ? `?${new URLSearchParams({ difficulty }).toString()}`
+    : "";
+  const response = await fetch(`/api/games/rune-match/ranking${queryParams}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch rune match rankings");
+  }
+
+  return response.json();
+};
+
+//---------------------------------
+// RPG Battle Game API
+//---------------------------------
+
+export interface RPGBattleVocabularyResponse {
+  vocabulary: { term: string; translation: string }[];
+}
+
+export interface SubmitRPGBattleResultInput {
+  xp: number;
+  accuracy: number;
+  totalAttempts: number;
+  totalCorrect: number;
+  turnsTaken: number;
+  heroId: string | null;
+  enemyId: string | null;
+  outcome: "victory" | "defeat";
+}
+
+export interface SubmitRPGBattleResultResponse {
+  success: boolean;
+  xpEarned?: number;
+}
+
+export interface RPGBattleRankingEntry {
+  rank: number;
+  userId: string;
+  name: string;
+  image: string | null;
+  xp: number;
+  difficulty: string;
+}
+
+export interface RPGBattleRankingResponse {
+  success: boolean;
+  rankings: RPGBattleRankingEntry[];
+  scope: "school" | "global";
+}
+
+export const fetchRPGBattleVocabularyApi = async (
+  language: string = "th",
+): Promise<RPGBattleVocabularyResponse> => {
+  const queryParams = new URLSearchParams({ language }).toString();
+  const response = await fetch(
+    `/api/games/rpg-battle/vocabulary?${queryParams}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch RPG Battle vocabulary");
+  }
+
+  return response.json();
+};
+
+export const submitRPGBattleResultApi = async (
+  data: SubmitRPGBattleResultInput,
+): Promise<SubmitRPGBattleResultResponse> => {
+  const response = await fetch("/api/games/rpg-battle/complete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to submit RPG Battle results");
+  }
+
+  return response.json();
+};
+
+export const fetchRPGBattleRankingApi = async (
+  difficulty?: string,
+): Promise<RPGBattleRankingResponse> => {
+  const queryParams = difficulty
+    ? `?${new URLSearchParams({ difficulty }).toString()}`
+    : "";
+  const response = await fetch(`/api/games/rpg-battle/ranking${queryParams}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch RPG Battle rankings");
+  }
+
+  return response.json();
+};

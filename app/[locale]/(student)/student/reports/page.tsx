@@ -18,15 +18,16 @@ export default async function ReportsPage() {
   const user = await getCurrentUser();
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["student-dashboard"],
-    queryFn: () => fetchStudentDashboardApi(),
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["ai-insights", "student", user?.id],
-    queryFn: () => fetchAISummaryApi("student", user?.id),
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["student-dashboard"],
+      queryFn: () => fetchStudentDashboardApi(),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["ai-insights", "student", user?.id],
+      queryFn: () => fetchAISummaryApi("student", user?.id),
+    }),
+  ]);
 
   return (
     <>

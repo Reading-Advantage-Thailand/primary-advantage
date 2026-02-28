@@ -7,7 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React from "react";
+import React, { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export const metadata = {
+  title: "Read Articles | Primary Advantage",
+  description:
+    "Browse and read levelled English articles tailored to your CEFR level.",
+};
 import genreDataJson from "@/data/genres.json";
 import { Link } from "@/i18n/navigation";
 import { fetchArticles } from "@/server/controllers/articleController";
@@ -162,10 +169,12 @@ export default async function ReadPage({ searchParams }: PageProps) {
             </div>
           )}
 
-          <ArticleSelect
-            initialArticles={initialData.articles}
-            total={initialData.totalArticles}
-          />
+          <Suspense fallback={<Skeleton className="h-96 w-full rounded-lg" />}>
+            <ArticleSelect
+              initialArticles={initialData.articles}
+              total={initialData.totalArticles}
+            />
+          </Suspense>
         </CardContent>
       </Card>
       <GoToTop />

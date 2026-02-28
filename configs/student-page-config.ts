@@ -38,6 +38,12 @@ export const studentPageConfig: PageConfig = {
       requiredPermissions: ["STUDENT_ACCESS"],
     },
     {
+      title: "games",
+      href: "/student/games",
+      icon: "GamepadIcon",
+      requiredPermissions: ["STUDENT_ACCESS"],
+    },
+    {
       title: "assignments",
       href: "/student/assignments",
       icon: "ClipboardCheckIcon",

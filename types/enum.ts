@@ -63,6 +63,8 @@ export enum ActivityType {
   STORIES_MC_QUESTION = "STORIES_MC_QUESTION",
   STORIES_SA_QUESTION = "STORIES_SA_QUESTION",
   STORIES_LA_QUESTION = "STORIES_LA_QUESTION",
+  RUNE_MATCH = "RUNE_MATCH",
+  RPG_BATTLE = "RPG_BATTLE",
 }
 
 export enum ActivityStatus {
@@ -96,6 +98,8 @@ export enum UserXpEarned {
   SENTENCE_CLOZE_TEST = 2,
   SENTENCE_ORDERING = 5,
   SENTENCE_WORD_ORDERING = 5,
+  RUNE_MATCH = 5,
+  RPG_BATTLE = 5,
 }
 
 export enum FlashcardType {

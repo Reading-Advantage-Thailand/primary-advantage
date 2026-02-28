@@ -5,43 +5,43 @@ import {
   DEMO_LICENSE_KEY,
   DEMO_SCHOOL_INFO,
 } from "@/configs/demo-account-seed";
-import { hashPassword } from "@/lib/password";
 import { ActivityType } from "@prisma/client";
+import { auth } from "@/lib/auth";
 
 export const resetDemoDateSeed = async () => {
   try {
     // Placeholder for resetting demo data seed
     console.log("Resetting demo data seed...");
 
-    await prisma.$transaction(async (tx) => {
-      // Delete existing demo users
-      await tx.user.deleteMany({
-        where: {
-          email: {
-            in: [
-              ...DEMO_ACCOUNTS.students.map((s) => s.email),
-              DEMO_ACCOUNTS.teachers.email,
-              DEMO_ACCOUNTS.admin.email,
-            ],
-          },
+    // Delete existing demo users
+    await prisma.user.deleteMany({
+      where: {
+        email: {
+          in: [
+            ...DEMO_ACCOUNTS.students.map((s) => s.email),
+            DEMO_ACCOUNTS.teachers.email,
+            DEMO_ACCOUNTS.admin.email,
+          ],
+        },
+      },
+    });
+
+    let school = await prisma.school.findFirst({
+      where: { name: DEMO_SCHOOL_INFO.name },
+      select: { id: true },
+    });
+
+    if (!school) {
+      school = await prisma.school.create({
+        data: {
+          name: DEMO_SCHOOL_INFO.name,
+          contactName: DEMO_SCHOOL_INFO.contactName,
+          contactEmail: DEMO_SCHOOL_INFO.contactEmail,
         },
       });
+    }
 
-      let school = await tx.school.findFirst({
-        where: { name: DEMO_SCHOOL_INFO.name },
-        select: { id: true },
-      });
-
-      if (!school) {
-        school = await tx.school.create({
-          data: {
-            name: DEMO_SCHOOL_INFO.name,
-            contactName: DEMO_SCHOOL_INFO.contactName,
-            contactEmail: DEMO_SCHOOL_INFO.contactEmail,
-          },
-        });
-      }
-
+    await prisma.$transaction(async (tx) => {
       await tx.license.upsert({
         where: { key: DEMO_LICENSE_KEY },
         update: {
@@ -90,38 +90,29 @@ export const resetDemoDateSeed = async () => {
         throw new Error("Required roles are missing in the database.");
       }
 
-      const teacher = await tx.user.upsert({
-        where: { email: DEMO_ACCOUNTS.teachers.email },
-        update: {
+      const teacher = await auth.api.createUser({
+        body: {
           email: DEMO_ACCOUNTS.teachers.email,
+          password: DEMO_ACCOUNTS.teachers.password,
           name: DEMO_ACCOUNTS.teachers.name,
-          password: await hashPassword(DEMO_ACCOUNTS.teachers.password),
-          schoolId: school.id,
-        },
-        create: {
-          email: DEMO_ACCOUNTS.teachers.email,
-          password: await hashPassword(DEMO_ACCOUNTS.teachers.password),
-          name: DEMO_ACCOUNTS.teachers.name,
-          schoolId: school.id,
-          role: "teacher",
-          roleId: roleTeacher?.id!,
+          data: {
+            role: "teacher",
+            schoolId: school.id,
+            roleId: roleTeacher.id,
+          },
         },
       });
 
-      const admin = await tx.user.upsert({
-        where: { email: DEMO_ACCOUNTS.admin.email },
-        update: {
-          name: DEMO_ACCOUNTS.admin.name,
-          password: await hashPassword(DEMO_ACCOUNTS.admin.password),
-          schoolId: school.id,
-        },
-        create: {
+      const admin = await auth.api.createUser({
+        body: {
           email: DEMO_ACCOUNTS.admin.email,
-          password: await hashPassword(DEMO_ACCOUNTS.admin.password),
+          password: DEMO_ACCOUNTS.admin.password,
           name: DEMO_ACCOUNTS.admin.name,
-          schoolId: school.id,
-          role: "admin",
-          roleId: roleAdmin?.id!,
+          data: {
+            role: "admin",
+            schoolId: school.id,
+            roleId: roleAdmin.id,
+          },
         },
       });
 
@@ -133,11 +124,9 @@ export const resetDemoDateSeed = async () => {
           update: {
             email: studentData.email,
             name: studentData.name,
-            password: await hashPassword(studentData.password),
           },
           create: {
             email: studentData.email,
-            password: await hashPassword(studentData.password),
             name: studentData.name,
             xp: studentData.xp,
             cefrLevel: studentData.cefrLevel,
@@ -154,13 +143,13 @@ export const resetDemoDateSeed = async () => {
         await tx.classroomTeachers.create({
           data: {
             classroomId: classroom.id,
-            userId: teacher.id,
+            userId: teacher.user.id,
           },
         }),
         await tx.schoolAdmins.create({
           data: {
             schoolId: school.id,
-            userId: admin.id,
+            userId: admin.user.id,
           },
         }),
       ]);

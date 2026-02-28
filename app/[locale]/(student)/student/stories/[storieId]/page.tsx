@@ -121,7 +121,8 @@ export default function StorieChapterSelectionPage() {
           alt={story.title}
           className="object-cover"
           fill
-          unoptimized
+          sizes="(max-width: 768px) 100vw, 1280px"
+          priority
         />
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />

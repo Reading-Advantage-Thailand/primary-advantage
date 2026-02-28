@@ -18,8 +18,15 @@ WORKDIR /app
 COPY . .
 
 # Set environment variables for build
+ARG BETTER_AUTH_SECRET="9Lqgbu9RKImLlxBVoppjLdZjsSZaCugvGc7DYTeTei0="
+ARG BETTER_AUTH_URL="http://localhost:3000"
+ARG NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
+
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/mydb"
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
+ENV NEXT_PUBLIC_BETTER_AUTH_URL=${NEXT_PUBLIC_BETTER_AUTH_URL}
 
 # Fix Memory issue during build
 ENV NODE_OPTIONS="--max-old-space-size=8192"

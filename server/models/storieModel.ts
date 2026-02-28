@@ -37,6 +37,7 @@ export const saveStoryToDB = async (
         imageDescription: story.imageDesc,
         cefrLevel: cefrLevel,
         rating: rating,
+        isPublished: true,
         characters: story.characters,
         storyChapters: {
           create: story.chapters.map((chapter, index) => ({

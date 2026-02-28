@@ -2,6 +2,12 @@ import React from "react";
 import { Header } from "@/components/header";
 import SystemDashboard from "@/components/dashboard/system/dashboard";
 import { getTranslations } from "next-intl/server";
+
+export const metadata = {
+  title: "System Dashboard | Primary Advantage",
+  description:
+    "Monitor platform-wide activity, AI usage, and system performance metrics.",
+};
 import {
   fetchAISummaryApi,
   fetchSystemActivityChartsApi,
@@ -20,20 +26,20 @@ export default async function SystemDashboardPage() {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["system-dashboard"],
-    queryFn: () => fetchSystemDashboardApi("30"),
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["system-activity-charts"],
-    queryFn: () => fetchSystemActivityChartsApi("30"),
-  });
-
-  await queryClient.prefetchQuery({
-    queryKey: ["ai-insights"],
-    queryFn: () => fetchAISummaryApi("system", user?.id || ""),
-  });
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["system-dashboard"],
+      queryFn: () => fetchSystemDashboardApi("30"),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["system-activity-charts"],
+      queryFn: () => fetchSystemActivityChartsApi("30"),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["ai-insights"],
+      queryFn: () => fetchAISummaryApi("system", user?.id || ""),
+    }),
+  ]);
 
   return (
     <>
