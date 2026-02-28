@@ -2,11 +2,13 @@
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 
+RUN apt-get update -y && apt-get install -y openssl
+
 # Copy package files
 COPY package.json package-lock.json* ./
 
 # Install all dependencies for build
-RUN npm ci
+RUN npm install
 
 # Stage 2: Build application
 FROM deps AS builder
