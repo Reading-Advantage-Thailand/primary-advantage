@@ -1,6 +1,5 @@
 # Stage 1: Install dependencies only
-FROM node:22-alpine AS deps
-RUN apk add --no-cache libc6-compat
+FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 
 # Copy package files
@@ -35,10 +34,12 @@ ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN npm run prisma:generate && npm run build
 
 # Stage 3: Production runner
-FROM node:22-alpine AS runner
+FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 
-RUN apk add --no-cache libc6-compat openssl curl bash ca-certificates
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends openssl curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Add non-root user
 RUN addgroup --system --gid 1001 nodejs && \
