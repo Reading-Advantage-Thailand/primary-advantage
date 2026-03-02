@@ -1,5 +1,5 @@
 # Stage 1: Install dependencies only
-FROM node:22-bookworm-slim AS deps
+FROM --platform=linux/amd64 node:22-bookworm-slim AS deps
 WORKDIR /app
 
 RUN apt-get update -y && apt-get install -y openssl
@@ -8,7 +8,7 @@ RUN apt-get update -y && apt-get install -y openssl
 COPY package.json package-lock.json* ./
 
 # Install all dependencies for build (clean cache to ensure correct platform binaries)
-RUN npm cache clean --force && npm ci
+RUN npm ci
 
 # Stage 2: Build application
 FROM deps AS builder
@@ -36,7 +36,7 @@ ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN npm run prisma:generate && npm run build
 
 # Stage 3: Production runner
-FROM node:22-bookworm-slim AS runner
+FROM --platform=linux/amd64 node:22-bookworm-slim AS runner
 WORKDIR /app
 
 RUN apt-get update && \

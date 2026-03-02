@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
   output: "standalone",
   devIndicators: false,
   reactStrictMode: false,
-  serverExternalPackages: ["@parcel/watcher"],
   images: {
     remotePatterns: [
       {
