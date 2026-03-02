@@ -8,7 +8,7 @@ RUN apt-get update -y && apt-get install -y openssl
 COPY package.json package-lock.json* ./
 
 # Install all dependencies for build
-RUN npm install
+RUN npm ci
 
 # Stage 2: Build application
 FROM deps AS builder

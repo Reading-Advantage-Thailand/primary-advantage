@@ -3,7 +3,8 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { nextCookies } from "better-auth/next-js";
 import { verifyPassword, hashPassword, isBcryptHash } from "@/lib/password";
-import { admin, createAuthEndpoint } from "better-auth/plugins";
+import { admin } from "better-auth/plugins";
+import { createAuthEndpoint } from "better-auth/api";
 import { setSessionCookie } from "better-auth/cookies";
 import { z } from "zod";
 
