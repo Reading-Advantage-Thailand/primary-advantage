@@ -11,11 +11,11 @@ COPY package.json package-lock.json* ./
 RUN npm ci
 
 # Stage 2: Build application
-FROM deps AS builder
+FROM node:22-bookworm-slim AS builder
 WORKDIR /app
 
 # Copy dependencies from deps stage
-# COPY --from=deps /app/node_modules ./node_modules # Not needed as we are using multi-stage build and node_modules is already in /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variables for build
