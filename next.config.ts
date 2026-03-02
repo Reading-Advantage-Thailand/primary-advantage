@@ -6,14 +6,6 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   reactStrictMode: false,
   serverExternalPackages: ["@parcel/watcher"],
-  outputFileTracingExcludes: {
-    "*": [
-      "@parcel/watcher",
-      "@parcel/watcher-linux-x64-glibc",
-      "@parcel/watcher-darwin-arm64",
-      "@parcel/watcher-win32-x64",
-    ],
-  },
   images: {
     remotePatterns: [
       {
