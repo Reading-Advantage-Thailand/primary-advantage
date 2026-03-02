@@ -1,5 +1,5 @@
 # Stage 1: Install dependencies only
-FROM node:22-bookworm-slim AS deps
+FROM --platform=linux/amd64 node:22-bookworm-slim AS deps
 WORKDIR /app
 
 RUN apt-get update -y && apt-get install -y openssl
@@ -7,11 +7,11 @@ RUN apt-get update -y && apt-get install -y openssl
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install all dependencies for build
-RUN npm ci
+# Install all dependencies for build (clean cache to ensure correct platform binaries)
+RUN npm cache clean --force && npm ci
 
 # Stage 2: Build application
-FROM node:22-bookworm-slim AS builder
+FROM --platform=linux/amd64 node:22-bookworm-slim AS builder
 WORKDIR /app
 
 # Copy dependencies from deps stage
