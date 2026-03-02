@@ -9,8 +9,9 @@ import { setSessionCookie } from "better-auth/cookies";
 import { z } from "zod";
 
 export const auth = betterAuth({
-  // baseURL: process.env.BETTER_AUTH_URL as string,
-  // secret: process.env.BETTER_AUTH_SECRET as string,
+  baseURL: process.env.BETTER_AUTH_URL as string,
+  secret: process.env.BETTER_AUTH_SECRET as string,
+  trustedOrigins: [process.env.BETTER_AUTH_URL!],
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
