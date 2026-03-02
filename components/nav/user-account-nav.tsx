@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
@@ -172,6 +173,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
 
             queryClient.clear();
             router.push("/");
+            router.refresh();
             setIsLoading(false);
           }}
         >
