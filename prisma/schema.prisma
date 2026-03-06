@@ -479,6 +479,9 @@ enum ActivityType {
   STORIES_LA_QUESTION
   RUNE_MATCH
   RPG_BATTLE
+  DRAGON_RIDER
+  POTION_RUSH
+  ENCHANTED_LIBRARY
 }
 
 enum FlashcardType {

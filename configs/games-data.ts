@@ -31,5 +31,18 @@ export function getGamesList(t: TranslationFunction) {
       badge: null,
       badgeVariant: "outline" as const,
     },
+    {
+      id: "dragon-rider",
+      title: t("games.dragonRider.title"),
+      description: t("games.dragonRider.description"),
+      icon: Flame,
+      coverImage: "/games/cover/dragon-rider.png",
+      color: "from-purple-500 via-pink-500 to-rose-500",
+      difficultyKey: "medium" as const,
+      difficulty: t("difficulty.medium"),
+      type: t("types.strategy"),
+      badge: t("badges.popular"),
+      badgeVariant: "default" as const,
+    },
   ];
 }

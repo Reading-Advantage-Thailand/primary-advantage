@@ -25,6 +25,11 @@ export default {
       title: "Rune Match",
       description: "Ghép rune và từ vựng để mở khóa bí mật cổ xưa.",
     },
+    dragonRider: {
+      title: "Dragon Rider",
+      description:
+        "Cưỡi rồng của bạn qua bầu trời, thu thập từ vựng và đánh bại kẻ thù để cứu vương quốc!",
+    },
   },
 
   // Badges
@@ -185,6 +190,119 @@ export default {
       combo: "Combo",
       damage: "Sát thương",
       freeze: "Đóng băng",
+    },
+  },
+
+  dragonRider: {
+    title: "Dragon Rider",
+    description:
+      "Cưỡi rồng bay qua bầu trời, thu thập từ vựng và đánh bại kẻ thù để cứu vương quốc!",
+    startScreen: {
+      title: "Dragon Rider",
+      description: "Chọn độ khó và bắt đầu cuộc phiêu lưu sử thi!",
+      difficultyLabel: "Độ Khó",
+      difficultyEasy: "Dễ",
+      difficultyNormal: "Bình Thường",
+      difficultyHard: "Khó",
+      difficultyExtreme: "Cực Khó",
+      startButton: "Bắt Đầu Phiêu Lưu",
+      rankingButton: "Bảng Xếp Hạng",
+      instructionsButton: "Hướng Dẫn",
+      loading: "Đang tải phiêu lưu...",
+    },
+    instructionsScreen: {
+      title: "Hướng Dẫn",
+      backButton: "Quay Lại Menu",
+      controls: {
+        title: "Điều Khiển",
+        move: "Di Chuyển",
+        moveKeys: "Phím Mũi Tên / WASD",
+        shield: "Lá Chắn",
+        shieldKeys: "Space / Enter",
+      },
+      gameplay: {
+        title: "Lối Chơi",
+        objective: "Mục Tiêu",
+        objectiveDesc:
+          "Thu thập từ vựng để tăng khoảng cách bay của rồng và đánh bại Vua Skeleton!",
+        gates: "Cổng",
+        gatesDesc:
+          "Chọn cổng đúng để tăng khoảng cách bay của rồng cho đến khi Vua Skeleton đến",
+        boss: "Trùm",
+        bossDesc:
+          "Đánh bại Vua Skeleton bằng cách trả lời đúng các câu hỏi từ vựng",
+        shields: "Lá Chắn",
+        shieldsDesc:
+          "Sử dụng lá chắn để phòng thủ khỏi các đòn tấn công của Vua Skeleton",
+        mana: "Mana",
+        manaDesc:
+          "Thu thập từ vựng để nhận mana và sử dụng lá chắn để bảo vệ bản thân",
+      },
+      scoring: {
+        title: "Tính Điểm",
+        wordsCollected: "Từ Đã Thu Thập",
+        wordsCollectedDesc: "+10 điểm mỗi từ",
+        correctAnswers: "Câu Trả Lời Đúng",
+        correctAnswersDesc: "+20 điểm mỗi câu trả lời đúng",
+        shieldsUsed: "Lá Chắn Đã Sử Dụng",
+        shieldsUsedDesc: "-5 điểm mỗi lá chắn",
+        timeBonus: "Thưởng Thời Gian",
+        timeBonusDesc: "+1 điểm mỗi giây còn lại",
+      },
+    },
+    gameplayScreen: {
+      hud: {
+        wordsCollected: "Từ Đã Thu Thập",
+        shields: "Lá Chắn",
+        mana: "Mana",
+        time: "Thời Gian",
+        bossHealth: "Máu Vua Skeleton",
+      },
+      messages: {
+        waveIncoming: "Sóng Kẻ Địch Sắp Đến!",
+        bossApproaching: "Vua Skeleton Đang Đến Gần!",
+        bossDefeated: "Vua Skeleton Đã Bị Đánh Bại!",
+        gameComplete: "Phiêu Lưu Hoàn Thành!",
+        gameOver: "Trò Chơi Kết Thúc",
+        pressEnterToContinue: "Nhấn Enter để tiếp tục",
+        pressSpaceToShield: "Nhấn Space để dùng lá chắn",
+      },
+    },
+    resultsScreen: {
+      title: "Phiêu Lưu Hoàn Thành!",
+      score: "Điểm Số Cuối Cùng",
+      wordsCollected: "Từ Đã Thu Thập",
+      correctAnswers: "Câu Trả Lời Đúng",
+      shieldsUsed: "Lá Chắn Đã Sử Dụng",
+      timeBonus: "Thưởng Thời Gian",
+      difficulty: "Độ Khó",
+      playAgainButton: "Chơi Lại",
+      backToMenuButton: "Quay Lại Menu",
+      rankingButton: "Bảng Xếp Hạng",
+    },
+    rankingScreen: {
+      title: "Bảng Xếp Hạng",
+      backButton: "Quay Lại Menu",
+      noScores: "Chưa có điểm số",
+      beTheFirst: "Hãy là người đầu tiên chinh phục bầu trời!",
+      yourRank: "Hạng Của Bạn",
+      topScores: "Điểm Cao Nhất",
+      score: "Điểm Số",
+      words: "Từ",
+      time: "Thời Gian",
+      difficulty: "Độ Khó",
+    },
+    ranking: {
+      leaderboard: "Bảng Xếp Hạng",
+      noChampions: "Chưa có điểm số",
+      beTheFirst: "Hãy là người đầu tiên chinh phục bầu trời!",
+      dragonRider: "Dragon Rider",
+    },
+    difficulty: {
+      easy: "Dễ",
+      normal: "Bình Thường",
+      hard: "Khó",
+      extreme: "Cực Khó",
     },
   },
 } as const;

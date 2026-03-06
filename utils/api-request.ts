@@ -456,3 +456,86 @@ export const fetchRPGBattleRankingApi = async (
 
   return response.json();
 };
+
+//---------------------------------
+// Dragon Rider Game API
+//---------------------------------
+export interface DragonRiderVocabularyResponse {
+  vocabulary: { term: string; translation: string }[];
+}
+
+export interface DragonRiderRankingEntry {
+  rank: number;
+  userId: string;
+  name: string;
+  image: string | null;
+  xp: number;
+  difficulty: string;
+}
+
+export interface DragonRiderRankingResponse {
+  success: boolean;
+  rankings: DragonRiderRankingEntry[];
+  scope: "school" | "global";
+}
+
+export interface SubmitDragonRiderResultInput {
+  xp: number;
+  accuracy: number;
+  totalAttempts: number;
+  correctAnswers: number;
+  dragonCount: number;
+  difficulty: string;
+  outcome: "victory" | "defeat";
+}
+
+export interface SubmitDragonRiderResultResponse {
+  success: boolean;
+  xpEarned?: number;
+}
+
+export const submitDragonRiderResultApi = async (
+  data: SubmitDragonRiderResultInput,
+): Promise<SubmitDragonRiderResultResponse> => {
+  const response = await fetch("/api/games/dragon-rider/complete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to submit Dragon Rider results");
+  }
+
+  return response.json();
+};
+
+export const fetchDragonRiderVocabularyApi = async (
+  language: string = "th",
+): Promise<DragonRiderVocabularyResponse> => {
+  const queryParams = new URLSearchParams({ language }).toString();
+  const response = await fetch(
+    `/api/games/dragon-rider/vocabulary?${queryParams}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch Dragon Rider vocabulary");
+  }
+
+  return response.json();
+};
+
+export const fetchDragonRiderRankingApi = async (
+  difficulty?: string,
+): Promise<DragonRiderRankingResponse> => {
+  const queryParams = difficulty
+    ? `?${new URLSearchParams({ difficulty }).toString()}`
+    : "";
+  const response = await fetch(`/api/games/dragon-rider/ranking${queryParams}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch Dragon Rider rankings");
+  }
+
+  return response.json();
+};
