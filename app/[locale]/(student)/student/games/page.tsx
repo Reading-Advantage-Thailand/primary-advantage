@@ -1,4 +1,3 @@
-import { Header } from "@/components/header";
 import {
   Card,
   CardContent,
@@ -105,7 +104,7 @@ export default async function GamesPage() {
                   const Icon = game.icon;
                   return (
                     <div key={game.id} className="h-full">
-                      <Card className="group hover:shadow-primary/20 hover:border-primary/50 bg-card/50 relative flex h-full cursor-pointer flex-col overflow-hidden border-2 backdrop-blur-sm transition-all duration-300 hover:z-30 hover:-translate-y-1 hover:shadow-2xl">
+                      <Card className="group hover:shadow-primary/20 hover:border-primary/50 bg-card/50 relative flex h-full flex-col overflow-hidden border-2 backdrop-blur-sm transition-all duration-300 hover:z-30 hover:-translate-y-1 hover:shadow-2xl">
                         {/* Badge overlay */}
                         {game.badge && (
                           <div className="absolute top-4 right-4 z-10">
@@ -192,15 +191,15 @@ export default async function GamesPage() {
                         </CardContent>
 
                         <CardFooter className="mt-auto pt-0 pb-6">
-                          <Button className="h-11 w-full text-base font-semibold shadow-md transition-all duration-300 group-hover:scale-[1.02] hover:shadow-lg">
-                            <Link
-                              href={`/student/games/vocabulary/${game.id}`}
-                              className="flex items-center justify-center"
-                            >
+                          <Link
+                            href={`/student/games/vocabulary/${game.id}`}
+                            className="flex w-full items-center justify-center"
+                          >
+                            <Button className="h-11 w-full cursor-pointer text-base font-semibold shadow-md transition-all duration-300 group-hover:scale-[1.02] hover:shadow-lg">
                               <Gamepad2 className="mr-2 h-4 w-4" />
                               {t("playNow")}
-                            </Link>
-                          </Button>
+                            </Button>
+                          </Link>
                         </CardFooter>
 
                         {/* Hover glow effect */}
@@ -327,15 +326,15 @@ export default async function GamesPage() {
                         </CardContent>
 
                         <CardFooter className="mt-auto pt-0 pb-6">
-                          <Button className="h-11 w-full text-base font-semibold shadow-md transition-all duration-300 group-hover:scale-[1.02] hover:shadow-lg">
-                            <Link
-                              href={`/student/games/sentences/${game.id}`}
-                              className="flex items-center justify-center"
-                            >
+                          <Link
+                            href={`/student/games/sentences/${game.id}`}
+                            className="flex cursor-pointer items-center justify-center"
+                          >
+                            <Button className="h-11 w-full text-base font-semibold shadow-md transition-all duration-300 group-hover:scale-[1.02] hover:shadow-lg">
                               <Gamepad2 className="mr-2 h-4 w-4" />
                               {t("playNow")}
-                            </Link>
-                          </Button>
+                            </Button>
+                          </Link>
                         </CardFooter>
 
                         {/* Hover glow effect */}

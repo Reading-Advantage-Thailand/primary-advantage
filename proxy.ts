@@ -214,7 +214,7 @@ function buildSigninRedirect(
   return NextResponse.redirect(signinUrl);
 }
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 0. If no locale prefix, let next-intl handle the redirect

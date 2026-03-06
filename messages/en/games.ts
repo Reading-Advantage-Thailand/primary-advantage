@@ -24,6 +24,11 @@ export default {
       title: "Rune Match",
       description: "Match runes and vocabulary to unlock ancient secrets.",
     },
+    dragonRider: {
+      title: "Dragon Rider",
+      description:
+        "Ride your dragon through the skies, collecting words and defeating enemies to save the kingdom!",
+    },
   },
 
   // Badges
@@ -187,6 +192,118 @@ export default {
       combo: "Combo",
       damage: "Damage",
       freeze: "Freeze",
+    },
+  },
+
+  dragonRider: {
+    title: "Dragon Rider",
+    description:
+      "Ride your dragon through the skies, collecting words and defeating enemies to save the kingdom!",
+    startScreen: {
+      title: "Dragon Rider",
+      description: "Choose your difficulty and embark on an epic adventure!",
+      difficultyLabel: "Difficulty",
+      difficultyEasy: "Easy",
+      difficultyNormal: "Normal",
+      difficultyHard: "Hard",
+      difficultyExtreme: "Extreme",
+      startButton: "Start Adventure",
+      rankingButton: "High Scores",
+      instructionsButton: "Instructions",
+      loading: "Loading adventure...",
+    },
+    instructionsScreen: {
+      title: "Instructions",
+      backButton: "Back to Menu",
+      controls: {
+        title: "Controls",
+        move: "Move",
+        moveKeys: "Arrows / WASD",
+        shield: "Shield",
+        shieldKeys: "Space / Enter",
+      },
+      gameplay: {
+        title: "Gameplay",
+        objective: "Objective",
+        objectiveDesc:
+          "Collect words to grow your dragon flight and defeat the Skeleton King!",
+        gates: "Gates",
+        gatesDesc:
+          "Choose the correct gate to grow your dragon flight before the Skeleton King arrives.",
+        boss: "Boss Battle",
+        bossDesc:
+          "Defeat the Skeleton King by answering vocabulary questions correctly.",
+        shields: "Shields",
+        shieldsDesc: "Use shields to block attacks from the Skeleton King.",
+        mana: "Mana",
+        manaDesc:
+          "Collect words to gain mana and use shields to protect yourself.",
+      },
+      scoring: {
+        title: "Scoring",
+        wordsCollected: "Words Collected",
+        wordsCollectedDesc: "+10 points per word",
+        correctAnswers: "Correct Answers",
+        correctAnswersDesc: "+20 points per correct answer",
+        shieldsUsed: "Shields Used",
+        shieldsUsedDesc: "-5 points per shield used",
+        timeBonus: "Time Bonus",
+        timeBonusDesc: "+1 point per second remaining",
+      },
+    },
+    gameplayScreen: {
+      hud: {
+        wordsCollected: "Words Collected",
+        shields: "Shields",
+        mana: "Mana",
+        time: "Time",
+        bossHealth: "Skeleton King Health",
+      },
+      messages: {
+        waveIncoming: "Wave Incoming!",
+        bossApproaching: "Skeleton King Approaching!",
+        bossDefeated: "Skeleton King Defeated!",
+        gameComplete: "Adventure Complete!",
+        gameOver: "Game Over",
+        pressEnterToContinue: "Press Enter to Continue",
+        pressSpaceToShield: "Press Space to Shield",
+      },
+    },
+    resultsScreen: {
+      title: "Adventure Complete!",
+      score: "Final Score",
+      wordsCollected: "Words Collected",
+      correctAnswers: "Correct Answers",
+      shieldsUsed: "Shields Used",
+      timeBonus: "Time Bonus",
+      difficulty: "Difficulty",
+      playAgainButton: "Play Again",
+      backToMenuButton: "Back to Menu",
+      rankingButton: "High Scores",
+    },
+    rankingScreen: {
+      title: "High Scores",
+      backButton: "Back to Menu",
+      noScores: "No scores yet.",
+      beTheFirst: "Be the first to conquer the skies!",
+      yourRank: "Your Rank",
+      topScores: "Top Scores",
+      score: "Score",
+      words: "Words",
+      time: "Time",
+      difficulty: "Difficulty",
+    },
+    ranking: {
+      leaderboard: "High Scores",
+      noChampions: "No scores yet.",
+      beTheFirst: "Be the first to conquer the skies!",
+      dragonRider: "Dragon Rider",
+    },
+    difficulty: {
+      easy: "Easy",
+      normal: "Normal",
+      hard: "Hard",
+      extreme: "Extreme",
     },
   },
 } as const;

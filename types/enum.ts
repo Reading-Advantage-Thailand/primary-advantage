@@ -65,6 +65,7 @@ export enum ActivityType {
   STORIES_LA_QUESTION = "STORIES_LA_QUESTION",
   RUNE_MATCH = "RUNE_MATCH",
   RPG_BATTLE = "RPG_BATTLE",
+  DRAGON_RIDER = "DRAGON_RIDER",
 }
 
 export enum ActivityStatus {
