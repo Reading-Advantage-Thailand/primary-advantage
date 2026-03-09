@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { after } from "next/server";
 import { withAuth } from "@/server/utils/middleware";
 import { generateStoryContentController } from "@/server/controllers/storieController";
 import { z } from "zod";
@@ -103,29 +104,27 @@ async function handleGeneration(
 
     console.log(`[Story Generate] Generation starting...`);
 
-    if (source === "scheduler") {
-      await generateStoryContentController(amountPerGen);
-    } else if (source === "session") {
-      setImmediate(async () => {
-        try {
-          await generateStoryContentController(amountPerGen);
-        } catch (error) {
-          console.error(`[Story Generate] Generation failed:`, error);
-        }
-      });
-    }
+    // Use next/server `after()` to run generation after the response is sent.
+    // This keeps the Cloud Run instance alive until the work finishes,
+    // unlike setImmediate which can be killed when the instance shuts down.
+    after(async () => {
+      try {
+        await generateStoryContentController(amountPerGen);
+        console.log(`[Story Generate] Generation completed successfully`);
+      } catch (error) {
+        console.error(`[Story Generate] Generation failed:`, error);
+      }
+    });
 
-    console.log(`[Story Generate] Generation completed successfully`);
-
-    // Return 200 OK after generation completes
+    // Return 202 Accepted immediately — generation continues in background
     return NextResponse.json(
       {
-        message: "Story generation completed successfully",
+        message: "Story generation accepted and running in background",
         amountPerGen,
         source,
         timestamp,
       },
-      { status: 200 },
+      { status: 202 },
     );
   } catch (error) {
     console.error(`[Story Generate] Unexpected error:`, error);
