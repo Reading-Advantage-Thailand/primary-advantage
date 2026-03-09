@@ -14,7 +14,7 @@ const google = createVertex({
 const googleModel = "gemini-2.5-flash";
 const googleModelLite = "gemini-2.5-flash-lite";
 const googleImage = "gemini-3-pro-image-preview";
-const googleNewModel = "gemini-3-pro-preview";
+const googleNewModel = "gemini-3.1-pro-preview";
 const googleImageModel = "imagen-4.0-generate-001";
 
 export {
