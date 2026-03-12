@@ -296,7 +296,7 @@ export function ClassroomsTable() {
                   {t("createClassroom")}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
+              <DialogContent className="sm:max-w-106.25">
                 <DialogHeader>
                   <DialogTitle>{t("createClassroom")}</DialogTitle>
                   <DialogDescription>
@@ -365,7 +365,7 @@ export function ClassroomsTable() {
           </div>
           {/* Search and Filters */}
           <div className="flex flex-wrap gap-4">
-            <div className="min-w-[200px] flex-1">
+            <div className="min-w-50 flex-1">
               <div className="relative">
                 <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                 <Input
@@ -388,7 +388,7 @@ export function ClassroomsTable() {
                 <TableHead>{t("students")}</TableHead>
                 <TableHead>{t("teachers")}</TableHead>
                 <TableHead>{t("createdAt")}</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-12.5"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

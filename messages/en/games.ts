@@ -29,6 +29,16 @@ export default {
       description:
         "Ride your dragon through the skies, collecting words and defeating enemies to save the kingdom!",
     },
+    potionRush: {
+      title: "Potion Rush",
+      description:
+        "Mix potions by combining words in the correct order to defeat the monster!",
+    },
+    enchantedLibrary: {
+      title: "Enchanted Library",
+      description:
+        "Explore the Enchanted Library and collect magical artifacts by matching words and completing challenges!",
+    },
   },
 
   // Badges
@@ -51,6 +61,7 @@ export default {
     vocabulary: "Vocabulary",
     matching: "Matching",
     spelling: "Spelling",
+    sentence: "Sentence",
   },
 
   // Actions
@@ -304,6 +315,109 @@ export default {
       normal: "Normal",
       hard: "Hard",
       extreme: "Extreme",
+    },
+  },
+  potionRush: {
+    loading: "Loading Alchemical Supplies...",
+    backToGames: "Back to Games",
+    noSentences: "No Sentences Found",
+    insufficientSentences: "Insufficient Sentences",
+    noSentencesDesc: "You haven't saved any sentences to your flashcards yet.",
+    insufficientDesc: "You need at least {count} sentences to play.",
+    currentCount: "You currently have {count}.",
+    readArticles: "Read Articles",
+    subtitle: "Level up your alchemy skills",
+    play: "Play",
+    rankings: "Rankings",
+    leaderboards: "Leaderboards",
+    mode: "{difficulty} Mode",
+    noRecords: "No records yet. Be the first!",
+    difficulty: {
+      easy: "Easy",
+      normal: "Normal",
+      hard: "Hard",
+      extreme: "Extreme",
+    },
+    // Game component translations
+    title: "Potion Rush",
+    gameSubtitle: "Alchemical Management",
+    proTip:
+      "Use the Trash Portal to clear ruined potions if you make a mistake.",
+    startButton: "Start Brewing",
+    instructions: {
+      step1: "Take orders from customers in their native language.",
+      step2: "Collect target language words from the conveyor belt.",
+      step3: "Drag correct words to a cauldron, then serve the potion.",
+    },
+    controls: {
+      match: "Match",
+      matchKeys: "Meanings",
+      drag: "Drag",
+      dragKeys: "Ingredients",
+    },
+    hud: {
+      score: "Score",
+      reputation: "Reputation",
+    },
+    messages: {
+      victory: "Closing Time!",
+      defeat: "Shop Closed!",
+      victoryDesc: "Great work! The shop is closed for the day.",
+      defeatDesc: "The reputation of your potion shop hit rock bottom.",
+      customersServed: "Customers Served",
+      openAgain: "Open Again",
+    },
+  },
+  enchantedLibrary: {
+    title: "Enchanted Library",
+    subtitle: "Mystic Studies",
+    loading: "Loading Ancient Tomes...",
+    proTip: "Use shield charges to bounce spirits when the stacks get crowded.",
+    startButton: "Start Adventure",
+    instructions: {
+      step1: "Collect magic books that match the target word.",
+      step2: "Correct books grant +10 mana and a shield charge.",
+      step3: "Wrong books or spirits drain mana. Choose carefully.",
+      step4: "Master each word twice to complete your studies.",
+    },
+    controls: {
+      move: "Move",
+      moveKeys: "Arrows / WASD",
+      shield: "Shield",
+      shieldKeys: "Space / Enter",
+    },
+    hud: {
+      target: "Target",
+      mana: "Mana",
+      time: "Time",
+      shields: "Shields",
+    },
+    messages: {
+      victory: "Master Wizard!",
+      victoryDesc: "You've learned all the vocabulary!",
+      gameOver: "Studies Incomplete",
+      gameOverDesc: "The library spirits have overwhelmed you.",
+      wordsMastered: "Words Mastered",
+      correctBooks: "Correct Books",
+    },
+    difficulty: {
+      label: "Difficulty",
+      easy: "Easy",
+      normal: "Normal",
+      hard: "Hard",
+      extreme: "Extreme",
+      descriptions: {
+        easy: "Fewer spirits, slower pace",
+        normal: "Balanced challenge",
+        hard: "More spirits, faster pace",
+        extreme: "Maximum challenge!",
+      },
+    },
+    ranking: {
+      noScholars: "No scholars yet.",
+      beTheFirst: "Master the library and claim your spot!",
+      topScholar: "Master Wizard",
+      leaderboard: "High Scores",
     },
   },
 } as const;

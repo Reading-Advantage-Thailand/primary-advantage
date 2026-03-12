@@ -43,7 +43,7 @@ proxy-on:
 db:
 	docker compose exec -it web npx prisma studio --hostname 0.0.0.0
 
-db-reset-skip-seed:
+db-reset-skip:
 	docker compose exec web npx prisma migrate reset --skip-seed
 
 %:

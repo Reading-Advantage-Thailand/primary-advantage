@@ -27,7 +27,17 @@ export default {
     dragonRider: {
       title: "Dragon Rider",
       description:
-        "Ride your dragon through the skies, collecting words and defeating enemies to save the kingdom!",
+        "ขี่มังกรของคุณผ่านท้องฟ้า รวบรวมคำศัพท์และเอาชนะศัตรูเพื่อช่วยเหลอาณาจักร!",
+    },
+    potionRush: {
+      title: "Potion Rush",
+      description:
+        "ผสมยาโดยการเรียงคำศัพท์ตามลำดับที่ถูกต้องเพื่อเอาชนะมอนสเตอร์!",
+    },
+    enchantedLibrary: {
+      title: "Enchanted Library",
+      description:
+        "สำรวจห้องสมุดต้องมนตร์และรวบรวมวัตถุวิเศษด้วยการจับคู่คำศัพท์และทำภารกิจให้สำเร็จ!",
     },
   },
 
@@ -50,6 +60,7 @@ export default {
     vocabulary: "คำศัพท์",
     matching: "จับคู่",
     spelling: "การสะกดคำ",
+    sentence: "ประโยค",
   },
 
   //Action
@@ -298,6 +309,108 @@ export default {
       normal: "ปกติ",
       hard: "ยาก",
       extreme: "สุดโหด",
+    },
+  },
+  potionRush: {
+    loading: "กำลังเตรียมอุปกรณ์เล่นแร่แปรธาตุ...",
+    backToGames: "กลับไปหน้าเกม",
+    noSentences: "ไม่พบประโยค",
+    insufficientSentences: "ประโยคไม่เพียงพอ",
+    noSentencesDesc: "คุณยังไม่ได้บันทึกประโยคลงในแฟลชการ์ดของคุณ",
+    insufficientDesc: "คุณต้องมีอย่างน้อย {count} ประโยคเพื่อเล่น",
+    currentCount: "คุณมีอยู่ {count}",
+    readArticles: "อ่านบทความ",
+    subtitle: "ยกระดับทักษะการเล่นแร่แปรธาตุของคุณ",
+    play: "เล่น",
+    rankings: "อันดับ",
+    leaderboards: "กระดานผู้นำ",
+    mode: "โหมด {difficulty}",
+    noRecords: "ยังไม่มีบันทึก เป็นคนแรกสิ!",
+    difficulty: {
+      easy: "ง่าย",
+      normal: "ปกติ",
+      hard: "ยาก",
+      extreme: "สุดโหด",
+    },
+    // Game component translations
+    title: "Potion Rush",
+    gameSubtitle: "การจัดการร้านยา",
+    proTip: "ใช้ประตูทิ้งขยะเพื่อกำจัดยาที่ทำพลาดได้",
+    startButton: "เริ่มต้มยา",
+    instructions: {
+      step1: "รับคำสั่งซื้อจากลูกค้าในภาษาของพวกเขา",
+      step2: "เก็บคำศัพท์ภาษาเป้าหมายจากสายพานลำเลียง",
+      step3: "ลากคำที่ถูกต้องไปยังหม้อต้ม แล้วเสิร์ฟยาให้ลูกค้า",
+    },
+    controls: {
+      match: "จับคู่",
+      matchKeys: "ความหมาย",
+      drag: "ลาก",
+      dragKeys: "ส่วนผสม",
+    },
+    hud: {
+      score: "คะแนน",
+      reputation: "ชื่อเสียง",
+    },
+    messages: {
+      victory: "ปิดร้านแล้ว!",
+      defeat: "ร้านปิดตัว!",
+      victoryDesc: "ทำได้ดีมาก! ร้านปิดสำหรับวันนี้แล้ว",
+      defeatDesc: "ชื่อเสียงร้านยาของคุณตกต่ำสุดแล้ว",
+      customersServed: "ลูกค้าที่บริการแล้ว",
+      openAgain: "เปิดร้านอีกครั้ง",
+    },
+  },
+  enchantedLibrary: {
+    title: "Enchanted Library",
+    subtitle: "การศึกษาลึกลับ",
+    loading: "กำลังโหลดตำราโบราณ...",
+    proTip: "ใช้โล่เพื่อผลักวิญญาณเมื่อมีจำนวนมากเกินไป",
+    startButton: "เริ่มการผจญภัย",
+    instructions: {
+      step1: "เก็บหนังสือวิเศษที่ตรงกับคำเป้าหมาย",
+      step2: "หนังสือที่ถูกต้องให้ +10 มานาและโล่หนึ่งชั้น",
+      step3: "เก็บหนังสือผิดหรือถูกวิญญาณโจมตีจะลดมานา เลือกอย่างระมัดระวัง",
+      step4: "เชี่ยวชาญแต่ละคำสองครั้งเพื่อจบการศึกษา",
+    },
+    controls: {
+      move: "เคลื่อนที่",
+      moveKeys: "ลูกศร / WASD",
+      shield: "โล่",
+      shieldKeys: "Space / Enter",
+    },
+    hud: {
+      target: "เป้าหมาย",
+      mana: "มานา",
+      time: "เวลา",
+      shields: "โล่",
+    },
+    messages: {
+      victory: "พ่อมดผู้เชี่ยวชาญ!",
+      victoryDesc: "คุณได้เรียนรู้คำศัพท์ทั้งหมดแล้ว!",
+      gameOver: "การศึกษาไม่สมบูรณ์",
+      gameOverDesc: "วิญญาณห้องสมุดครอบงำคุณแล้ว",
+      wordsMastered: "คำที่เชี่ยวชาญ",
+      correctBooks: "หนังสือที่ถูกต้อง",
+    },
+    difficulty: {
+      label: "ระดับความยาก",
+      easy: "ง่าย",
+      normal: "ปกติ",
+      hard: "ยาก",
+      extreme: "สุดโหด",
+      descriptions: {
+        easy: "วิญญาณน้อย ช้าลง",
+        normal: "ความท้าทายที่สมดุล",
+        hard: "วิญญาณมาก เร็วขึ้น",
+        extreme: "ความท้าทายสูงสุด!",
+      },
+    },
+    ranking: {
+      noScholars: "ยังไม่มีนักวิชาการ",
+      beTheFirst: "เชี่ยวชาญห้องสมุดและคว้าตำแหน่งของคุณ!",
+      topScholar: "พ่อมดผู้เชี่ยวชาญ",
+      leaderboard: "คะแนนสูงสุด",
     },
   },
 } as const;
