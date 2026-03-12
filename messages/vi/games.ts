@@ -30,6 +30,16 @@ export default {
       description:
         "Cưỡi rồng của bạn qua bầu trời, thu thập từ vựng và đánh bại kẻ thù để cứu vương quốc!",
     },
+    potionRush: {
+      title: "Potion Rush",
+      description:
+        "Pha chế thuốc bằng cách kết hợp các từ theo đúng thứ tự để đánh bại quái vật!",
+    },
+    enchantedLibrary: {
+      title: "Enchanted Library",
+      description:
+        "Khám phá Thư viện Phép thuật và thu thập các hiện vật ma thuật bằng cách ghép từ và hoàn thành các thử thách!",
+    },
   },
 
   // Badges
@@ -52,6 +62,7 @@ export default {
     vocabulary: "Từ vựng",
     matching: "Ghép",
     spelling: "Đánh vần",
+    sentence: "Câu",
   },
 
   // Actions
@@ -303,6 +314,108 @@ export default {
       normal: "Bình Thường",
       hard: "Khó",
       extreme: "Cực Khó",
+    },
+  },
+  potionRush: {
+    loading: "Đang chuẩn bị dụng cụ giả kim...",
+    backToGames: "Quay lại Trò chơi",
+    noSentences: "Không tìm thấy câu",
+    insufficientSentences: "Không đủ câu",
+    noSentencesDesc: "Bạn chưa lưu bất kỳ câu nào vào flashcards của mình.",
+    insufficientDesc: "Bạn cần ít nhất {count} câu để chơi.",
+    currentCount: "Bạn hiện có {count} câu.",
+    readArticles: "Đọc bài viết",
+    subtitle: "Nâng cao kỹ năng giả kim của bạn",
+    play: "Chơi",
+    rankings: "Bảng xếp hạng",
+    leaderboards: "Bảng xếp hạng",
+    mode: "Chế độ {difficulty}",
+    noRecords: "Chưa có kỷ lục nào. Hãy là người đầu tiên!",
+    difficulty: {
+      easy: "Dễ",
+      normal: "Thường",
+      hard: "Khó",
+      extreme: "Cực khó",
+    },
+    // Game component translations
+    title: "Potion Rush",
+    gameSubtitle: "Quản lý giả kim",
+    proTip: "Sử dụng Cổng Rác để dọn những lọ thuốc hỏng nếu bạn phạm sai lầm.",
+    startButton: "Bắt đầu pha chế",
+    instructions: {
+      step1: "Nhận đơn đặt hàng từ khách hàng bằng ngôn ngữ mẹ đẻ của họ.",
+      step2: "Thu thập các từ mục tiêu từ băng chuyền.",
+      step3: "Kéo các từ đúng vào vạc, sau đó phục vụ thuốc.",
+    },
+    controls: {
+      match: "Ghép",
+      matchKeys: "Ý nghĩa",
+      drag: "Kéo",
+      dragKeys: "Nguyên liệu",
+    },
+    hud: {
+      score: "Điểm",
+      reputation: "Danh tiếng",
+    },
+    messages: {
+      victory: "Giờ đóng cửa!",
+      defeat: "Cửa hàng đóng cửa!",
+      victoryDesc: "Làm tốt lắm! Cửa hàng đã đóng cửa trong ngày.",
+      defeatDesc: "Danh tiếng cửa hàng thuốc của bạn đã chạm đáy.",
+      customersServed: "Khách hàng đã phục vụ",
+      openAgain: "Mở lại",
+    },
+  },
+  enchantedLibrary: {
+    title: "Enchanted Library",
+    subtitle: "Nghiên Cứu Huyền Bí",
+    loading: "Đang tải sách cổ...",
+    proTip: "Sử dụng lá chắn để đẩy lùi linh hồn khi chúng quá đông",
+    startButton: "Bắt Đầu Phiêu Lưu",
+    instructions: {
+      step1: "Thu thập sách phép thuật khớp với từ mục tiêu",
+      step2: "Sách đúng tặng +10 mana và một lá chắn",
+      step3: "Sách sai hoặc linh hồn làm giảm mana. Hãy cẩn thận",
+      step4: "Thành thạo mỗi từ hai lần để hoàn thành học tập",
+    },
+    controls: {
+      move: "Di Chuyển",
+      moveKeys: "Mũi Tên / WASD",
+      shield: "Lá Chắn",
+      shieldKeys: "Space / Enter",
+    },
+    hud: {
+      target: "Mục Tiêu",
+      mana: "Mana",
+      time: "Thời Gian",
+      shields: "Lá Chắn",
+    },
+    messages: {
+      victory: "Pháp Sư Bậc Thầy!",
+      victoryDesc: "Bạn đã học hết từ vựng!",
+      gameOver: "Học Chưa Hoàn Thành",
+      gameOverDesc: "Linh hồn thư viện đã áp đảo bạn",
+      wordsMastered: "Từ Đã Thành Thạo",
+      correctBooks: "Sách Đúng",
+    },
+    difficulty: {
+      label: "Độ Khó",
+      easy: "Dễ",
+      normal: "Bình Thường",
+      hard: "Khó",
+      extreme: "Cực Khó",
+      descriptions: {
+        easy: "Ít linh hồn, chậm hơn",
+        normal: "Thử thách cân bằng",
+        hard: "Nhiều linh hồn, nhanh hơn",
+        extreme: "Thử thách tối đa!",
+      },
+    },
+    ranking: {
+      noScholars: "Chưa có học giả",
+      beTheFirst: "Làm chủ thư viện và giành vị trí của bạn!",
+      topScholar: "Pháp Sư Bậc Thầy",
+      leaderboard: "Bảng Xếp Hạng",
     },
   },
 } as const;

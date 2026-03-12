@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "GameType" ADD VALUE 'POTION_RUSH';

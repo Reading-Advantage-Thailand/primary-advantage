@@ -80,8 +80,8 @@ const ComingSoonCard = async () => {
 export default async function GamesPage() {
   const t = await getTranslations("games");
   const games = getGamesList(t);
-  const sentenceGames: any[] = [];
-  const vocabularyGames = games;
+  const sentenceGames = games.sentence;
+  const vocabularyGames = games.vocabulary;
 
   return (
     <>

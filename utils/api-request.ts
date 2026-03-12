@@ -539,3 +539,87 @@ export const fetchDragonRiderRankingApi = async (
 
   return response.json();
 };
+
+//---------------------------------
+// Potion Rush Game API
+//---------------------------------
+
+export interface PotionRushSentencesResponse {
+  success: boolean;
+  sentences: { term: string; translation: string }[];
+  warning?: "NO_SENTENCES" | "INSUFFICIENT_SENTENCES";
+  requiredCount?: number;
+  currentCount?: number;
+  total?: number;
+}
+
+export interface PotionRushRankingEntry {
+  rank: number;
+  userId: string;
+  name: string | null;
+  image: string | null;
+  xp: number;
+}
+
+export interface PotionRushRankingResponse {
+  success: boolean;
+  rankings: Record<string, PotionRushRankingEntry[]>;
+  scope: "school" | "global";
+}
+
+export interface SubmitPotionRushResultInput {
+  xp: number;
+  score: number;
+  accuracy: number;
+  difficulty: string;
+  correctAnswers: number;
+  totalAttempts: number;
+  gameTime: number;
+}
+
+export interface SubmitPotionRushResultResponse {
+  success: boolean;
+  xpEarned?: number;
+}
+
+export const fetchPotionRushSentencesApi = async (
+  language: string = "th",
+): Promise<PotionRushSentencesResponse> => {
+  const queryParams = new URLSearchParams({ language }).toString();
+  const response = await fetch(
+    `/api/games/potion-rush/sentences?${queryParams}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch potion rush sentences");
+  }
+
+  return response.json();
+};
+
+export const submitPotionRushResultApi = async (
+  data: SubmitPotionRushResultInput,
+): Promise<SubmitPotionRushResultResponse> => {
+  const response = await fetch("/api/games/potion-rush/complete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to submit potion rush results");
+  }
+
+  return response.json();
+};
+
+export const fetchPotionRushRankingsApi =
+  async (): Promise<PotionRushRankingResponse> => {
+    const response = await fetch("/api/games/potion-rush/ranking");
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch potion rush rankings");
+    }
+
+    return response.json();
+  };

@@ -1171,6 +1171,7 @@ export function DragonRiderGame({
             },
             { label: "Select", keys: "Tap Gate", color: "bg-emerald-500" },
           ]}
+          gameType="vocabulary"
           selectedLanguage={selectedLanguage}
           onLanguageChange={setSelectedLanguage}
           startButtonText={

@@ -39,7 +39,7 @@ export function CreateSchoolDialog({
           Create School
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>Create New School</DialogTitle>
           <DialogDescription>

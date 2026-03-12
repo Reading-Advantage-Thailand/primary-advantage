@@ -74,7 +74,7 @@ export default function Sentence({
             {t("sentences")}
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-h-[80vh] gap-0 p-0 sm:max-w-[600px]">
+        <DialogContent className="max-h-[80vh] gap-0 p-0 sm:max-w-150">
           <div className="flex h-full max-h-[80vh] flex-col">
             <DialogHeader className="border-b px-6 py-4">
               <DialogTitle>
@@ -99,8 +99,8 @@ export default function Sentence({
                         >
                           <Skeleton className="h-5 w-5 rounded" />
                           <div className="flex-1 space-y-2">
-                            <Skeleton className="h-4 w-[200px]" />
-                            <Skeleton className="h-3 w-[300px]" />
+                            <Skeleton className="h-4 w-50" />
+                            <Skeleton className="h-3 w-75" />
                           </div>
                         </div>
                       ))}
@@ -122,7 +122,7 @@ export default function Sentence({
                                   </span>
 
                                   {/* Audio button */}
-                                  <div className="flex-shrink-0">
+                                  <div className="shrink-0">
                                     <AudioButton
                                       audioUrl={list.audioUrl}
                                       startTimestamp={list.startTime}

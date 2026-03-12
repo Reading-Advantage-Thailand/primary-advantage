@@ -66,6 +66,8 @@ export enum ActivityType {
   RUNE_MATCH = "RUNE_MATCH",
   RPG_BATTLE = "RPG_BATTLE",
   DRAGON_RIDER = "DRAGON_RIDER",
+  POTION_RUSH = "POTION_RUSH",
+  ENCHANTED_LIBRARY = "ENCHANTED_LIBRARY",
 }
 
 export enum ActivityStatus {
@@ -101,6 +103,7 @@ export enum UserXpEarned {
   SENTENCE_WORD_ORDERING = 5,
   RUNE_MATCH = 5,
   RPG_BATTLE = 5,
+  POTION_RUSH = 5,
 }
 
 export enum FlashcardType {

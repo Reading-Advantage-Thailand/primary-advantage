@@ -777,6 +777,7 @@ enum GameType {
   RUNE_MATCH
   ENCHANTED_LIBRARY
   DRAGON_RIDER
+  POTION_RUSH
 }
 
 model GameRanking {

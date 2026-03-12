@@ -811,7 +811,7 @@ export function OrderSentenceGame({
               </p>
             </div>
 
-            <div className="border-muted-foreground/25 bg-muted/30 min-h-[400px] rounded-lg border-2 border-dashed p-4">
+            <div className="border-muted-foreground/25 bg-muted/30 min-h-100 rounded-lg border-2 border-dashed p-4">
               {userOrder.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <p className="text-muted-foreground">
