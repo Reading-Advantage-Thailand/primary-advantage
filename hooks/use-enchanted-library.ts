@@ -2,33 +2,35 @@ import { useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { VocabularyItem } from "@/store/useGameStore";
 import {
-  fetchDragonRiderVocabularyApi,
-  fetchDragonRiderRankingApi,
-  submitDragonRiderResultApi,
-  type DragonRiderVocabularyResponse,
-  type DragonRiderRankingResponse,
-  type SubmitDragonRiderResultInput,
-  type SubmitDragonRiderResultResponse,
+  fetchEnchantedLibraryVocabularyApi,
+  fetchEnchantedLibraryRankingApi,
+  submitEnchantedLibraryResultApi,
+  type EnchantedLibraryVocabularyResponse,
+  type EnchantedLibraryRankingResponse,
+  type SubmitEnchantedLibraryResultInput,
+  type SubmitEnchantedLibraryResultResponse,
 } from "@/utils/api-request";
 import { SAMPLE_VOCABULARY } from "@/lib/games/sampleVocabulary";
 
 // ─── Query Keys ────────────────────────────────────────────
-export const dragonRiderKeys = {
-  all: ["dragon-rider"] as const,
+export const enchantedLibraryKeys = {
+  all: ["enchanted-library"] as const,
   vocabulary: (language: string) =>
-    [...dragonRiderKeys.all, "vocabulary", language] as const,
+    [...enchantedLibraryKeys.all, "vocabulary", language] as const,
   rankings: (difficulty?: string) =>
-    [...dragonRiderKeys.all, "rankings", difficulty ?? "all"] as const,
+    [...enchantedLibraryKeys.all, "rankings", difficulty ?? "all"] as const,
 } as const;
 
 // ─── Types ─────────────────────────────────────────────────
-export interface UseDragonRiderVocabularyOptions {
+export interface UseEnchantedLibraryVocabularyOptions {
   language?: string;
   enabled?: boolean;
 }
 
-export interface UseDragonRiderVocabularyReturn {
+export interface UseEnchantedLibraryVocabularyReturn {
   vocabulary: VocabularyItem[];
+  warning?: string;
+  message?: string;
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
@@ -36,15 +38,15 @@ export interface UseDragonRiderVocabularyReturn {
   refetch: () => void;
 }
 
-// ─── useDragonRiderVocabulary ─────────────────────────────────
-export function useDragonRiderVocabulary(
-  options: UseDragonRiderVocabularyOptions = {},
-): UseDragonRiderVocabularyReturn {
+// ─── useEnchantedLibraryVocabulary ─────────────────────────
+export function useEnchantedLibraryVocabulary(
+  options: UseEnchantedLibraryVocabularyOptions = {},
+): UseEnchantedLibraryVocabularyReturn {
   const { language = "th", enabled = true } = options;
 
-  const query = useQuery<DragonRiderVocabularyResponse>({
-    queryKey: dragonRiderKeys.vocabulary(language),
-    queryFn: () => fetchDragonRiderVocabularyApi(language),
+  const query = useQuery<EnchantedLibraryVocabularyResponse>({
+    queryKey: enchantedLibraryKeys.vocabulary(language),
+    queryFn: () => fetchEnchantedLibraryVocabularyApi(language),
     enabled,
     staleTime: 5 * 60 * 1000, // 5 mins — vocab doesn't change rapidly
     retry: 1,
@@ -64,6 +66,8 @@ export function useDragonRiderVocabulary(
 
   return {
     vocabulary,
+    warning: query.data?.warning,
+    message: query.data?.message,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     isError: query.isError,
@@ -72,11 +76,11 @@ export function useDragonRiderVocabulary(
   };
 }
 
-// ─── useDragonRiderRanking ───────────────────────────────────
-export function useDragonRiderRanking(difficulty?: string) {
-  const query = useQuery<DragonRiderRankingResponse>({
-    queryKey: dragonRiderKeys.rankings(difficulty),
-    queryFn: () => fetchDragonRiderRankingApi(difficulty),
+// ─── useEnchantedLibraryRanking ────────────────────────────
+export function useEnchantedLibraryRanking(difficulty?: string) {
+  const query = useQuery<EnchantedLibraryRankingResponse>({
+    queryKey: enchantedLibraryKeys.rankings(difficulty),
+    queryFn: () => fetchEnchantedLibraryRankingApi(difficulty),
     staleTime: 60 * 1000, // 1 min — rankings can update after each game
     retry: 1,
   });
@@ -92,26 +96,28 @@ export function useDragonRiderRanking(difficulty?: string) {
   };
 }
 
-// ─── useSubmitDragonRiderResult ──────────────────────────────
-export function useSubmitDragonRiderResult() {
+// ─── useSubmitEnchantedLibraryResult ───────────────────────
+export function useSubmitEnchantedLibraryResult() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<
-    SubmitDragonRiderResultResponse,
+    SubmitEnchantedLibraryResultResponse,
     Error,
-    SubmitDragonRiderResultInput
+    SubmitEnchantedLibraryResultInput
   >({
-    mutationFn: submitDragonRiderResultApi,
+    mutationFn: submitEnchantedLibraryResultApi,
     onSuccess: () => {
       // Invalidate user-related queries so XP/stats update everywhere
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      // Invalidate rankings so they reflect the new score (but NOT vocabulary)
-      queryClient.invalidateQueries({ queryKey: dragonRiderKeys.rankings() });
+      // Invalidate rankings so they reflect the new score
+      queryClient.invalidateQueries({
+        queryKey: enchantedLibraryKeys.rankings(),
+      });
     },
   });
 
   const submitResult = useCallback(
-    (data: SubmitDragonRiderResultInput) => mutation.mutateAsync(data),
+    (data: SubmitEnchantedLibraryResultInput) => mutation.mutateAsync(data),
     [mutation],
   );
 
