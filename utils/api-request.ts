@@ -465,17 +465,15 @@ export interface DragonRiderVocabularyResponse {
 }
 
 export interface DragonRiderRankingEntry {
-  rank: number;
   userId: string;
   name: string;
   image: string | null;
   xp: number;
-  difficulty: string;
 }
 
 export interface DragonRiderRankingResponse {
   success: boolean;
-  rankings: DragonRiderRankingEntry[];
+  rankings: Record<string, DragonRiderRankingEntry[]>;
   scope: "school" | "global";
 }
 
@@ -623,3 +621,89 @@ export const fetchPotionRushRankingsApi =
 
     return response.json();
   };
+
+//---------------------------------
+// Enchanted Library Game API
+//---------------------------------
+
+export interface EnchantedLibraryVocabularyResponse {
+  success: boolean;
+  vocabulary: { term: string; translation: string }[];
+  warning?: "NO_VOCABULARY" | "INSUFFICIENT_VOCABULARY";
+  message?: string;
+}
+
+export interface EnchantedLibraryRankingEntry {
+  userId: string;
+  name: string;
+  image: string | null;
+  xp: number;
+}
+
+export interface EnchantedLibraryRankingResponse {
+  success: boolean;
+  rankings: Record<string, EnchantedLibraryRankingEntry[]>;
+  scope: "school" | "global";
+}
+
+export interface SubmitEnchantedLibraryResultInput {
+  xp: number;
+  accuracy: number;
+  correctAnswers: number;
+  totalAttempts: number;
+  difficulty: string;
+  gameTime: number;
+}
+
+export interface SubmitEnchantedLibraryResultResponse {
+  success: boolean;
+  xpEarned?: number;
+}
+
+export const fetchEnchantedLibraryVocabularyApi = async (
+  language: string = "th",
+): Promise<EnchantedLibraryVocabularyResponse> => {
+  const queryParams = new URLSearchParams({ language }).toString();
+  const response = await fetch(
+    `/api/games/enchanted-library/vocabulary?${queryParams}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch Enchanted Library vocabulary");
+  }
+
+  return response.json();
+};
+
+export const fetchEnchantedLibraryRankingApi = async (
+  difficulty?: string,
+): Promise<EnchantedLibraryRankingResponse> => {
+  const queryParams = difficulty
+    ? `?${new URLSearchParams({ difficulty }).toString()}`
+    : "";
+  const response = await fetch(
+    `/api/games/enchanted-library/ranking${queryParams}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch Enchanted Library rankings");
+  }
+
+  return response.json();
+};
+
+export const submitEnchantedLibraryResultApi = async (
+  data: SubmitEnchantedLibraryResultInput,
+): Promise<SubmitEnchantedLibraryResultResponse> => {
+  const response = await fetch("/api/games/enchanted-library/complete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to submit Enchanted Library results");
+  }
+
+  return response.json();
+};

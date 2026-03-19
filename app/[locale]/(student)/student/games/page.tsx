@@ -80,8 +80,20 @@ const ComingSoonCard = async () => {
 export default async function GamesPage() {
   const t = await getTranslations("games");
   const games = getGamesList(t);
-  const sentenceGames = games.sentence;
-  const vocabularyGames = games.vocabulary;
+
+  const badgePriority = (badge: string | null) => {
+    if (badge === t("badges.new")) return 0;
+    if (badge === t("badges.recommended")) return 1;
+    if (badge === t("badges.popular")) return 2;
+    return 3;
+  };
+
+  const sentenceGames = [...games.sentence].sort(
+    (a, b) => badgePriority(a.badge) - badgePriority(b.badge),
+  );
+  const vocabularyGames = [...games.vocabulary].sort(
+    (a, b) => badgePriority(a.badge) - badgePriority(b.badge),
+  );
 
   return (
     <>
@@ -150,16 +162,18 @@ export default async function GamesPage() {
                           </div>
 
                           {/* Gamepad icon */}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="absolute right-4 bottom-4 z-10 transform rounded-lg bg-white/90 p-2 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:-rotate-12 dark:bg-gray-900/90">
-                                <Gamepad2 className="text-primary h-6 w-6" />
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{t("clickToPlay")}</p>
-                            </TooltipContent>
-                          </Tooltip>
+                          <Link href={`/student/games/vocabulary/${game.id}`}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="absolute right-4 bottom-4 z-10 transform cursor-pointer rounded-lg bg-white/90 p-2 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:-rotate-12 dark:bg-gray-900/90">
+                                  <Gamepad2 className="text-primary h-6 w-6" />
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{t("clickToPlay")}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </Link>
                         </CardHeader>
 
                         <CardContent className="flex flex-1 flex-col space-y-4 pt-6 pb-4">
@@ -178,7 +192,7 @@ export default async function GamesPage() {
                               variant="outline"
                               className={`${
                                 difficultyColors[
-                                  game.difficulty as keyof typeof difficultyColors
+                                  game.difficultyKey as keyof typeof difficultyColors
                                 ]
                               } font-medium`}
                             >
@@ -237,7 +251,7 @@ export default async function GamesPage() {
                   return (
                     <div key={game.id} className="h-full">
                       <Card
-                        className="group hover:shadow-primary/20 hover:border-primary/50 bg-card/50 relative flex h-full cursor-pointer flex-col overflow-hidden border-2 backdrop-blur-sm transition-all duration-300 hover:z-30 hover:-translate-y-1 hover:shadow-2xl"
+                        className="group hover:shadow-primary/20 hover:border-primary/50 bg-card/50 relative flex h-full flex-col overflow-hidden border-2 backdrop-blur-sm transition-all duration-300 hover:z-30 hover:-translate-y-1 hover:shadow-2xl"
                         // onClick={() => router.push(`/student/games/${game.id}`)}
                       >
                         {/* Badge overlay */}
@@ -285,16 +299,18 @@ export default async function GamesPage() {
                           </div>
 
                           {/* Gamepad icon */}
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="absolute right-4 bottom-4 z-10 transform rounded-lg bg-white/90 p-2 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:-rotate-12 dark:bg-gray-900/90">
-                                <Gamepad2 className="text-primary h-6 w-6" />
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{t("clickToPlay")}</p>
-                            </TooltipContent>
-                          </Tooltip>
+                          <Link href={`/student/games/sentences/${game.id}`}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="absolute right-4 bottom-4 z-10 transform cursor-pointer rounded-lg bg-white/90 p-2 shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:-rotate-12 dark:bg-gray-900/90">
+                                  <Gamepad2 className="text-primary h-6 w-6" />
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{t("clickToPlay")}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </Link>
                         </CardHeader>
 
                         <CardContent className="flex flex-1 flex-col space-y-4 pt-6 pb-4">
@@ -313,7 +329,7 @@ export default async function GamesPage() {
                               variant="outline"
                               className={`${
                                 difficultyColors[
-                                  game.difficulty as keyof typeof difficultyColors
+                                  game.difficultyKey as keyof typeof difficultyColors
                                 ]
                               } font-medium`}
                             >
@@ -328,7 +344,7 @@ export default async function GamesPage() {
                         <CardFooter className="mt-auto pt-0 pb-6">
                           <Link
                             href={`/student/games/sentences/${game.id}`}
-                            className="flex cursor-pointer items-center justify-center"
+                            className="flex w-full cursor-pointer items-center justify-center"
                           >
                             <Button className="h-11 w-full text-base font-semibold shadow-md transition-all duration-300 group-hover:scale-[1.02] hover:shadow-lg">
                               <Gamepad2 className="mr-2 h-4 w-4" />

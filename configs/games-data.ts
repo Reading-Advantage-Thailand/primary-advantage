@@ -1,4 +1,12 @@
-import { Flame, Shield, Sword, Puzzle, Zap, Sparkles } from "lucide-react";
+import {
+  Flame,
+  Shield,
+  Sword,
+  Puzzle,
+  Zap,
+  Sparkles,
+  BookOpen,
+} from "lucide-react";
 import type { useTranslations } from "next-intl";
 
 type TranslationFunction = ReturnType<typeof useTranslations<"GamesPage">>;
@@ -38,6 +46,19 @@ export function getGamesList(t: TranslationFunction) {
         description: t("games.dragonRider.description"),
         icon: Flame,
         coverImage: "/games/cover/dragon-rider.png",
+        color: "from-purple-500 via-pink-500 to-rose-500",
+        difficultyKey: "medium" as const,
+        difficulty: t("difficulty.medium"),
+        type: t("types.strategy"),
+        badge: t("badges.popular"),
+        badgeVariant: "default" as const,
+      },
+      {
+        id: "enchanted-library",
+        title: t("games.enchantedLibrary.title"),
+        description: t("games.enchantedLibrary.description"),
+        icon: BookOpen,
+        coverImage: "/games/cover/enchanted-library.png",
         color: "from-purple-500 via-pink-500 to-rose-500",
         difficultyKey: "medium" as const,
         difficulty: t("difficulty.medium"),
