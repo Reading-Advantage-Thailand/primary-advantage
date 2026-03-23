@@ -141,4 +141,4 @@ availableSecrets:
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: "E2_HIGHCPU_8"
-  cloudSqlInstance: ${_CLOUD_SQL_INSTANCE}
+  cloudSqlInstances: ["${_CLOUD_SQL_INSTANCE}"]
