@@ -146,47 +146,6 @@ export default function LessonProgressBar({
     };
   }, [initialLoadComplete, assignment?.id, setTimer, setPaused]);
 
-  // const updatePhaseCompletion = useCallback(
-  //   (phaseIndex: number, isComplete: boolean) => {
-  //     setPhaseCompletion((prev) => {
-  //       const updated = [...prev];
-  //       if (updated[phaseIndex] !== isComplete) {
-  //         updated[phaseIndex] = isComplete;
-  //         return updated;
-  //       }
-  //       return prev; // Return previous state if no change to prevent unnecessary re-renders
-  //     });
-  //   },
-  //   [],
-  // );
-
-  // useEffect(() => {
-  //   const logActivity = async () => {
-  //     if (currentPhase === 14) {
-  //       await fetch(`/api/v1/users/${userId}/activitylog`, {
-  //         method: "PUT",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           articleId: article.id,
-  //           activityType: ActivityType.LessonRead,
-  //           activityStatus: ActivityStatus.Completed,
-  //           timeTaken: elapsedTime,
-  //           details: {
-  //             title: article.title,
-  //             level: article.ra_level,
-  //             cefr_level: article.cefr_level,
-  //             type: article.type,
-  //             genre: article.genre,
-  //             subgenre: article.subgenre,
-  //           },
-  //         }),
-  //       });
-  //     }
-  //   };
-
-  //   logActivity();
-  // }, [currentPhase, userId, article, elapsedTime]);
-
   const startLesson = async () => {
     try {
       // Prevent multiple clicks and transitions
@@ -276,27 +235,6 @@ export default function LessonProgressBar({
       if (newTask === 7) {
         await saveArticleToFlashcard(assignment?.articleId as string);
       }
-      // Handle final phase logging
-      // if (Phase === 13) {
-      //   await fetch(`/api/v1/users/${userId}/activitylog`, {
-      //     method: "PUT",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({
-      //       articleId: article.id,
-      //       activityType: ActivityType.LessonRead,
-      //       activityStatus: ActivityStatus.Completed,
-      //       timeTaken: elapsedTime,
-      //       details: {
-      //         title: article.title,
-      //         level: article.ra_level,
-      //         cefr_level: article.cefr_level,
-      //         type: article.type,
-      //         genre: article.genre,
-      //         subgenre: article.subgenre,
-      //       },
-      //     }),
-      //   });
-      // }
 
       if (newTask === 14) {
         setPaused(true);
@@ -489,40 +427,7 @@ export default function LessonProgressBar({
   };
 
   const skipTask = async (Task: number) => {
-    // if (Phase === 13) {
-    //   await fetch(`/api/v1/users/${userId}/activitylog`, {
-    //     method: "PUT",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({
-    //       articleId: article.id,
-    //       activityType: ActivityType.LessonRead,
-    //       activityStatus: ActivityStatus.Completed,
-    //       timeTaken: elapsedTime,
-    //       details: {
-    //         title: article.title,
-    //         level: article.ra_level,
-    //         cefr_level: article.cefr_level,
-    //         type: article.type,
-    //         genre: article.genre,
-    //         subgenre: article.subgenre,
-    //       },
-    //     }),
-    //   });
-    // }
     setCurrentTask(Task + 1);
-
-    // const url = classroomId
-    //   ? `/api/v1/lesson/${userId}?articleId=${articleId}&classroomId=${classroomId}`
-    //   : `/api/v1/lesson/${userId}?articleId=${articleId}`;
-
-    // await fetch(url, {
-    //   method: "PUT",
-    //   body: JSON.stringify({
-    //     phase: Phase,
-    //     status: 2,
-    //     elapsedTime: elapsedTime,
-    //   }),
-    // });
   };
 
   useEffect(() => {
@@ -577,11 +482,11 @@ export default function LessonProgressBar({
                 <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-900">
                   <Button
                     size="lg"
-                    className="group relative w-full transform overflow-hidden rounded-xl bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 px-6 py-4 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-blue-600 hover:via-indigo-600 hover:to-purple-600 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
+                    className="group relative w-full transform overflow-hidden rounded-xl bg-linear-to-r from-blue-500 via-indigo-500 to-purple-500 px-6 py-4 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-blue-600 hover:via-indigo-600 hover:to-purple-600 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={startLesson}
                     disabled={phaseLoading || isTransitioning}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     <div className="relative flex items-center justify-center">
                       {phaseLoading || isTransitioning ? (
                         <>
@@ -616,7 +521,7 @@ export default function LessonProgressBar({
                         onClick={previousTask}
                         disabled={phaseLoading || isTransitioning}
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-slate-50 to-slate-100 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-slate-800 dark:to-slate-700" />
+                        <div className="absolute inset-0 bg-linear-to-r from-slate-50 to-slate-100 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-slate-800 dark:to-slate-700" />
                         <div className="relative flex items-center justify-center">
                           {phaseLoading || isTransitioning ? (
                             <>
@@ -643,13 +548,13 @@ export default function LessonProgressBar({
                     {/* Next Button */}
                     <Button
                       size="lg"
-                      className={`${currentTask > 2 ? "flex-1" : "w-full"} group relative transform overflow-hidden rounded-xl bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 px-6 py-4 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-emerald-600 hover:via-green-600 hover:to-teal-600 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 ${
+                      className={`${currentTask > 2 ? "flex-1" : "w-full"} group relative transform overflow-hidden rounded-xl bg-linear-to-r from-emerald-500 via-green-500 to-teal-500 px-6 py-4 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:from-emerald-600 hover:via-green-600 hover:to-teal-600 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 ${
                         shakeButton ? "animate-shake" : ""
                       }`}
                       onClick={() => nextTask(currentTask, timer)}
                       disabled={phaseLoading || isTransitioning}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                       <div className="relative flex items-center justify-center">
                         {phaseLoading || isTransitioning ? (
                           <>
@@ -682,7 +587,7 @@ export default function LessonProgressBar({
         <div className="sticky top-6">
           <div className="overflow-hidden rounded-2xl border border-gray-300 bg-gray-200 shadow-lg dark:border-gray-700 dark:bg-gray-900">
             {/* Progress Header */}
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-4">
+            <div className="bg-linear-to-r from-indigo-500 to-purple-600 p-4">
               <div className="flex items-center justify-between text-white">
                 <div>
                   <h3 className="font-semibold">
@@ -753,7 +658,7 @@ export default function LessonProgressBar({
                           className="flex items-center space-x-3"
                         >
                           <div
-                            className={`h-3 w-3 flex-shrink-0 rounded-full transition-all duration-300 ${
+                            className={`h-3 w-3 shrink-0 rounded-full transition-all duration-300 ${
                               isActive
                                 ? "scale-110 bg-blue-500 ring-4 ring-blue-100 dark:ring-blue-900"
                                 : isCompleted
@@ -788,7 +693,7 @@ export default function LessonProgressBar({
                   return (
                     <div key={index} className="flex items-center space-x-3">
                       <div
-                        className={`h-3 w-3 flex-shrink-0 rounded-full transition-all duration-300 ${
+                        className={`h-3 w-3 shrink-0 rounded-full transition-all duration-300 ${
                           isActive
                             ? "scale-110 bg-blue-500 ring-4 ring-blue-100 dark:ring-blue-900"
                             : isCompleted
