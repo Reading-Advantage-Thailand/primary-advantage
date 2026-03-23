@@ -73,7 +73,7 @@ steps:
       - "-c"
       - |
         npx prisma migrate deploy
-    secretEnv: ["DATABASE_URL"]
+    secretEnv: ["MIGRATE_DB_URL"]
 
   # Step 4: Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
