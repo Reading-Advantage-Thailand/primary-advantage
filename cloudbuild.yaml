@@ -29,43 +29,55 @@ steps:
   # Step 3: Manual Proxy & Migrate (No-Variable Version)
   - name: "asia-southeast1-docker.pkg.dev/${_PROJECT_ID}/primary-advantage-repo/primary-advantage-app:$BUILD_ID"
     id: "migrate-db"
-    entrypoint: "bash"
+    entrypoint: "sh"
+    # entrypoint: "bash"
+    # args:
+    #   - "-c"
+    #   - |
+    #     echo "=== [1] Setup Proxy ==="
+    #     curl -o /tmp/cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64
+    #     chmod +x /tmp/cloud_sql_proxy
+
+    #     echo "=== [2] Start Proxy ==="
+    #     /tmp/cloud_sql_proxy -instances=${_CLOUD_SQL_INSTANCE}=tcp:5432 &
+    #     PROXY_PID=$$!
+    #     sleep 5
+
+    #     echo "=== [3] Run Migration ==="
+
+    #     if [ -z "$$MIGRATE_DB_URL" ]; then
+    #        echo "❌ ERROR: MIGRATE_DB_URL is empty!"
+    #        exit 1
+    #     fi
+
+    #     export DATABASE_URL=$(echo $$MIGRATE_DB_URL | sed -E 's/@[^:]+:[0-9]+/@127.0.0.1:5432/')
+
+    #     npx prisma@6.19.0 migrate deploy
+    #     EXIT_CODE=$$?
+
+    #     kill $$PROXY_PID
+
+    #     if [ $$EXIT_CODE -eq 0 ]; then
+    #         echo "✅ MIGRATION SUCCESS"
+    #     else
+    #         echo "❌ MIGRATION FAILED"
+    #         exit $$EXIT_CODE
+    #     fi
     args:
       - "-c"
       - |
-        echo "=== [1] Setup Proxy ==="
-        curl -o /tmp/cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64
-        chmod +x /tmp/cloud_sql_proxy
+        echo "=== [1] Prepare Database Connection ==="
 
-        echo "=== [2] Start Proxy ==="
-        /tmp/cloud_sql_proxy -instances=${_CLOUD_SQL_INSTANCE}=tcp:5432 &
-        PROXY_PID=$$!
-        sleep 5
-
-        echo "=== [3] Run Migration ==="
-
-        if [ -z "$$MIGRATE_DB_URL" ]; then
-           echo "❌ ERROR: MIGRATE_DB_URL is empty!"
-           exit 1
-        fi
-
+        # แก้ไข DATABASE_URL ให้ชี้ไปที่ localhost (127.0.0.1) 
+        # เพราะ Cloud Build จะเปิด Proxy รอไว้ที่ port 5432 ใน container นี้เลย
         export DATABASE_URL=$(echo $$MIGRATE_DB_URL | sed -E 's/@[^:]+:[0-9]+/@127.0.0.1:5432/')
 
-        npx prisma@6.19.0 migrate deploy
-        EXIT_CODE=$$?
-
-        kill $$PROXY_PID
-
-        if [ $$EXIT_CODE -eq 0 ]; then
-            echo "✅ MIGRATION SUCCESS"
-        else
-            echo "❌ MIGRATION FAILED"
-            exit $$EXIT_CODE
-        fi
+        echo "=== [2] Run Prisma Migration ==="
+        npx prisma migrate deploy
 
     secretEnv: ["MIGRATE_DB_URL"]
-    env:
-      - "HOME=/tmp"
+    # env:
+    #   - "HOME=/tmp"
 
   # Step 4: Deploy to Cloud Run
   - name: "gcr.io/cloud-builders/gcloud"
@@ -129,3 +141,4 @@ availableSecrets:
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: "E2_HIGHCPU_8"
+  cloudSqlInstance: ${_CLOUD_SQL_INSTANCE}
