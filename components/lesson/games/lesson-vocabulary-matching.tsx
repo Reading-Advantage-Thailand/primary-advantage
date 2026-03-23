@@ -248,7 +248,7 @@ export default function LessonVocabularyMatching({
       <div className="space-y-6">
         <Card>
           <CardContent className="p-8">
-            <div className="flex min-h-[400px] flex-col items-center justify-center space-y-6">
+            <div className="flex min-h-100 flex-col items-center justify-center space-y-6">
               <div className="relative">
                 <div className="h-16 w-16 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600 dark:border-emerald-800 dark:border-t-emerald-400"></div>
                 <GraduationCap className="absolute inset-0 m-auto h-8 w-8 text-emerald-600 dark:text-emerald-400" />
@@ -272,7 +272,7 @@ export default function LessonVocabularyMatching({
       <div className="space-y-6">
         <Card>
           <CardContent className="p-8">
-            <div className="flex min-h-[400px] flex-col items-center justify-center space-y-6">
+            <div className="flex min-h-100 flex-col items-center justify-center space-y-6">
               <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/20">
                 <GraduationCap className="h-12 w-12 text-yellow-600 dark:text-yellow-400" />
               </div>
@@ -295,7 +295,7 @@ export default function LessonVocabularyMatching({
       <div className="space-y-6">
         <Card>
           <CardContent className="p-8">
-            <div className="flex min-h-[400px] flex-col items-center justify-center space-y-6">
+            <div className="flex min-h-100 flex-col items-center justify-center space-y-6">
               <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
                 <XCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
               </div>
@@ -424,7 +424,7 @@ export default function LessonVocabularyMatching({
   if (gameState === GameState.Completed) {
     return (
       <div className="space-y-6">
-        <Card className="overflow-hidden border-emerald-200 bg-gradient-to-br from-emerald-50 via-emerald-50 to-emerald-100 pb-14 dark:border-emerald-800 dark:from-emerald-950/20 dark:via-emerald-950/20 dark:to-emerald-950/30">
+        <Card className="overflow-hidden border-emerald-200 bg-linear-to-br from-emerald-50 via-emerald-50 to-emerald-100 pb-14 dark:border-emerald-800 dark:from-emerald-950/20 dark:via-emerald-950/20 dark:to-emerald-950/30">
           <CardContent className="p-8 text-center">
             <div className="space-y-6">
               {/* Trophy and celebration */}
@@ -439,7 +439,7 @@ export default function LessonVocabularyMatching({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <h2 className="bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-3xl font-bold text-transparent">
+                  <h2 className="bg-linear-to-r from-emerald-600 to-emerald-700 bg-clip-text text-3xl font-bold text-transparent">
                     {t("completed.title")}
                   </h2>
                   <p className="text-lg text-gray-600 dark:text-gray-400">
@@ -532,7 +532,7 @@ export default function LessonVocabularyMatching({
                         onClick={() => handleLeftItemClick(pair.id)}
                         variant="outline"
                         className={cn(
-                          "h-auto min-h-[3rem] w-full justify-start p-4 text-left whitespace-normal transition-all",
+                          "h-auto min-h-12 w-full justify-start p-4 text-left whitespace-normal transition-all",
                           isSelected && "ring-primary border-primary ring-2",
                           isMatched &&
                             isCorrect &&
@@ -548,12 +548,12 @@ export default function LessonVocabularyMatching({
                       >
                         <div className="flex w-full items-start gap-2">
                           {isMatched && isCorrect && (
-                            <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-600" />
+                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
                           )}
                           {isMatched && !isCorrect && (
-                            <XCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
+                            <XCircle className="h-4 w-4 shrink-0 text-red-600" />
                           )}
-                          <span className="text-base leading-relaxed font-semibold break-words">
+                          <span className="warp-break-words text-base leading-relaxed font-semibold">
                             {pair.word}
                           </span>
                         </div>
@@ -567,7 +567,7 @@ export default function LessonVocabularyMatching({
               <div className="space-y-3 lg:col-start-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 flex-shrink-0 rounded-full bg-green-500" />
+                    <div className="h-3 w-3 shrink-0 rounded-full bg-green-500" />
                     <h3 className="font-medium">
                       {t("game.columns.definitions")}
                     </h3>
@@ -606,7 +606,7 @@ export default function LessonVocabularyMatching({
                         onClick={() => handleRightItemClick(pair.id)}
                         variant="outline"
                         className={cn(
-                          "h-auto min-h-[3rem] w-full justify-start p-4 text-left whitespace-normal transition-all",
+                          "h-auto min-h-12 w-full justify-start p-4 text-left whitespace-normal transition-all",
                           !selectedLeft && "cursor-not-allowed opacity-50",
                           isMatched &&
                             isCorrect &&
@@ -622,12 +622,12 @@ export default function LessonVocabularyMatching({
                       >
                         <div className="flex w-full items-start gap-2">
                           {isMatched && isCorrect && (
-                            <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-600" />
+                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
                           )}
                           {isMatched && !isCorrect && (
-                            <XCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
+                            <XCircle className="h-4 w-4 shrink-0 text-red-600" />
                           )}
-                          <span className="text-sm leading-relaxed break-words">
+                          <span className="warp-break-words text-sm leading-relaxed">
                             {pair.definition}
                           </span>
                         </div>
