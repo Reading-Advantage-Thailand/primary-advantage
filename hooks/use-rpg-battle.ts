@@ -81,7 +81,7 @@ export function useRPGBattleRanking(difficulty?: string) {
   });
 
   return {
-    rankings: query.data?.rankings ?? [],
+    rankings: query.data?.rankings ?? {},
     scope: query.data?.scope ?? "global",
     isLoading: query.isLoading,
     isFetching: query.isFetching,

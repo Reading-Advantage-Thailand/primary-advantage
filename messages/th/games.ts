@@ -67,6 +67,7 @@ export default {
   playNow: "เล่นเลย",
   clickToPlay: "คลิกเพื่อเล่น",
   selectTranslation: "เลือกภาษาคำแปล",
+  backToLessons: "กลับไปบทเรียน",
 
   // Coming soon
   comingSoon: "เร็วๆ นี้",
@@ -93,6 +94,7 @@ export default {
     victory: "ชนะ",
     defeat: "แพ้",
     playAgain: "เล่นอีกครั้ง",
+    exit: "ออก",
     tryAgain: "ลองอีกครั้ง",
     continue: "ดำเนินการต่อ",
     startGame: "เริ่มเกม",

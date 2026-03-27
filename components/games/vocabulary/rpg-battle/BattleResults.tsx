@@ -8,6 +8,7 @@ interface BattleResultsProps {
   xp: number;
   accuracy: number;
   onRestart: () => void;
+  onExit?: () => void;
 }
 
 export function BattleResults({
@@ -15,6 +16,7 @@ export function BattleResults({
   xp,
   accuracy,
   onRestart,
+  onExit,
 }: BattleResultsProps) {
   const t = useTranslations("games");
   const title =
@@ -55,9 +57,21 @@ export function BattleResults({
               </p>
             </div>
           </div>
-          <Button onClick={onRestart} className="w-full" size="lg">
-            {t("common.playAgain")}
-          </Button>
+          <div className="flex gap-3">
+            {onExit && (
+              <Button
+                onClick={onExit}
+                variant="outline"
+                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
+                size="lg"
+              >
+                {t("common.exit")}
+              </Button>
+            )}
+            <Button onClick={onRestart} className="flex-1" size="lg">
+              {t("common.playAgain")}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -97,28 +97,33 @@ export const SAQuestionSchema = z.object({
     .max(5),
 });
 
-export const VocabularySchema = z.array(
-  z.object({
-    vocabulary: z
-      .string()
-      .describe("A difficult vocabulary word, phrase, or idiom."),
-    definition: z.object({
-      en: z
+export const VocabularySchema = z
+  .array(
+    z.object({
+      vocabulary: z
         .string()
-        .describe(
-          "The English definition of the vocabulary in simple language.",
-        ),
-      th: z.string().describe("The Thai translation of the vocabulary."),
-      cn: z
-        .string()
-        .describe("The Simplified Chinese translation of the vocabulary."),
-      tw: z
-        .string()
-        .describe("The Traditional Chinese translation of the vocabulary."),
-      vi: z.string().describe("The Vietnamese translation of the vocabulary."),
+        .describe("A difficult vocabulary word, phrase, or idiom."),
+      definition: z.object({
+        en: z
+          .string()
+          .describe(
+            "The English definition of the vocabulary in simple language.",
+          ),
+        th: z.string().describe("The Thai translation of the vocabulary."),
+        cn: z
+          .string()
+          .describe("The Simplified Chinese translation of the vocabulary."),
+        tw: z
+          .string()
+          .describe("The Traditional Chinese translation of the vocabulary."),
+        vi: z
+          .string()
+          .describe("The Vietnamese translation of the vocabulary."),
+      }),
     }),
-  }),
-);
+  )
+  .min(10)
+  .max(15);
 
 export const laqFeedbackInputSchema = z.object({
   preferredLanguage: z.string(),
@@ -250,8 +255,10 @@ export const articleGeneratorSchema = z.object({
         }),
       }),
     )
+    .min(10)
+    .max(15)
     .describe(
-      "Extract the 3 to 5 most difficult vocabulary words, phrases, or idioms from the article",
+      "Extract the 10 to 15 most difficult vocabulary words, phrases, or idioms from the article",
     ),
   flashcard: z
     .array(
@@ -367,8 +374,10 @@ export const storyGeneratorSchema = z.object({
               }),
             }),
           )
+          .min(10)
+          .max(15)
           .describe(
-            "Extract the 3 to 5 most difficult vocabulary words, phrases, or idioms from the chapter",
+            "Extract the 10 to 15 most difficult vocabulary words, phrases, or idioms from the chapter",
           ),
         sentencesFlashcard: z
           .array(

@@ -319,11 +319,11 @@ export const generateExportWorkbook = async (articleId: string) => {
       );
     }
 
-    // 2. Extract Vocabulary from Article Words (limit to 5)
+    // 2. Extract Vocabulary from Article Words (limit to 15)
     let vocab: WorkbookJSON["vocabulary"] = [];
     if (Array.isArray(article.sentencsAndWordsForFlashcard[0].words)) {
       vocab = (article?.sentencsAndWordsForFlashcard[0].words)
-        .slice(0, 5)
+        .slice(0, 15)
         .map((w: any) => ({
           word: w.vocabulary,
           phonetic: "",

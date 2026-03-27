@@ -51,7 +51,8 @@ export async function generateImage(
       );
 
       const { output: storyParts } = await generateText({
-        model: openai("gpt-4o-mini"),
+        // model: openai("gpt-4o-mini"),
+        model: google(googleModelLite),
         output: Output.object({
           schema: z.object({
             prompt: z.array(z.string()),

@@ -45,6 +45,7 @@ export interface GameStartScreenProps {
   gameType?: "sentence" | "vocabulary";
   selectedLanguage?: string;
   onLanguageChange?: (language: string) => void;
+  showSelectionLanguage?: boolean;
 }
 
 /**
@@ -64,6 +65,7 @@ export function GameStartScreen({
   children,
   selectedLanguage = "th",
   onLanguageChange,
+  showSelectionLanguage = false,
   gameType = "vocabulary",
 }: GameStartScreenProps) {
   const hasInstructions = Boolean(instructions && instructions.length > 0);
@@ -78,7 +80,7 @@ export function GameStartScreen({
     >
       {/* <div className="p-6 md:p-8 lg:p-10"> */}
       <div className="min-h-0 flex-1 overflow-auto p-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-4">
             <div className="rounded-2xl bg-linear-to-br from-yellow-400 to-orange-600 p-3 shadow-lg shadow-orange-900/20">
               <TitleIcon className="h-7 w-7 text-black" />
@@ -144,98 +146,100 @@ export function GameStartScreen({
                 {proTip}
               </p>
             </div>
-            <div className="rounded-xl border border-white/5 bg-white/5 p-4">
-              <h4 className="mb-3 text-xs font-bold tracking-wider text-slate-400 uppercase">
-                {t("selectTranslation")}
-              </h4>
-              <Select
-                value={selectedLanguage}
-                onValueChange={(value) => {
-                  onLanguageChange?.(value);
-                }}
-              >
-                <SelectTrigger className="h-12 w-50">
-                  <SelectValue>
-                    {selectedLanguage && (
-                      <div className="flex items-center gap-3">
-                        {gameType === "vocabulary" ? (
-                          <>
-                            <span className="text-lg">
-                              {
-                                VOCABULARY_LANGUAGES[
-                                  selectedLanguage as keyof typeof VOCABULARY_LANGUAGES
-                                ]?.flag
-                              }
-                            </span>
-                            <div className="flex flex-col text-left">
-                              <span className="font-medium">
+            {showSelectionLanguage && (
+              <div className="rounded-xl border border-white/5 bg-white/5 p-4">
+                <h4 className="mb-3 text-xs font-bold tracking-wider text-slate-400 uppercase">
+                  {t("selectTranslation")}
+                </h4>
+                <Select
+                  value={selectedLanguage}
+                  onValueChange={(value) => {
+                    onLanguageChange?.(value);
+                  }}
+                >
+                  <SelectTrigger className="h-12 w-50">
+                    <SelectValue>
+                      {selectedLanguage && (
+                        <div className="flex items-center gap-3">
+                          {gameType === "vocabulary" ? (
+                            <>
+                              <span className="text-lg">
                                 {
                                   VOCABULARY_LANGUAGES[
                                     selectedLanguage as keyof typeof VOCABULARY_LANGUAGES
-                                  ]?.name
+                                  ]?.flag
                                 }
                               </span>
-                              <span className="text-muted-foreground text-xs">
-                                {
-                                  VOCABULARY_LANGUAGES[
-                                    selectedLanguage as keyof typeof VOCABULARY_LANGUAGES
-                                  ]?.nativeName
-                                }
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-lg">
-                              {
-                                SENTENCE_LANGUAGES[
-                                  selectedLanguage as keyof typeof SENTENCE_LANGUAGES
-                                ]?.flag
-                              }
-                            </span>
-                            <div className="flex flex-col text-left">
-                              <span className="font-medium">
-                                {
-                                  SENTENCE_LANGUAGES[
-                                    selectedLanguage as keyof typeof SENTENCE_LANGUAGES
-                                  ]?.name
-                                }
-                              </span>
-                              <span className="text-muted-foreground text-xs">
+                              <div className="flex flex-col text-left">
+                                <span className="font-medium">
+                                  {
+                                    VOCABULARY_LANGUAGES[
+                                      selectedLanguage as keyof typeof VOCABULARY_LANGUAGES
+                                    ]?.name
+                                  }
+                                </span>
+                                <span className="text-muted-foreground text-xs">
+                                  {
+                                    VOCABULARY_LANGUAGES[
+                                      selectedLanguage as keyof typeof VOCABULARY_LANGUAGES
+                                    ]?.nativeName
+                                  }
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-lg">
                                 {
                                   SENTENCE_LANGUAGES[
                                     selectedLanguage as keyof typeof SENTENCE_LANGUAGES
-                                  ]?.nativeName
+                                  ]?.flag
                                 }
                               </span>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(
-                    gameType === "vocabulary"
-                      ? VOCABULARY_LANGUAGES
-                      : SENTENCE_LANGUAGES,
-                  ).map((language) => (
-                    <SelectItem key={language.code} value={language.code}>
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{language.flag}</span>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{language.name}</span>
-                          <span className="text-muted-foreground text-xs">
-                            {language.nativeName}
-                          </span>
+                              <div className="flex flex-col text-left">
+                                <span className="font-medium">
+                                  {
+                                    SENTENCE_LANGUAGES[
+                                      selectedLanguage as keyof typeof SENTENCE_LANGUAGES
+                                    ]?.name
+                                  }
+                                </span>
+                                <span className="text-muted-foreground text-xs">
+                                  {
+                                    SENTENCE_LANGUAGES[
+                                      selectedLanguage as keyof typeof SENTENCE_LANGUAGES
+                                    ]?.nativeName
+                                  }
+                                </span>
+                              </div>
+                            </>
+                          )}
                         </div>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(
+                      gameType === "vocabulary"
+                        ? VOCABULARY_LANGUAGES
+                        : SENTENCE_LANGUAGES,
+                    ).map((language) => (
+                      <SelectItem key={language.code} value={language.code}>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">{language.flag}</span>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{language.name}</span>
+                            <span className="text-muted-foreground text-xs">
+                              {language.nativeName}
+                            </span>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div className="shrink-0 space-y-4 xl:w-95">

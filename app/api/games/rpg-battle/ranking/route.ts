@@ -3,20 +3,17 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 const TOP_N = 20;
+const DIFFICULTIES = ["SLIME", "GOBLIN", "SPECTRE", "ELEMENTAL"];
 
 export const GET = withAuth(async (req, _context, user) => {
   try {
-    const { searchParams } = new URL(req.url);
-    const difficulty =
-      searchParams.get("difficulty")?.toUpperCase() ?? undefined;
-
     // Scope to same school when user belongs to one; otherwise global
     const { schoolId } = user;
 
     const rankings = await prisma.gameRanking.findMany({
       where: {
         gameType: "RPG_BATTLE",
-        ...(difficulty ? { difficulty } : {}),
+        difficulty: { in: DIFFICULTIES },
         ...(schoolId ? { user: { schoolId } } : {}),
       },
       include: {
@@ -29,22 +26,30 @@ export const GET = withAuth(async (req, _context, user) => {
         },
       },
       orderBy: { totalXp: "desc" },
-      take: TOP_N,
     });
 
-    const result = rankings.map((entry, index) => ({
-      rank: index + 1,
-      userId: entry.userId,
-      name: entry.user.name,
-      image: entry.user.image,
-      xp: entry.totalXp,
-      difficulty: entry.difficulty,
-    }));
+    const grouped: Record<
+      string,
+      { userId: string; name: string; image: string | null; xp: number }[]
+    > = {};
+
+    for (const diff of DIFFICULTIES) {
+      const key = diff.toLowerCase();
+      grouped[key] = rankings
+        .filter((entry) => entry.difficulty === diff)
+        .slice(0, TOP_N)
+        .map((entry) => ({
+          userId: entry.userId,
+          name: entry.user.name ?? "Unknown",
+          image: entry.user.image,
+          xp: entry.totalXp,
+        }));
+    }
 
     return NextResponse.json(
       {
         success: true,
-        rankings: result,
+        rankings: grouped,
         scope: schoolId ? "school" : "global",
       },
       { status: 200 },

@@ -45,7 +45,6 @@ import { useTranslations } from "next-intl";
 import {
   useDragonRiderRanking,
   useDragonRiderVocabulary,
-  useSubmitDragonRiderResult,
 } from "@/hooks/use-dragon-rider";
 import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
@@ -65,8 +64,15 @@ type DragonRiderAssets = {
 export type Difficulty = "easy" | "normal" | "hard" | "extreme";
 
 export type DragonRiderGameProps = {
+  vocabulary: VocabularyItem[];
+  onComplete?: (
+    results: DragonRiderResults & { difficulty: Difficulty },
+  ) => void;
   preloadedAssets?: DragonRiderAssets | null;
   durationMs?: number;
+  mode?: "normal" | "lesson";
+  selectedLanguage?: string;
+  onLanguageChange?: (language: string) => void;
 };
 
 type GateFeedback = {
@@ -377,8 +383,13 @@ const getActiveGatePair = (pairs: GatePair[]) => {
 };
 
 export function DragonRiderGame({
+  vocabulary,
+  onComplete,
   preloadedAssets,
   durationMs,
+  mode = "normal",
+  selectedLanguage,
+  onLanguageChange,
 }: DragonRiderGameProps) {
   const t = useTranslations("games");
 
@@ -393,13 +404,10 @@ export function DragonRiderGame({
     preloadedAssets ?? null,
   );
   const [isLoading, setIsLoading] = useState(!preloadedAssets);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("th");
-  const { vocabulary, isLoading: isVocabularyLoading } =
-    useDragonRiderVocabulary({
-      language: selectedLanguage,
-    });
-  const { submitResult } = useSubmitDragonRiderResult();
-  const hasSubmittedRef = useRef(false);
+
+  const pendingResultRef = useRef<
+    (DragonRiderResults & { difficulty: Difficulty }) | null
+  >(null);
 
   const [state, setState] = useState<DragonRiderState>(() => {
     return createDragonRiderState(vocabulary, {
@@ -414,7 +422,6 @@ export function DragonRiderGame({
   const [playerFrame, setPlayerFrame] = useState(0);
   const [bossFrame, setBossFrame] = useState(0);
   const [playerX, setPlayerX] = useState(DEFAULT_STAGE.width / 2);
-  const [activeTab, setActiveTab] = useState<"game" | "rankings">("game");
   const [lockedPairId, setLockedPairId] = useState<string | null>(null);
   const [displayDragonCount, setDisplayDragonCount] = useState(1);
   const [bossHealth, setBossHealth] = useState(0);
@@ -425,14 +432,6 @@ export function DragonRiderGame({
   const resultsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingSelectionRef = useRef<PendingSelection | null>(null);
   const playerTargetRef = useRef<number | null>(null);
-  const { rankings: rawRankings } = useDragonRiderRanking();
-
-  const rankings = {
-    easy: rawRankings.easy ?? [],
-    normal: rawRankings.normal ?? [],
-    hard: rawRankings.hard ?? [],
-    extreme: rawRankings.extreme ?? [],
-  };
 
   const measureStage = useCallback(() => {
     const element = containerRef.current;
@@ -489,7 +488,7 @@ export function DragonRiderGame({
     setBossBattleStarted(false);
     pendingSelectionRef.current = null;
     playerTargetRef.current = null;
-    hasSubmittedRef.current = false;
+    pendingResultRef.current = null;
   }, [vocabulary]);
 
   useEffect(() => {
@@ -815,23 +814,12 @@ export function DragonRiderGame({
     }
   }, [showResults]);
 
-  // // Submit results when game ends
+  // Store result for deferred onComplete call (after user sees results screen)
   useEffect(() => {
-    if (gamePhase === "ended" && results && !hasSubmittedRef.current) {
-      hasSubmittedRef.current = true;
-      submitResult({
-        xp: results.xp,
-        accuracy: results.accuracy,
-        totalAttempts: results.totalAttempts,
-        correctAnswers: results.correctAnswers,
-        dragonCount: results.dragonCount,
-        difficulty,
-        outcome: results.victory ? "victory" : "defeat",
-      }).catch((err) => {
-        console.error("Failed to submit Dragon Rider result:", err);
-      });
+    if (gamePhase === "ended" && results) {
+      pendingResultRef.current = { ...results, difficulty };
     }
-  }, [gamePhase, results, difficulty, submitResult]);
+  }, [gamePhase, results, difficulty]);
 
   const activePair = useMemo(() => {
     if (lockedPairId) {
@@ -945,414 +933,312 @@ export function DragonRiderGame({
       )
     : 0;
 
-  console.log(gamePhase, activeTab);
-
   return (
-    <div className="mx-auto w-full max-w-6xl">
-      <header className="mb-4 flex items-center justify-between px-2">
-        <Link
-          href="/student/games"
-          className="flex items-center text-slate-400 transition-colors hover:text-white"
-        >
-          <button className="flex items-center text-slate-400 transition-colors hover:text-white">
-            <ChevronLeft className="mr-1 h-5 w-5" />
-            <span className="hidden font-medium sm:inline">
-              {t("backToGames")}
-            </span>
-          </button>
-        </Link>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setActiveTab("game")}
-            className={cn(
-              "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all",
-              activeTab === "game"
-                ? "bg-purple-600 text-white shadow-md"
-                : "text-slate-600 hover:text-slate-900 dark:text-white/60 dark:hover:text-white",
-            )}
-            disabled={gamePhase === "playing"}
-          >
-            <PlayIcon className="h-4 w-4 fill-current" />
-            Play
-          </button>
-          <button
-            onClick={() => setActiveTab("rankings")}
-            className={cn(
-              "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all",
-              activeTab === "rankings"
-                ? "bg-amber-600 text-white shadow-md"
-                : "text-slate-600 hover:text-slate-900 dark:text-white/60 dark:hover:text-white",
-            )}
-            disabled={gamePhase === "playing"}
-          >
-            <LayoutGridIcon className="h-5 w-5" />
-            Ranking
-          </button>
-        </div>
-      </header>
+    <div
+      ref={containerRef}
+      className={`relative h-[80vh] max-h-190 min-h-80 w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.45)] sm:min-h-100 md:min-h-120 ${gamePhase !== "start" ? "touch-none select-none" : ""}`}
+      data-testid="dragon-rider"
+      data-status={statusLabel}
+    >
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${ASSETS.loadingBackground})`,
+        }}
+      />
+      <div className="absolute inset-0 bg-slate-950/55" />
 
-      {activeTab === "game" ? (
-        <div
-          ref={containerRef}
-          className={`relative h-[80vh] max-h-190 min-h-80 w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-[0_20px_60px_rgba(15,23,42,0.45)] sm:min-h-100 md:min-h-120 ${gamePhase !== "start" ? "touch-none select-none" : ""}`}
-          data-testid="dragon-rider"
-          data-status={statusLabel}
-        >
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${ASSETS.loadingBackground})`,
-            }}
-          />
-          <div className="absolute inset-0 bg-slate-950/55" />
+      {canRenderGame && (
+        <DragonRiderCanvas
+          stageSize={stageSize}
+          assets={assets!}
+          feedback={feedback}
+          gatePairs={gatePairs}
+          activePairId={activePairId}
+          layout={layout!}
+          playerFrame={playerFrame}
+          playerX={playerX}
+          dragonCount={dragonCountDisplay}
+          bossFrame={bossFrame}
+          bossY={bossY}
+          bossHealth={bossHealth}
+          onSelectGate={handleGateSelection}
+          showBoss={state.status === "boss"}
+        />
+      )}
 
-          {canRenderGame && (
-            <DragonRiderCanvas
-              stageSize={stageSize}
-              assets={assets!}
-              feedback={feedback}
-              gatePairs={gatePairs}
-              activePairId={activePairId}
-              layout={layout!}
-              playerFrame={playerFrame}
-              playerX={playerX}
-              dragonCount={dragonCountDisplay}
-              bossFrame={bossFrame}
-              bossY={bossY}
-              bossHealth={bossHealth}
-              onSelectGate={handleGateSelection}
-              showBoss={state.status === "boss"}
-            />
-          )}
-
-          {canRenderGame && (
-            <div className="pointer-events-none absolute inset-0 z-10">
-              <div className="flex items-start justify-between p-2 sm:p-4 md:p-6">
-                <div className="max-w-[60%] rounded-2xl border border-white/10 bg-white/10 px-3 py-1.5 backdrop-blur sm:px-5 sm:py-3">
-                  <div className="text-[10px] tracking-[0.2em] text-white/70 uppercase sm:text-xs">
-                    Prompt
-                  </div>
-                  <div className="text-base font-semibold text-white sm:text-xl md:text-2xl">
-                    {promptRound.term || "—"}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-2 py-1.5 text-white backdrop-blur sm:gap-2 sm:px-4 sm:py-2">
-                  <Flame
-                    className="h-3 w-3 text-amber-300 sm:h-4 sm:w-4"
-                    aria-hidden="true"
-                  />
-                  <span className="xs:inline hidden text-xs tracking-[0.2em] text-white/70 uppercase">
-                    Dragons
-                  </span>
-                  <motion.span
-                    key={dragonCountDisplay}
-                    data-testid="dragon-rider-dragon-count"
-                    className="text-base font-semibold sm:text-lg"
-                    initial={{ scale: 0.9, opacity: 0.6 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {dragonCountDisplay}
-                  </motion.span>
-                </div>
+      {canRenderGame && (
+        <div className="pointer-events-none absolute inset-0 z-10">
+          <div className="flex items-start justify-between p-2 sm:p-4 md:p-6">
+            <div className="max-w-[60%] rounded-2xl border border-white/10 bg-white/10 px-3 py-1.5 backdrop-blur sm:px-5 sm:py-3">
+              <div className="text-[10px] tracking-[0.2em] text-white/70 uppercase sm:text-xs">
+                Prompt
               </div>
-
-              <div className="absolute top-15 right-2 left-2 sm:top-18 sm:right-4 sm:left-4 md:top-22 md:right-6 md:left-6">
-                <div
-                  className="h-2 w-full overflow-hidden rounded-full bg-white/10"
-                  role="progressbar"
-                  aria-label="Run timer"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={Math.round(remainingRatio * 100)}
-                >
-                  <motion.div
-                    className="h-full rounded-full bg-linear-to-r from-emerald-400 via-sky-400 to-indigo-400"
-                    initial={{ width: "100%" }}
-                    animate={{ width: `${remainingRatio * 100}%` }}
-                    transition={{ duration: 0.2, ease: "linear" }}
-                    data-testid="dragon-rider-timer"
-                  />
-                </div>
+              <div className="text-base font-semibold text-white sm:text-xl md:text-2xl">
+                {promptRound.term || "—"}
               </div>
-
-              {state.status === "running" && (
-                <>
-                  <button
-                    type="button"
-                    className="pointer-events-auto absolute flex items-center justify-center rounded-2xl border border-white/20 bg-white/20 text-white backdrop-blur-sm transition active:scale-95"
-                    style={{
-                      width: arrowSize,
-                      height: arrowSize,
-                      left: leftArrowX,
-                      top: arrowTop,
-                    }}
-                    onPointerDown={() => handleGateSelection("left")}
-                    aria-label="Choose left gate"
-                  >
-                    <ArrowLeft size={arrowSize * 0.55} aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className="pointer-events-auto absolute flex items-center justify-center rounded-2xl border border-white/20 bg-white/20 text-white backdrop-blur-sm transition active:scale-95"
-                    style={{
-                      width: arrowSize,
-                      height: arrowSize,
-                      left: rightArrowX,
-                      top: arrowTop,
-                    }}
-                    onPointerDown={() => handleGateSelection("right")}
-                    aria-label="Choose right gate"
-                  >
-                    <ArrowRight size={arrowSize * 0.55} aria-hidden="true" />
-                  </button>
-                </>
-              )}
-
-              {gateLabels && layout && (
-                <>
-                  <div
-                    className="sm:truncate-none absolute max-w-30 -translate-x-1/2 truncate rounded-xl border border-white/10 bg-black/80 px-2 py-1 text-xs font-semibold text-white shadow-lg sm:max-w-45 sm:px-3 sm:py-1.5 sm:text-base md:max-w-none md:px-4 md:py-2 md:text-2xl"
-                    style={{
-                      left: layout.leftGate.left + layout.leftGate.width / 2,
-                      top: gateLabelTop,
-                    }}
-                  >
-                    {gateLabels?.left}
-                  </div>
-                  <div
-                    className="sm:truncate-none absolute max-w-30 -translate-x-1/2 truncate rounded-xl border border-white/10 bg-black/80 px-2 py-1 text-xs font-semibold text-white shadow-lg sm:max-w-45 sm:px-3 sm:py-1.5 sm:text-base md:max-w-none md:px-4 md:py-2 md:text-2xl"
-                    style={{
-                      left: layout.rightGate.left + layout.rightGate.width / 2,
-                      top: gateLabelTop,
-                    }}
-                  >
-                    {gateLabels?.right}
-                  </div>
-                </>
-              )}
-
-              <AnimatePresence>
-                {feedback && (
-                  <motion.div
-                    className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {feedback.outcome === "correct" ? "+1 Dragon" : "-1 Dragon"}
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
-          )}
-
-          {canRenderGame && (
-            <div className="pointer-events-none absolute inset-0 z-20">
-              <AnimatePresence>
-                {state.status === "boss" &&
-                  bossBattleStarted &&
-                  !showResults && (
-                    <React.Fragment key="boss-battle">
-                      <motion.div
-                        className="absolute inset-x-0 top-12 mx-auto flex w-fit items-center gap-2 rounded-full border border-red-500/40 bg-red-950/70 px-3 py-2 text-sm font-bold tracking-widest text-red-200 uppercase sm:top-16 sm:gap-3 sm:px-6 sm:py-3 sm:text-xl sm:tracking-[0.2em]"
-                        initial={{ opacity: 0, scale: 0.8, y: -20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ duration: 0.4, type: "spring" }}
-                      >
-                        ⚔️ Big Boss Battle! ⚔️
-                      </motion.div>
-                      <motion.div
-                        className="absolute inset-x-0 top-24 mx-auto w-40 px-2 sm:top-36 sm:w-64 sm:px-0 md:w-80"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3, delay: 0.2 }}
-                      >
-                        <div className="rounded-lg border border-white/10 bg-slate-900/70 p-2 backdrop-blur sm:p-3">
-                          <div className="mb-1 text-xs tracking-[0.2em] text-white/70 uppercase">
-                            Boss Health
-                          </div>
-                          <div className="h-4 w-full overflow-hidden rounded-full bg-white/10">
-                            <motion.div
-                              className="h-full rounded-full bg-linear-to-r from-red-500 to-red-600"
-                              initial={{ width: "100%" }}
-                              animate={{
-                                width: `${Math.max(0, (bossHealth / calculateBossPower(state.attempts)) * 100)}%`,
-                              }}
-                              transition={{ duration: 0.3 }}
-                            />
-                          </div>
-                          <div className="mt-1 text-center text-xs text-white/60">
-                            {bossHealth} / {calculateBossPower(state.attempts)}
-                          </div>
-                        </div>
-                      </motion.div>
-                    </React.Fragment>
-                  )}
-              </AnimatePresence>
+            <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-2 py-1.5 text-white backdrop-blur sm:gap-2 sm:px-4 sm:py-2">
+              <Flame
+                className="h-3 w-3 text-amber-300 sm:h-4 sm:w-4"
+                aria-hidden="true"
+              />
+              <span className="xs:inline hidden text-xs tracking-[0.2em] text-white/70 uppercase">
+                Dragons
+              </span>
+              <motion.span
+                key={dragonCountDisplay}
+                data-testid="dragon-rider-dragon-count"
+                className="text-base font-semibold sm:text-lg"
+                initial={{ scale: 0.9, opacity: 0.6 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {dragonCountDisplay}
+              </motion.span>
             </div>
-          )}
-
-          {gamePhase === "start" && (
-            <GameStartScreen
-              gameTitle={t("dragonRider.startScreen.title")}
-              gameSubtitle={t("dragonRider.startScreen.description")}
-              vocabulary={vocabulary}
-              instructions={[
-                {
-                  step: 1,
-                  text: t("dragonRider.instructionsScreen.gameplay.gatesDesc"),
-                  icon: Shield,
-                },
-                {
-                  step: 2,
-                  text: `${t("dragonRider.instructionsScreen.controls.move")}: ${t("dragonRider.instructionsScreen.controls.moveKeys")}`,
-                  icon: Wand2,
-                },
-                {
-                  step: 3,
-                  text: t("dragonRider.instructionsScreen.gameplay.bossDesc"),
-                  icon: Sparkles,
-                },
-              ]}
-              proTip={t(
-                "dragonRider.instructionsScreen.gameplay.objectiveDesc",
-              )}
-              controls={[
-                {
-                  label: t("dragonRider.instructionsScreen.controls.move"),
-                  keys: t("dragonRider.instructionsScreen.controls.moveKeys"),
-                  color: "bg-amber-500",
-                },
-                { label: "Select", keys: "Tap Gate", color: "bg-emerald-500" },
-              ]}
-              gameType="vocabulary"
-              selectedLanguage={selectedLanguage}
-              onLanguageChange={setSelectedLanguage}
-              startButtonText={
-                isLoading
-                  ? t("dragonRider.startScreen.loading")
-                  : t("dragonRider.startScreen.startButton")
-              }
-              onStart={() => {
-                if (isLoading) return;
-                resetGame();
-                setGamePhase("playing");
-              }}
-            >
-              <div>
-                <div className="flex gap-1 rounded-lg border border-white/10 bg-slate-900/80">
-                  {(["easy", "normal", "hard", "extreme"] as Difficulty[]).map(
-                    (d) => (
-                      <button
-                        key={d}
-                        onClick={() => setDifficulty(d)}
-                        className={`rounded-md px-3 py-1.5 text-[10px] font-bold tracking-wider uppercase transition-colors ${
-                          difficulty === d
-                            ? "bg-amber-500 text-slate-900"
-                            : "text-slate-400 hover:bg-white/10 hover:text-white"
-                        }`}
-                      >
-                        {t(
-                          `dragonRider.startScreen.difficulty${d.charAt(0).toUpperCase() + d.slice(1)}` as any,
-                        )}
-                      </button>
-                    ),
-                  )}
-                </div>
-              </div>
-            </GameStartScreen>
-          )}
-
-          {gamePhase === "ended" && results && (
-            <GameEndScreen
-              status={results.victory ? "victory" : "defeat"}
-              score={results.correctAnswers}
-              xp={results.xp}
-              accuracy={results.accuracy}
-              customStats={[
-                {
-                  label: t("dragonRider.resultsScreen.wordsCollected"),
-                  value: results.dragonCount,
-                },
-                {
-                  label: t("dragonRider.gameplayScreen.hud.bossHealth"),
-                  value: results.bossPower,
-                },
-              ]}
-              onRestart={() => {
-                resetGame();
-                setGamePhase("playing");
-              }}
-              onExit={() => {
-                resetGame();
-                setGamePhase("start");
-              }}
-            />
-          )}
-        </div>
-      ) : (
-        <div className="w-full rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900/50">
-          <h2 className="mb-6 flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
-            <Trophy className="h-6 w-6 text-amber-500" />
-            Leaderboards
-          </h2>
-
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            {(["easy", "normal", "hard", "extreme"] as Difficulty[]).map(
-              (dif) => (
-                <div
-                  key={dif}
-                  className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-900"
-                >
-                  <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100 px-4 py-3 dark:border-white/5 dark:bg-slate-800">
-                    <h3 className="font-bold text-slate-700 capitalize dark:text-white/90">
-                      {dif} Mode
-                    </h3>
-                  </div>
-                  <div className="divide-y divide-slate-200 dark:divide-white/5">
-                    {rankings[dif]?.length ? (
-                      rankings[dif].map((entry, index) => (
-                        <div
-                          key={entry.userId}
-                          className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-100 dark:hover:bg-white/5"
-                        >
-                          <div
-                            className={cn(
-                              "flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold",
-                              index === 0
-                                ? "bg-amber-400 text-slate-900"
-                                : index === 1
-                                  ? "bg-slate-300 text-slate-900"
-                                  : index === 2
-                                    ? "bg-amber-700 text-white"
-                                    : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-white/50",
-                            )}
-                          >
-                            {index + 1}
-                          </div>
-                          <div className="flex-1 truncate font-medium text-slate-700 dark:text-white/80">
-                            {entry.name}
-                          </div>
-                          <div className="font-mono font-bold text-purple-600 dark:text-purple-400">
-                            {entry.xp.toLocaleString()} XP
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-8 text-center text-sm text-slate-500 dark:text-white/30">
-                        No records yet
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ),
-            )}
           </div>
+
+          <div className="absolute top-15 right-2 left-2 sm:top-18 sm:right-4 sm:left-4 md:top-22 md:right-6 md:left-6">
+            <div
+              className="h-2 w-full overflow-hidden rounded-full bg-white/10"
+              role="progressbar"
+              aria-label="Run timer"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(remainingRatio * 100)}
+            >
+              <motion.div
+                className="h-full rounded-full bg-linear-to-r from-emerald-400 via-sky-400 to-indigo-400"
+                initial={{ width: "100%" }}
+                animate={{ width: `${remainingRatio * 100}%` }}
+                transition={{ duration: 0.2, ease: "linear" }}
+                data-testid="dragon-rider-timer"
+              />
+            </div>
+          </div>
+
+          {state.status === "running" && (
+            <>
+              <button
+                type="button"
+                className="pointer-events-auto absolute flex items-center justify-center rounded-2xl border border-white/20 bg-white/20 text-white backdrop-blur-sm transition active:scale-95"
+                style={{
+                  width: arrowSize,
+                  height: arrowSize,
+                  left: leftArrowX,
+                  top: arrowTop,
+                }}
+                onPointerDown={() => handleGateSelection("left")}
+                aria-label="Choose left gate"
+              >
+                <ArrowLeft size={arrowSize * 0.55} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="pointer-events-auto absolute flex items-center justify-center rounded-2xl border border-white/20 bg-white/20 text-white backdrop-blur-sm transition active:scale-95"
+                style={{
+                  width: arrowSize,
+                  height: arrowSize,
+                  left: rightArrowX,
+                  top: arrowTop,
+                }}
+                onPointerDown={() => handleGateSelection("right")}
+                aria-label="Choose right gate"
+              >
+                <ArrowRight size={arrowSize * 0.55} aria-hidden="true" />
+              </button>
+            </>
+          )}
+
+          {gateLabels && layout && (
+            <>
+              <div
+                className="sm:truncate-none absolute max-w-30 -translate-x-1/2 truncate rounded-xl border border-white/10 bg-black/80 px-2 py-1 text-xs font-semibold text-white shadow-lg sm:max-w-45 sm:px-3 sm:py-1.5 sm:text-base md:max-w-none md:px-4 md:py-2 md:text-2xl"
+                style={{
+                  left: layout.leftGate.left + layout.leftGate.width / 2,
+                  top: gateLabelTop,
+                }}
+              >
+                {gateLabels?.left}
+              </div>
+              <div
+                className="sm:truncate-none absolute max-w-30 -translate-x-1/2 truncate rounded-xl border border-white/10 bg-black/80 px-2 py-1 text-xs font-semibold text-white shadow-lg sm:max-w-45 sm:px-3 sm:py-1.5 sm:text-base md:max-w-none md:px-4 md:py-2 md:text-2xl"
+                style={{
+                  left: layout.rightGate.left + layout.rightGate.width / 2,
+                  top: gateLabelTop,
+                }}
+              >
+                {gateLabels?.right}
+              </div>
+            </>
+          )}
+
+          <AnimatePresence>
+            {feedback && (
+              <motion.div
+                className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                {feedback.outcome === "correct" ? "+1 Dragon" : "-1 Dragon"}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+      )}
+
+      {canRenderGame && (
+        <div className="pointer-events-none absolute inset-0 z-20">
+          <AnimatePresence>
+            {state.status === "boss" && bossBattleStarted && !showResults && (
+              <React.Fragment key="boss-battle">
+                <motion.div
+                  className="absolute inset-x-0 top-12 mx-auto flex w-fit items-center gap-2 rounded-full border border-red-500/40 bg-red-950/70 px-3 py-2 text-sm font-bold tracking-widest text-red-200 uppercase sm:top-16 sm:gap-3 sm:px-6 sm:py-3 sm:text-xl sm:tracking-[0.2em]"
+                  initial={{ opacity: 0, scale: 0.8, y: -20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.4, type: "spring" }}
+                >
+                  ⚔️ Big Boss Battle! ⚔️
+                </motion.div>
+                <motion.div
+                  className="absolute inset-x-0 top-24 mx-auto w-40 px-2 sm:top-36 sm:w-64 sm:px-0 md:w-80"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                >
+                  <div className="rounded-lg border border-white/10 bg-slate-900/70 p-2 backdrop-blur sm:p-3">
+                    <div className="mb-1 text-xs tracking-[0.2em] text-white/70 uppercase">
+                      Boss Health
+                    </div>
+                    <div className="h-4 w-full overflow-hidden rounded-full bg-white/10">
+                      <motion.div
+                        className="h-full rounded-full bg-linear-to-r from-red-500 to-red-600"
+                        initial={{ width: "100%" }}
+                        animate={{
+                          width: `${Math.max(0, (bossHealth / calculateBossPower(state.attempts)) * 100)}%`,
+                        }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </div>
+                    <div className="mt-1 text-center text-xs text-white/60">
+                      {bossHealth} / {calculateBossPower(state.attempts)}
+                    </div>
+                  </div>
+                </motion.div>
+              </React.Fragment>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {gamePhase === "start" && (
+        <GameStartScreen
+          gameTitle={t("dragonRider.startScreen.title")}
+          gameSubtitle={t("dragonRider.startScreen.description")}
+          vocabulary={vocabulary}
+          instructions={[
+            {
+              step: 1,
+              text: t("dragonRider.instructionsScreen.gameplay.gatesDesc"),
+              icon: Shield,
+            },
+            {
+              step: 2,
+              text: `${t("dragonRider.instructionsScreen.controls.move")}: ${t("dragonRider.instructionsScreen.controls.moveKeys")}`,
+              icon: Wand2,
+            },
+            {
+              step: 3,
+              text: t("dragonRider.instructionsScreen.gameplay.bossDesc"),
+              icon: Sparkles,
+            },
+          ]}
+          proTip={t("dragonRider.instructionsScreen.gameplay.objectiveDesc")}
+          controls={[
+            {
+              label: t("dragonRider.instructionsScreen.controls.move"),
+              keys: t("dragonRider.instructionsScreen.controls.moveKeys"),
+              color: "bg-amber-500",
+            },
+            { label: "Select", keys: "Tap Gate", color: "bg-emerald-500" },
+          ]}
+          gameType="vocabulary"
+          selectedLanguage={selectedLanguage}
+          onLanguageChange={onLanguageChange}
+          showSelectionLanguage={mode !== "lesson" ? true : false}
+          startButtonText={
+            isLoading
+              ? t("dragonRider.startScreen.loading")
+              : t("dragonRider.startScreen.startButton")
+          }
+          onStart={() => {
+            if (isLoading) return;
+            resetGame();
+            setGamePhase("playing");
+          }}
+        >
+          <div>
+            <div className="flex gap-1 rounded-lg border border-white/10 bg-slate-900/80">
+              {(["easy", "normal", "hard", "extreme"] as Difficulty[]).map(
+                (d) => (
+                  <button
+                    key={d}
+                    onClick={() => setDifficulty(d)}
+                    className={`rounded-md px-3 py-1.5 text-[10px] font-bold tracking-wider uppercase transition-colors ${
+                      difficulty === d
+                        ? "bg-amber-500 text-slate-900"
+                        : "text-slate-400 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    {t(
+                      `dragonRider.startScreen.difficulty${d.charAt(0).toUpperCase() + d.slice(1)}` as any,
+                    )}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
+        </GameStartScreen>
+      )}
+
+      {gamePhase === "ended" && results && (
+        <GameEndScreen
+          status={results.victory ? "victory" : "defeat"}
+          score={results.correctAnswers}
+          xp={results.xp}
+          accuracy={results.accuracy}
+          customStats={[
+            {
+              label: t("dragonRider.resultsScreen.wordsCollected"),
+              value: results.dragonCount,
+            },
+            {
+              label: t("dragonRider.gameplayScreen.hud.bossHealth"),
+              value: results.bossPower,
+            },
+          ]}
+          onRestart={() => {
+            if (pendingResultRef.current) {
+              onComplete?.(pendingResultRef.current);
+              pendingResultRef.current = null;
+            }
+            resetGame();
+            setGamePhase("playing");
+          }}
+          onExit={() => {
+            if (pendingResultRef.current) {
+              onComplete?.(pendingResultRef.current);
+              pendingResultRef.current = null;
+            }
+            resetGame();
+            setGamePhase("start");
+          }}
+        />
       )}
     </div>
   );
