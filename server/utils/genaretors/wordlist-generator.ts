@@ -1,7 +1,12 @@
 // import { WordListResponse } from "./audio-words-generator";
 import { generateText, Output } from "ai";
 import { openai, openaiModel } from "@/utils/openai";
-import { google, googleModel, googleModelLite } from "@/utils/google";
+import {
+  google,
+  googleModel,
+  googleModelLite,
+  googleModelPro,
+} from "@/utils/google";
 import { VocabularySchema } from "@/lib/zod";
 
 interface GenerateWordListParams {
@@ -27,19 +32,18 @@ export async function generateWordList(
   params: GenerateWordListParams,
 ): Promise<WordListResponse[]> {
   try {
-    const userPrompt = `Extract the ten most difficult vocabulary words, phrases, or idioms from the following passage: ${params.passage}`;
+    const userPrompt = `Extract the ten to fifteen most difficult vocabulary words, phrases, or idioms from the following passage: ${params.passage}`;
 
-    const { output } = await generateText({
-      model: google(googleModelLite),
+    const { output: wordlist } = await generateText({
+      model: google(googleModel),
       output: Output.object({ schema: VocabularySchema }),
       system: "You are an article database assisstant.",
       prompt: userPrompt,
     });
 
-    return output;
+    return wordlist;
   } catch (error) {
-    console.log(error);
-    throw `failed to generate audio: ${
+    throw `failed to generate : ${
       error as unknown
     } \n\n error: ${JSON.stringify((error as any).response.data)}`;
   }

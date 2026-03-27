@@ -1,60 +1,63 @@
 "use client";
-import {
-  ActivityType,
-  FlashcardType,
-  GameState,
-  UserXpEarned,
-} from "@/types/enum";
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  GraduationCap,
-  Languages,
-  Trophy,
-  Sparkles,
-  Star,
-  CheckCircle,
-  XCircle,
-  RotateCcw,
-  Eye,
-  Lightbulb,
-  Volume2,
-  Play,
-  Loader2,
-} from "lucide-react";
+import { DragonRiderGame } from "@/components/games/vocabulary/dragon-rider/DragonRiderGame";
+import { EnchantedLibraryGame } from "@/components/games/vocabulary/enchanted-library/EnchantedLibraryGame";
+import RPGBattle from "@/components/games/vocabulary/rpg-battle/RPGBattle";
+import { RuneMatchGame } from "@/components/games/vocabulary/rune-match/RuneMatchGame";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { VOCABULARY_LANGUAGES } from "../../flashcards/deck-view";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { getLessonFlashcards } from "@/actions/flashcard";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { updateUserActivity } from "@/actions/user";
+import { getGamesList } from "@/configs/games-data";
+import {
+  useLessonVocabulary,
+  useLessonGameResult,
+  useSubmitLessonGamesResult,
+} from "@/hooks/use-lesson-vocabulary";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Languages,
+  RotateCcw,
+  Shield,
+  Trophy,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
-import { authClient } from "@/lib/auth-client";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { VOCABULARY_LANGUAGES } from "../../flashcards/deck-view";
 
-// Type definitions
-interface VocabularyPair {
-  id: string;
-  word: string;
-  definition: string;
-  audioUrl?: string;
-  startTime?: number;
-  endTime?: number;
+type GameId =
+  | "rpg-battle"
+  | "rune-match"
+  | "dragon-rider"
+  | "enchanted-library";
+
+interface GameOption {
+  id: GameId;
+  title: string;
+  description: string;
+  icon: any;
+  coverImage: string;
+  color: string;
+  difficulty: string;
+  type: string;
 }
 
-interface UserMatch {
-  leftId: string;
-  rightId: string;
-  isCorrect: boolean;
+interface GameResult {
+  score?: number;
+  xp?: number;
+  accuracy?: number | undefined;
+  correctAnswers?: number;
+  totalAttempts?: number;
+  gameId?: GameId;
 }
 
 export default function LessonVocabularyMatching({
@@ -63,669 +66,398 @@ export default function LessonVocabularyMatching({
   articleId: string;
 }) {
   const t = useTranslations("Lesson.VocabularyMatching");
+  const tg = useTranslations("games");
   // Game state
-  const [gameState, setGameState] = useState<GameState>(GameState.Starting);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
-  const [vocabularyPairs, setVocabularyPairs] = useState<VocabularyPair[]>([]);
-  const [shuffledDefinitions, setShuffledDefinitions] = useState<
-    VocabularyPair[]
-  >([]);
-  const { data: session } = authClient.useSession();
-  // Matching state
-  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
-  const [userMatches, setUserMatches] = useState<UserMatch[]>([]);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [showResult, setShowResult] = useState(false);
-  const [showCorrectAnswers, setShowCorrectAnswers] = useState(false);
-  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
-  // Helper states
-  const [score, setScore] = useState(0);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("th");
+  const [lastResult, setLastResult] = useState<GameResult | null>(null);
+  const [vocabError, setVocabError] = useState<string | null>(null);
+  const [activeGame, setActiveGame] = useState<GameId | null>(null);
+  const GamesLists = getGamesList(tg);
+  const VOCABULARY_GAMES = GamesLists.vocabulary;
+  const Games = VOCABULARY_GAMES.filter(
+    (game) => game.id !== "enchanted-library",
+  ); // Temporarily exclude Enchanted Library until it's ready
 
   const languageOptions = VOCABULARY_LANGUAGES;
 
-  // Callback functions
-  const handlePairSelect = useCallback(
-    (leftId: string, rightId: string) => {
-      if (isCompleted) return;
+  // Fetch previous game result from DB
+  const { result: dbResult, isLoading: isResultLoading } =
+    useLessonGameResult(articleId);
 
-      const correctPair = vocabularyPairs.find((pair) => pair.id === leftId);
-      if (!correctPair) return;
-
-      const isCorrect = rightId === correctPair.id;
-
-      const newMatch: UserMatch = {
-        leftId,
-        rightId,
-        isCorrect,
-      };
-
-      setUserMatches((prev) => {
-        const existing = prev.find((m) => m.leftId === leftId);
-        if (existing) {
-          return prev.map((m) => (m.leftId === leftId ? newMatch : m));
-        } else {
-          return [...prev, newMatch];
-        }
+  useEffect(() => {
+    if (dbResult && !lastResult) {
+      setLastResult({
+        score: dbResult.score,
+        xp: dbResult.xp,
+        accuracy: dbResult.accuracy,
+        correctAnswers: dbResult.correctAnswers,
+        totalAttempts: dbResult.totalAttempts,
+        gameId: (dbResult.gameId as GameId) ?? undefined,
       });
-
-      setHasUserInteracted(true);
-      setSelectedLeft(null);
-
-      if (isCorrect) {
-        toast.success(t("results.correctMatch"));
-      } else {
-        toast.error(t("results.incorrectMatch"));
-      }
-    },
-    [vocabularyPairs, isCompleted],
-  );
-
-  const handleLeftItemClick = useCallback(
-    (leftId: string) => {
-      if (isCompleted) return;
-      setSelectedLeft((prev) => (prev === leftId ? null : leftId));
-    },
-    [isCompleted],
-  );
-
-  const handleRightItemClick = useCallback(
-    (rightId: string) => {
-      if (isCompleted || !selectedLeft) return;
-      handlePairSelect(selectedLeft, rightId);
-    },
-    [selectedLeft, isCompleted, handlePairSelect],
-  );
-
-  const handleShowAnswers = useCallback(() => {
-    setShowCorrectAnswers(true);
-    toast.info(t("results.showAnswers"));
-  }, []);
-
-  const handleComplete = useCallback(() => {
-    setGameState(GameState.Completed);
-  }, []);
-
-  // Computed values
-  const progress = useMemo(
-    () => (userMatches.length / vocabularyPairs.length) * 100 || 0,
-    [userMatches.length, vocabularyPairs.length],
-  );
-
-  // Load game data
-  useEffect(() => {
-    const fetchGameData = async () => {
-      setGameState(GameState.Loading);
-      try {
-        const response = await getLessonFlashcards(
-          articleId,
-          FlashcardType.VOCABULARY,
-        );
-
-        if (response.success && response.cards && response.cards.length > 0) {
-          // Transform flashcards to vocabulary pairs
-          const pairs: VocabularyPair[] = response.cards.map((card: any) => ({
-            id: card.id,
-            word: card.word,
-            definition: card.definition[selectedLanguage],
-            audioUrl: card.audioUrl,
-            startTime: card.startTime,
-            endTime: card.endTime,
-          }));
-
-          setVocabularyPairs(pairs);
-
-          // Shuffle definitions for the right column
-          const shuffled = [...pairs].sort(() => Math.random() - 0.5);
-          setShuffledDefinitions(shuffled);
-
-          setGameState(GameState.Starting);
-        } else {
-          setGameState(GameState.NoCards);
-        }
-      } catch (error) {
-        console.error("Error loading flashcards:", error);
-        setGameState(GameState.Error);
-        toast.error(t("toast.failedToLoad"));
-      }
-    };
-
-    if (gameState === GameState.Playing && vocabularyPairs.length === 0) {
-      fetchGameData();
-    } else if (
-      gameState === GameState.Starting &&
-      vocabularyPairs.length === 0
-    ) {
-      fetchGameData();
     }
-  }, [articleId, gameState, selectedLanguage]);
+  }, [dbResult, lastResult]);
 
-  // Auto-complete check
-  useEffect(() => {
-    const handleComplete = async () => {
-      await updateUserActivity(
+  // Fetch vocabulary from article via TanStack Query
+  const {
+    vocabulary: fetchedVocabulary,
+    isLoading: isVocabularyLoading,
+    isError: isVocabularyError,
+    error: vocabularyError,
+  } = useLessonVocabulary({ articleId, language: selectedLanguage });
+
+  const { submitResult, isSubmitting } = useSubmitLessonGamesResult();
+
+  const handleComplete = async (result: GameResult) => {
+    const gameResult: GameResult = {
+      score: result.score || 0,
+      xp: result.xp || 0,
+      accuracy: result.accuracy || 0,
+      correctAnswers: result.correctAnswers || 0,
+      totalAttempts: result.totalAttempts || 0,
+      gameId: activeGame!,
+    };
+    setLastResult(gameResult);
+    setActiveGame(null);
+    try {
+      await submitResult({
         articleId,
-        ActivityType.VOCABULARY_MATCHING,
-        UserXpEarned.VOCABULARY_MATCHING,
-        0,
-        {
-          score: UserXpEarned.VOCABULARY_MATCHING,
-        },
-      );
-    };
-    if (
-      vocabularyPairs.length > 0 &&
-      userMatches.length === vocabularyPairs.length &&
-      !isCompleted &&
-      hasUserInteracted
-    ) {
-      const correctCount = userMatches.filter(
-        (match) => match.isCorrect,
-      ).length;
-      const isAllCorrect = correctCount === vocabularyPairs.length;
-
-      setIsCompleted(true);
-      setShowResult(true);
-      handleComplete();
-
-      if (isAllCorrect) {
-        setScore((prev) => prev + 1);
-        toast.success(t("results.perfect"));
-      } else {
-        toast.error(
-          t("results.tryAgain", {
-            correct: correctCount,
-            total: vocabularyPairs.length,
-          }),
-        );
-      }
+        gameId: gameResult.gameId!,
+        xp: gameResult.xp,
+        score: gameResult.score,
+        correctAnswers: gameResult.correctAnswers,
+        totalAttempts: gameResult.totalAttempts,
+        accuracy: gameResult.accuracy,
+        difficulty: gameResult.gameId,
+      });
+    } catch (error) {
+      console.error("Failed to submit game results:", error);
     }
-  }, [userMatches, vocabularyPairs.length, isCompleted, hasUserInteracted]);
+  };
 
-  // Loading state
-  if (gameState === GameState.Loading) {
-    return (
-      <div className="space-y-6">
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex min-h-100 flex-col items-center justify-center space-y-6">
-              <div className="relative">
-                <div className="h-16 w-16 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600 dark:border-emerald-800 dark:border-t-emerald-400"></div>
-                <GraduationCap className="absolute inset-0 m-auto h-8 w-8 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">{t("loading.title")}</h3>
-                <p className="text-muted-foreground">
-                  {t("loading.description")}
-                </p>
-              </div>
+  const handlePlayGame = (gameId: GameId) => {
+    setActiveGame(gameId);
+  };
+
+  // --- RENDER: Active Game ---
+  if (activeGame) {
+    if (typeof document === "undefined") return null;
+
+    return createPortal(
+      <div className="animate-in fade-in fixed inset-0 z-100 flex items-center justify-center p-4 duration-300 sm:p-8">
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+          onClick={() => setActiveGame(null)}
+        />
+
+        {/* Modal Container */}
+        <div className="relative flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl sm:max-h-[90vh] md:max-h-[80vh]">
+          {/* Header */}
+          <div className="z-10 flex shrink-0 items-center justify-between border-b border-slate-800/50 bg-slate-900/50 p-4 backdrop-blur-md">
+            <Button
+              size="sm"
+              onClick={() => setActiveGame(null)}
+              className="text-slate-400 hover:bg-slate-800/50 hover:text-white"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {tg("backToLessons")}
+            </Button>
+            <div className="text-lg font-bold text-slate-200">
+              {VOCABULARY_GAMES.find((g) => g.id === activeGame)?.title}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="w-24" /> {/* Spacer */}
+          </div>
+
+          {/* Game Content */}
+          <div className="relative">
+            {activeGame === "rune-match" && (
+              <div className="h-full w-full">
+                <RuneMatchGame
+                  vocabulary={fetchedVocabulary}
+                  onComplete={handleComplete}
+                />
+              </div>
+            )}
+
+            {activeGame === "rpg-battle" && (
+              <div className="h-full w-full">
+                <RPGBattle
+                  vocabulary={fetchedVocabulary}
+                  onComplete={handleComplete}
+                  mode="lesson"
+                />
+              </div>
+            )}
+
+            {activeGame === "dragon-rider" && (
+              <div className="h-full w-full">
+                <DragonRiderGame
+                  vocabulary={fetchedVocabulary}
+                  onComplete={handleComplete}
+                  mode="lesson"
+                />
+              </div>
+            )}
+
+            {/* {activeGame === "enchanted-library" && (
+              <div className="h-full w-full">
+                <EnchantedLibraryGame
+                  vocabulary={fetchedVocabulary}
+                  onComplete={handleComplete}
+                  mode="lesson"
+                />
+              </div>
+            )} */}
+          </div>
+        </div>
+      </div>,
+      document.body,
     );
   }
 
-  // No cards state
-  if (gameState === GameState.NoCards) {
-    return (
-      <div className="space-y-6">
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex min-h-100 flex-col items-center justify-center space-y-6">
-              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/20">
-                <GraduationCap className="h-12 w-12 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">{t("noCards.title")}</h3>
-                <p className="text-muted-foreground">
-                  {t("noCards.description")}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Error state
-  if (gameState === GameState.Error) {
-    return (
-      <div className="space-y-6">
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex min-h-100 flex-col items-center justify-center space-y-6">
-              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
-                <XCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
-              </div>
-              <div className="space-y-2 text-center">
-                <h3 className="text-lg font-semibold">{t("error.title")}</h3>
-                <p className="text-muted-foreground">
-                  {t("error.description")}
-                </p>
-              </div>
-              <Button
-                onClick={() => {
-                  setGameState(GameState.Starting);
-                  setVocabularyPairs([]);
-                }}
-                variant="outline"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" />
-                {t("buttons.tryAgain")}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (gameState === GameState.Starting) {
-    return (
-      <div className="space-y-6">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <div className="space-y-6">
-              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/20">
-                <GraduationCap className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold">{t("start.title")}</h3>
-                <p className="text-muted-foreground">{t("start.subtitle")}</p>
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <div className="w-full max-w-md space-y-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <Languages className="h-5 w-5 text-indigo-500" />
-                      <Label className="text-base font-semibold">
-                        {t("start.languageLabel")}
-                      </Label>
+  return (
+    <div className="animate-in slide-in-from-bottom-4 fade-in mx-auto max-w-6xl space-y-8 duration-500">
+      {/* Language Selector */}
+      <div className="flex flex-col items-center justify-center gap-4">
+        <div className="w-full max-w-md space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <Languages className="h-5 w-5 text-indigo-500" />
+            <Label className="text-base font-semibold">
+              {tg("selectTranslation")}
+            </Label>
+          </div>
+          <Select
+            value={selectedLanguage}
+            onValueChange={(value) => {
+              setSelectedLanguage(value);
+            }}
+          >
+            <SelectTrigger className="h-12 w-full">
+              <SelectValue>
+                {selectedLanguage && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">
+                      {
+                        languageOptions[
+                          selectedLanguage as keyof typeof languageOptions
+                        ]?.flag
+                      }
+                    </span>
+                    <div className="flex flex-col text-left">
+                      <span className="font-medium">
+                        {
+                          languageOptions[
+                            selectedLanguage as keyof typeof languageOptions
+                          ]?.name
+                        }
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        {
+                          languageOptions[
+                            selectedLanguage as keyof typeof languageOptions
+                          ]?.nativeName
+                        }
+                      </span>
                     </div>
-                    <Select
-                      value={selectedLanguage}
-                      onValueChange={(value) => {
-                        setSelectedLanguage(value);
-                        // Reset vocabulary to force re-fetch with new language
-                        setVocabularyPairs([]);
-                        setShuffledDefinitions([]);
-                      }}
+                  </div>
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(languageOptions).map((language) => (
+                <SelectItem key={language.code} value={language.code}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{language.flag}</span>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{language.name}</span>
+                      <span className="text-muted-foreground text-xs">
+                        {language.nativeName}
+                      </span>
+                    </div>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {isVocabularyLoading && (
+        <div className="flex flex-col items-center gap-2 p-6 text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+          <div className="text-muted-foreground text-sm">
+            Loading vocabulary...
+          </div>
+        </div>
+      )}
+
+      {vocabError && (
+        <div className="bg-destructive/10 border-destructive/20 text-destructive flex flex-col items-center gap-2 rounded-xl border p-6 text-center">
+          <Shield className="h-8 w-8" />
+          <div className="font-semibold">{t("phase10.failedToLoad")}</div>
+          <div className="text-sm opacity-80">{vocabError}</div>
+        </div>
+      )}
+
+      {!vocabError && !isVocabularyLoading && (
+        <>
+          {/* Summary Card (If Completed) */}
+          {lastResult && (
+            <div className="mb-12 transform overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-1 shadow-2xl transition-all hover:scale-[1.01]">
+              <div className="relative overflow-hidden rounded-[22px] bg-linear-to-br from-slate-900 to-slate-950 p-8">
+                {/* Background FX */}
+                <div className="pointer-events-none absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/10 p-48 blur-[100px]" />
+                <div className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 rounded-full bg-blue-500/10 p-32 blur-[80px]" />
+
+                <div className="relative z-10 flex flex-col items-center justify-between gap-4 md:flex-row">
+                  <div className="flex items-center gap-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 animate-pulse bg-green-500 opacity-20 blur-xl" />
+                      <div className="flex h-16 w-16 rotate-3 transform items-center justify-center rounded-2xl bg-linear-to-br from-green-400 to-emerald-600 shadow-lg">
+                        <Trophy className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="mb-1 flex items-center gap-2">
+                        <h3 className="text-2xl font-bold text-white">
+                          {t("awesome")}
+                        </h3>
+                        <Badge className="border-0 bg-green-500/20 text-green-400 hover:bg-green-500/30">
+                          {t("completed.completed")}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-slate-400">
+                        {t("youCompleted")}{" "}
+                        <b>
+                          {
+                            VOCABULARY_GAMES.find(
+                              (g) => g.id === lastResult.gameId,
+                            )?.title
+                          }
+                        </b>
+                        .
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-8 rounded-2xl border border-white/5 bg-slate-950/50 p-4 md:gap-12">
+                    <div className="text-center">
+                      <div className="mb-1 text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                        {t("score")}
+                      </div>
+                      <div className="text-3xl font-black text-yellow-400 tabular-nums">
+                        {lastResult.score}
+                      </div>
+                    </div>
+                    <div className="h-10 w-px bg-white/10" />
+                    <div className="text-center">
+                      <div className="mb-1 text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                        {t("accuracy")}
+                      </div>
+                      <div className="text-3xl font-black text-blue-400 tabular-nums">
+                        {Math.round((lastResult?.accuracy || 0) * 100)}
+                        <span className="ml-0.5 text-lg">%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex w-full flex-col gap-2 md:w-auto">
+                    <Button
+                      onClick={() => handlePlayGame(lastResult.gameId!)}
+                      size="lg"
+                      className="w-full rounded-xl bg-white font-bold text-slate-950 shadow-lg shadow-white/5 hover:bg-slate-200 md:w-auto"
                     >
-                      <SelectTrigger className="h-12 w-full">
-                        <SelectValue>
-                          {selectedLanguage && (
-                            <div className="flex items-center gap-3">
-                              <span className="text-lg">
-                                {
-                                  languageOptions[
-                                    selectedLanguage as keyof typeof languageOptions
-                                  ]?.flag
-                                }
-                              </span>
-                              <div className="flex flex-col text-left">
-                                <span className="font-medium">
-                                  {
-                                    languageOptions[
-                                      selectedLanguage as keyof typeof languageOptions
-                                    ]?.name
-                                  }
-                                </span>
-                                <span className="text-muted-foreground text-xs">
-                                  {
-                                    languageOptions[
-                                      selectedLanguage as keyof typeof languageOptions
-                                    ]?.nativeName
-                                  }
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.values(languageOptions).map((language) => (
-                          <SelectItem key={language.code} value={language.code}>
-                            <div className="flex items-center gap-3">
-                              <span className="text-lg">{language.flag}</span>
-                              <div className="flex flex-col">
-                                <span className="font-medium">
-                                  {language.name}
-                                </span>
-                                <span className="text-muted-foreground text-xs">
-                                  {language.nativeName}
-                                </span>
-                              </div>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-muted-foreground text-center text-xs">
-                      {t("start.languageHint")}
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      {t("playAgain")}
+                    </Button>
+                    <p className="text-center text-[10px] text-slate-500">
+                      {t("continueNext")}
                     </p>
                   </div>
-                  <Button
-                    onClick={() => setGameState(GameState.Playing)}
-                    size="lg"
-                    className="w-full max-w-md"
-                  >
-                    <Play className="mr-2 h-4 w-4" />
-                    {t("start.startButton")}
-                  </Button>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (gameState === GameState.Completed) {
-    return (
-      <div className="space-y-6">
-        <Card className="overflow-hidden border-emerald-200 bg-linear-to-br from-emerald-50 via-emerald-50 to-emerald-100 pb-14 dark:border-emerald-800 dark:from-emerald-950/20 dark:via-emerald-950/20 dark:to-emerald-950/30">
-          <CardContent className="p-8 text-center">
-            <div className="space-y-6">
-              {/* Trophy and celebration */}
-              <div className="space-y-4">
-                <div className="relative">
-                  <Trophy className="mx-auto h-20 w-20 text-yellow-500 drop-shadow-lg" />
-                  <div className="absolute -top-2 -right-2">
-                    <Sparkles className="h-8 w-8 animate-pulse text-yellow-400" />
-                  </div>
-                  <div className="absolute -bottom-2 -left-2">
-                    <Star className="h-6 w-6 animate-pulse text-yellow-400" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <h2 className="bg-linear-to-r from-emerald-600 to-emerald-700 bg-clip-text text-3xl font-bold text-transparent">
-                    {t("completed.title")}
-                  </h2>
-                  <p className="text-lg text-gray-600 dark:text-gray-400">
-                    {t("completed.subtitle")}
-                  </p>
-                </div>
-              </div>
-
-              <Separator className="bg-emerald-200 dark:bg-emerald-800" />
-
-              {/* Stats Grid */}
-              <div className="flex items-center justify-center gap-4">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                    20
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {t("completed.xpEarned")}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    5/5
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {t("completed.completed")}
-                  </div>
-                </div>
-              </div>
-
-              <Separator className="bg-emerald-200 dark:bg-emerald-800" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Playing state - Main game UI
-  return (
-    <div className="container mx-auto max-w-6xl space-y-4 px-4">
-      {/* Progress bar */}
-      <div className="space-y-2">
-        <div className="text-muted-foreground flex items-center justify-between text-sm">
-          <span>
-            {userMatches.length}/{vocabularyPairs.length} matched
-          </span>
-          <span>
-            {userMatches.filter((m) => m.isCorrect).length}/
-            {vocabularyPairs.length} correct
-          </span>
-        </div>
-        <Progress value={progress} className="h-2" />
-      </div>
-
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-            <div className="space-y-3">
-              <CardTitle className="text-xl">{t("game.title")}</CardTitle>
-              <p className="text-muted-foreground text-sm">
-                {t("game.instruction")}
-              </p>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          {/* Matching game grid */}
-          <div className="bg-muted/10 border-muted-foreground/25 rounded-lg border-2">
-            <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
-              {/* Left column - Words */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-blue-500" />
-                  <h3 className="font-medium">{t("game.columns.words")}</h3>
-                </div>
-                <div className="space-y-2">
-                  {vocabularyPairs.map((pair) => {
-                    const isSelected = selectedLeft === pair.id;
-                    const userMatch = userMatches.find(
-                      (m) => m.leftId === pair.id,
-                    );
-                    const isMatched = !!userMatch;
-                    const isCorrect = userMatch?.isCorrect;
-
-                    return (
-                      <Button
-                        key={pair.id}
-                        onClick={() => handleLeftItemClick(pair.id)}
-                        variant="outline"
-                        className={cn(
-                          "h-auto min-h-12 w-full justify-start p-4 text-left whitespace-normal transition-all",
-                          isSelected && "ring-primary border-primary ring-2",
-                          isMatched &&
-                            isCorrect &&
-                            isCompleted &&
-                            "border-green-500 bg-green-50 dark:bg-green-950/20",
-                          isMatched &&
-                            !isCorrect &&
-                            isCompleted &&
-                            "border-red-500 bg-red-50 dark:bg-red-950/20",
-                          isCompleted && "cursor-default",
-                        )}
-                        disabled={isCompleted}
-                      >
-                        <div className="flex w-full items-start gap-2">
-                          {isMatched && isCorrect && (
-                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
-                          )}
-                          {isMatched && !isCorrect && (
-                            <XCircle className="h-4 w-4 shrink-0 text-red-600" />
-                          )}
-                          <span className="warp-break-words text-base leading-relaxed font-semibold">
-                            {pair.word}
-                          </span>
-                        </div>
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Right column - Definitions */}
-              <div className="space-y-3 lg:col-start-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 shrink-0 rounded-full bg-green-500" />
-                    <h3 className="font-medium">
-                      {t("game.columns.definitions")}
-                    </h3>
-                  </div>
-                  {selectedLanguage &&
-                    languageOptions[
-                      selectedLanguage as keyof typeof languageOptions
-                    ] && (
-                      <span className="text-muted-foreground text-xs font-normal">
-                        (
-                        {
-                          languageOptions[
-                            selectedLanguage as keyof typeof languageOptions
-                          ].flag
-                        }{" "}
-                        {
-                          languageOptions[
-                            selectedLanguage as keyof typeof languageOptions
-                          ].name
-                        }
-                        )
-                      </span>
-                    )}
-                </div>
-                <div className="space-y-2">
-                  {shuffledDefinitions.map((pair) => {
-                    const userMatch = userMatches.find(
-                      (m) => m.rightId === pair.id,
-                    );
-                    const isMatched = !!userMatch;
-                    const isCorrect = userMatch?.isCorrect;
-
-                    return (
-                      <Button
-                        key={pair.id}
-                        onClick={() => handleRightItemClick(pair.id)}
-                        variant="outline"
-                        className={cn(
-                          "h-auto min-h-12 w-full justify-start p-4 text-left whitespace-normal transition-all",
-                          !selectedLeft && "cursor-not-allowed opacity-50",
-                          isMatched &&
-                            isCorrect &&
-                            isCompleted &&
-                            "border-green-500 bg-green-50 dark:bg-green-950/20",
-                          isMatched &&
-                            !isCorrect &&
-                            isCompleted &&
-                            "border-red-500 bg-red-50 dark:bg-red-950/20",
-                          isCompleted && "cursor-default",
-                        )}
-                        disabled={!selectedLeft || isCompleted}
-                      >
-                        <div className="flex w-full items-start gap-2">
-                          {isMatched && isCorrect && (
-                            <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
-                          )}
-                          {isMatched && !isCorrect && (
-                            <XCircle className="h-4 w-4 shrink-0 text-red-600" />
-                          )}
-                          <span className="warp-break-words text-sm leading-relaxed">
-                            {pair.definition}
-                          </span>
-                        </div>
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Result card */}
-          {showResult && (
-            <Card
-              className={cn(
-                "border-2",
-                userMatches.every((m) => m.isCorrect)
-                  ? "border-green-500 bg-green-50 dark:bg-green-950/20"
-                  : "border-red-500 bg-red-50 dark:bg-red-950/20",
-              )}
-            >
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-center gap-3">
-                    {userMatches.every((m) => m.isCorrect) ? (
-                      <CheckCircle className="h-6 w-6 text-green-600" />
-                    ) : (
-                      <XCircle className="h-6 w-6 text-red-600" />
-                    )}
-                    <h3 className="text-lg font-semibold">
-                      {userMatches.every((m) => m.isCorrect)
-                        ? t("results.perfect")
-                        : t("results.partialCorrect", {
-                            correct: userMatches.filter((m) => m.isCorrect)
-                              .length,
-                            total: vocabularyPairs.length,
-                          })}
-                    </h3>
-                  </div>
-
-                  {!userMatches.every((m) => m.isCorrect) &&
-                    showCorrectAnswers && (
-                      <div className="space-y-3">
-                        <Separator />
-                        <div>
-                          <h4 className="mb-3 font-medium">
-                            {t("results.correctMatches")}
-                          </h4>
-                          <div className="space-y-2">
-                            {vocabularyPairs.map((pair, index) => (
-                              <div key={pair.id} className="flex gap-3 text-sm">
-                                <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
-                                  {index + 1}
-                                </span>
-                                <p className="flex-1">
-                                  <span className="font-semibold">
-                                    {pair.word}
-                                  </span>
-                                  <span className="text-muted-foreground mx-2">
-                                    →
-                                  </span>
-                                  <span>{pair.definition}</span>
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                </div>
-              </CardContent>
-            </Card>
           )}
 
-          {/* Action buttons */}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            {isCompleted &&
-              !userMatches.every((m) => m.isCorrect) &&
-              !showCorrectAnswers && (
-                <Button
-                  onClick={handleShowAnswers}
-                  variant="secondary"
-                  size="sm"
-                  className="sm:w-auto"
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  {t("buttons.showAnswers")}
-                </Button>
-              )}
-
-            {isCompleted && userMatches.every((m) => m.isCorrect) && (
-              <Button onClick={handleComplete} className="flex-1">
-                {t("buttons.completeActivity")}
-              </Button>
+          {/* Game Selection Grid */}
+          <div className="space-y-4">
+            {!lastResult && (
+              <div className="flex items-center gap-2 px-1 text-sm font-medium text-slate-500">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
+                {t("chooseGames.title")}
+              </div>
             )}
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+              {Games.map((game) => {
+                const Icon = game.icon;
+                const isLastPlayed = lastResult?.gameId === game.id;
+
+                return (
+                  <Card
+                    key={game.id}
+                    className={`group relative flex cursor-pointer flex-col overflow-hidden border-2 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${
+                      isLastPlayed
+                        ? "border-green-500/50 ring-4 ring-green-500/10 dark:bg-slate-900"
+                        : "border-transparent bg-white shadow-md hover:border-purple-500/30 dark:bg-slate-900/50"
+                    } `}
+                    onClick={() => setActiveGame(game.id as GameId)}
+                  >
+                    <CardHeader className="relative -mt-6 h-40 w-full overflow-hidden">
+                      <Image
+                        src={game.coverImage}
+                        alt={game.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div
+                        className={`absolute inset-0 bg-linear-to-t ${game.color} opacity-20 transition-opacity duration-300 group-hover:opacity-30`}
+                      />
+
+                      <div className="absolute top-3 right-3">
+                        <Badge
+                          // variant="secondary"
+                          className="border-white/20 bg-white/20 text-white shadow-sm backdrop-blur-md"
+                        >
+                          {game.difficulty}
+                        </Badge>
+                      </div>
+
+                      <div className="absolute bottom-3 left-3 flex items-center gap-3">
+                        <div className="text-primary transform rounded-xl bg-white/90 p-2.5 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 dark:bg-slate-950/90">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="flex flex-1 flex-col p-5">
+                      <div className="mb-2">
+                        <h3 className="text-lg leading-tight font-bold transition-colors group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                          {game.title}
+                        </h3>
+                        <div className="text-muted-foreground mt-1 text-xs font-medium">
+                          {game.type}
+                        </div>
+                      </div>
+                      <p className="line-clamp-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                        {game.description}
+                      </p>
+
+                      {isLastPlayed && (
+                        <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-3 text-xs font-bold text-green-600 dark:border-slate-800 dark:text-green-400">
+                          <CheckCircle2 className="h-3 w-3" />
+                          {t("lastPlayed")}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </>
+      )}
     </div>
   );
 }

@@ -2624,6 +2624,17 @@
       }
     },
     "VocabularyMatching": {
+      "awesome": "太棒了！",
+      "youCompleted": "你完成了",
+      "score": "分数",
+      "accuracy": "准确率",
+      "playAgain": "再玩一次",
+      "continueNext": "准备好时继续下一阶段",
+      "lastPlayed": "上次玩",
+      "chooseGames": {
+        "title": "选择你的游戏",
+        "description": "选择一个游戏模式来练习将词汇与其含义匹配。"
+      },
       "loading": {
         "title": "正在加载闪卡",
         "description": "正在准备您的词汇练习..."

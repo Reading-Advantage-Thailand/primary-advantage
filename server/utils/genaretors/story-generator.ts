@@ -3,7 +3,7 @@ import {
   google,
   googleImage,
   googleModel,
-  googleNewModel,
+  googleModelPro,
   googleImageModel,
 } from "@/utils/google";
 import { openai, newModel } from "@/utils/openai";
@@ -35,7 +35,7 @@ type CefrLevelType = {
 
 export type GenerateStoryResponse = z.infer<typeof storyGeneratorSchema>;
 
-const aiModel = googleNewModel;
+const aiModel = googleModelPro;
 
 // Cache prompt file in memory (lazy-loaded singleton)
 let cachedPrompts: CefrLevelPromptType | null = null;

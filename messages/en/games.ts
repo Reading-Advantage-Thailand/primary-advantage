@@ -68,6 +68,7 @@ export default {
   playNow: "Play Now",
   clickToPlay: "Click to play!",
   selectTranslation: "Select Translation Language",
+  backToLessons: "Back to Lessons",
 
   // Coming soon
   comingSoon: "Coming Soon",
@@ -96,6 +97,7 @@ export default {
     victory: "Victory",
     defeat: "Defeat",
     playAgain: "Play Again",
+    exit: "Exit",
     tryAgain: "Try Again",
     continue: "Continue",
     startGame: "Start Game",

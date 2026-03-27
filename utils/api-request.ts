@@ -204,6 +204,10 @@ export const fetchDashboardHeatmapApi = async (
   return response;
 };
 
+import {
+  SubmitLessonGamesResultInput,
+  SubmitLessonGamesResultResponse,
+} from "@/hooks/use-lesson-vocabulary";
 //---------------------------------
 // Stories API
 //---------------------------------
@@ -407,7 +411,7 @@ export interface RPGBattleRankingEntry {
 
 export interface RPGBattleRankingResponse {
   success: boolean;
-  rankings: RPGBattleRankingEntry[];
+  rankings: Record<string, RPGBattleRankingEntry[]>;
   scope: "school" | "global";
 }
 
@@ -703,6 +707,77 @@ export const submitEnchantedLibraryResultApi = async (
 
   if (!response.ok) {
     throw new Error("Failed to submit Enchanted Library results");
+  }
+
+  return response.json();
+};
+
+//---------------------------------
+// Lesson Vocabulary API
+//---------------------------------
+export interface LessonVocabularyResponse {
+  success: boolean;
+  vocabulary: { term: string; translation: string }[];
+  message?: string;
+}
+
+export const fetchLessonVocabularyApi = async (
+  articleId: string,
+  language: string = "th",
+): Promise<LessonVocabularyResponse> => {
+  const queryParams = new URLSearchParams({ language }).toString();
+  const response = await fetch(
+    `/api/lessons/${encodeURIComponent(articleId)}/vocabulary?${queryParams}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch lesson vocabulary");
+  }
+
+  return response.json();
+};
+
+export const submitLessonGamesResultApi = async (
+  data: SubmitLessonGamesResultInput,
+): Promise<SubmitLessonGamesResultResponse> => {
+  const response = await fetch(
+    `/api/lessons/${encodeURIComponent(data.articleId)}/vocabulary`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to submit lesson game results");
+  }
+
+  return response.json();
+};
+
+export interface LessonGameResultResponse {
+  success: boolean;
+  result: {
+    score: number;
+    xp: number;
+    accuracy: number;
+    correctAnswers: number;
+    totalAttempts: number;
+    gameId: string | null;
+    createdAt: string;
+  } | null;
+}
+
+export const fetchLessonGameResultApi = async (
+  articleId: string,
+): Promise<LessonGameResultResponse> => {
+  const response = await fetch(
+    `/api/lessons/${encodeURIComponent(articleId)}/vocabulary/results`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch lesson game results");
   }
 
   return response.json();

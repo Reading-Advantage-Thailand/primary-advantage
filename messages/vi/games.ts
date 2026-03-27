@@ -69,6 +69,7 @@ export default {
   playNow: "Chơi ngay",
   clickToPlay: "Nhấp để chơi!",
   selectTranslation: "Chọn ngôn ngữ dịch",
+  backToLessons: "Quay lại bài học",
 
   // Coming soon
   comingSoon: "Sắp ra mắt",
@@ -105,6 +106,7 @@ export default {
     wordsToReview: "Từ cần ôn",
     viewLeaderboard: "Xem bảng xếp hạng",
     howToPlay: "Cách chơi",
+    exit: "Thoát",
     tip: "Mẹo",
     xp: "XP",
   },

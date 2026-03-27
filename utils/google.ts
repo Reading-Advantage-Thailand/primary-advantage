@@ -1,4 +1,5 @@
 import { createVertex } from "@ai-sdk/google-vertex";
+import "dotenv/config";
 
 const google = createVertex({
   project: process.env.PROJECT_ID,
@@ -11,17 +12,17 @@ const google = createVertex({
   },
 });
 
-const googleModel = "gemini-2.5-flash";
-const googleModelLite = "gemini-2.5-flash-lite";
+const googleModel = "	gemini-3-flash-preview";
+const googleModelLite = "gemini-3.1-flash-lite-preview";
+const googleModelPro = "gemini-3.1-pro-preview";
 const googleImage = "gemini-3-pro-image-preview";
-const googleNewModel = "gemini-3.1-pro-preview";
 const googleImageModel = "imagen-4.0-generate-001";
 
 export {
   google,
   googleModel,
   googleModelLite,
+  googleModelPro,
   googleImage,
-  googleNewModel,
   googleImageModel,
 };

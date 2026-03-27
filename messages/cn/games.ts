@@ -62,6 +62,7 @@ export default {
   playNow: "立即游戏",
   clickToPlay: "点击开始！",
   selectTranslation: "选择翻译语言",
+  backToLessons: "返回课程",
 
   // Coming soon
   comingSoon: "即将推出",
@@ -96,6 +97,7 @@ export default {
     loading: "加载中",
     wordsToReview: "待复习的单词",
     viewLeaderboard: "查看排行榜",
+    exit: "退出",
     howToPlay: "如何玩",
     tip: "提示",
     xp: "XP",

@@ -2492,7 +2492,7 @@
       "multipleChoice": "Multiple Choice",
       "shortAnswer": "Short Answer",
       "vocabularyFlashcards": "Vocabulary Flashcards",
-      "vocabularyMatching": "Vocabulary Matching",
+      "vocabularyMatching": "Vocabulary Games",
       "sentenceFlashcards": "Sentence Flashcards",
       "sentenceActivities": "Sentence Activities",
       "languageQuestions": "Language Questions",
@@ -2503,8 +2503,8 @@
       "multipleChoiceDescription": "Task Description Topic : {title}",
       "vocabularyFlashcardsTitle": "Task Vocabulary Flashcards",
       "vocabularyFlashcardsDescription": "Review key vocabulary using interactive flashcards.",
-      "vocabularyMatchingTitle": "Task Vocabulary Matching",
-      "vocabularyMatchingDescription": "Match words with their meanings to build understanding.",
+      "vocabularyMatchingTitle": "Task Vocabulary Games",
+      "vocabularyMatchingDescription": "Practice the vocabulary you've learned in this lesson by playing games",
       "sentenceFlashcardsTitle": "Task Sentence Flashcards",
       "sentenceFlashcardsDescription": "Practice sentences and reinforce context with flashcards."
     },
@@ -2564,6 +2564,17 @@
       }
     },
     "VocabularyMatching": {
+      "awesome": "Awesome!",
+      "youCompleted": "You completed",
+      "score": "Score",
+      "accuracy": "Accuracy",
+      "playAgain": "Play Again",
+      "continueNext": "Continue to next phase whenever you're ready",
+      "lastPlayed": "Last Played",
+      "chooseGames": {
+        "title": "Choose Your Game",
+        "description": "Select a game mode to practice matching vocabulary words with their meanings."
+      },
       "loading": {
         "title": "Loading Flashcards",
         "description": "Preparing your vocabulary practice..."

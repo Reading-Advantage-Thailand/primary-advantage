@@ -62,6 +62,7 @@ export default {
   playNow: "立即遊玩",
   clickToPlay: "點擊開始！",
   selectTranslation: "選擇翻譯語言",
+  backToLessons: "返回課程",
 
   // Coming soon
   comingSoon: "即將推出",
@@ -97,6 +98,7 @@ export default {
     wordsToReview: "待復習的單詞",
     viewLeaderboard: "查看排行榜",
     howToPlay: "如何玩",
+    exit: "退出",
     tip: "提示",
     xp: "XP",
   },

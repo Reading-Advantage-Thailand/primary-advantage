@@ -62,12 +62,13 @@ interface RankingEntry {
 interface EnchantedLibraryGameProps {
   vocabulary: VocabularyItem[];
   onComplete: (results: EnchantedLibraryGameResult) => void;
-  rankings: Record<
+  rankings?: Record<
     import("@/lib/games/enchanted-library/enchantedLibrary").Difficulty,
     RankingEntry[]
   >;
-  selectedLanguage: string;
-  onLanguageChange: (language: string) => void;
+  mode?: "normal" | "lesson";
+  selectedLanguage?: string;
+  onLanguageChange?: (language: string) => void;
 }
 
 // Sprite Helper
@@ -94,6 +95,7 @@ export function EnchantedLibraryGame({
   vocabulary,
   onComplete,
   rankings,
+  mode = "normal",
   selectedLanguage,
   onLanguageChange,
 }: EnchantedLibraryGameProps) {
@@ -531,6 +533,7 @@ export function EnchantedLibraryGame({
           icon={BookOpen}
           selectedLanguage={selectedLanguage}
           onLanguageChange={onLanguageChange}
+          showSelectionLanguage={mode === "normal"}
           onStart={() => {
             resetGame();
             setGamePhase("playing");
@@ -834,12 +837,14 @@ export function EnchantedLibraryGame({
           />
 
           {/* Rankings Display */}
-          <div className="absolute bottom-6 left-1/2 max-h-[40vh] w-full max-w-4xl -translate-x-1/2 overflow-y-auto px-6">
-            <RankingDisplay
-              rankings={rankings}
-              currentDifficulty={difficulty}
-            />
-          </div>
+          {mode === "normal" && rankings ? (
+            <div className="absolute bottom-6 left-1/2 max-h-[40vh] w-full max-w-4xl -translate-x-1/2 overflow-y-auto px-6">
+              <RankingDisplay
+                rankings={rankings}
+                currentDifficulty={difficulty}
+              />
+            </div>
+          ) : null}
         </>
       )}
     </div>

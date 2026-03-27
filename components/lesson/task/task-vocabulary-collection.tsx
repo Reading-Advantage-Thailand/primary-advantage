@@ -65,7 +65,7 @@ export default function TaskVocabularyCollection({
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header Section */}
-      <div className="space-y-4 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-300 via-orange-300 to-red-300 p-8 text-center dark:border-amber-800 dark:from-amber-950 dark:via-orange-950 dark:to-red-950">
+      <div className="space-y-4 rounded-2xl border border-amber-200 bg-linear-to-br from-amber-300 via-orange-300 to-red-300 p-8 text-center dark:border-amber-800 dark:from-amber-950 dark:via-orange-950 dark:to-red-950">
         <div className="mb-4 inline-flex items-center justify-center rounded-full bg-amber-100 p-3 dark:bg-amber-900">
           <BookmarkIcon className="h-8 w-8 text-amber-600 dark:text-amber-400" />
         </div>
@@ -96,7 +96,7 @@ export default function TaskVocabularyCollection({
               ))}
             </div>
           ) : wordList && wordList.length > 0 ? (
-            <div className="grid max-h-[500px] gap-4 overflow-y-auto pr-2">
+            <div className="grid max-h-125 gap-4 overflow-y-auto pr-2">
               {wordList.map((word, index) => (
                 <div
                   key={index}
@@ -109,14 +109,14 @@ export default function TaskVocabularyCollection({
                 >
                   <div className="flex items-start gap-4">
                     {/* Word */}
-                    <div className="flex-shrink-0">
-                      <span className="inline-flex items-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-3 py-1 text-sm font-bold text-white">
+                    <div className="shrink-0">
+                      <span className="inline-flex items-center rounded-full bg-linear-to-r from-blue-500 to-purple-600 px-3 py-1 text-sm font-bold text-white">
                         {word.vocabulary}
                       </span>
                     </div>
 
                     {/* Audio Button */}
-                    <div className="mt-1 flex-shrink-0">
+                    <div className="mt-1 shrink-0">
                       {word?.startTime !== undefined && word?.audioUrl ? (
                         <AudioButton
                           audioUrl={word.audioUrl}
@@ -171,7 +171,7 @@ export default function TaskVocabularyCollection({
           </div>
           <div className="mt-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300"
+              className="h-2 rounded-full bg-linear-to-r from-amber-500 to-orange-500 transition-all duration-300"
               style={{ width: "100%" }}
             />
           </div>
