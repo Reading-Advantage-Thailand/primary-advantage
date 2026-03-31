@@ -1,8 +1,5 @@
 "use client";
-import { DragonRiderGame } from "@/components/games/vocabulary/dragon-rider/DragonRiderGame";
-import { EnchantedLibraryGame } from "@/components/games/vocabulary/enchanted-library/EnchantedLibraryGame";
-import RPGBattle from "@/components/games/vocabulary/rpg-battle/RPGBattle";
-import { RuneMatchGame } from "@/components/games/vocabulary/rune-match/RuneMatchGame";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -29,10 +26,39 @@ import {
   Trophy,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { VOCABULARY_LANGUAGES } from "../../flashcards/deck-view";
+const EnchantedLibraryGame = dynamic(
+  () =>
+    import("@/components/games/vocabulary/enchanted-library/EnchantedLibraryGame").then(
+      (mod) => mod.EnchantedLibraryGame,
+    ),
+  { ssr: false },
+);
+const DragonRiderGame = dynamic(
+  () =>
+    import("@/components/games/vocabulary/dragon-rider/DragonRiderGame").then(
+      (mod) => mod.DragonRiderGame,
+    ),
+  { ssr: false },
+);
+const RuneMatchGame = dynamic(
+  () =>
+    import("@/components/games/vocabulary/rune-match/RuneMatchGame").then(
+      (mod) => mod.RuneMatchGame,
+    ),
+  { ssr: false },
+);
+const RPGBattle = dynamic(
+  () =>
+    import("@/components/games/vocabulary/rpg-battle/RPGBattle").then(
+      (mod) => mod.default,
+    ),
+  { ssr: false },
+);
 
 type GameId =
   | "rpg-battle"
@@ -75,9 +101,9 @@ export default function LessonVocabularyMatching({
   const [activeGame, setActiveGame] = useState<GameId | null>(null);
   const GamesLists = getGamesList(tg);
   const VOCABULARY_GAMES = GamesLists.vocabulary;
-  const Games = VOCABULARY_GAMES.filter(
-    (game) => game.id !== "enchanted-library",
-  ); // Temporarily exclude Enchanted Library until it's ready
+  // const Games = VOCABULARY_GAMES.filter(
+  //   (game) => game.id !== "enchanted-library",
+  // ); // Temporarily exclude Enchanted Library until it's ready
 
   const languageOptions = VOCABULARY_LANGUAGES;
 
@@ -108,32 +134,35 @@ export default function LessonVocabularyMatching({
 
   const { submitResult, isSubmitting } = useSubmitLessonGamesResult();
 
-  const handleComplete = async (result: GameResult) => {
-    const gameResult: GameResult = {
-      score: result.score || 0,
-      xp: result.xp || 0,
-      accuracy: result.accuracy || 0,
-      correctAnswers: result.correctAnswers || 0,
-      totalAttempts: result.totalAttempts || 0,
-      gameId: activeGame!,
-    };
-    setLastResult(gameResult);
-    setActiveGame(null);
-    try {
-      await submitResult({
-        articleId,
-        gameId: gameResult.gameId!,
-        xp: gameResult.xp,
-        score: gameResult.score,
-        correctAnswers: gameResult.correctAnswers,
-        totalAttempts: gameResult.totalAttempts,
-        accuracy: gameResult.accuracy,
-        difficulty: gameResult.gameId,
-      });
-    } catch (error) {
-      console.error("Failed to submit game results:", error);
-    }
-  };
+  const handleComplete = useCallback(
+    async (result: GameResult) => {
+      const gameResult: GameResult = {
+        score: result.score || 0,
+        xp: result.xp || 0,
+        accuracy: result.accuracy || 0,
+        correctAnswers: result.correctAnswers || 0,
+        totalAttempts: result.totalAttempts || 0,
+        gameId: activeGame!,
+      };
+      setLastResult(gameResult);
+      setActiveGame(null);
+      try {
+        await submitResult({
+          articleId,
+          gameId: gameResult.gameId!,
+          xp: gameResult.xp,
+          score: gameResult.score,
+          correctAnswers: gameResult.correctAnswers,
+          totalAttempts: gameResult.totalAttempts,
+          accuracy: gameResult.accuracy,
+          difficulty: gameResult.gameId,
+        });
+      } catch (error) {
+        console.error("Failed to submit game results:", error);
+      }
+    },
+    [activeGame, articleId, submitResult],
+  );
 
   const handlePlayGame = (gameId: GameId) => {
     setActiveGame(gameId);
@@ -147,14 +176,14 @@ export default function LessonVocabularyMatching({
       <div className="animate-in fade-in fixed inset-0 z-100 flex items-center justify-center p-4 duration-300 sm:p-8">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+          className="absolute inset-0 bg-slate-950/90"
           onClick={() => setActiveGame(null)}
         />
 
         {/* Modal Container */}
         <div className="relative flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl sm:max-h-[90vh] md:max-h-[80vh]">
           {/* Header */}
-          <div className="z-10 flex shrink-0 items-center justify-between border-b border-slate-800/50 bg-slate-900/50 p-4 backdrop-blur-md">
+          <div className="z-10 flex shrink-0 items-center justify-between border-b border-slate-800/50 bg-slate-900 p-4">
             <Button
               size="sm"
               onClick={() => setActiveGame(null)}
@@ -170,7 +199,7 @@ export default function LessonVocabularyMatching({
           </div>
 
           {/* Game Content */}
-          <div className="relative">
+          <div className="relative min-h-0 flex-1 overflow-hidden">
             {activeGame === "rune-match" && (
               <div className="h-full w-full">
                 <RuneMatchGame
@@ -200,7 +229,7 @@ export default function LessonVocabularyMatching({
               </div>
             )}
 
-            {/* {activeGame === "enchanted-library" && (
+            {activeGame === "enchanted-library" && (
               <div className="h-full w-full">
                 <EnchantedLibraryGame
                   vocabulary={fetchedVocabulary}
@@ -208,7 +237,7 @@ export default function LessonVocabularyMatching({
                   mode="lesson"
                 />
               </div>
-            )} */}
+            )}
           </div>
         </div>
       </div>,
@@ -390,7 +419,7 @@ export default function LessonVocabularyMatching({
             )}
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-              {Games.map((game) => {
+              {VOCABULARY_GAMES.map((game) => {
                 const Icon = game.icon;
                 const isLastPlayed = lastResult?.gameId === game.id;
 

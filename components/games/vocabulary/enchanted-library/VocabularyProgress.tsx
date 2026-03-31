@@ -8,6 +8,7 @@ interface VocabularyProgressProps {
   progress: Map<string, number>;
   isOpen: boolean;
   onClose: () => void;
+  requiredCollections?: number;
 }
 
 export function VocabularyProgress({
@@ -15,6 +16,7 @@ export function VocabularyProgress({
   progress,
   isOpen,
   onClose,
+  requiredCollections = 2,
 }: VocabularyProgressProps) {
   return (
     <AnimatePresence>
@@ -68,16 +70,14 @@ export function VocabularyProgress({
                       </div>
                     </div>
                     <div className="flex gap-1 text-amber-400 drop-shadow-sm">
-                      <Star
-                        className={`h-5 w-5 ${count >= 1 ? "fill-yellow-400 text-yellow-500" : "text-slate-300"}`}
-                        data-testid="star"
-                        data-filled={count >= 1}
-                      />
-                      <Star
-                        className={`h-5 w-5 ${count >= 2 ? "fill-yellow-400 text-yellow-500" : "text-slate-300"}`}
-                        data-testid="star"
-                        data-filled={count >= 2}
-                      />
+                      {Array.from({ length: requiredCollections }, (_, s) => (
+                        <Star
+                          key={s}
+                          className={`h-5 w-5 ${count >= s + 1 ? "fill-yellow-400 text-yellow-500" : "text-slate-300"}`}
+                          data-testid="star"
+                          data-filled={count >= s + 1}
+                        />
+                      ))}
                     </div>
                   </div>
                 );
@@ -85,7 +85,7 @@ export function VocabularyProgress({
             </div>
 
             <div className="border-t border-amber-300/50 bg-white/30 p-4 text-center text-xs font-medium tracking-wider text-amber-800 uppercase">
-              Collect all words twice!
+              Collect all words {requiredCollections}×!
             </div>
           </motion.div>
         </>
