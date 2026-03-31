@@ -272,7 +272,14 @@ export function EnchantedLibraryGame({
         let nextCamera = camera;
         if (dimensions.width > 0 && dimensions.height > 0) {
           nextCamera = computeCamera(nextState);
-          setCamera(nextCamera);
+          // Only update camera state when values actually change
+          if (
+            nextCamera.x !== camera.x ||
+            nextCamera.y !== camera.y ||
+            nextCamera.scale !== camera.scale
+          ) {
+            setCamera(nextCamera);
+          }
         }
 
         // Check for book collection events
@@ -290,22 +297,30 @@ export function EnchantedLibraryGame({
           );
 
           const pickupId = pickupIdRef.current++;
-          const variant = collectedBook.isCorrect ? "glow" : "close";
+          const variant: "glow" | "close" = collectedBook.isCorrect ? "glow" : "close";
           const frameIndex = collectedBook.isCorrect
             ? BOOK_FRAME_GLOW
             : BOOK_FRAME_CLOSED;
 
-          setPickupBursts((prev) => [
-            ...prev,
-            { id: pickupId, x: percentX, y: percentY, frameIndex, variant },
-          ]);
+          setPickupBursts((prev) => {
+            const next = [
+              ...prev,
+              { id: pickupId, x: percentX, y: percentY, frameIndex, variant },
+            ];
+            // Cap at 5 to prevent unbounded growth
+            return next.length > 5 ? next.slice(-5) : next;
+          });
 
           if (collectedBook.isCorrect) {
             const sparkleId = sparkleIdRef.current++;
-            setSparkles((prev) => [
-              ...prev,
-              { id: sparkleId, x: percentX, y: percentY },
-            ]);
+            setSparkles((prev) => {
+              const next = [
+                ...prev,
+                { id: sparkleId, x: percentX, y: percentY },
+              ];
+              // Cap at 3 to prevent unbounded growth
+              return next.length > 3 ? next.slice(-3) : next;
+            });
           }
         }
       }
@@ -316,54 +331,27 @@ export function EnchantedLibraryGame({
   useEffect(() => {
     if (!gameState) return;
 
-    // Handle victory
-    if (gameState.status === "victory") {
-      const accuracy = totalAttempts > 0 ? correctAnswers / totalAttempts : 0;
-      const xp = calculateXP(
-        Math.max(0, gameState.mana),
-        correctAnswers,
-        totalAttempts,
-      );
-      const nextResults = {
-        xp,
-        accuracy,
-        gameTime: gameState.gameTime,
-        correctAnswers,
-        totalAttempts,
-        difficulty,
-      };
-      setResults(nextResults);
-      if (!hasReportedRef.current) {
-        onComplete(nextResults);
-        hasReportedRef.current = true;
-      }
-      setGamePhase("ended");
-    }
+    const accuracy = totalAttempts > 0 ? correctAnswers / totalAttempts : 0;
+    const xp = calculateXP(
+      Math.max(0, gameState.mana),
+      correctAnswers,
+      totalAttempts,
+    );
+    const nextResults = {
+      xp,
+      accuracy,
+      gameTime: gameState.gameTime,
+      correctAnswers,
+      totalAttempts,
+      difficulty,
+    };
 
-    // Handle game over (mana depleted or time ran out)
-    if (gameState.status === "gameover") {
-      const accuracy = totalAttempts > 0 ? correctAnswers / totalAttempts : 0;
-      const xp = calculateXP(
-        Math.max(0, gameState.mana),
-        correctAnswers,
-        totalAttempts,
-      );
-      const nextResults = {
-        xp,
-        accuracy,
-        gameTime: gameState.gameTime,
-        correctAnswers,
-        totalAttempts,
-        difficulty,
-      };
+    // Handle victory
+    if (gameState.status === "victory" || gameState.status === "gameover") {
       setResults(nextResults);
-      if (!hasReportedRef.current) {
-        onComplete(nextResults);
-        hasReportedRef.current = true;
-      }
       setGamePhase("ended");
     }
-  }, [gameState, correctAnswers, totalAttempts, difficulty, onComplete]);
+  }, [gameState, correctAnswers, totalAttempts, difficulty]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -629,6 +617,7 @@ export function EnchantedLibraryGame({
               progress={gameState.vocabularyProgress}
               isOpen={showGrimoire}
               onClose={() => setShowGrimoire(false)}
+              requiredCollections={gameState.requiredCollections}
             />
           )}
 
@@ -819,7 +808,7 @@ export function EnchantedLibraryGame({
             customStats={[
               {
                 label: t("messages.wordsMastered"),
-                value: `${Array.from(gameState.vocabularyProgress.values()).filter((count) => count >= 2).length}/${vocabulary.length}`,
+                value: `${Array.from(gameState.vocabularyProgress.values()).filter((count) => count >= gameState.requiredCollections).length}/${vocabulary.length}`,
               },
               { label: t("messages.correctBooks"), value: correctAnswers },
               {
@@ -828,11 +817,20 @@ export function EnchantedLibraryGame({
               },
             ]}
             onRestart={() => {
+              if (!hasReportedRef.current) {
+                onComplete(results);
+                hasReportedRef.current = true;
+              }
               resetGame();
-              setGamePhase("start");
+              setGamePhase("playing");
             }}
             onExit={() => {
-              window.location.href = "/student/games";
+              if (!hasReportedRef.current) {
+                onComplete(results);
+                hasReportedRef.current = true;
+              }
+              resetGame();
+              setGamePhase("start");
             }}
           />
 

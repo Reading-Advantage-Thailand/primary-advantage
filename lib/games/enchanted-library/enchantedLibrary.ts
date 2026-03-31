@@ -47,6 +47,7 @@ export type EnchantedLibraryState = {
   spiritSpeed: number;
   difficulty: Difficulty;
   maxSpirits: number;
+  requiredCollections: number;
 };
 
 export type Difficulty = "easy" | "normal" | "hard" | "extreme";
@@ -97,6 +98,13 @@ export const MANA_LOSS_SPIRIT_HIT = 10;
 export const MIN_BOOK_SPAWN_DISTANCE = 150; // Minimum distance from player
 export const GAME_DURATION_MS = 180000; // 3 minutes
 
+/**
+ * Calculate how many times each word must be collected to win.
+ * Targets ~30 total correct picks so the game lasts close to the full timer.
+ */
+export const getRequiredCollections = (vocabLength: number): number =>
+  Math.max(2, Math.ceil(30 / vocabLength));
+
 export const createEnchantedLibraryState = (
   vocabulary: VocabularyItem[],
   { rng = Math.random, difficulty = "normal" }: EnchantedLibraryConfig = {},
@@ -105,7 +113,8 @@ export const createEnchantedLibraryState = (
     throw new Error("Vocabulary cannot be empty");
   }
 
-  // Initialize vocabulary progress (each word needs to be collected 2x)
+  // Initialize vocabulary progress
+  const requiredCollections = getRequiredCollections(vocabulary.length);
   const vocabularyProgress = new Map<string, number>();
   vocabulary.forEach((vocab) => {
     vocabularyProgress.set(vocab.term, 0);
@@ -151,6 +160,7 @@ export const createEnchantedLibraryState = (
     spiritSpeed: initialSpiritSpeed,
     difficulty,
     maxSpirits: difficultyConfig.spiritCount,
+    requiredCollections,
   };
 };
 
@@ -464,10 +474,10 @@ export const selectNextTargetWord = (
   vocabulary: VocabularyItem[],
   { rng = Math.random }: EnchantedLibraryConfig = {},
 ): string => {
-  // Filter words that haven't been collected 2x yet
+  // Filter words that haven't reached the required collection count
   const incompleteWords = vocabulary.filter((vocab) => {
     const progress = state.vocabularyProgress.get(vocab.term) || 0;
-    return progress < 2;
+    return progress < state.requiredCollections;
   });
 
   if (incompleteWords.length === 0) {
@@ -488,9 +498,9 @@ export const selectNextTargetWord = (
 export const checkVictoryCondition = (
   state: EnchantedLibraryState,
 ): boolean => {
-  // Check if all words have been collected 2x
+  // Check if all words have reached the required collection count
   for (const [, count] of state.vocabularyProgress.entries()) {
-    if (count < 2) {
+    if (count < state.requiredCollections) {
       return false;
     }
   }
@@ -674,7 +684,6 @@ export const advanceEnchantedLibraryTime = (
       x: newPlayerX,
       y: newPlayerY,
     },
-    gameTime: newState.gameTime + dt,
     spiritSpawnTimer: Math.max(0, newState.spiritSpawnTimer - dt),
   };
 

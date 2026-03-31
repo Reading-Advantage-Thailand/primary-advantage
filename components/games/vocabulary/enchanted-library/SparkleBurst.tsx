@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 
 interface SparkleBurstProps {
@@ -9,8 +9,26 @@ interface SparkleBurstProps {
   onComplete: () => void;
 }
 
-export function SparkleBurst({ x, y, onComplete }: SparkleBurstProps) {
-  const particles = Array.from({ length: 10 });
+export const SparkleBurst = React.memo(function SparkleBurst({
+  x,
+  y,
+  onComplete,
+}: SparkleBurstProps) {
+  // Memoize random positions once so re-renders don't reset framer-motion targets
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 8 }, () => ({
+        tx: (Math.random() - 0.5) * 120,
+        ty: (Math.random() - 0.5) * 120,
+      })),
+    [],
+  );
+
+  // Safety timeout: auto-remove after 1s even if animation callback doesn't fire
+  useEffect(() => {
+    const timer = setTimeout(onComplete, 1000);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
 
   return (
     <div
@@ -18,13 +36,13 @@ export function SparkleBurst({ x, y, onComplete }: SparkleBurstProps) {
       style={{ left: `${x}%`, top: `${y}%` }}
       data-testid="sparkle-burst"
     >
-      {particles.map((_, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
           animate={{
-            x: (Math.random() - 0.5) * 120,
-            y: (Math.random() - 0.5) * 120,
+            x: p.tx,
+            y: p.ty,
             opacity: 0,
             scale: 0,
           }}
@@ -36,4 +54,4 @@ export function SparkleBurst({ x, y, onComplete }: SparkleBurstProps) {
       ))}
     </div>
   );
-}
+});

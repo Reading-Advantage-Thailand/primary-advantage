@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 
 type BookPickupVariant = "glow" | "close";
@@ -16,7 +16,7 @@ interface BookPickupBurstProps {
   onComplete: () => void;
 }
 
-export function BookPickupBurst({
+export const BookPickupBurst = React.memo(function BookPickupBurst({
   x,
   y,
   spriteUrl,
@@ -28,6 +28,12 @@ export function BookPickupBurst({
 }: BookPickupBurstProps) {
   const backgroundPosition = `${-frameIndex * frameWidth}px 0px`;
   const glow = variant === "glow";
+
+  // Safety timeout: auto-remove after 1s even if animation callback doesn't fire
+  useEffect(() => {
+    const timer = setTimeout(onComplete, 1000);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
 
   return (
     <div
@@ -74,4 +80,4 @@ export function BookPickupBurst({
       </motion.div>
     </div>
   );
-}
+});
