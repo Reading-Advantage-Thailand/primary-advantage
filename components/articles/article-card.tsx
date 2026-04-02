@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { Article } from "@/types";
-import { AlertCircle, BookCheck } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import ArticleContent from "./article-content";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getArticleImageUrl } from "@/lib/storage-config";
+import FlashcardSavedBadge from "./flashcard-saved-badge";
 
 // import RatingPopup from "./rating-popup";
 
@@ -21,7 +22,7 @@ type Props = {
   userId?: string;
 };
 
-export default async function ArticleCard({ article }: Props) {
+export default async function ArticleCard({ article, userId }: Props) {
   const locale = await getLocale();
   const t = await getTranslations();
   const getLocalizedSummary = () => {
@@ -39,7 +40,9 @@ export default async function ArticleCard({ article }: Props) {
   // const imageUrl = `/nopic.png`;
 
   const isSaved = article.articleActivityLog.some(
-    (activity) => activity.isSentenceAndWordsSaved === true,
+    (activity) =>
+      (!userId || activity.userId === userId) &&
+      activity.isSentenceAndWordsSaved === true,
   );
 
   return (
@@ -54,10 +57,10 @@ export default async function ArticleCard({ article }: Props) {
             <Badge>
               {t("Article.cefrLevel", { level: article.cefrLevel })}
             </Badge>
-            <Badge>
-              <BookCheck className="h-4 w-4" />
-              {isSaved ? t("Article.saveToFlashcard") : t("Article.notSaved")}
-            </Badge>
+            <FlashcardSavedBadge
+              articleId={article.id}
+              initialSaved={isSaved}
+            />
           </div>
           <CardDescription className="font-article text-lg md:text-xl">
             {getLocalizedSummary()}
