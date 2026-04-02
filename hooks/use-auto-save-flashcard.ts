@@ -27,6 +27,24 @@ export interface SaveStoryChapterFlashcardInput {
   }[];
 }
 
+export interface SaveArticleFlashcardInput {
+  articleId: string;
+  words?: {
+    vocabulary: string;
+    definition?: Record<string, string> | null;
+    startTime: number;
+    endTime: number;
+    audioUrl?: string;
+  }[];
+  sentences?: {
+    sentence: string;
+    translation?: Record<string, string> | null;
+    startTime: number;
+    endTime: number;
+    audioUrl?: string;
+  }[];
+}
+
 export interface SaveStoryChapterFlashcardResult {
   message: string;
   data?: {
@@ -35,6 +53,8 @@ export interface SaveStoryChapterFlashcardResult {
     alreadyExists: boolean;
   };
 }
+
+export type SaveFlashcardResult = SaveStoryChapterFlashcardResult;
 
 export interface FlashcardExistenceResult {
   wordsExist: boolean;
@@ -53,10 +73,10 @@ export interface FlashcardSaveStatus {
 export interface UseAutoSaveFlashcardOptions {
   // Story chapter specific
   storyChapterId?: string;
-  // Article specific (for future use)
+  // Article specific
   articleId?: string;
   // Activity status to check quiz completion
-  activityStatus?: ChapterActivityStatus;
+  activityStatus?: ChapterActivityStatus | ArticleActivityStatus;
   // Flashcard data
   words?: WordFlashcard[] | null;
   sentences?: SentenceFlashcard[] | null;
@@ -65,6 +85,12 @@ export interface UseAutoSaveFlashcardOptions {
   sentencesAudioUrl?: string;
   // Enable/disable auto-save
   enabled?: boolean;
+}
+
+export interface ArticleActivityStatus {
+  isMultipleChoiceCompleted: boolean;
+  isShortAnswerCompleted: boolean;
+  isLongAnswerCompleted: boolean;
 }
 
 export interface UseAutoSaveFlashcardReturn {
@@ -176,7 +202,15 @@ export function useAutoSaveFlashcard(
           }
           return response.json();
         }
-        // For articles, return default (can be extended later)
+        if (articleId) {
+          const response = await fetch(
+            `/api/flashcard/article?articleId=${articleId}`,
+          );
+          if (!response.ok) {
+            throw new Error("Failed to check flashcard existence");
+          }
+          return response.json();
+        }
         return { wordsExist: false, sentencesExist: false };
       },
       enabled: enabled && !!contentId,
@@ -185,12 +219,17 @@ export function useAutoSaveFlashcard(
 
   // Mutation for saving flashcards (using API route)
   const saveMutation = useMutation<
-    SaveStoryChapterFlashcardResult,
+    SaveFlashcardResult,
     Error,
-    SaveStoryChapterFlashcardInput
+    SaveStoryChapterFlashcardInput | SaveArticleFlashcardInput
   >({
     mutationFn: async (input) => {
-      const response = await fetch("/api/flashcard/story-chapter", {
+      const endpoint =
+        "storyChapterId" in input
+          ? "/api/flashcard/story-chapter"
+          : "/api/flashcard/article";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -221,7 +260,8 @@ export function useAutoSaveFlashcard(
 
   // Manual save trigger
   const triggerSave = useCallback(() => {
-    if (!storyChapterId || saveMutation.isPending) return;
+    if (saveMutation.isPending) return;
+    if (!storyChapterId && !articleId) return;
 
     const preparedWords = prepareWordsForSave(words, wordsAudioUrl);
     const preparedSentences = prepareSentencesForSave(
@@ -231,13 +271,22 @@ export function useAutoSaveFlashcard(
 
     if (!preparedWords.length && !preparedSentences.length) return;
 
-    saveMutation.mutate({
-      storyChapterId,
-      words: preparedWords,
-      sentences: preparedSentences,
-    });
+    if (storyChapterId) {
+      saveMutation.mutate({
+        storyChapterId,
+        words: preparedWords,
+        sentences: preparedSentences,
+      });
+    } else if (articleId) {
+      saveMutation.mutate({
+        articleId,
+        words: preparedWords,
+        sentences: preparedSentences,
+      });
+    }
   }, [
     storyChapterId,
+    articleId,
     words,
     sentences,
     wordsAudioUrl,
@@ -288,6 +337,12 @@ export function useAutoSaveFlashcard(
         words: preparedWords,
         sentences: preparedSentences,
       });
+    } else if (articleId) {
+      saveMutation.mutate({
+        articleId,
+        words: preparedWords,
+        sentences: preparedSentences,
+      });
     }
   }, [
     enabled,
@@ -300,6 +355,7 @@ export function useAutoSaveFlashcard(
     wordsAudioUrl,
     sentencesAudioUrl,
     storyChapterId,
+    articleId,
     saveMutation,
   ]);
 

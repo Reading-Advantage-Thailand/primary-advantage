@@ -11,13 +11,14 @@ import Sentence, {
 } from "@/components/articles/sentence";
 import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { saveArticleToFlashcard } from "@/actions/flashcard";
 import AssignButton from "@/components/teacher/assign-button";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { FileTextIcon } from "lucide-react";
 import ExportWorkbookButton from "@/components/export-workbook-button";
+import ArticleFlashcardAutoSave from "@/components/articles/article-flashcard-auto-save";
+import { WordFlashcard, SentenceFlashcard } from "@/types/story";
 
 export async function generateMetadata({
   params,
@@ -44,31 +45,35 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
 
   const { articleId } = await params;
   const t = await getTranslations("Article");
-  const { article } = await getArticleById(articleId);
+  const { article } = await getArticleById(articleId, user.id);
 
   const isAtLeastTeacher = (role: string) =>
     role.includes("teacher") ||
     role.includes("admin") ||
     role.includes("system");
 
-  const isSaved = article.articleActivityLog.some(
-    (activity) =>
-      activity.userId === user.id && activity.isSentenceAndWordsSaved === true,
-  );
+  // Build activity status from user's activity log for the auto-save hook
+  const userActivity = article.articleActivityLog[0];
+  const activityStatus = {
+    isMultipleChoiceCompleted:
+      userActivity?.isMultipleChoiceQuestionCompleted ?? false,
+    isShortAnswerCompleted:
+      userActivity?.isShortAnswerQuestionCompleted ?? false,
+    isLongAnswerCompleted:
+      userActivity?.isLongAnswerQuestionCompleted ?? false,
+  };
 
-  if (!isSaved) {
-    if (
-      article.articleActivityLog.some(
-        (activity) =>
-          activity.userId === user.id &&
-          activity.isLongAnswerQuestionCompleted === true &&
-          activity.isShortAnswerQuestionCompleted === true &&
-          activity.isMultipleChoiceQuestionCompleted === true,
-      )
-    ) {
-      await saveArticleToFlashcard(articleId, article.articleActivityLog[0].id);
-    }
-  }
+  // Prepare words and sentences for the auto-save component
+  const words = article.sentencsAndWordsForFlashcard.flatMap(
+    (w) => (w.words as unknown as WordFlashcard[]) ?? [],
+  );
+  const sentences = article.sentencsAndWordsForFlashcard.flatMap(
+    (s) => (s.sentence as unknown as SentenceFlashcard[]) ?? [],
+  );
+  const wordsAudioUrl =
+    article.sentencsAndWordsForFlashcard[0]?.wordsUrl ?? undefined;
+  const sentencesAudioUrl =
+    article.sentencsAndWordsForFlashcard[0]?.audioSentencesUrl ?? undefined;
 
   return (
     <>
@@ -77,6 +82,7 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
           article={
             article as unknown as Article & { articleActivityLog: any[] }
           }
+          userId={user.id}
         />
         <div className="flex flex-col gap-4 xl:basis-2/5">
           <div className="flex flex-wrap gap-2">
@@ -128,6 +134,14 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
           <LAQuestionCard articleId={articleId} />
         </div>
       </div>
+      <ArticleFlashcardAutoSave
+        articleId={articleId}
+        activityStatus={activityStatus}
+        words={words}
+        sentences={sentences}
+        wordsAudioUrl={wordsAudioUrl}
+        sentencesAudioUrl={sentencesAudioUrl}
+      />
       {/* <ChatBotFloatingChatButton
         article={articleResponse?.article as Article}
       /> */}

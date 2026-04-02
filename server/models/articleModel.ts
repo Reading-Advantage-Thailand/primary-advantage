@@ -373,12 +373,14 @@ export const getArticlesWithParams = async (params: {
   };
 };
 
-export const getArticleById = async (articleId: string) => {
+export const getArticleById = async (articleId: string, userId?: string) => {
   const article = await prisma.article.findUnique({
     where: { id: articleId },
     include: {
       sentencsAndWordsForFlashcard: true,
-      articleActivityLog: true,
+      articleActivityLog: userId
+        ? { where: { userId } }
+        : true,
     },
   });
 
