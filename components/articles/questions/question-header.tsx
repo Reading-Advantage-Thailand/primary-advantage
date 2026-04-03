@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import React from "react";
+import { useStartArticleQuiz } from "@/hooks/use-article-quiz";
 
 type Props = {
   children: React.ReactNode;
@@ -16,12 +17,8 @@ type Props = {
   buttonLabel: string;
   className?: string;
   disabled?: boolean;
-  userId?: string;
-  articleId?: string;
-};
-
-type ActivityType = {
-  [key: string]: string;
+  articleId: string;
+  activityType: string;
 };
 
 export default function QuestionHeader({
@@ -30,27 +27,17 @@ export default function QuestionHeader({
   description,
   buttonLabel,
   disabled = true,
+  articleId,
+  activityType,
 }: Props) {
   const [isButtonClicked, setIsButtonClicked] = React.useState<boolean>(false);
-  async function onButtonClick() {
+  const { startQuiz } = useStartArticleQuiz();
+
+  function onButtonClick() {
     setIsButtonClicked(true);
-    //   const activityTypes: ActivityType = {
-    //     "Practice Writing": "la_question",
-    //     "Start Quiz": "mc_question",
-    //     "Start Writing": "sa_question",
-    //   };
-
-    //   const activityType = activityTypes[buttonLabel as keyof ActivityType];
-
-    // if (activityType) {
-    //   fetch(`/api/users/${userId}/activitylog`, {
-    //     method: "POST",
-    //     body: JSON.stringify({
-    //       activityType,
-    //       articleId,
-    //     }),
-    //   });
+    startQuiz({ articleId, activityType });
   }
+
   return isButtonClicked ? (
     <>{children}</>
   ) : (

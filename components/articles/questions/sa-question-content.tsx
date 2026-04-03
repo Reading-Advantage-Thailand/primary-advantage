@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
 import { authClient } from "@/lib/auth-client";
 
 interface SAQFeedback {
@@ -48,9 +47,11 @@ interface SAQFeedback {
 export default function SAQuestionContent({
   articleId,
   questions,
+  onComplete,
 }: {
   articleId: string;
   questions: SAQuestion;
+  onComplete?: (data: { question: string; suggestedAnswer: string; feedback: string; yourAnswer: string }) => void;
 }) {
   const { timer, setPaused } = useContext(QuizContext);
   const [feedback, setFeedback] = useState<SAQFeedback | null>(null);
@@ -58,7 +59,6 @@ export default function SAQuestionContent({
   const [isPanding, startTransition] = useTransition();
   const t = useTranslations("Question");
   const tc = useTranslations("Components");
-  const router = useRouter();
   const { data: session } = authClient.useSession();
 
   const formSchema = z.object({
@@ -111,7 +111,12 @@ export default function SAQuestionContent({
               richColors: true,
             });
             setIsOpenModal(false);
-            router.refresh();
+            onComplete?.({
+              question: data.question ?? "",
+              suggestedAnswer: data.suggestedAnswer ?? "",
+              feedback: data.feedback ?? "",
+              yourAnswer: data.yourAnswer ?? "",
+            });
           } else {
             toast.error(res.error, { richColors: true });
           }

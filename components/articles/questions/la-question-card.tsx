@@ -7,11 +7,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { getQuestionsByArticleId } from "@/server/models/articleModel";
 import { ActivityType, QuestionState } from "@/types/enum";
-import QuestionHeader from "./question-header";
-import { QuizContextProvider } from "@/contexts/question-context";
-import LAQuestionContent from "./la-question-content";
 import { LAQuestion, QuestionResponse } from "@/types";
 import { getTranslations } from "next-intl/server";
+import LAQuestionCardClient from "./la-question-card-client";
 
 export default async function LAQuestionCard({
   articleId,
@@ -55,35 +53,15 @@ export default async function LAQuestionCard({
     );
   }
 
-  if (questionsData.questionStatus === QuestionState.INCOMPLETE) {
+  if (questionsData.questionStatus === QuestionState.INCOMPLETE ||
+      questionsData.questionStatus === QuestionState.COMPLETED) {
     return (
       <Card className="w-full">
-        <QuestionHeader
-          heading={t("LAQuestion.title")}
-          description={t("LAQuestion.description")}
-          buttonLabel={tc("startQuiz")}
-          disabled={false}
-        >
-          <QuizContextProvider>
-            <LAQuestionContent
-              articleId={articleId}
-              questions={questionsData.questions as LAQuestion}
-            />
-          </QuizContextProvider>
-        </QuestionHeader>
-      </Card>
-    );
-  }
-
-  if (questionsData.questionStatus === QuestionState.COMPLETED) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="text-muted-foreground text-3xl font-bold md:text-3xl">
-            {t("LAQuestion.title")}
-          </CardTitle>
-          <CardDescription>{t("descriptionSuccess")}</CardDescription>
-        </CardHeader>
+        <LAQuestionCardClient
+          articleId={articleId}
+          questions={questionsData.questions as LAQuestion}
+          initialState={questionsData.questionStatus}
+        />
       </Card>
     );
   }

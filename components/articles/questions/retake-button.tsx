@@ -13,24 +13,24 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 export default function RetakeButton({
   articleId,
   type,
+  onRetake,
 }: {
   articleId: string;
   type: ActivityType;
+  onRetake?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
   const t = useTranslations("Components");
 
   const handleRetakeQuiz = async () => {
     await retakeQuiz(articleId, type);
     setIsOpen(false);
-    router.refresh();
+    onRetake?.();
   };
 
   return (
