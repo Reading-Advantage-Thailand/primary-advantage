@@ -27,7 +27,6 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { ActivityType } from "@/types/enum";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { useRouter } from "@/i18n/navigation";
 import {
   Form,
   FormControl,
@@ -63,16 +62,17 @@ interface FeedbackData {
 export default function LAQuestionContent({
   articleId,
   questions,
+  onComplete,
 }: {
   articleId: string;
   questions: LAQuestion;
+  onComplete?: () => void;
 }) {
   const { timer, setPaused } = useContext(QuizContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const { user, refetch } = useCurrentUser();
-  const router = useRouter();
   const [feedback, setFeedback] = useState<FeedbackData | null>(null);
   const [isPanding, startTransition] = useTransition();
   const locale = useLocale();
@@ -84,14 +84,14 @@ export default function LAQuestionContent({
     setSelectedCategory(selectedCategory === category ? "" : category);
   };
 
+  const minChars = (user?.level ?? 1) * 30;
+
   const longAnswerSchema = z.object({
     answer: z
       .string()
       .trim()
-      .min((user?.level as number) * 30, {
-        message: `Please Enter minimum ${
-          (user?.level as number) * 30
-        } character...`,
+      .min(minChars, {
+        message: `Please Enter minimum ${minChars} character...`,
       })
       .max(2000, {
         error: "Answer must be less than 2000 characters...",
@@ -144,7 +144,7 @@ export default function LAQuestionContent({
           if (res.success) {
             toast.success("Quiz finished");
             setOpenModal(false);
-            router.refresh();
+            onComplete?.();
           } else {
             toast.error(res.error);
           }

@@ -14,23 +14,13 @@ export async function retakeQuiz(articleId: string, type: ActivityType) {
       return { error: "User not found" };
     }
 
-    const userActivity = await prisma.userActivity.findFirst({
+    // Delete ALL activities for this user/article/type (completed + orphaned starts)
+    const deleted = await prisma.userActivity.deleteMany({
       where: { targetId: articleId, activityType: type, userId: user.id },
-      select: {
-        id: true,
-      },
     });
 
-    if (!userActivity) {
+    if (deleted.count === 0) {
       return { error: "User activity not found" };
-    }
-
-    const deleted = await prisma.userActivity.delete({
-      where: { id: userActivity.id },
-    });
-
-    if (!deleted) {
-      return { error: "Failed to delete user activity" };
     }
 
     return { success: true };
@@ -73,24 +63,53 @@ export async function finishQuiz(
   let xpEarned = 0;
   let isCompleted = {};
 
-  // Create user activity first
-  const userActivity = await prisma.userActivity.create({
-    data: {
+  // Find existing start activity and update it, or create a new one if none exists
+  const existingStart = await prisma.userActivity.findFirst({
+    where: {
       userId: user.id as string,
       activityType: type,
       targetId: articleId,
-      timer: data.timer,
-      details: {
-        question: data.question,
-        suggestedAnswer: data.suggestedAnswer,
-        feedback: data.feedback as string,
-        yourAnswer: data.yourAnswer,
-        score: data.score,
-        responses: data.responses,
-      },
-      completed: true,
+      completed: false,
     },
+    select: { id: true },
   });
+
+  let userActivity;
+  if (existingStart) {
+    userActivity = await prisma.userActivity.update({
+      where: { id: existingStart.id },
+      data: {
+        timer: data.timer,
+        details: {
+          question: data.question,
+          suggestedAnswer: data.suggestedAnswer,
+          feedback: data.feedback as string,
+          yourAnswer: data.yourAnswer,
+          score: data.score,
+          responses: data.responses,
+        },
+        completed: true,
+      },
+    });
+  } else {
+    userActivity = await prisma.userActivity.create({
+      data: {
+        userId: user.id as string,
+        activityType: type,
+        targetId: articleId,
+        timer: data.timer,
+        details: {
+          question: data.question,
+          suggestedAnswer: data.suggestedAnswer,
+          feedback: data.feedback as string,
+          yourAnswer: data.yourAnswer,
+          score: data.score,
+          responses: data.responses,
+        },
+        completed: true,
+      },
+    });
+  }
 
   // Calculate XP based on activity type
   switch (type) {

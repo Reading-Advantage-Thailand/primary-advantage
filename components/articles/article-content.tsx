@@ -908,7 +908,7 @@ export default function ArticleContent({ article }: Props) {
                 src={
                   getArticleImageUrl(article.id, groupIndex + 1) || `/nopic.png`
                 }
-                alt="Article Image"
+                alt={`${article.title} - illustration ${groupIndex + 1}`}
                 width={1024}
                 height={1024}
                 unoptimized

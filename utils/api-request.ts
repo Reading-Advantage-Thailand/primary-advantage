@@ -782,3 +782,30 @@ export const fetchLessonGameResultApi = async (
 
   return response.json();
 };
+
+// ─── Article Quiz Start Activity ────────────────────────────
+
+export interface StartArticleQuizInput {
+  articleId: string;
+  activityType: string;
+}
+
+export interface StartArticleQuizResponse {
+  success: boolean;
+}
+
+export const startArticleQuizApi = async (
+  data: StartArticleQuizInput,
+): Promise<StartArticleQuizResponse> => {
+  const response = await fetch("/api/articles/activity/start", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to log quiz start activity");
+  }
+
+  return response.json();
+};

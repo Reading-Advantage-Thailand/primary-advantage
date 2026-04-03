@@ -427,6 +427,8 @@ export const getQuestionsByArticleId = async (
         activityType: type,
         completed: true,
       },
+      orderBy: { createdAt: "desc" },
+      take: 1,
     });
 
     // Map activities to QuestionResult type

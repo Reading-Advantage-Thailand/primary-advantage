@@ -340,7 +340,7 @@ export default function TaskFirstReading({ article }: { article: Article }) {
                         getArticleImageUrl(article.id, groupIndex + 1) ||
                         `/nopic.png`
                       }
-                      alt="Article Image"
+                      alt={`${article.title} - illustration ${groupIndex + 1}`}
                       width={640}
                       height={640}
                       unoptimized

@@ -9,7 +9,6 @@ import { CheckCircle2, MinusCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useRouter } from "@/i18n/navigation";
 import { finishQuiz } from "@/actions/question";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
@@ -17,9 +16,11 @@ import { authClient } from "@/lib/auth-client";
 export default function MCQuestionContent({
   articleId,
   questions,
+  onComplete,
 }: {
   articleId: string;
   questions: MCQuestion[];
+  onComplete?: (data: { score: number }) => void;
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { timer, setPaused } = useContext(QuizContext);
@@ -31,7 +32,6 @@ export default function MCQuestionContent({
     Array(5).fill(AnswerStatus.UNANSWERED),
   );
   const [textualEvidence, setTextualEvidence] = useState("");
-  const router = useRouter();
   const [isPanding, startTransition] = useTransition();
 
   const { data: session } = authClient.useSession();
@@ -138,7 +138,7 @@ export default function MCQuestionContent({
                 background: `var(--success)`,
               },
             });
-            router.refresh();
+            onComplete?.(data);
           } else {
             toast("Failed to finish quiz", {
               style: {

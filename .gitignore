@@ -58,3 +58,4 @@ service-account.json
 .agents/
 .cursor/
 .github/
+skills-lock.json
