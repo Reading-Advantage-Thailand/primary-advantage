@@ -14,7 +14,7 @@ import { Button } from "../ui/button";
 import { FileTextIcon } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import AudioButton from "../audio-button";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export interface Sentence {
   sentence: string;
@@ -40,6 +40,7 @@ export default function Sentence({
   const [loading, setLoading] = useState(false);
   const [sentenceList, setSentenceList] = useState<Sentence[]>([]);
   const t = useTranslations("Components");
+  const locale = useLocale();
 
   useEffect(() => {
     if (sentences) {
@@ -133,7 +134,9 @@ export default function Sentence({
 
                                 {/* Definition */}
                                 <p className="text-muted-foreground text-sm leading-relaxed">
-                                  {list.translation.th}
+                                  {list.translation[
+                                    locale as keyof typeof list.translation
+                                  ] || list.translation.th}
                                 </p>
                               </div>
                             </div>

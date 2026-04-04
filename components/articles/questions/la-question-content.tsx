@@ -107,6 +107,8 @@ export default function LAQuestionContent({
     },
   });
 
+  const method = form.watch("method");
+
   const handleSubmit = (value: z.infer<typeof longAnswerSchema>) => {
     startTransition(async () => {
       await getFeedback({
@@ -190,10 +192,10 @@ export default function LAQuestionContent({
           <div className="flex space-x-2">
             <Button
               type="submit"
-              disabled={isPanding || form.getValues("method") === "submit"}
+              disabled={isPanding || method === "submit"}
               size={"sm"}
             >
-              {isPanding && form.getValues("method") === "feedback" && (
+              {isPanding && method === "feedback" && (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
               )}
               {tc("getFeedback")}
@@ -201,9 +203,9 @@ export default function LAQuestionContent({
             <Button
               type="submit"
               size={"sm"}
-              disabled={isPanding || form.getValues("method") === "feedback"}
+              disabled={isPanding || method === "feedback"}
             >
-              {isPanding && form.getValues("method") === "submit" && (
+              {isPanding && method === "submit" && (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
               )}
               {tc("submitButton")}
@@ -211,10 +213,10 @@ export default function LAQuestionContent({
           </div>
 
           <AlertDialog open={openModal} onOpenChange={setOpenModal}>
-            <AlertDialogContent className="sm:max-w-[425px]">
+            <AlertDialogContent className="sm:max-w-106.25">
               <AlertDialogHeader className="text-left">
                 <AlertDialogTitle className="text-2xl font-bold">
-                  {form.getValues("method") === "feedback"
+                  {method === "feedback"
                     ? "Feedback and your score"
                     : "Final Feedback and your score"}
                 </AlertDialogTitle>
@@ -316,11 +318,11 @@ export default function LAQuestionContent({
                 </>
               )}
               {!selectedCategory && (
-                <div className="flex flex-grow flex-col gap-2 overflow-y-auto pr-4">
+                <div className="flex grow flex-col gap-2 overflow-y-auto pr-4">
                   <p className="text-bold text-xl">{tfq("feedbackoverall")}</p>
                   <p className="text-sm">{feedback?.overallImpression}</p>
 
-                  {form.getValues("method") === "feedback" ? (
+                  {method === "feedback" ? (
                     <>
                       <p className="text-bold text-xl">
                         {tfq("examplerevisions")}
@@ -342,8 +344,8 @@ export default function LAQuestionContent({
                 </div>
               )}
 
-              <AlertDialogFooter className="flex-shrink-0">
-                {form.getValues("method") === "feedback" ? (
+              <AlertDialogFooter className="shrink-0">
+                {method === "feedback" ? (
                   <Button
                     onClick={() => {
                       form.setValue("method", "submit");
