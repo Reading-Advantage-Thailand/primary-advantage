@@ -3,68 +3,70 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
 import { hashPassword } from "@/lib/password";
 
-// Replace lines 31-47 in your current API with this corrected version:
+const ELEVATED_ROLES = ["teacher", "admin", "system"] as const;
+const ADMIN_ROLES = ["admin", "system"] as const;
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const currentUserData = await getCurrentUser();
-    if (!currentUserData) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check user permissions based on UserRole table
-    // const userWithRoles = await prisma.user.findUnique({
-    //   where: { id: currentUserData.id },
-    //   include: {
-    //     roles: { include: { role: true } },
-    //   },
-    // });
-
-    // const hasTeacherRole = userWithRoles?.roles.some(
-    //   (r) => r.role.name === "teacher",
-    // );
-    // const hasSystemRole = userWithRoles?.roles.some(
-    //   (r) => r.role.name === "system",
-    // );
-
-    // if (!hasTeacherRole && !hasSystemRole) {
-    //   return NextResponse.json(
-    //     { error: "Access denied. Insufficient permissions." },
-    //     { status: 403 },
-    //   );
-    // }
-
     const userId = (await params).id;
+    const isSelf = currentUser.id === userId;
+    const callerRole = currentUser.role ?? "user";
+
+    // Cross-user update requires at least teacher/admin/system role
+    if (!isSelf && !ELEVATED_ROLES.includes(callerRole as (typeof ELEVATED_ROLES)[number])) {
+      return NextResponse.json(
+        { error: "Access denied. Insufficient permissions." },
+        { status: 403 },
+      );
+    }
+
     const body = await request.json();
     const { name, email, role, xp, level, cefrLevel, password } = body;
 
-    // Build update data object (excluding role for now)
-    const updateData: any = {};
+    // Role reassignment requires admin or system
+    if (role !== undefined && !ADMIN_ROLES.includes(callerRole as (typeof ADMIN_ROLES)[number])) {
+      return NextResponse.json(
+        { error: "Access denied. Only admins can change roles." },
+        { status: 403 },
+      );
+    }
+
+    // Password changes are self-service only
+    if (password !== undefined && !isSelf) {
+      return NextResponse.json(
+        { error: "Access denied. You cannot change another user's password." },
+        { status: 403 },
+      );
+    }
+
+    // Build update data object
+    const updateData: Record<string, unknown> = {};
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email;
     if (xp !== undefined) updateData.xp = xp;
     if (level !== undefined) updateData.level = level;
     if (cefrLevel !== undefined) updateData.cefrLevel = cefrLevel;
 
-    // Handle password hashing if password is provided
     if (password !== undefined) {
       updateData.password = await hashPassword(password);
     }
 
     // Use transaction to handle both user data and role updates
     const updatedUser = await prisma.$transaction(async (tx) => {
-      // Update user data
       const user = await tx.user.update({
         where: { id: userId },
         data: updateData,
       });
 
-      // Handle role update if specified
       if (role !== undefined) {
-        // Find the new role by name
         const roleRecord = await tx.role.findFirst({
           where: { name: role },
         });
@@ -73,7 +75,6 @@ export async function PATCH(
           throw new Error(`Role '${role}' not found`);
         }
 
-        // Assign the new role
         await tx.user.update({
           where: { id: userId },
           data: {
@@ -82,11 +83,12 @@ export async function PATCH(
           },
         });
 
-        // Return updated user with roles
         return await tx.user.findUnique({
           where: { id: userId },
         });
       }
+
+      return user;
     });
 
     return NextResponse.json(
