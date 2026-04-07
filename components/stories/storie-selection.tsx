@@ -80,7 +80,7 @@ export default function StorieSelection() {
       <CardContent>
         {/* Filters Section */}
         <div className="flex flex-wrap gap-4">
-          <div className="min-w-[200px] flex-1">
+          <div className="min-w-50 flex-1">
             <div className="relative">
               <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
               <Input
@@ -98,7 +98,7 @@ export default function StorieSelection() {
               updateFilter("genre", value === "all" ? undefined : value)
             }
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Select genre" />
             </SelectTrigger>
@@ -135,7 +135,7 @@ export default function StorieSelection() {
         {isLoading ? (
           <div className="mt-4 grid grid-flow-row gap-4 sm:grid-cols-2">
             {Array.from({ length: 6 }).map((_, index) => (
-              <Skeleton key={index} className="h-[20rem] w-full" />
+              <Skeleton key={index} className="h-80 w-full" />
             ))}
           </div>
         ) : stories.length > 0 ? (
@@ -152,7 +152,7 @@ export default function StorieSelection() {
                   <div
                     key={story.id}
                     onClick={() => router.push(`/student/stories/${story.id}`)}
-                    className="flex h-[20rem] w-full cursor-pointer flex-col justify-between gap-2 rounded-md bg-black bg-cover bg-center p-4 transition-all duration-300 hover:scale-105"
+                    className="flex h-80 w-full cursor-pointer flex-col justify-between gap-2 rounded-md bg-black bg-cover bg-center p-4 transition-all duration-300 hover:scale-105"
                     style={{
                       backgroundImage: `url(${getStorieImageUrl(story.id)})`,
                       backgroundSize: "cover",

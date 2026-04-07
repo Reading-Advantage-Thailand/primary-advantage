@@ -9,9 +9,19 @@ import getAssignmentById, {
   getAssignmentActivityById,
 } from "../models/assignmentModel";
 import { getCurrentUser } from "@/lib/session";
+import { Role } from "@/types/enum";
 
 export async function fetchAssignments(req: NextRequest) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (user.role === Role.student) {
+      return NextResponse.json({ error: "Access denied" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
     const classroomId = searchParams.get("classroomId");
     const articleId = searchParams.get("articleId");
@@ -20,21 +30,17 @@ export async function fetchAssignments(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
 
-    // if (!classroomId) {
-    //   return NextResponse.json(
-    //     { message: "Missing classroomId in query parameters" },
-    //     { status: 400 },
-    //   );
-    // }
+    // Scope teachers to their own assignments only
+    const teacherFilter = user.role === Role.teacher ? { teacherId: user.id } : {};
 
     if (articleId || assignmentId) {
       // Get assignment for specific article and classroom
-      console.log("Do we get here?");
       const assignment = await prisma.assignment.findFirst({
         where: {
           classroomId: classroomId || undefined,
           articleId: articleId || undefined,
           id: assignmentId || undefined,
+          ...teacherFilter,
         },
         include: {
           article: {
@@ -99,12 +105,13 @@ export async function fetchAssignments(req: NextRequest) {
       // Get all assignments for classroom
       let whereClause: any = {
         classroomId,
+        ...teacherFilter,
       };
 
       if (search && search.trim() !== "") {
         const searchLower = search.toLowerCase().trim();
         whereClause.OR = [
-          { title: { contains: searchLower, mode: "insensitive" } },
+          { name: { contains: searchLower, mode: "insensitive" } },
           { description: { contains: searchLower, mode: "insensitive" } },
         ];
       }
@@ -200,8 +207,28 @@ export async function fetchAssignments(req: NextRequest) {
 
 export async function postAssignment(req: NextRequest) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (user.role !== Role.teacher && user.role !== Role.admin && user.role !== Role.system) {
+      return NextResponse.json({ error: "Access denied" }, { status: 403 });
+    }
+
     const { classroomId, articleId, students, name, description, dueDate } =
       await req.json();
+
+    // For teachers, verify they own the classroom
+    if (user.role === Role.teacher) {
+      const ownership = await prisma.classroomTeachers.findFirst({
+        where: { classroomId, userId: user.id },
+      });
+
+      if (!ownership) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
+    }
 
     await createAssignment({
       classroomId,
@@ -281,12 +308,26 @@ export async function fetchStudentAssignments(
 }
 
 export async function fetchAssignmentById(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const assignment = await getAssignmentById(id);
+
+    if (!assignment) {
+      return NextResponse.json({ error: "Assignment not found" }, { status: 404 });
+    }
+
+    // Teachers may only access their own assignments
+    if (user.role === Role.teacher && assignment.teacherId !== user.id) {
+      return NextResponse.json({ error: "Access denied" }, { status: 403 });
+    }
 
     return NextResponse.json(assignment, { status: 200 });
   } catch (error) {
@@ -332,7 +373,7 @@ export async function postUserLessonProgress(
 }
 
 export async function fetchUserLessonProgress(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -359,7 +400,7 @@ export async function fetchUserLessonProgress(
 }
 
 export async function fetchAssignmentActivityById(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {

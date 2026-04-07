@@ -43,7 +43,7 @@ export default function TranslationToggle({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-2 rounded-lg border bg-gradient-to-r from-emerald-50 to-teal-50 p-2 sm:p-3 dark:from-emerald-950/30 dark:to-teal-950/30",
+        "flex flex-wrap items-center gap-2 rounded-lg border bg-linear-to-r from-emerald-50 to-teal-50 p-2 sm:p-3 dark:from-emerald-950/30 dark:to-teal-950/30",
         className,
       )}
     >
@@ -78,7 +78,7 @@ export default function TranslationToggle({
         className={cn(
           "flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium transition-all sm:h-12 sm:px-6 sm:text-base",
           showTranslation
-            ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md hover:from-emerald-600 hover:to-teal-600"
+            ? "bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-md hover:from-emerald-600 hover:to-teal-600"
             : "border-2 border-emerald-300 bg-white hover:bg-emerald-50 dark:bg-gray-800 dark:hover:bg-emerald-900/30",
         )}
       >

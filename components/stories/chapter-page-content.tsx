@@ -98,9 +98,9 @@ export default function ChapterPageContent({
             <Skeleton className="h-10 w-32" />
             <Skeleton className="h-10 w-32" />
           </div>
-          <Skeleton className="h-[200px] w-full rounded-lg" />
-          <Skeleton className="h-[200px] w-full rounded-lg" />
-          <Skeleton className="h-[200px] w-full rounded-lg" />
+          <Skeleton className="h-50 w-full rounded-lg" />
+          <Skeleton className="h-50 w-full rounded-lg" />
+          <Skeleton className="h-50 w-full rounded-lg" />
         </div>
       </div>
     );

@@ -214,7 +214,7 @@ export default function StorieContent({ chapter }: StorieContentProps) {
         {!isAudioMode && hasAudioSupport && (
           <Button
             onClick={handleStartListening}
-            className="h-14 w-full gap-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 text-base font-semibold shadow-lg transition-all hover:from-blue-600 hover:to-purple-600 hover:shadow-xl sm:h-16 sm:text-lg"
+            className="h-14 w-full gap-3 rounded-2xl bg-linear-to-r from-blue-500 to-purple-500 text-base font-semibold shadow-lg transition-all hover:from-blue-600 hover:to-purple-600 hover:shadow-xl sm:h-16 sm:text-lg"
           >
             <Headphones className="h-6 w-6 sm:h-7 sm:w-7" />
             {tCommon("listenandread")}
@@ -253,7 +253,7 @@ export default function StorieContent({ chapter }: StorieContentProps) {
         )}
 
         {/* Chapter Image */}
-        <div className="relative aspect-square w-full overflow-hidden rounded-xl shadow-lg sm:aspect-video md:aspect-[16/10]">
+        <div className="relative aspect-square w-full overflow-hidden rounded-xl shadow-lg sm:aspect-video md:aspect-16/10">
           <Image
             className="object-cover"
             src={getStorieImageUrl(chapter.id)}
@@ -266,7 +266,7 @@ export default function StorieContent({ chapter }: StorieContentProps) {
         </div>
 
         {/* Reading Content */}
-        <div className="rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 p-4 shadow-inner sm:p-6 md:p-8 dark:from-amber-950/20 dark:to-orange-950/20">
+        <div className="rounded-xl bg-linear-to-br from-amber-50 to-orange-50 p-4 shadow-inner sm:p-6 md:p-8 dark:from-amber-950/20 dark:to-orange-950/20">
           {/* Reading mode indicator */}
           {isAudioMode && (
             <div className="text-muted-foreground mb-4 flex items-center gap-2 text-sm">
@@ -318,7 +318,7 @@ export default function StorieContent({ chapter }: StorieContentProps) {
           {chapter.chapterNumber < chapter.story.totalChapters && (
             <Button
               variant="default"
-              className="h-12 w-full gap-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-base shadow-md hover:from-green-600 hover:to-emerald-600 sm:h-14 sm:w-auto sm:px-6"
+              className="h-12 w-full gap-2 rounded-xl bg-linear-to-r from-green-500 to-emerald-500 text-base shadow-md hover:from-green-600 hover:to-emerald-600 sm:h-14 sm:w-auto sm:px-6"
               onClick={() =>
                 router.push(
                   `/student/stories/${chapter.storyId}/${chapter.chapterNumber + 1}`,
@@ -334,7 +334,7 @@ export default function StorieContent({ chapter }: StorieContentProps) {
 
       <CardFooter>
         <div className="bg-muted/50 flex items-start gap-3 rounded-lg p-4 text-sm">
-          <AlertCircle className="text-muted-foreground mt-0.5 h-5 w-5 flex-shrink-0" />
+          <AlertCircle className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0" />
           <p className="text-muted-foreground leading-relaxed">
             <strong>For language learners:</strong> This reading passage and its
             supporting visuals are designed for educational purposes. The
