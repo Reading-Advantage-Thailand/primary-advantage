@@ -130,7 +130,7 @@ export default function AudioPlayerControls({
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-xl border bg-gradient-to-r from-blue-50 to-purple-50 p-4 shadow-sm dark:from-blue-950/30 dark:to-purple-950/30",
+        "flex flex-col gap-3 rounded-xl border bg-linear-to-r from-blue-50 to-purple-50 p-4 shadow-sm dark:from-blue-950/30 dark:to-purple-950/30",
         className,
       )}
     >
@@ -165,8 +165,8 @@ export default function AudioPlayerControls({
           className={cn(
             "h-14 w-14 rounded-full shadow-lg transition-all duration-200 sm:h-16 sm:w-16",
             isPlaying
-              ? "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-              : "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600",
+              ? "bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+              : "bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600",
             !isLoaded && "opacity-50",
           )}
           aria-label={isPlaying ? "หยุด" : "เล่น"}

@@ -61,7 +61,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
         <div
           onClick={handleReadClick}
           ref={ref}
-          className="flex h-[20rem] cursor-pointer flex-col gap-1 rounded-md bg-black bg-cover bg-center p-3 transition-all duration-300 hover:scale-105"
+          className="flex h-80 cursor-pointer flex-col gap-1 rounded-md bg-black bg-cover bg-center p-3 transition-all duration-300 hover:scale-105"
           style={{
             backgroundImage: `url('${getArticleImageUrl(article.id, 1)}')`,
             boxShadow: "inset 80px 10px 90px 10px rgba(0, 0, 0, 0.9)",
@@ -128,7 +128,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
         </div>
         {article.is_read && !article.is_completed && (
           <div className="flex justify-center">
-            <Badge className="text-md relative -top-[11rem] right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
+            <Badge className="text-md relative -top-44 right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
               Started
             </Badge>
           </div>
@@ -136,7 +136,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
 
         {article.is_read && article.is_completed && (
           <div className="flex justify-center">
-            <Badge className="text-md relative -top-[11rem] right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
+            <Badge className="text-md relative -top-44 right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
               Completed
             </Badge>
           </div>
@@ -144,7 +144,7 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
 
         {article.is_approved && systemPathRegex.test(pathName) && (
           <div className="flex justify-center">
-            <Badge className="text-md relative -top-[11rem] right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
+            <Badge className="text-md relative -top-44 right-0 left-0 m-auto max-w-max bg-slate-200 text-slate-900 shadow-lg">
               Approved
             </Badge>
           </div>

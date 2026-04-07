@@ -184,9 +184,9 @@ export default function HighlightedPassage({
     <div ref={containerRef} className={cn("relative", className)}>
       {/* Book-like decorative header */}
       <div className="mb-6 flex items-center justify-center gap-3">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent dark:via-amber-600" />
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-amber-400 to-transparent dark:via-amber-600" />
         <span className="text-2xl">📖</span>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent dark:via-amber-600" />
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-amber-400 to-transparent dark:via-amber-600" />
       </div>
 
       {/* Story content with paragraphs */}
@@ -194,7 +194,7 @@ export default function HighlightedPassage({
         {paragraphs.map((paragraph, paragraphIndex) => (
           <p
             key={paragraphIndex}
-            className="text-muted-foreground text-lg leading-[2] md:text-xl md:leading-[2]"
+            className="text-muted-foreground text-lg leading-loose md:text-xl md:leading-loose"
           >
             {paragraph.map((sentence, sentenceInParagraphIndex) => {
               const sentenceIndex = sentence.originalIndex;
@@ -350,7 +350,7 @@ export default function HighlightedPassage({
                       <TooltipTrigger asChild>{sentenceContent}</TooltipTrigger>
                       <TooltipContent
                         side="bottom"
-                        className="max-w-xs rounded-lg border-2 border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-3 text-sm text-emerald-800 shadow-xl sm:max-w-sm dark:border-emerald-600 dark:from-emerald-950 dark:to-teal-950 dark:text-emerald-200"
+                        className="max-w-xs rounded-lg border-2 border-emerald-300 bg-linear-to-r from-emerald-50 to-teal-50 px-4 py-3 text-sm text-emerald-800 shadow-xl sm:max-w-sm dark:border-emerald-600 dark:from-emerald-950 dark:to-teal-950 dark:text-emerald-200"
                         sideOffset={8}
                       >
                         <div className="flex items-start gap-2">
@@ -376,9 +376,9 @@ export default function HighlightedPassage({
 
       {/* Book-like decorative footer */}
       <div className="mt-8 flex items-center justify-center gap-3">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent dark:via-amber-600" />
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-amber-400 to-transparent dark:via-amber-600" />
         <span className="text-xl text-amber-500">✦</span>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent dark:via-amber-600" />
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-amber-400 to-transparent dark:via-amber-600" />
       </div>
     </div>
   );

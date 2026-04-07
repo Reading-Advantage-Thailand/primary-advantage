@@ -224,8 +224,8 @@ export default function FloatingAudioControls({
             className={cn(
               "h-12 w-12 shrink-0 rounded-full shadow-lg sm:h-14 sm:w-14",
               isPlaying
-                ? "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                : "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600",
+                ? "bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                : "bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600",
             )}
             aria-label={isPlaying ? "หยุด" : "เล่น"}
           >
@@ -246,7 +246,7 @@ export default function FloatingAudioControls({
               className={cn(
                 "h-10 w-10 shrink-0 rounded-full sm:h-11 sm:w-11",
                 showTranslation
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+                  ? "bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
                   : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700",
               )}
               aria-label={showTranslation ? "ซ่อนคำแปล" : "แสดงคำแปล"}

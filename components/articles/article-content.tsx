@@ -1,8 +1,7 @@
 "use client";
-import React, { useState, useEffect, useRef, useTransition } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
-// import { createEmptyCard, Card } from "ts-fsrs";
-import { Article, SentenceTimepoint, WordTimestamp } from "@/types";
+import { Article, SentenceTimepoint } from "@/types";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import {
@@ -24,14 +23,184 @@ import {
   SkipBackIcon,
   SkipForwardIcon,
   Languages,
-  Loader2,
 } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
-import { saveFlashcard } from "@/actions/flashcard";
-import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { fetchArticleActivity } from "@/actions/article";
 import Image from "next/image";
 import { getArticleImageUrl, getAudioUrl } from "@/lib/storage-config";
+import { useAudioPlayer } from "@/hooks/use-audio-player";
+
+// --- Word alignment helpers ---
+
+/** Strip apostrophes and non-alphanumeric chars for fuzzy word matching */
+function normalizeWord(w: string): string {
+  return w.toLowerCase().replace(/['''\u2019`]/g, "").replace(/[^a-z0-9]/g, "");
+}
+
+/** Split sentence text into display parts, merging common English contractions */
+function splitIntoDisplayParts(text: string): string[] {
+  const CONTRACTION_SUFFIXES = new Set(["t", "s", "re", "ll", "ve", "d", "m"]);
+  const raw = text.split(
+    /(\s+|[.!?;:,"""''`()[\]{}—–\u2013\u2014\u2026]+)/,
+  );
+  const merged: string[] = [];
+  for (let i = 0; i < raw.length; i++) {
+    const cur = raw[i] ?? "";
+    const nxt = raw[i + 1] ?? "";
+    const aft = raw[i + 2] ?? "";
+    if (
+      cur &&
+      /^\w+$/.test(cur) &&
+      /^['''\u2019]$/.test(nxt) &&
+      aft &&
+      /^[a-z]+$/i.test(aft) &&
+      CONTRACTION_SUFFIXES.has(aft.toLowerCase())
+    ) {
+      merged.push(cur + nxt + aft);
+      i += 2;
+    } else {
+      merged.push(cur);
+    }
+  }
+  return merged;
+}
+
+/** A part is an "actual word" when it contains letters/numbers and no bare punctuation */
+function isActualWordPart(part: string): boolean {
+  return /[\w]/.test(part) && /^[\w'-]+$/.test(part) && part.trim() !== "";
+}
+
+/** Compute Levenshtein edit distance between two strings */
+function levenshtein(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  const dp: number[] = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const temp = dp[j];
+      dp[j] =
+        a[i - 1] === b[j - 1]
+          ? prev
+          : 1 + Math.min(prev, dp[j], dp[j - 1]);
+      prev = temp;
+    }
+  }
+  return dp[n];
+}
+
+/**
+ * Build bidirectional maps between display-word index and audio-word index.
+ *
+ * TTS engines may tokenize contractions differently from the display text, e.g.:
+ *   display "didn't" → audio "didt" (apostrophe stripped, merged)
+ *   display "I'm"    → audio ["i","m"] (split)
+ *   display "they're"→ audio "theyre"
+ *
+ * Matching tiers (in order):
+ *   1. Exact normalized match
+ *   2. Combine up to 3 consecutive audio words (handles "i"+"m" → "i'm")
+ *   3. Prefix: audio-word is prefix of display-word (≥60% length coverage)
+ *   4. Suffix: audio-word is suffix of display-word (≥60% length coverage)
+ *   5. Levenshtein ≤ 1 (both words length ≥ 3)
+ *   6. Positional 1-to-1 fallback
+ */
+function buildWordMaps(sentence: SentenceTimepoint): {
+  audioToDisplay: Map<number, number>;
+  displayToAudio: Map<number, number>;
+} {
+  const parts = splitIntoDisplayParts(sentence.sentence);
+  const displayWords = parts.filter(isActualWordPart);
+  const audioWords = sentence.words;
+
+  const audioToDisplay = new Map<number, number>();
+  const displayToAudio = new Map<number, number>();
+
+  let audioIdx = 0;
+  for (
+    let dIdx = 0;
+    dIdx < displayWords.length && audioIdx < audioWords.length;
+    dIdx++
+  ) {
+    const normDisplay = normalizeWord(displayWords[dIdx]);
+
+    // Tier 1 + 2: exact match, optionally combining up to 3 consecutive audio words
+    let combined = "";
+    let matched = false;
+    for (
+      let k = audioIdx;
+      k < Math.min(audioIdx + 3, audioWords.length);
+      k++
+    ) {
+      combined += normalizeWord(audioWords[k].word);
+      if (combined === normDisplay) {
+        for (let m = audioIdx; m <= k; m++) audioToDisplay.set(m, dIdx);
+        displayToAudio.set(dIdx, audioIdx);
+        audioIdx = k + 1;
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) {
+      const normAudio = normalizeWord(audioWords[audioIdx].word);
+      const minLen = Math.min(normAudio.length, normDisplay.length);
+      const maxLen = Math.max(normAudio.length, normDisplay.length);
+      const COVERAGE = 0.6;
+
+      // Tier 3: prefix — audio word is prefix of display word with ≥60% coverage
+      if (
+        !matched &&
+        minLen >= 2 &&
+        minLen / maxLen >= COVERAGE &&
+        normDisplay.startsWith(normAudio)
+      ) {
+        audioToDisplay.set(audioIdx, dIdx);
+        displayToAudio.set(dIdx, audioIdx);
+        audioIdx++;
+        matched = true;
+      }
+
+      // Tier 4: suffix — audio word is suffix of display word with ≥60% coverage
+      if (
+        !matched &&
+        minLen >= 2 &&
+        minLen / maxLen >= COVERAGE &&
+        normDisplay.endsWith(normAudio)
+      ) {
+        audioToDisplay.set(audioIdx, dIdx);
+        displayToAudio.set(dIdx, audioIdx);
+        audioIdx++;
+        matched = true;
+      }
+
+      // Tier 5: Levenshtein distance ≤ 1 (for short corruptions like "didt" vs "didnt")
+      if (
+        !matched &&
+        normAudio.length >= 3 &&
+        normDisplay.length >= 3 &&
+        levenshtein(normAudio, normDisplay) <= 1
+      ) {
+        audioToDisplay.set(audioIdx, dIdx);
+        displayToAudio.set(dIdx, audioIdx);
+        audioIdx++;
+        matched = true;
+      }
+
+      // Tier 6: positional 1-to-1 fallback
+      if (!matched) {
+        audioToDisplay.set(audioIdx, dIdx);
+        displayToAudio.set(dIdx, audioIdx);
+        audioIdx++;
+      }
+    }
+  }
+
+  return { audioToDisplay, displayToAudio };
+}
+
+// --- End helpers ---
 
 type Props = {
   article: Article;
@@ -45,24 +214,48 @@ const SUPPORTED_LANGUAGES = {
 };
 
 export default function ArticleContent({ article }: Props) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentSentenceRef = useRef<HTMLSpanElement | null>(null);
   const controlsRef = useRef<HTMLDivElement | null>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  // Per-sentence bidirectional word alignment maps (audio index ↔ display index)
+  const wordMapsRef = useRef<Map<number, ReturnType<typeof buildWordMaps>>>(
+    new Map(),
+  );
+
   const [togglePlayer, setTogglePlayer] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
-  const [speed, setSpeed] = useState<string>("1");
-  const [currentWordIndex, setCurrentWordIndex] = useState<number>(-1);
-  const [currentSentenceIndex, setCurrentSentenceIndex] = useState<number>(-1);
+  const [loading] = useState(false);
   const [translate, setTranslate] = useState<string>("");
   const [isTranslateOpen, setIsTranslateOpen] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("th");
-  const [isPanding, startTransition] = useTransition();
   const t = useTranslations("Components");
   const [isControlsVisible, setIsControlsVisible] = useState<boolean>(true);
   const [isAutoScrollPaused, setIsAutoScrollPaused] = useState<boolean>(false);
+
+  // Sentences typed for the hook
+  const sentences = Array.isArray(article.sentences)
+    ? (article.sentences as SentenceTimepoint[])
+    : [];
+
+  const {
+    audioRef,
+    isPlaying,
+    currentSentenceIndex,
+    currentWordIndex: audioWordIndex,
+    play,
+    pause,
+    seekToWord,
+    setPlaybackRate,
+    reset,
+  } = useAudioPlayer({
+    audioUrl: togglePlayer ? getAudioUrl(article.audioUrl || "") : null,
+    sentences,
+  });
+
+  // Convert hook's audio word index → display word index via alignment map
+  const currentWordIndex =
+    wordMapsRef.current
+      .get(currentSentenceIndex)
+      ?.audioToDisplay.get(audioWordIndex) ?? audioWordIndex;
 
   useEffect(() => {
     if (article.id) {
@@ -70,6 +263,18 @@ export default function ArticleContent({ article }: Props) {
     }
   }, [article.id]);
 
+  // Pre-compute word alignment maps for every sentence
+  useEffect(() => {
+    if (Array.isArray(article.sentences)) {
+      const maps = new Map<number, ReturnType<typeof buildWordMaps>>();
+      (article.sentences as SentenceTimepoint[]).forEach((sentence, i) => {
+        maps.set(i, buildWordMaps(sentence));
+      });
+      wordMapsRef.current = maps;
+    }
+  }, [article.sentences]);
+
+  // Auto-scroll active sentence into view (with 3 s pause-on-user-scroll)
   useEffect(() => {
     if (
       isPlaying &&
@@ -87,8 +292,9 @@ export default function ArticleContent({ article }: Props) {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [currentSentenceIndex, currentWordIndex, isPlaying, isAutoScrollPaused]);
+  }, [currentSentenceIndex, isPlaying, isAutoScrollPaused]);
 
+  // IntersectionObserver for fixed-controls visibility
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -111,6 +317,7 @@ export default function ArticleContent({ article }: Props) {
     };
   }, []);
 
+  // Pause auto-scroll for 3 s when user scrolls manually
   useEffect(() => {
     let isScrolling = false;
 
@@ -152,236 +359,81 @@ export default function ArticleContent({ article }: Props) {
   const shouldShowFixedControls =
     togglePlayer && isPlaying && !isControlsVisible;
 
-  const handlePlayPause = async () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        try {
-          await audioRef.current.play();
-        } catch (error) {
-          console.log("Error playing audio: ", error);
-        }
+  const handlePlayPause = useCallback(async () => {
+    if (isPlaying) {
+      pause();
+    } else {
+      try {
+        await play();
+      } catch (error) {
+        console.log("Error playing audio: ", error);
       }
-      setIsPlaying(!isPlaying);
     }
-  };
+  }, [isPlaying, play, pause]);
 
-  const handleTogglePlayer = () => {
+  const handleTogglePlayer = useCallback(() => {
     if (togglePlayer) {
+      reset();
       setTogglePlayer(false);
-      setIsPlaying(false);
-      setCurrentWordIndex(-1);
-      setCurrentSentenceIndex(-1);
-      setSpeed("1");
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
+      setIsTranslateOpen(false);
     } else {
       setTogglePlayer(true);
     }
-  };
+  }, [togglePlayer, reset]);
 
-  const handleSpeedTime = (value: string) => {
-    setSpeed(value);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = Number(value);
-    }
-  };
+  const handleSpeedTime = useCallback(
+    (value: string) => {
+      setPlaybackRate(Number(value));
+    },
+    [setPlaybackRate],
+  );
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !article) return;
-
-    const handleLoadedMetadata = () => {
-      audio.playbackRate = Number(speed);
-    };
-
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-
-    return () => {
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-    };
-  }, [article, speed]);
-
-  const handleTimeUpdate = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const newCurrentTime = audio.currentTime;
-    setCurrentTime(newCurrentTime);
-
-    const sentences = article.sentences as SentenceTimepoint[];
-
-    let foundSentenceIndex = -1;
-    let foundWordIndex = -1;
-
-    for (let i = 0; i < sentences.length; i++) {
-      const sentence = sentences[i];
-
-      if (
-        newCurrentTime >= sentence.startTime &&
-        newCurrentTime <= sentence.endTime
-      ) {
-        foundSentenceIndex = i;
-
-        const isNewSentence = foundSentenceIndex !== currentSentenceIndex;
-
-        if (isNewSentence) {
-          foundWordIndex = 0;
+  const handleTranslate = useCallback(
+    (sentenceIndex: number) => {
+      if (selectedLanguage) {
+        setTranslate(
+          article.translatedPassage?.[
+            selectedLanguage as "th" | "cn" | "tw" | "vi"
+          ]?.[sentenceIndex] || "",
+        );
+      } else {
+        if (sentenceIndex !== -1) {
+          setTranslate(article.sentences?.[sentenceIndex]?.sentence || "");
         } else {
-          for (let j = 0; j < sentence.words.length; j++) {
-            const word = sentence.words[j];
-
-            if (newCurrentTime >= word.start && newCurrentTime < word.end) {
-              foundWordIndex = j;
-              break;
-            }
-          }
+          setTranslate("");
         }
-        break;
       }
-    }
+    },
+    [selectedLanguage, article.translatedPassage, article.sentences],
+  );
 
-    if (foundSentenceIndex !== -1) {
-      setCurrentSentenceIndex(foundSentenceIndex);
-    }
-
-    if (
-      newCurrentTime === 0 ||
-      (audioRef.current && newCurrentTime >= audioRef.current.duration)
-    ) {
-      foundWordIndex = -1;
-    }
-
-    if (foundWordIndex !== -1 && foundWordIndex !== currentWordIndex) {
-      const wordDifference = foundWordIndex - currentWordIndex;
-
-      if (wordDifference > 1 && currentWordIndex >= 0) {
-        let intermediateIndex = currentWordIndex + 1;
-
-        const highlightIntermediateWords = () => {
-          if (intermediateIndex < foundWordIndex) {
-            setCurrentWordIndex(intermediateIndex);
-            intermediateIndex++;
-
-            setTimeout(highlightIntermediateWords, 100);
-          } else {
-            setCurrentWordIndex(foundWordIndex);
-          }
-        };
-
-        highlightIntermediateWords();
-      } else {
-        setCurrentWordIndex(foundWordIndex);
-      }
-    }
-  };
-
-  const handleTranslate = (sentenceIndex: number) => {
-    if (selectedLanguage) {
-      setTranslate(
-        article.translatedPassage?.[
-          selectedLanguage as "th" | "cn" | "tw" | "vi"
-        ]?.[sentenceIndex] || "",
-      );
-    } else {
-      if (currentSentenceIndex !== -1) {
-        setTranslate(article.sentences?.[sentenceIndex]?.sentence || "");
-      } else {
-        setTranslate("");
-      }
-    }
-  };
-
-  const handleTranslateClick = (sentenceIndex: number) => {
-    setCurrentSentenceIndex(sentenceIndex);
-    setIsTranslateOpen(true);
-    handleTranslate(sentenceIndex);
-  };
+  const handleTranslateClick = useCallback(
+    (sentenceIndex: number) => {
+      setIsTranslateOpen(true);
+      handleTranslate(sentenceIndex);
+    },
+    [handleTranslate],
+  );
 
   useEffect(() => {
     handleTranslate(currentSentenceIndex);
-  }, [currentSentenceIndex, selectedLanguage]);
+  }, [currentSentenceIndex, selectedLanguage, handleTranslate]);
 
-  const handleWordClick = async (
-    sentenceIndex: number,
-    wordIndex: number,
-    sentence: SentenceTimepoint,
-  ) => {
-    if (wordIndex !== -1 && audioRef.current && sentence.words[wordIndex]) {
-      // Set the audio time
-      const startTime = sentence.words[wordIndex].start - 0.1;
-      audioRef.current.currentTime = startTime;
-
-      setCurrentSentenceIndex(sentenceIndex);
-      setCurrentWordIndex(wordIndex);
-      setCurrentTime(startTime);
-
-      // Start playing the audio to give user feedback
-      if (togglePlayer) {
-        setTimeout(async () => {
-          try {
-            await audioRef.current?.play();
-            setIsPlaying(true);
-          } catch (error) {
-            console.log("Error playing audio: ", error);
-          }
-        }, 50);
+  const handleWordClick = useCallback(
+    (sentenceIndex: number, displayWordIdx: number) => {
+      if (displayWordIdx === -1 || !togglePlayer) return;
+      // Convert display word index → audio word index for seeking
+      const audioWIdx =
+        wordMapsRef.current
+          .get(sentenceIndex)
+          ?.displayToAudio.get(displayWordIdx) ?? displayWordIdx;
+      seekToWord(sentenceIndex, audioWIdx);
+      if (!isPlaying) {
+        play().catch((err) => console.log("Error playing audio: ", err));
       }
-    }
-  };
-
-  const handleSaveToFlashcard = () => {
-    if (currentSentenceIndex !== -1) {
-      const sentence = article.sentences?.[currentSentenceIndex];
-      if (sentence) {
-        const sentences = {
-          sentence: sentence.sentence,
-          startTime: sentence.startTime,
-          endTime: sentence.endTime,
-          translation: {
-            th: article.translatedPassage?.th?.[currentSentenceIndex] as string,
-            cn: article.translatedPassage?.cn?.[currentSentenceIndex] as string,
-            tw: article.translatedPassage?.tw?.[currentSentenceIndex] as string,
-            vi: article.translatedPassage?.vi?.[currentSentenceIndex] as string,
-          },
-          audioUrl: article.audioUrl as string,
-        };
-
-        if (sentences) {
-          startTransition(async () => {
-            try {
-              const res = await saveFlashcard(article.id, [], [sentences]);
-              console.log(res.message);
-              if (res.status === 200) {
-                toast.success("Success", {
-                  description: `You have saved sentences to flashcard`,
-                  richColors: true,
-                });
-              } else if (res.status === 400) {
-                toast.info("Sentence already saved", {
-                  description: `${res?.message}`,
-                  richColors: true,
-                });
-              }
-            } catch (error: any) {
-              toast.error("Something went wrong.", {
-                description: "Your sentence was not saved. Please try again.",
-                richColors: true,
-              });
-            }
-          });
-        }
-      } else {
-        toast.error("Something went wrong.", {
-          description: "Your sentence was not saved. Please try again.",
-          richColors: true,
-        });
-      }
-    }
-  };
+    },
+    [togglePlayer, isPlaying, play, seekToWord],
+  );
 
   const paragraphs = article.passage
     .split("\n\n")
@@ -391,17 +443,10 @@ export default function ArticleContent({ article }: Props) {
     <div className="flex flex-col gap-4">
       <div ref={controlsRef} className="flex flex-col gap-2 md:flex-row">
         <div id="onborda-audio" className="w-full">
-          <audio
-            ref={audioRef}
-            src={getAudioUrl(article.audioUrl || "")}
-            onTimeUpdate={handleTimeUpdate}
-            onEnded={() => {
-              setIsPlaying(false);
-              setCurrentWordIndex(-1);
-              setCurrentSentenceIndex(-1);
-              setCurrentTime(0);
-            }}
-          />
+          {/* Hidden audio element managed by useAudioPlayer */}
+          {togglePlayer && (
+            <audio ref={audioRef} src={getAudioUrl(article.audioUrl || "")} preload="auto" />
+          )}
           <Button
             variant="default"
             className="w-full"
@@ -468,7 +513,7 @@ export default function ArticleContent({ article }: Props) {
 
             {/* Main Controls */}
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-center md:gap-4">
-              <div className="flex w-full items-center md:flex-grow">
+              <div className="flex w-full items-center md:grow">
                 <Button
                   variant="default"
                   className="w-full"
@@ -483,7 +528,7 @@ export default function ArticleContent({ article }: Props) {
                   onValueChange={setSelectedLanguage}
                   disabled={loading}
                 >
-                  <SelectTrigger className="h-10 w-[70px] md:w-auto">
+                  <SelectTrigger className="h-10 w-17.5 md:w-auto">
                     <div className="flex items-center gap-1 md:gap-2">
                       <Languages className="h-4 w-4 shrink-0" />
                       <SelectValue>
@@ -634,229 +679,6 @@ export default function ArticleContent({ article }: Props) {
         </div>
       )}
 
-      {/* {isTranslateOpen && (
-        <div
-          // className="flex h-32 flex-col items-center justify-between md:h-24"
-          className={cn(
-            "flex h-32 flex-col items-center justify-between transition-all duration-300 md:h-24",
-            shouldShowFixedControls
-              ? "dark:bg-primary-foreground bg-primary fixed right-4 bottom-0 left-4 z-30 border-t p-4 shadow-lg"
-              : "",
-          )}
-        >
-          <Separator />
-          <p className="text-center text-green-500">{translate}</p>
-          <Separator />
-        </div>
-      )} */}
-
-      {/* {Array.isArray(article.sentences) &&
-        article.sentences.map(
-          (sentence: SentenceTimepoint, sentenceIndex: number) => {
-            return (
-              <ContextMenu key={sentenceIndex}>
-                <ContextMenuTrigger>
-                  <span
-                    className={`font-article mb-2 block rounded px-0.5 indent-4 text-lg hyphens-auto whitespace-pre-wrap transition-all duration-200 md:text-xl ${
-                      sentenceIndex === currentSentenceIndex
-                        ? "bg-blue-300 dark:bg-blue-900/70"
-                        : ""
-                    }`}
-                  >
-                    {(() => {
-                      // Split on spaces and punctuation, including single quotes
-                      const parts = sentence.sentence.split(
-                        /(\s+|[.!?;:,"""'’`()[\]{}—–\u2013\u2014\u2026]+)/,
-                      );
-                      let wordIndex = 0;
-
-                      // Merge contractions back together
-                      const mergedParts = [];
-                      for (let i = 0; i < parts.length; i++) {
-                        const current = parts[i];
-                        const next = parts[i + 1];
-                        const after = parts[i + 2];
-
-                        // Check if this is a contraction pattern: word + ' + word-part
-                        if (
-                          current &&
-                          /^\w+$/.test(current) && // current is a word
-                          (next === "'" || next === "’") && // next is apostrophe
-                          after &&
-                          /^[a-z]+$/i.test(after) && // after is letters
-                          (after.toLowerCase() === "t" ||
-                            after.toLowerCase() === "s" ||
-                            after.toLowerCase() === "re" ||
-                            after.toLowerCase() === "ll" ||
-                            after.toLowerCase() === "ve" ||
-                            after.toLowerCase() === "d" ||
-                            after.toLowerCase() === "m")
-                        ) {
-                          // Merge contraction
-                          mergedParts.push(current + next + after);
-                          i += 2; // Skip the next two parts
-                        } else {
-                          mergedParts.push(current);
-                        }
-                      }
-
-                      return mergedParts.map((part, partIndex) => {
-                        // A word must contain letters/numbers and may include hyphens and apostrophes
-                        // But it cannot be ONLY punctuation
-                        const isActualWord =
-                          /[\w]/.test(part) && // Must contain at least one letter/number
-                          /^[\w'-]+$/.test(part) && // Can only contain word chars, hyphens, apostrophes
-                          part.trim() !== "";
-
-                        const currentPartWordIndex = isActualWord
-                          ? wordIndex
-                          : -1;
-
-                        if (isActualWord) {
-                          wordIndex++;
-                        }
-
-                        const isCurrentWord =
-                          sentenceIndex === currentSentenceIndex &&
-                          currentPartWordIndex !== -1 &&
-                          currentPartWordIndex === currentWordIndex &&
-                          isActualWord;
-
-                        return (
-                          <span
-                            key={partIndex}
-                            className={cn(
-                              isActualWord
-                                ? "cursor-pointer rounded transition-colors duration-150"
-                                : "",
-                              isCurrentWord && isPlaying
-                                ? "bg-blue-500 text-white"
-                                : isActualWord
-                                  ? "hover:bg-blue-200 dark:hover:bg-blue-900/50"
-                                  : "",
-                            )}
-                            onClick={() =>
-                              handleWordClick(
-                                sentenceIndex,
-                                currentPartWordIndex,
-                                sentence,
-                              )
-                            }
-                            // onClick={() => {
-                            //   if (currentPartWordIndex !== -1 && isActualWord) {
-                            //     setCurrentSentenceIndex(sentenceIndex);
-                            //     setCurrentWordIndex(currentPartWordIndex);
-
-                            //     if (
-                            //       audioRef.current &&
-                            //       sentence.words[currentPartWordIndex]
-                            //     ) {
-                            //       audioRef.current.currentTime =
-                            //         sentence.words[currentPartWordIndex].start;
-                            //     }
-                            //   }
-                            // }}
-                          >
-                            {part}
-                          </span>
-                        );
-                      });
-                    })()}
-                    {sentence.sentence.split(/\b/).map((part, partIndex) => {
-                      // const wordIndex = sentence.words.findIndex(
-                      //   (word) => word.word === part
-                      // );
-
-                      // Instead of using findIndex, we need to map the split parts to actual word indices
-                      // We'll create a mapping of word positions to their indices in the words array
-                      let wordIndex = -1;
-                      let wordCount = 0;
-
-                      // Count actual words (not spaces/punctuation) up to this part
-                      const splitParts = sentence.sentence.split(/\b/);
-
-                      for (let i = 0; i <= partIndex; i++) {
-                        const currentPart = splitParts[i];
-                        // Check if this part is an actual word (not whitespace/punctuation)
-                        if (currentPart && /\w/.test(currentPart)) {
-                          if (i === partIndex) {
-                            wordIndex = wordCount;
-                          }
-                          wordCount++;
-                        }
-                      }
-
-                      // Only highlight if this part is actually a word (contains letters/numbers)
-                      const isActualWord = part && /\w/.test(part);
-
-                      // Check if this word should be highlighted
-                      const isCurrentWord =
-                        sentenceIndex === currentSentenceIndex &&
-                        wordIndex !== -1 &&
-                        wordIndex === currentWordIndex &&
-                        isActualWord; // Only highlight actual words
-
-                      return (
-                        <span
-                          key={partIndex}
-                          className={cn(
-                            isActualWord
-                              ? "cursor-pointer rounded transition-colors duration-150"
-                              : "",
-                            isCurrentWord
-                              ? "bg-blue-500 text-white"
-                              : isActualWord
-                                ? "hover:bg-blue-200 dark:hover:bg-blue-900/50"
-                                : "",
-                          )}
-                          onClick={() => {
-                            if (wordIndex !== -1 && isActualWord) {
-                              setCurrentSentenceIndex(sentenceIndex);
-                              setCurrentWordIndex(wordIndex);
-
-                              // Jump audio to word start time
-                              if (audioRef.current) {
-                                audioRef.current.currentTime =
-                                  sentence.words[wordIndex].start;
-                              }
-                            }
-                          }}
-                        >
-                          {part}
-                        </span>
-                      );
-                    })}
-                  </span>
-                </ContextMenuTrigger>
-                <ContextMenuContent className="w-50">
-                  {loading ? (
-                    <ContextMenuItem inset disabled>
-                      Loading
-                    </ContextMenuItem>
-                  ) : (
-                    <>
-                      <ContextMenuItem
-                        inset
-                        disabled={loading}
-                        onClick={handleSaveToFlashcard}
-                      >
-                        {t("saveToFlashcard")}
-                      </ContextMenuItem>
-                      <ContextMenuItem
-                        inset
-                        disabled={loading || currentSentenceIndex === -1}
-                        onClick={() => handleTranslateClick(sentenceIndex)}
-                      >
-                        {t("translate")}
-                      </ContextMenuItem>
-                    </>
-                  )}
-                </ContextMenuContent>
-              </ContextMenu>
-            );
-          },
-        )} */}
-
       {(() => {
         if (!Array.isArray(article.sentences)) {
           // Fallback to original paragraphs if no sentences
@@ -870,22 +692,29 @@ export default function ArticleContent({ article }: Props) {
           ));
         }
 
-        // Group sentences back into original paragraphs
+        // Group sentences into paragraphs using sequential assignment.
+        // Walking sentenceIdx forward monotonically means each sentence is
+        // claimed by exactly one paragraph — no duplicates even when a short
+        // sentence text is a substring of multiple paragraph strings.
         const groupSentencesIntoParagraphs = () => {
           const paragraphGroups: { paragraph: string; sentences: number[] }[] =
             [];
-          let currentParagraphText = "";
-          let currentSentenceIndices: number[] = [];
+          const allSentences = article.sentences as SentenceTimepoint[];
+          let sentenceIdx = 0;
 
-          // Reconstruct paragraph structure by checking which sentences belong to which paragraph
           paragraphs.forEach((paragraph) => {
             const paragraphSentences: number[] = [];
 
-            article.sentences?.forEach((sentence, sentenceIndex) => {
-              if (paragraph.includes(sentence.sentence.trim())) {
-                paragraphSentences.push(sentenceIndex);
+            // Consume consecutive sentences that appear in this paragraph text
+            while (sentenceIdx < allSentences.length) {
+              const sentText = allSentences[sentenceIdx].sentence.trim();
+              if (paragraph.includes(sentText)) {
+                paragraphSentences.push(sentenceIdx);
+                sentenceIdx++;
+              } else {
+                break;
               }
-            });
+            }
 
             if (paragraphSentences.length > 0) {
               paragraphGroups.push({
@@ -894,6 +723,14 @@ export default function ArticleContent({ article }: Props) {
               });
             }
           });
+
+          // Append any unmatched trailing sentences to the last paragraph
+          if (sentenceIdx < allSentences.length && paragraphGroups.length > 0) {
+            const last = paragraphGroups[paragraphGroups.length - 1];
+            while (sentenceIdx < allSentences.length) {
+              last.sentences.push(sentenceIdx++);
+            }
+          }
 
           return paragraphGroups;
         };
@@ -931,77 +768,37 @@ export default function ArticleContent({ article }: Props) {
                           }`}
                         >
                           {(() => {
-                            // ... existing word rendering logic ...
-                            const parts = sentence?.sentence.split(
-                              /(\s+|[.!?;:,"""''`()[\]{}—–\u2013\u2014\u2026]+)/,
-                            );
-                            let wordIndex = 0;
+                            if (!sentence) return null;
+                            const parts = splitIntoDisplayParts(sentence.sentence);
+                            let displayWordIdx = 0;
 
-                            const mergedParts = [];
-                            for (let i = 0; i < (parts?.length ?? 0); i++) {
-                              const current = parts?.[i];
-                              const next = parts?.[i + 1];
-                              const after = parts?.[i + 2];
-
-                              if (
-                                current &&
-                                /^\w+$/.test(current) &&
-                                (next === "'" || next === "'") &&
-                                after &&
-                                /^[a-z]+$/i.test(after) &&
-                                (after.toLowerCase() === "t" ||
-                                  after.toLowerCase() === "s" ||
-                                  after.toLowerCase() === "re" ||
-                                  after.toLowerCase() === "ll" ||
-                                  after.toLowerCase() === "ve" ||
-                                  after.toLowerCase() === "d" ||
-                                  after.toLowerCase() === "m")
-                              ) {
-                                mergedParts.push(current + next + after);
-                                i += 2;
-                              } else {
-                                mergedParts.push(current);
-                              }
-                            }
-
-                            return mergedParts.map((part, partIndex) => {
-                              const isActualWord =
-                                /[\w]/.test(part ?? "") &&
-                                /^[\w'-]+$/.test(part ?? "") &&
-                                part?.trim() !== "";
-
-                              const currentPartWordIndex = isActualWord
-                                ? wordIndex
-                                : -1;
-
-                              if (isActualWord) {
-                                wordIndex++;
-                              }
+                            return parts.map((part, partIndex) => {
+                              const isWord = isActualWordPart(part);
+                              const wordIdx = isWord ? displayWordIdx : -1;
+                              if (isWord) displayWordIdx++;
 
                               const isCurrentWord =
                                 sentenceIndex === currentSentenceIndex &&
-                                currentPartWordIndex !== -1 &&
-                                currentPartWordIndex === currentWordIndex &&
-                                isActualWord;
+                                wordIdx !== -1 &&
+                                wordIdx === currentWordIndex;
 
                               return (
                                 <span
                                   key={partIndex}
                                   className={cn(
-                                    isActualWord
+                                    isWord
                                       ? "cursor-pointer rounded transition-colors duration-150"
                                       : "",
                                     isCurrentWord && isPlaying
                                       ? "bg-blue-500 text-white"
-                                      : isActualWord
+                                      : isWord
                                         ? "hover:bg-blue-200 dark:hover:bg-blue-900/50"
                                         : "",
                                   )}
                                   onClick={() =>
                                     handleWordClick(
                                       sentenceIndex,
-                                      currentPartWordIndex,
-                                      sentence as SentenceTimepoint,
+                                      wordIdx,
                                     )
                                   }
                                 >

@@ -123,10 +123,17 @@ export function useAudioPlayer({
     const { sentenceIndex, wordIndex } = findCurrentPosition(currentTime);
 
     setState((prev) => {
-      // Don't update wordIndex if we're in a gap (wordIndex is -1)
-      // Keep the previous word highlighted during gaps between words
+      // Don't update wordIndex if we're in a gap (wordIndex is -1) within the
+      // SAME sentence — keep current word highlighted during inter-word gaps.
+      // BUT if the sentence just changed, reset to -1: carrying over a word
+      // index from the previous sentence would look up the wrong display word
+      // in the new sentence's alignment map and cause a one-frame blink.
       const effectiveWordIndex =
-        wordIndex === -1 ? prev.currentWordIndex : wordIndex;
+        wordIndex === -1
+          ? sentenceIndex !== prev.currentSentenceIndex
+            ? -1
+            : prev.currentWordIndex
+          : wordIndex;
 
       const hasChanges =
         prev.currentTime !== currentTime ||
