@@ -11,6 +11,7 @@ export interface StoryIssue {
     | "content_generation"
     | "evaluation"
     | "rating_check"
+    | "cefr_band_check"
     | "save_to_db"
     | "image_generation"
     | "image_upload"

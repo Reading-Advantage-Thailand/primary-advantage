@@ -510,6 +510,9 @@ export async function generateAudio({
   }
 }
 
+const AUDIO_MAX_RETRIES = 3;
+const AUDIO_RETRY_DELAY_BASE = 1000;
+
 export async function generateChapterAudio({
   passage,
   sentences,
@@ -522,94 +525,104 @@ export async function generateChapterAudio({
   uploadSuccess: boolean;
   uploadError?: string;
 }> {
-  try {
-    const voice = VOICES_AI[Math.floor(Math.random() * VOICES_AI.length)];
+  const localPath = `${process.cwd()}/data/audios/${chapterId}.mp3`;
+  const cloudPath = `audios/story/chapter/${chapterId}.mp3`;
 
-    const response = await fetch("https://api.lemonfox.ai/v1/audio/speech", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.AUDIO_API_KEY}`,
-      },
-      body: JSON.stringify({
-        input: passage,
-        voice: voice,
-        response_format: "mp3",
-        speed: 0.7,
-        word_timestamps: true,
-      }),
-    });
+  // ── Phase 1: Generate audio + write to disk (retry on TTS/write failure) ──
+  let json: any;
+  let generateAttempts = 0;
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    if (!response.body) {
-      throw new Error("Response body is null");
-    }
-
-    const json = await response.json();
-
-    const MP3 = base64.toByteArray(json.audio);
-
-    const localPath = `${process.cwd()}/data/audios/${chapterId}.mp3`;
-    await fsPromises.writeFile(localPath, MP3);
-
-    // Upload to bucket — track separately
-    let uploadSuccess = true;
-    let uploadError: string | undefined;
+  while (generateAttempts < AUDIO_MAX_RETRIES) {
     try {
-      await uploadToBucket(localPath, `audios/story/chapter/${chapterId}.mp3`);
+      const voice = VOICES_AI[Math.floor(Math.random() * VOICES_AI.length)];
+
+      const response = await fetch("https://api.lemonfox.ai/v1/audio/speech", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${process.env.AUDIO_API_KEY}` },
+        body: JSON.stringify({
+          input: passage,
+          voice,
+          response_format: "mp3",
+          speed: 0.7,
+          word_timestamps: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`TTS HTTP error: ${response.status}`);
+      }
+
+      json = await response.json();
+      const MP3 = base64.toByteArray(json.audio);
+      await fsPromises.writeFile(localPath, MP3);
+      break; // generation succeeded
     } catch (err: any) {
-      uploadSuccess = false;
-      uploadError = err?.message || String(err);
-      console.error(`Failed to upload chapter audio ${chapterId}:`, err);
+      generateAttempts++;
+      if (generateAttempts >= AUDIO_MAX_RETRIES) {
+        throw new Error(
+          `Chapter audio generation failed after ${AUDIO_MAX_RETRIES} attempts: ${err?.message ?? err}`,
+        );
+      }
+      const delay = Math.pow(2, generateAttempts) * AUDIO_RETRY_DELAY_BASE;
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
+  }
 
-    await fsPromises.unlink(localPath);
+  // ── Phase 2: Upload from saved file (retry without re-generating) ──
+  let uploadSuccess = true;
+  let uploadError: string | undefined;
+  let uploadAttempts = 0;
 
-    // Process word timestamps into sentence timepoints
-    const sentenceTimepoints = processWordTimestampsIntoSentences(
-      json.word_timestamps,
+  while (uploadAttempts < AUDIO_MAX_RETRIES) {
+    try {
+      await uploadToBucket(localPath, cloudPath);
+      break; // upload succeeded
+    } catch (err: any) {
+      uploadAttempts++;
+      if (uploadAttempts >= AUDIO_MAX_RETRIES) {
+        uploadSuccess = false;
+        uploadError = err?.message ?? String(err);
+      } else {
+        const delay = Math.pow(2, uploadAttempts) * AUDIO_RETRY_DELAY_BASE;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  // Always clean up temp file after upload phase (success or fail)
+  await fsPromises.unlink(localPath).catch(() => {});
+
+  // ── Phase 3: Process timestamps + update DB ──
+  const sentenceTimepoints = processWordTimestampsIntoSentences(
+    json.word_timestamps,
+    sentences,
+    chapterId,
+  );
+
+  await prisma.storyChapter.updateMany({
+    where: { id: chapterId, chapterNumber },
+    data: {
+      sentences: JSON.parse(JSON.stringify(sentenceTimepoints)),
+      audioSentencesUrl: uploadSuccess ? cloudPath : null,
+    },
+  });
+
+  // ── Phase 4: Translate sentences ──
+  try {
+    await translateAndStoreSentencesForStory({
       sentences,
       chapterId,
-    );
-
-    // Update the database with sentence timepoints
-    await prisma.storyChapter.updateMany({
-      where: { id: chapterId, chapterNumber },
-      data: {
-        sentences: JSON.parse(JSON.stringify(sentenceTimepoints)),
-        audioSentencesUrl: `audios/story/chapter/${chapterId}.mp3`,
-      },
+      chapterNumber,
+      cefrLevel,
     });
-
-    // Automatically translate sentences after audio generation
-    try {
-      await translateAndStoreSentencesForStory({
-        sentences,
-        chapterId,
-        chapterNumber,
-        cefrLevel,
-      });
-    } catch (translationError: any) {
-      console.error(
-        `Failed to translate sentences for story ${chapterId}:`,
-        translationError,
-      );
-      // Don't throw here - audio generation was successful
-      return {
-        translationSuccess: false,
-        translationError: translationError?.message || String(translationError),
-        uploadSuccess,
-        uploadError,
-      };
-    }
-
-    return { translationSuccess: true, uploadSuccess, uploadError };
-  } catch (error: any) {
-    console.log(error);
-    throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(
-      error.response?.data,
-    )}`;
+  } catch (translationError: any) {
+    return {
+      translationSuccess: false,
+      translationError: translationError?.message ?? String(translationError),
+      uploadSuccess,
+      uploadError,
+    };
   }
+
+  return { translationSuccess: true, uploadSuccess, uploadError };
 }

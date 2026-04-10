@@ -55,8 +55,18 @@ const GENRES = [
 ];
 
 const MAX_RETRY_ATTEMPTS = 3;
-const MIN_RATING = 2;
-const RETRY_DELAY_MS = 1000;
+const MIN_RATING = 3;
+const RETRY_DELAY_BASE_MS = 1000; // exponential: 2s, 4s, 8s
+
+/**
+ * Validates that the evaluated CEFR level stays within the target band.
+ * e.g. target "A1" → only "A1-", "A1", "A1+" are valid.
+ * Prevents accepting content generated at the wrong level entirely.
+ */
+function isWithinCefrBand(target: string, evaluated: string): boolean {
+  const base = evaluated.replace(/[+-]$/, "");
+  return base === target;
+}
 
 interface GenerationSummary {
   total: number;
@@ -113,15 +123,30 @@ const processCefrLevel = async (
         throw err;
       }
 
-      // Step 3: Check rating threshold
+      // Step 3a: Check content quality threshold
       if (evaluation.rating < MIN_RATING) {
         logger.addIssue({
           step: "rating_check",
           severity: "WARN",
-          message: `Attempt ${attempt + 1}: Rating ${evaluation.rating} below minimum ${MIN_RATING}`,
+          message: `Attempt ${attempt + 1}: Quality rating ${evaluation.rating} below minimum ${MIN_RATING}`,
           attempt: attempt + 1,
         });
-        throw new Error("Story rating below minimum threshold");
+        throw new Error(
+          `Story quality rating ${evaluation.rating} below minimum ${MIN_RATING}`,
+        );
+      }
+
+      // Step 3b: Check CEFR band — evaluated level must stay within target band (e.g. A1-, A1, A1+)
+      if (!isWithinCefrBand(level, evaluation.cefrLevel)) {
+        logger.addIssue({
+          step: "cefr_band_check",
+          severity: "WARN",
+          message: `Attempt ${attempt + 1}: Evaluated level '${evaluation.cefrLevel}' is outside target band '${level}' (expected ${level}-, ${level}, or ${level}+)`,
+          attempt: attempt + 1,
+        });
+        throw new Error(
+          `Evaluated CEFR level '${evaluation.cefrLevel}' is outside target band for '${level}'`,
+        );
       }
 
       // Step 4: Save to database
@@ -144,47 +169,50 @@ const processCefrLevel = async (
         throw err;
       }
 
-      console.log(`Save Story Completed CefrLevel: ${evaluation.cefrLevel}`);
-
-      // ─── Steps 5-7: Image + Audio (Promise.allSettled — partial failure = warning) ───
-
-      // Step 5: Generate images
-      const imagePromise = generateStoryImage(
-        savedStory.character,
-        savedStory.imagesDesc,
+      console.log(
+        `[${storyId}] DB saved (CEFR: ${evaluation.cefrLevel}, rating: ${evaluation.rating}) — uploading images & audio...`,
       );
 
-      // Step 6 & 7: Chapter audio (+ translation) and Flashcard audio
-      const chapterAudioPromises = savedStory.chapters.map((chapter) =>
-        generateChapterAudio({
-          passage: chapter.passage,
-          sentences: chapter.sentences as string[],
-          chapterId: chapter.id,
-          chapterNumber: chapter.chapterNumber,
-          cefrLevel: level,
-        }).then((res) => ({ ...res, chapterId: chapter.id })),
-      );
-
-      const flashcardAudioPromises = savedStory.chapters.map((chapter) =>
-        generateAudioForFlashcard({
-          sentences: chapter.sentencsAndWordsForFlashcards
-            .sentence as sentenceTranslation[],
-          words: chapter.sentencsAndWordsForFlashcards
-            .words as wordTranslation[],
-          contentId: chapter.id,
-          job: "story",
-        }).then((res) => ({ ...res, chapterId: chapter.id })),
-      );
+      // ─── Steps 5-7: Image + Audio (allSettled — partial failure = warning, not retry) ───
 
       const [imageResults, chapterAudioResults, flashcardAudioResults] =
         await Promise.all([
-          Promise.allSettled([imagePromise]),
-          Promise.allSettled(chapterAudioPromises),
-          Promise.allSettled(flashcardAudioPromises),
+          Promise.allSettled([
+            generateStoryImage(savedStory.character, savedStory.imagesDesc),
+          ]),
+          Promise.allSettled(
+            savedStory.chapters.map((chapter) =>
+              generateChapterAudio({
+                passage: chapter.passage,
+                sentences: chapter.sentences as string[],
+                chapterId: chapter.id,
+                chapterNumber: chapter.chapterNumber,
+                cefrLevel: level,
+              }),
+            ),
+          ),
+          Promise.allSettled(
+            savedStory.chapters.map((chapter) =>
+              generateAudioForFlashcard({
+                sentences: chapter.sentencsAndWordsForFlashcards
+                  .sentence as sentenceTranslation[],
+                words: chapter.sentencsAndWordsForFlashcards
+                  .words as wordTranslation[],
+                contentId: chapter.id,
+                job: "story",
+              }),
+            ),
+          ),
         ]);
+
+      // ── Collect step statuses for the final completion log ──
+      let imagesOk = true;
+      let chapterAudioOk = true;
+      let flashcardAudioOk = true;
 
       // Check image result
       if (imageResults[0].status === "rejected") {
+        imagesOk = false;
         logger.addIssue({
           step: "image_generation",
           severity: "WARN",
@@ -192,6 +220,7 @@ const processCefrLevel = async (
             imageResults[0].reason?.message || String(imageResults[0].reason),
         });
       } else if (!imageResults[0].value.success) {
+        imagesOk = false;
         logger.addIssue({
           step: "image_upload",
           severity: "WARN",
@@ -207,6 +236,7 @@ const processCefrLevel = async (
         const chId = savedStory.chapters[c].id;
 
         if (audioResult.status === "rejected") {
+          chapterAudioOk = false;
           logger.addIssue({
             step: "chapter_audio",
             severity: "WARN",
@@ -215,6 +245,7 @@ const processCefrLevel = async (
           });
         } else {
           if (!audioResult.value.uploadSuccess) {
+            chapterAudioOk = false;
             logger.addIssue({
               step: "chapter_audio_upload",
               severity: "WARN",
@@ -241,6 +272,7 @@ const processCefrLevel = async (
         const chId = savedStory.chapters[c].id;
 
         if (flashResult.status === "rejected") {
+          flashcardAudioOk = false;
           logger.addIssue({
             step: "flashcard_audio",
             severity: "WARN",
@@ -249,6 +281,7 @@ const processCefrLevel = async (
           });
         } else {
           if (!flashResult.value.sentenceUploadSuccess) {
+            flashcardAudioOk = false;
             logger.addIssue({
               step: "flashcard_audio_upload",
               severity: "WARN",
@@ -259,6 +292,7 @@ const processCefrLevel = async (
             });
           }
           if (!flashResult.value.wordUploadSuccess) {
+            flashcardAudioOk = false;
             logger.addIssue({
               step: "flashcard_audio_upload",
               severity: "WARN",
@@ -271,11 +305,16 @@ const processCefrLevel = async (
         }
       }
 
-      if (logger.hasIssues()) {
-        console.warn(
-          `⚠️ Story [${storyId}] completed with issues — check logs table for details`,
-        );
-      }
+      // ── True completion log — all steps accounted for ──
+      const allOk = imagesOk && chapterAudioOk && flashcardAudioOk;
+      console.log(
+        `[${storyId}] Story FULLY COMPLETED` +
+          ` | DB: ✓` +
+          ` | Images: ${imagesOk ? "✓" : "✗"}` +
+          ` | Chapter audio: ${chapterAudioOk ? "✓" : "✗"}` +
+          ` | Flashcard audio: ${flashcardAudioOk ? "✓" : "✗"}` +
+          (allOk ? "" : " — partial failures logged"),
+      );
 
       return { storyId }; // Success — exit retry loop
     } catch (error: any) {
@@ -295,7 +334,9 @@ const processCefrLevel = async (
           `Max retry attempts reached for level ${level}: ${error}`,
         );
       }
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      // Exponential backoff: 2s → 4s → 8s
+      const delay = Math.pow(2, attempt) * RETRY_DELAY_BASE_MS;
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 
