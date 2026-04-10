@@ -51,6 +51,11 @@ const characterSchema = z.object({
 const storyBlueprintSchema = z.object({
   // High Level Concept
   topic: z.string().describe("The core subject matter of the story."),
+  // title: z
+  //   .string()
+  //   .describe(
+  //     "A compelling, short title for the entire story (max 8 words). Must sound like a real book title.",
+  //   ),
   genre: z
     .string()
     .describe("The literary genre (e.g., Mystery, Adventure, Fantasy)."),
@@ -62,6 +67,19 @@ const storyBlueprintSchema = z.object({
     .describe(
       "The specific age range and their interests (e.g., 'Aged 7-8, likes animals').",
     ),
+  // summary: z
+  //   .string()
+  //   .describe(
+  //     "A concise 2-3 sentence summary of the entire story arc, suitable for a back-cover blurb.",
+  //   ),
+  // imageDesc: z
+  //   .string()
+  //   .describe(
+  //     "A highly detailed visual prompt for generating the story's cover image. Must feature the main character(s) and establish the setting and tone.",
+  //   ),
+  // translatedSummary: translationSchema.describe(
+  //   "Translations of the story summary into the four supported languages.",
+  // ),
 
   // Language Planning
   globalVocabularyList: z
@@ -170,9 +188,14 @@ const chapterSchema = z.object({
       z.object({
         vocabulary: z.string().describe("A word from the passage."),
         definition: z
-          .string()
-          .describe("A simple, level-appropriate definition in English."),
-        translation: translationSchema,
+          .object({
+            en: z.string().describe("A simple, level-appropriate definition in English."),
+            th: z.string().describe("Thai translation of the definition."),
+            cn: z.string().describe("Simplified Chinese translation of the definition."),
+            tw: z.string().describe("Traditional Chinese translation of the definition."),
+            vi: z.string().describe("Vietnamese translation of the definition."),
+          })
+          .describe("Multilingual definition for this vocabulary word."),
       }),
     )
     .describe(

@@ -85,6 +85,97 @@ function contentToSSML(content: string[]): string {
   return ssml;
 }
 
+const FLASHCARD_MAX_RETRIES = 3;
+const FLASHCARD_RETRY_DELAY_BASE = 1000;
+
+async function synthesizeAndUpload({
+  texts,
+  localPath,
+  cloudPath,
+  voice,
+}: {
+  texts: string[];
+  localPath: string;
+  cloudPath: string;
+  voice: string;
+}): Promise<{
+  timePoints: TimePoint[];
+  audioContent: string;
+  uploadSuccess: boolean;
+  uploadError?: string;
+}> {
+  // ── Phase 1: TTS generate + write to disk (retry on TTS/write failure) ──
+  let ttsData: any;
+  let generateAttempts = 0;
+
+  while (generateAttempts < FLASHCARD_MAX_RETRIES) {
+    try {
+      const response = await fetch(
+        `${BASE_TEXT_TO_SPEECH_URL}/v1beta1/text:synthesize?key=${process.env.GOOGLE_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            input: { ssml: contentToSSML(texts) },
+            voice: { languageCode: "en-US", name: voice },
+            audioConfig: { audioEncoding: "MP3" },
+            enableTimePointing: ["SSML_MARK"],
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`TTS HTTP error: ${response.statusText}`);
+      }
+
+      ttsData = await response.json();
+      const MP3 = base64.toByteArray(ttsData.audioContent);
+      await fsPromises.writeFile(localPath, MP3);
+      break; // generation succeeded
+    } catch (err: any) {
+      generateAttempts++;
+      if (generateAttempts >= FLASHCARD_MAX_RETRIES) {
+        throw new Error(
+          `TTS generation failed after ${FLASHCARD_MAX_RETRIES} attempts: ${err?.message ?? err}`,
+        );
+      }
+      const delay = Math.pow(2, generateAttempts) * FLASHCARD_RETRY_DELAY_BASE;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  // ── Phase 2: Upload from saved file (retry without re-generating) ──
+  let uploadSuccess = true;
+  let uploadError: string | undefined;
+  let uploadAttempts = 0;
+
+  while (uploadAttempts < FLASHCARD_MAX_RETRIES) {
+    try {
+      await uploadToBucket(localPath, cloudPath);
+      break; // upload succeeded
+    } catch (err: any) {
+      uploadAttempts++;
+      if (uploadAttempts >= FLASHCARD_MAX_RETRIES) {
+        uploadSuccess = false;
+        uploadError = err?.message ?? String(err);
+      } else {
+        const delay = Math.pow(2, uploadAttempts) * FLASHCARD_RETRY_DELAY_BASE;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  // Always clean up temp file after upload phase
+  await fsPromises.unlink(localPath).catch(() => {});
+
+  return {
+    timePoints: ttsData?.timepoints ?? [],
+    audioContent: ttsData?.audioContent ?? "",
+    uploadSuccess,
+    uploadError,
+  };
+}
+
 export async function generateAudioForFlashcard({
   sentences,
   words,
@@ -96,198 +187,103 @@ export async function generateAudioForFlashcard({
   wordUploadSuccess: boolean;
   wordUploadError?: string;
 }> {
-  try {
-    let sentenceUploadSuccess = true;
-    let sentenceUploadError: string | undefined;
-    let wordUploadSuccess = true;
-    let wordUploadError: string | undefined;
+  const voice =
+    AVAILABLE_VOICES[Math.floor(Math.random() * AVAILABLE_VOICES.length)];
+  const urlPath = job === "article" ? "audios" : "audios/story";
 
-    const voice =
-      AVAILABLE_VOICES[Math.floor(Math.random() * AVAILABLE_VOICES.length)];
+  const sentenceTexts = Array.isArray(sentences)
+    ? sentences.map((item: any) => item?.sentence as string)
+    : [];
+  const wordTexts = Array.isArray(words)
+    ? words.map((item: any) => item?.vocabulary as string)
+    : [];
 
-    const urlPath = job === "article" ? "audios" : "audios/story";
+  let sentenceTimePoints: SentencesResponse[] = [];
+  let sentenceUploadSuccess = true;
+  let sentenceUploadError: string | undefined;
 
-    // Extract sentence strings for audio generation
-    const sentenceTexts: string[] = Array.isArray(sentences)
-      ? sentences.map((item: any) => item?.sentence)
-      : [];
+  let wordTimePoints: WordsResponse[] = [];
+  let wordUploadSuccess = true;
+  let wordUploadError: string | undefined;
 
-    // Extract word strings for audio generation
-    const wordTexts: string[] = Array.isArray(words)
-      ? words.map((item: any) => item?.vocabulary)
-      : [];
-
-    let sentenceTimePoints: SentencesResponse[] = [];
-    let wordTimePoints: WordsResponse[] = [];
-
-    // Generate audio for sentences
-    if (sentenceTexts.length > 0) {
-      const sentenceResponse = await fetch(
-        `${BASE_TEXT_TO_SPEECH_URL}/v1beta1/text:synthesize?key=${process.env.GOOGLE_API_KEY}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            input: { ssml: contentToSSML(sentenceTexts) },
-            voice: {
-              languageCode: "en-US",
-              name: voice,
-            },
-            audioConfig: {
-              audioEncoding: "MP3",
-            },
-            enableTimePointing: ["SSML_MARK"],
-          }),
-        },
-      );
-
-      if (!sentenceResponse.ok) {
-        throw new Error(`Sentence audio error: ${sentenceResponse.statusText}`);
-      }
-
-      const sentenceData = await sentenceResponse.json();
-      const sentenceAudio = sentenceData.audioContent;
-      const sentenceTimepoints: TimePoint[] = sentenceData?.timepoints;
-
-      // Combine sentences with timepoints
-      sentenceTimePoints = sentences.map((sentence, index) => ({
-        sentence: sentence.sentence,
-        translation: sentence.translation,
-        timeSeconds: sentenceTimepoints[index]?.timeSeconds,
-      }));
-
-      const sentenceMP3 = base64.toByteArray(sentenceAudio);
-
-      // Ensure the sentences directory exists
-      const sentencesDir = path.join(process.cwd(), "data/audios/sentences");
-      if (!fs.existsSync(sentencesDir)) {
-        fs.mkdirSync(sentencesDir, { recursive: true });
-      }
-
-      const sentenceLocalPath = path.join(sentencesDir, `${contentId}.mp3`);
-      await fsPromises.writeFile(sentenceLocalPath, sentenceMP3);
-
-      try {
-        await uploadToBucket(
-          sentenceLocalPath,
-          `${urlPath}/sentences/${contentId}.mp3`,
-        );
-      } catch (err: any) {
-        sentenceUploadSuccess = false;
-        sentenceUploadError = err?.message || String(err);
-        console.error(
-          `Failed to upload flashcard sentence audio ${contentId}:`,
-          err,
-        );
-      }
-
-      await fsPromises.unlink(sentenceLocalPath);
+  // ── Sentences ──
+  if (sentenceTexts.length > 0) {
+    const sentencesDir = path.join(process.cwd(), "data/audios/sentences");
+    if (!fs.existsSync(sentencesDir)) {
+      fs.mkdirSync(sentencesDir, { recursive: true });
     }
 
-    // Generate audio for words
-    if (wordTexts.length > 0) {
-      const wordResponse = await fetch(
-        `${BASE_TEXT_TO_SPEECH_URL}/v1beta1/text:synthesize?key=${process.env.GOOGLE_API_KEY}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            input: { ssml: contentToSSML(wordTexts) },
-            voice: {
-              languageCode: "en-US",
-              name: voice,
-            },
-            audioConfig: {
-              audioEncoding: "MP3",
-            },
-            enableTimePointing: ["SSML_MARK"],
-          }),
-        },
-      );
-
-      if (!wordResponse.ok) {
-        throw new Error(`Word audio error: ${wordResponse.statusText}`);
-      }
-
-      const wordData = await wordResponse.json();
-      const wordAudio = wordData.audioContent;
-      const wordTimepoints: TimePoint[] = wordData?.timepoints;
-
-      // Combine words with timepoints
-      wordTimePoints = words.map((word, index) => ({
-        vocabulary: word.vocabulary,
-        definition: word.definition,
-        timeSeconds: wordTimepoints[index]?.timeSeconds,
-      }));
-
-      const wordMP3 = base64.toByteArray(wordAudio);
-
-      // Ensure the words directory exists
-      const wordsDir = path.join(process.cwd(), "data/audios/words");
-      if (!fs.existsSync(wordsDir)) {
-        fs.mkdirSync(wordsDir, { recursive: true });
-      }
-
-      const wordLocalPath = path.join(wordsDir, `${contentId}.mp3`);
-      await fsPromises.writeFile(wordLocalPath, wordMP3);
-
-      try {
-        await uploadToBucket(
-          wordLocalPath,
-          `${urlPath}/words/${contentId}.mp3`,
-        );
-      } catch (err: any) {
-        wordUploadSuccess = false;
-        wordUploadError = err?.message || String(err);
-        console.error(
-          `Failed to upload flashcard word audio ${contentId}:`,
-          err,
-        );
-      }
-
-      await fsPromises.unlink(wordLocalPath);
-    }
-
-    // Store both sentence and word data with their respective audio URLs
-    await prisma.sentencsAndWordsForFlashcard.updateMany({
-      where: {
-        articleId: job === "article" ? contentId : undefined,
-        storyChapterId: job === "story" ? contentId : undefined,
-      },
-      data: {
-        sentence:
-          sentenceTimePoints.length > 0
-            ? JSON.parse(JSON.stringify(sentenceTimePoints))
-            : null,
-        audioSentencesUrl:
-          sentenceTimePoints.length > 0
-            ? `${urlPath}/sentences/${contentId}.mp3`
-            : null,
-        words:
-          wordTimePoints.length > 0
-            ? JSON.parse(JSON.stringify(wordTimePoints))
-            : null,
-        wordsUrl:
-          wordTimePoints.length > 0
-            ? `${urlPath}/words/${contentId}.mp3`
-            : null,
-      },
+    const result = await synthesizeAndUpload({
+      texts: sentenceTexts,
+      localPath: path.join(sentencesDir, `${contentId}.mp3`),
+      cloudPath: `${urlPath}/sentences/${contentId}.mp3`,
+      voice,
     });
 
-    return {
-      sentenceUploadSuccess,
-      sentenceUploadError,
-      wordUploadSuccess,
-      wordUploadError,
-    };
-  } catch (error: any) {
-    const errorDetails = error.response?.data || error.message || error;
-    throw `failed to generate audio: ${error} \n\n error: ${JSON.stringify(errorDetails)}`;
+    sentenceUploadSuccess = result.uploadSuccess;
+    sentenceUploadError = result.uploadError;
+
+    sentenceTimePoints = sentences.map((sentence, index) => ({
+      sentence: sentence.sentence,
+      translation: sentence.translation,
+      timeSeconds: result.timePoints[index]?.timeSeconds,
+    }));
   }
+
+  // ── Words ──
+  if (wordTexts.length > 0) {
+    const wordsDir = path.join(process.cwd(), "data/audios/words");
+    if (!fs.existsSync(wordsDir)) {
+      fs.mkdirSync(wordsDir, { recursive: true });
+    }
+
+    const result = await synthesizeAndUpload({
+      texts: wordTexts,
+      localPath: path.join(wordsDir, `${contentId}.mp3`),
+      cloudPath: `${urlPath}/words/${contentId}.mp3`,
+      voice,
+    });
+
+    wordUploadSuccess = result.uploadSuccess;
+    wordUploadError = result.uploadError;
+
+    wordTimePoints = words.map((word, index) => ({
+      vocabulary: word.vocabulary,
+      definition: word.definition,
+      timeSeconds: result.timePoints[index]?.timeSeconds,
+    }));
+  }
+
+  // ── Update DB — use null for URL if upload failed ──
+  await prisma.sentencsAndWordsForFlashcard.updateMany({
+    where: {
+      articleId: job === "article" ? contentId : undefined,
+      storyChapterId: job === "story" ? contentId : undefined,
+    },
+    data: {
+      sentence:
+        sentenceTimePoints.length > 0
+          ? JSON.parse(JSON.stringify(sentenceTimePoints))
+          : null,
+      audioSentencesUrl: sentenceUploadSuccess && sentenceTimePoints.length > 0
+        ? `${urlPath}/sentences/${contentId}.mp3`
+        : null,
+      words:
+        wordTimePoints.length > 0
+          ? JSON.parse(JSON.stringify(wordTimePoints))
+          : null,
+      wordsUrl: wordUploadSuccess && wordTimePoints.length > 0
+        ? `${urlPath}/words/${contentId}.mp3`
+        : null,
+    },
+  });
+
+  return {
+    sentenceUploadSuccess,
+    sentenceUploadError,
+    wordUploadSuccess,
+    wordUploadError,
+  };
 }
 
 //   export async function generateChapterAudioForWord({
