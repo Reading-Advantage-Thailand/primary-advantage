@@ -107,24 +107,17 @@ async function handleGeneration(
     // Use next/server `after()` to run generation after the response is sent.
     // This keeps the Cloud Run instance alive until the work finishes,
     // unlike setImmediate which can be killed when the instance shuts down.
-    after(async () => {
-      try {
-        await generateStoryContentController(amountPerGen);
-        console.log(`[Story Generate] Generation completed successfully`);
-      } catch (error) {
-        console.error(`[Story Generate] Generation failed:`, error);
-      }
-    });
-
-    // Return 202 Accepted immediately — generation continues in background
+    await generateStoryContentController(amountPerGen);
+    
+    // Return 200 OK — generation completed successfully
     return NextResponse.json(
       {
-        message: "Story generation accepted and running in background",
+        message: "Story generation completed successfully",
         amountPerGen,
         source,
         timestamp,
       },
-      { status: 202 },
+      { status: 200 },
     );
   } catch (error) {
     console.error(`[Story Generate] Unexpected error:`, error);
