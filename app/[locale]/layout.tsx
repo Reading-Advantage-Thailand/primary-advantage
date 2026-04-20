@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { SerwistClientProvider } from "@/components/providers/serwist-provider";
 import "@/styles/globals.css";
 import { NextIntlClientProvider, hasLocale, Locale } from "next-intl";
 import { notFound } from "next/navigation";
@@ -63,8 +64,18 @@ export const metadata: Metadata = {
   icons: {
     icon: "/primary-advantage.png",
   },
-  // manifest: `${siteConfig.url}/site.webmanifest`,
-  // manifest: `http://localhost:3000/site.webmanifest`,
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: siteConfig.name,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0891b2",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default async function RootLayout({
@@ -84,22 +95,24 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning className="overscroll-none">
       <body
-        className={`${fontSans.variable} ${cabinSketch.variable} ${quicksand.variable} ${winkyRough.variable} bg-background min-h-screen font-sans antialiased [--header-height:calc(var(--spacing)*14)]`}
+        className={`${fontSans.variable} ${cabinSketch.variable} ${quicksand.variable} ${winkyRough.variable} bg-background min-h-screen font-sans antialiased [--header-height:--spacing(14)]`}
       >
-        <NextIntlClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-            enableColorScheme
-          >
-            <QueryProvider>
-              <NuqsAdapter>{children}</NuqsAdapter>
-              <Toaster />
-            </QueryProvider>
-          </ThemeProvider>
-        </NextIntlClientProvider>
+        <SerwistClientProvider>
+          <NextIntlClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              enableColorScheme
+            >
+              <QueryProvider>
+                <NuqsAdapter>{children}</NuqsAdapter>
+                <Toaster />
+              </QueryProvider>
+            </ThemeProvider>
+          </NextIntlClientProvider>
+        </SerwistClientProvider>
       </body>
     </html>
   );

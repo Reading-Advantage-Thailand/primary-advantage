@@ -18,6 +18,10 @@
 /.next/
 /out/
 
+# serwist / PWA
+/public/sw.js
+/public/swe-worker-*.js
+
 # production
 /build
 

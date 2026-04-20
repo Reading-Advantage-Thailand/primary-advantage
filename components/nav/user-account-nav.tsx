@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
   DropdownMenu,
@@ -13,7 +13,6 @@ import { UserAvatar } from "@/components/user-avatar";
 import { Loader2, LogOutIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Role } from "@/types/enum";
-import { useCurrentUser } from "@/hooks/use-current-user";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
@@ -58,10 +57,10 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
             name: user?.name || "",
             image: user?.image || "",
           }}
-          className="border-muted-foreground h-8 w-8 cursor-pointer border"
+          className="border-muted-foreground h-8 w-8 cursor-pointer border ring-offset-background transition-all hover:ring-2 hover:ring-cyan-400 hover:ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2"
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="md:w-56 lg:w-fit">
+      <DropdownMenuContent align="end" sideOffset={8} className="w-56">
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
             <p className="line-clamp-1 font-medium">{user?.name}</p>
