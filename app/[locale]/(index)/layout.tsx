@@ -1,28 +1,17 @@
 import { Footer } from "@/components/index/footer";
 import { MainNav } from "@/components/nav/main-nav";
 import { UserAccountNav } from "@/components/nav/user-account-nav";
-import { SiteHeader } from "@/components/site-header";
 import { buttonVariants } from "@/components/ui/button";
 import { indexPageConfig } from "@/configs/index-page-config";
-import { auth } from "@/lib/auth";
+import { Link } from "@/i18n/navigation";
+import { getCurrentUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import { ReactNode } from "react";
-import { headers } from "next/headers";
-import { getCurrentUser } from "@/lib/session";
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const t = await getTranslations("MainNav");
   const user = await getCurrentUser();
-
-  // return (
-  //   <div className="bg-background relative z-10 flex min-h-svh flex-col">
-  //     <SiteHeader />
-  //     <main className="flex flex-1 flex-col">{children}</main>
-  //     <Footer />
-  //   </div>
-  // );
 
   if (!user) {
     return (
