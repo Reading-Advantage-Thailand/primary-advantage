@@ -16,6 +16,12 @@ export function usePwaInstall() {
     (window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true);
 
+  // iOS Safari never fires beforeinstallprompt — detect it separately
+  const isIOS =
+    typeof window !== "undefined" &&
+    /iphone|ipad|ipod/i.test(window.navigator.userAgent) &&
+    !(window.navigator as Navigator & { standalone?: boolean }).standalone;
+
   useEffect(() => {
     if (isStandalone) return;
 
@@ -39,5 +45,5 @@ export function usePwaInstall() {
     }
   };
 
-  return { isInstallable, promptInstall };
+  return { isInstallable, promptInstall, isIOS, isStandalone };
 }

@@ -63,6 +63,7 @@ export const metadata: Metadata = {
   // },
   icons: {
     icon: "/primary-advantage.png",
+    apple: "/icons/icon-192x192.png",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
