@@ -1,0 +1,609 @@
+{
+  "storyCollection": {
+    "title": "Primary Advantage B2 Preliminary Story Library",
+    "targetAudience": "Grades 5-6 (B2 Preliminary for Schools Level)",
+    "totalStories": 100,
+    "stories": [
+      {
+        "id": 1,
+        "genre": "Identity & Belonging",
+        "title": "The Club That Needed a Voice",
+        "description": "A student joins a school club and must decide how to express an unpopular but thoughtful opinion."
+      },
+      {
+        "id": 2,
+        "genre": "Identity & Belonging",
+        "title": "The Name on the Poster",
+        "description": "A poster mistake makes a child reflect on identity, recognition, and speaking up respectfully."
+      },
+      {
+        "id": 3,
+        "genre": "Identity & Belonging",
+        "title": "The Two Homes Project",
+        "description": "A student with two family homes creates a project that helps classmates understand different family structures."
+      },
+      {
+        "id": 4,
+        "genre": "Identity & Belonging",
+        "title": "The Accent Question",
+        "description": "A new student feels embarrassed by an accent until classmates learn how language connects to personal history."
+      },
+      {
+        "id": 5,
+        "genre": "Identity & Belonging",
+        "title": "The Team Uniform Debate",
+        "description": "A debate about team uniforms becomes a story about belonging, comfort, and group identity."
+      },
+      {
+        "id": 6,
+        "genre": "Identity & Belonging",
+        "title": "The Hidden Sketchbook",
+        "description": "A student hides a sketchbook before learning that personal interests can become bridges to friendship."
+      },
+      {
+        "id": 7,
+        "genre": "Identity & Belonging",
+        "title": "The Family Story Presentation",
+        "description": "A class presentation about family history helps a child understand pride and privacy."
+      },
+      {
+        "id": 8,
+        "genre": "Identity & Belonging",
+        "title": "The New Role in the Group",
+        "description": "A student who is usually the helper must learn to become the decision-maker during a difficult project."
+      },
+      {
+        "id": 9,
+        "genre": "Identity & Belonging",
+        "title": "The Quiet Table",
+        "description": "A quiet lunch table becomes a place where several students slowly build a sense of belonging."
+      },
+      {
+        "id": 10,
+        "genre": "Identity & Belonging",
+        "title": "The Festival Clothes Choice",
+        "description": "A child chooses what to wear for a school festival and learns to balance tradition and confidence."
+      },
+      {
+        "id": 11,
+        "genre": "Complex Friendship",
+        "title": "The Friend Who Changed Groups",
+        "description": "A friendship changes when one student joins a different group, forcing both children to reconsider loyalty."
+      },
+      {
+        "id": 12,
+        "genre": "Complex Friendship",
+        "title": "The Message Taken Wrong",
+        "description": "A short online message creates a misunderstanding that friends must repair face to face."
+      },
+      {
+        "id": 13,
+        "genre": "Complex Friendship",
+        "title": "The Competition Between Friends",
+        "description": "Two close friends compete for the same award and learn how ambition can strain kindness."
+      },
+      {
+        "id": 14,
+        "genre": "Complex Friendship",
+        "title": "The Secret-Keeper Problem",
+        "description": "A student is trusted with a secret and must decide when silence stops being helpful."
+      },
+      {
+        "id": 15,
+        "genre": "Complex Friendship",
+        "title": "The Unequal Partnership",
+        "description": "A group project reveals that one student is doing too much work while another is avoiding responsibility."
+      },
+      {
+        "id": 16,
+        "genre": "Complex Friendship",
+        "title": "The Birthday Nobody Planned",
+        "description": "A forgotten birthday forces a group of friends to think about attention, apology, and repair."
+      },
+      {
+        "id": 17,
+        "genre": "Complex Friendship",
+        "title": "The Rumor in the Hallway",
+        "description": "Students respond to a rumor and learn how quickly careless words can change relationships."
+      },
+      {
+        "id": 18,
+        "genre": "Complex Friendship",
+        "title": "The Old Friend and the New Friend",
+        "description": "A child struggles to balance an old friendship with a new one without making either person feel replaced."
+      },
+      {
+        "id": 19,
+        "genre": "Complex Friendship",
+        "title": "The Honest Feedback",
+        "description": "A student must give honest feedback on a friend's performance without damaging the friendship."
+      },
+      {
+        "id": 20,
+        "genre": "Complex Friendship",
+        "title": "The Group Chat Choice",
+        "description": "A group chat problem teaches students about digital responsibility and including people fairly."
+      },
+      {
+        "id": 21,
+        "genre": "Adventure With Consequences",
+        "title": "The Trail Closed Sign",
+        "description": "Friends face a choice when a shortcut is closed and learn why rules often have hidden reasons."
+      },
+      {
+        "id": 22,
+        "genre": "Adventure With Consequences",
+        "title": "The Storm on the Ridge",
+        "description": "A hiking group must change its plan quickly when a storm approaches during an outdoor challenge."
+      },
+      {
+        "id": 23,
+        "genre": "Adventure With Consequences",
+        "title": "The Kayak Drift",
+        "description": "A kayaking lesson becomes serious when students drift from the group and must use safety training."
+      },
+      {
+        "id": 24,
+        "genre": "Adventure With Consequences",
+        "title": "The Abandoned Station",
+        "description": "Students explore an old station for a history project and discover why curiosity needs boundaries."
+      },
+      {
+        "id": 25,
+        "genre": "Adventure With Consequences",
+        "title": "The Cave Echo Decision",
+        "description": "A cave visit tests a group's patience when sound and fear make communication difficult."
+      },
+      {
+        "id": 26,
+        "genre": "Adventure With Consequences",
+        "title": "The Broken Bridge Route",
+        "description": "A damaged footbridge forces children to choose between turning back or finding a safer route."
+      },
+      {
+        "id": 27,
+        "genre": "Adventure With Consequences",
+        "title": "The Night Walk Challenge",
+        "description": "A supervised night walk teaches students how fear changes perception and why calm observation matters."
+      },
+      {
+        "id": 28,
+        "genre": "Adventure With Consequences",
+        "title": "The Island Tide Lesson",
+        "description": "A beach exploration changes when the tide rises faster than expected."
+      },
+      {
+        "id": 29,
+        "genre": "Adventure With Consequences",
+        "title": "The Mountain Rescue Drill",
+        "description": "A practice rescue drill becomes a lesson in leadership, trust, and following instructions."
+      },
+      {
+        "id": 30,
+        "genre": "Adventure With Consequences",
+        "title": "The Lost Research Notebook",
+        "description": "A field trip notebook goes missing, threatening a project and forcing the group to retrace its choices."
+      },
+      {
+        "id": 31,
+        "genre": "Ethics & Fairness",
+        "title": "The Answer Sheet Temptation",
+        "description": "A student finds an answer sheet before a test and must choose between advantage and integrity."
+      },
+      {
+        "id": 32,
+        "genre": "Ethics & Fairness",
+        "title": "The Prize That Felt Unfair",
+        "description": "A contest result seems unfair, and students must decide how to question it respectfully."
+      },
+      {
+        "id": 33,
+        "genre": "Ethics & Fairness",
+        "title": "The Borrowed Idea",
+        "description": "A creative idea is used without credit, forcing classmates to talk about ownership and respect."
+      },
+      {
+        "id": 34,
+        "genre": "Ethics & Fairness",
+        "title": "The Captain's Hard Choice",
+        "description": "A team captain must choose players fairly while managing pressure from close friends."
+      },
+      {
+        "id": 35,
+        "genre": "Ethics & Fairness",
+        "title": "The Fundraising Mistake",
+        "description": "A fundraising total is counted incorrectly, and students must decide whether to correct a helpful error."
+      },
+      {
+        "id": 36,
+        "genre": "Ethics & Fairness",
+        "title": "The Rule Everyone Ignores",
+        "description": "A small ignored rule creates a larger problem, teaching students why shared rules matter."
+      },
+      {
+        "id": 37,
+        "genre": "Ethics & Fairness",
+        "title": "The Apology After Winning",
+        "description": "A student wins but behaves badly, then learns that success does not excuse unkindness."
+      },
+      {
+        "id": 38,
+        "genre": "Ethics & Fairness",
+        "title": "The Teacher's Trust",
+        "description": "A class earns extra freedom and must decide how to respond when someone misuses it."
+      },
+      {
+        "id": 39,
+        "genre": "Ethics & Fairness",
+        "title": "The Shared Credit Debate",
+        "description": "A group must decide how to share credit when one member had the original idea but others improved it."
+      },
+      {
+        "id": 40,
+        "genre": "Ethics & Fairness",
+        "title": "The Photo Permission Problem",
+        "description": "A student posts a photo without asking and learns why permission matters even among friends."
+      },
+      {
+        "id": 41,
+        "genre": "Environment & Community Action",
+        "title": "The Plastic-Free Week",
+        "description": "A school tries a plastic-free week and students discover both the difficulty and value of changing habits."
+      },
+      {
+        "id": 42,
+        "genre": "Environment & Community Action",
+        "title": "The River Testing Project",
+        "description": "Students test water from a local river and must explain their findings to the community."
+      },
+      {
+        "id": 43,
+        "genre": "Environment & Community Action",
+        "title": "The Trees Marked for Cutting",
+        "description": "Children learn that some trees may be removed and organize a thoughtful response with facts and respect."
+      },
+      {
+        "id": 44,
+        "genre": "Environment & Community Action",
+        "title": "The Community Garden Argument",
+        "description": "A garden project divides neighbors until students help find a plan that serves different needs."
+      },
+      {
+        "id": 45,
+        "genre": "Environment & Community Action",
+        "title": "The Wildlife Crossing Plan",
+        "description": "A class designs a simple wildlife crossing idea and learns how roads affect animals."
+      },
+      {
+        "id": 46,
+        "genre": "Environment & Community Action",
+        "title": "The Cafeteria Waste Audit",
+        "description": "Students measure food waste at school and face uncomfortable facts about daily choices."
+      },
+      {
+        "id": 47,
+        "genre": "Environment & Community Action",
+        "title": "The Polluted Pond Report",
+        "description": "A pond project teaches students how evidence can turn concern into practical action."
+      },
+      {
+        "id": 48,
+        "genre": "Environment & Community Action",
+        "title": "The Solar Panel Proposal",
+        "description": "A student council considers solar panels and learns to compare cost, benefit, and long-term impact."
+      },
+      {
+        "id": 49,
+        "genre": "Environment & Community Action",
+        "title": "The Quiet Park Campaign",
+        "description": "Children campaign for quieter park behavior after learning how noise affects people and animals."
+      },
+      {
+        "id": 50,
+        "genre": "Environment & Community Action",
+        "title": "The Repair Cafe Day",
+        "description": "A community repair event teaches students that fixing objects can reduce waste and build skills."
+      },
+      {
+        "id": 51,
+        "genre": "Technology & Responsibility",
+        "title": "The AI Homework Helper",
+        "description": "A student uses a digital tool for homework and learns the difference between help and dishonesty."
+      },
+      {
+        "id": 52,
+        "genre": "Technology & Responsibility",
+        "title": "The Phone-Free Challenge",
+        "description": "A class tries a phone-free challenge and reflects on attention, boredom, and real conversation."
+      },
+      {
+        "id": 53,
+        "genre": "Technology & Responsibility",
+        "title": "The Online Game Team",
+        "description": "An online team game creates conflict around cooperation, tone, and fair play."
+      },
+      {
+        "id": 54,
+        "genre": "Technology & Responsibility",
+        "title": "The Drone Video Plan",
+        "description": "Students plan a drone video and learn about privacy, permission, and safety rules."
+      },
+      {
+        "id": 55,
+        "genre": "Technology & Responsibility",
+        "title": "The Broken Class Website",
+        "description": "A class website breaks before a presentation, requiring students to troubleshoot under pressure."
+      },
+      {
+        "id": 56,
+        "genre": "Technology & Responsibility",
+        "title": "The Algorithm Surprise",
+        "description": "A student notices repeated video recommendations and begins to question how online choices are shaped."
+      },
+      {
+        "id": 57,
+        "genre": "Technology & Responsibility",
+        "title": "The Digital Time Capsule",
+        "description": "A class creates a digital time capsule and discusses what memories should be shared publicly."
+      },
+      {
+        "id": 58,
+        "genre": "Technology & Responsibility",
+        "title": "The Robot Helper Debate",
+        "description": "Students debate whether a robot helper should replace or support human jobs in school."
+      },
+      {
+        "id": 59,
+        "genre": "Technology & Responsibility",
+        "title": "The Edited Photo",
+        "description": "An edited photo causes confusion and teaches students how images can change truth."
+      },
+      {
+        "id": 60,
+        "genre": "Technology & Responsibility",
+        "title": "The Password Problem",
+        "description": "A shared password creates trouble and students learn why personal information must be protected."
+      },
+      {
+        "id": 61,
+        "genre": "Culture & Perspective",
+        "title": "The Festival Exchange",
+        "description": "Students compare two festivals and learn how traditions can be different while sharing similar values."
+      },
+      {
+        "id": 62,
+        "genre": "Culture & Perspective",
+        "title": "The Translation Mistake",
+        "description": "A translation mistake creates confusion during a school event and teaches patience with language learning."
+      },
+      {
+        "id": 63,
+        "genre": "Culture & Perspective",
+        "title": "The Lunch From Home",
+        "description": "A student feels shy about a traditional lunch before classmates learn about food and culture."
+      },
+      {
+        "id": 64,
+        "genre": "Culture & Perspective",
+        "title": "The Museum Label",
+        "description": "A museum label makes students question whose stories are included in history."
+      },
+      {
+        "id": 65,
+        "genre": "Culture & Perspective",
+        "title": "The Pen Pal Project",
+        "description": "Letters from another country help students notice assumptions they did not know they had."
+      },
+      {
+        "id": 66,
+        "genre": "Culture & Perspective",
+        "title": "The Music Collaboration",
+        "description": "Students combine different musical styles and learn how creativity grows from listening."
+      },
+      {
+        "id": 67,
+        "genre": "Culture & Perspective",
+        "title": "The Story From Two Sides",
+        "description": "A local legend is told in two versions, helping students understand perspective and memory."
+      },
+      {
+        "id": 68,
+        "genre": "Culture & Perspective",
+        "title": "The Language Day Speech",
+        "description": "A language celebration teaches students about pride, nervousness, and respect for multilingual classmates."
+      },
+      {
+        "id": 69,
+        "genre": "Culture & Perspective",
+        "title": "The Art From Recycled Objects",
+        "description": "An art project connects culture, environment, and personal expression through reused materials."
+      },
+      {
+        "id": 70,
+        "genre": "Culture & Perspective",
+        "title": "The History Walk",
+        "description": "A guided walk through town helps students see familiar streets through older stories."
+      },
+      {
+        "id": 71,
+        "genre": "Leadership & Teamwork",
+        "title": "The Reluctant Team Leader",
+        "description": "A student who avoids attention must lead a team when the usual leader is absent."
+      },
+      {
+        "id": 72,
+        "genre": "Leadership & Teamwork",
+        "title": "The Debate Team Split",
+        "description": "A debate team divides over strategy and must rebuild trust before the final round."
+      },
+      {
+        "id": 73,
+        "genre": "Leadership & Teamwork",
+        "title": "The Camp Schedule Crisis",
+        "description": "A camp schedule falls apart, forcing students to decide priorities under time pressure."
+      },
+      {
+        "id": 74,
+        "genre": "Leadership & Teamwork",
+        "title": "The Orchestra Performance",
+        "description": "A school orchestra prepares for a performance and learns how individual practice affects the group."
+      },
+      {
+        "id": 75,
+        "genre": "Leadership & Teamwork",
+        "title": "The Volunteer Roster",
+        "description": "A volunteer project fails when jobs are unclear, and students redesign the system fairly."
+      },
+      {
+        "id": 76,
+        "genre": "Leadership & Teamwork",
+        "title": "The House Captain Problem",
+        "description": "A house captain must handle complaints from younger students and pressure from friends."
+      },
+      {
+        "id": 77,
+        "genre": "Leadership & Teamwork",
+        "title": "The Emergency Drill",
+        "description": "An emergency drill reveals who stays calm and how leadership appears in small actions."
+      },
+      {
+        "id": 78,
+        "genre": "Leadership & Teamwork",
+        "title": "The Robotics Team Deadline",
+        "description": "A robotics team faces a deadline and learns how planning prevents last-minute blame."
+      },
+      {
+        "id": 79,
+        "genre": "Leadership & Teamwork",
+        "title": "The Community Interview Team",
+        "description": "Students interview community members and learn to share roles based on skill, confidence, and need."
+      },
+      {
+        "id": 80,
+        "genre": "Leadership & Teamwork",
+        "title": "The Final Rehearsal",
+        "description": "A rehearsal goes badly, and a student leader must encourage honesty without discouraging the team."
+      },
+      {
+        "id": 81,
+        "genre": "Mystery & Investigation",
+        "title": "The Anonymous Suggestion Box",
+        "description": "A series of anonymous suggestions leads students to investigate what their classmates truly need."
+      },
+      {
+        "id": 82,
+        "genre": "Mystery & Investigation",
+        "title": "The Missing Memory Card",
+        "description": "A missing memory card threatens a class film project and forces careful, fair investigation."
+      },
+      {
+        "id": 83,
+        "genre": "Mystery & Investigation",
+        "title": "The Pattern in the Library",
+        "description": "Repeated book movements in the library reveal a hidden system created by a quiet student."
+      },
+      {
+        "id": 84,
+        "genre": "Mystery & Investigation",
+        "title": "The Locked Greenhouse",
+        "description": "A locked greenhouse mystery leads students to discover a problem with plant care and responsibility."
+      },
+      {
+        "id": 85,
+        "genre": "Mystery & Investigation",
+        "title": "The Changed Science Results",
+        "description": "A science experiment result changes overnight, and students must separate evidence from assumptions."
+      },
+      {
+        "id": 86,
+        "genre": "Mystery & Investigation",
+        "title": "The Old School Photograph",
+        "description": "An old photograph reveals a forgotten story about the school and its past students."
+      },
+      {
+        "id": 87,
+        "genre": "Mystery & Investigation",
+        "title": "The Vanishing Stage Props",
+        "description": "Theater props disappear before a performance, creating a mystery about organization and trust."
+      },
+      {
+        "id": 88,
+        "genre": "Mystery & Investigation",
+        "title": "The Unsent Letter",
+        "description": "An unsent letter found in a book prompts students to learn about privacy and empathy."
+      },
+      {
+        "id": 89,
+        "genre": "Mystery & Investigation",
+        "title": "The Map With Two Dates",
+        "description": "A map with two dates leads students to compare past and present versions of their town."
+      },
+      {
+        "id": 90,
+        "genre": "Mystery & Investigation",
+        "title": "The Silent Bell",
+        "description": "A school bell stops working at important moments, and students investigate a practical but surprising cause."
+      },
+      {
+        "id": 91,
+        "genre": "Personal Challenge",
+        "title": "The Speech Without Notes",
+        "description": "A student prepares to give a speech without notes and learns how confidence grows through structure."
+      },
+      {
+        "id": 92,
+        "genre": "Personal Challenge",
+        "title": "The Long-Distance Race",
+        "description": "A runner trains for a difficult race and learns to understand effort, limits, and recovery."
+      },
+      {
+        "id": 93,
+        "genre": "Personal Challenge",
+        "title": "The Audition Decision",
+        "description": "A child decides whether to audition again after failing once and learns what persistence really means."
+      },
+      {
+        "id": 94,
+        "genre": "Personal Challenge",
+        "title": "The Difficult Conversation",
+        "description": "A student must have a difficult conversation with a friend instead of avoiding the problem."
+      },
+      {
+        "id": 95,
+        "genre": "Personal Challenge",
+        "title": "The Fear of Deep Water",
+        "description": "Swimming lessons help a student face fear gradually with support and realistic goals."
+      },
+      {
+        "id": 96,
+        "genre": "Personal Challenge",
+        "title": "The Exam Pressure Plan",
+        "description": "A student under exam pressure learns how planning and rest can work together."
+      },
+      {
+        "id": 97,
+        "genre": "Personal Challenge",
+        "title": "The First Solo Trip",
+        "description": "A first short solo trip across town teaches a child independence and careful attention."
+      },
+      {
+        "id": 98,
+        "genre": "Personal Challenge",
+        "title": "The Art Competition Loss",
+        "description": "A student loses an art competition and learns to value feedback without losing motivation."
+      },
+      {
+        "id": 99,
+        "genre": "Personal Challenge",
+        "title": "The Promise to Practice",
+        "description": "A music student makes a practice promise and learns why consistency matters more than last-minute effort."
+      },
+      {
+        "id": 100,
+        "genre": "Personal Challenge",
+        "title": "The Day Everything Changed",
+        "description": "An unexpected family change challenges a child to adapt while still asking for support."
+      }
+    ]
+  }
+}
