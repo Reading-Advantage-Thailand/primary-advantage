@@ -1,0 +1,1109 @@
+{
+  "storyCollection": {
+    "title": "Primary Advantage YLE Flyers Nonfiction Library",
+    "targetAudience": "Grades 3-6 (YLE Flyers Level)",
+    "totalStories": 100,
+    "stories": [
+      {
+        "id": 1,
+        "genre": "Animals & Habitats",
+        "title": "Rainforest Animals",
+        "description": "A common-knowledge article about animals that live in rainforests and the features of their habitat.",
+        "points": [
+          "what a rainforest is like",
+          "animals that live there",
+          "how the habitat helps them survive"
+        ]
+      },
+      {
+        "id": 2,
+        "genre": "Animals & Habitats",
+        "title": "Desert Animals",
+        "description": "A common-knowledge article about animals that live in hot, dry deserts.",
+        "points": [
+          "desert weather and land",
+          "animals found there",
+          "ways they stay safe and find water"
+        ]
+      },
+      {
+        "id": 3,
+        "genre": "Animals & Habitats",
+        "title": "Animals in the Ocean",
+        "description": "A common-knowledge article about ocean animals and the different parts of the sea where they live.",
+        "points": [
+          "main ocean habitat features",
+          "animals in the water",
+          "how the ocean supports life"
+        ]
+      },
+      {
+        "id": 4,
+        "genre": "Animals & Habitats",
+        "title": "Life in a Pond",
+        "description": "A common-knowledge article about small pond habitats and the creatures that live there.",
+        "points": [
+          "what a pond is like",
+          "plants and animals in a pond",
+          "how these living things depend on each other"
+        ]
+      },
+      {
+        "id": 5,
+        "genre": "Animals & Habitats",
+        "title": "How Birds Build Nests",
+        "description": "A common-knowledge article about the materials birds use and why nests are important.",
+        "points": [
+          "where birds build nests",
+          "materials they collect",
+          "how nests protect eggs and chicks"
+        ]
+      },
+      {
+        "id": 6,
+        "genre": "Animals & Habitats",
+        "title": "Why Polar Bears Need Ice",
+        "description": "A common-knowledge article about polar bears and the icy habitat they depend on.",
+        "points": [
+          "what the Arctic is like",
+          "how polar bears use sea ice",
+          "why habitat change is a problem"
+        ]
+      },
+      {
+        "id": 7,
+        "genre": "Animals & Habitats",
+        "title": "Camels in the Desert",
+        "description": "A common-knowledge article about camels and the body features that help them live in deserts.",
+        "points": [
+          "camel body features",
+          "desert challenges",
+          "how camels travel and survive"
+        ]
+      },
+      {
+        "id": 8,
+        "genre": "Animals & Habitats",
+        "title": "Life in a Coral Reef",
+        "description": "A common-knowledge article about colorful coral reefs and the animals that depend on them.",
+        "points": [
+          "what coral reefs are",
+          "animals found there",
+          "why reefs need protection"
+        ]
+      },
+      {
+        "id": 9,
+        "genre": "Animals & Habitats",
+        "title": "Animals That Live Underground",
+        "description": "A common-knowledge article about animals that spend much of their lives below the ground.",
+        "points": [
+          "examples of underground animals",
+          "why underground homes help",
+          "how these animals find food"
+        ]
+      },
+      {
+        "id": 10,
+        "genre": "Animals & Habitats",
+        "title": "How Animals Hide",
+        "description": "A common-knowledge article about the ways animals use color or shape to stay safe.",
+        "points": [
+          "reasons animals hide",
+          "common ways they hide",
+          "examples from different habitats"
+        ]
+      },
+      {
+        "id": 11,
+        "genre": "Earth & Weather",
+        "title": "The Water Cycle",
+        "description": "A common-knowledge article about evaporation, clouds, rain, and the movement of water.",
+        "points": [
+          "water rising into the air",
+          "clouds and rain",
+          "why the cycle matters on Earth"
+        ]
+      },
+      {
+        "id": 12,
+        "genre": "Earth & Weather",
+        "title": "How Rainbows Form",
+        "description": "A common-knowledge article about sunlight, rain, and the colors seen in a rainbow.",
+        "points": [
+          "what is needed for a rainbow",
+          "how light changes",
+          "when people can see one"
+        ]
+      },
+      {
+        "id": 13,
+        "genre": "Earth & Weather",
+        "title": "Why It Rains",
+        "description": "A common-knowledge article about how clouds fill with water and release rain.",
+        "points": [
+          "water in the air",
+          "how clouds change",
+          "what happens when rain falls"
+        ]
+      },
+      {
+        "id": 14,
+        "genre": "Earth & Weather",
+        "title": "Thunder and Lightning",
+        "description": "A common-knowledge article about storms, thunder, and lightning in simple terms.",
+        "points": [
+          "what happens in a storm cloud",
+          "why we see light and hear sound",
+          "how to stay safe during storms"
+        ]
+      },
+      {
+        "id": 15,
+        "genre": "Earth & Weather",
+        "title": "The Four Seasons",
+        "description": "A common-knowledge article about the changes people notice during the year.",
+        "points": [
+          "weather in each season",
+          "changes in plants and animals",
+          "how people adjust their activities"
+        ]
+      },
+      {
+        "id": 16,
+        "genre": "Earth & Weather",
+        "title": "Cloud Types for Children",
+        "description": "A common-knowledge article about a few simple cloud shapes and what they can tell us.",
+        "points": [
+          "different cloud shapes",
+          "weather clues they give",
+          "how children observe the sky"
+        ]
+      },
+      {
+        "id": 17,
+        "genre": "Earth & Weather",
+        "title": "Wind and Weather",
+        "description": "A common-knowledge article about moving air and the role it plays in weather.",
+        "points": [
+          "what wind is",
+          "how wind changes weather",
+          "how wind affects daily life"
+        ]
+      },
+      {
+        "id": 18,
+        "genre": "Earth & Weather",
+        "title": "Floods and Heavy Rain",
+        "description": "A common-knowledge article about what floods are and why too much rain can cause them.",
+        "points": [
+          "how heavy rain builds up",
+          "what a flood does",
+          "simple ways communities stay safe"
+        ]
+      },
+      {
+        "id": 19,
+        "genre": "Earth & Weather",
+        "title": "Snow and Ice",
+        "description": "A common-knowledge article about how snow and ice form in cold weather.",
+        "points": [
+          "conditions for snow and ice",
+          "how they change the land",
+          "how people live safely in cold weather"
+        ]
+      },
+      {
+        "id": 20,
+        "genre": "Earth & Weather",
+        "title": "How Weather Forecasts Help Us",
+        "description": "A common-knowledge article about weather reports and why people use them.",
+        "points": [
+          "tools or signs used to study weather",
+          "what a forecast tells us",
+          "how forecasts help daily planning"
+        ]
+      },
+      {
+        "id": 21,
+        "genre": "Science Basics",
+        "title": "States of Water",
+        "description": "A common-knowledge article about water as ice, liquid, and gas.",
+        "points": [
+          "the three states",
+          "how water changes state",
+          "examples from everyday life"
+        ]
+      },
+      {
+        "id": 22,
+        "genre": "Science Basics",
+        "title": "Simple Machines at Home",
+        "description": "A common-knowledge article about simple machines children use without always noticing them.",
+        "points": [
+          "examples of simple machines",
+          "how they make work easier",
+          "where children see them every day"
+        ]
+      },
+      {
+        "id": 23,
+        "genre": "Science Basics",
+        "title": "How Magnets Work",
+        "description": "A common-knowledge article about magnets and the materials they attract.",
+        "points": [
+          "what magnets do",
+          "materials magnets attract",
+          "where magnets are used"
+        ]
+      },
+      {
+        "id": 24,
+        "genre": "Science Basics",
+        "title": "Light and Shadows",
+        "description": "A common-knowledge article about how light travels and creates shadows.",
+        "points": [
+          "how light moves",
+          "how shadows form",
+          "ways shadows change"
+        ]
+      },
+      {
+        "id": 25,
+        "genre": "Science Basics",
+        "title": "Why Plants Need Sunlight",
+        "description": "A common-knowledge article about sunlight and how plants use it to grow.",
+        "points": [
+          "what plants need",
+          "why sunlight matters",
+          "changes children see in healthy plants"
+        ]
+      },
+      {
+        "id": 26,
+        "genre": "Science Basics",
+        "title": "The Parts of a Plant",
+        "description": "A common-knowledge article about roots, stems, leaves, and flowers.",
+        "points": [
+          "main plant parts",
+          "job of each part",
+          "how the parts work together"
+        ]
+      },
+      {
+        "id": 27,
+        "genre": "Science Basics",
+        "title": "What Soil Does",
+        "description": "A common-knowledge article about soil and why it matters for plants and animals.",
+        "points": [
+          "what soil contains",
+          "how soil helps plants",
+          "animals that live in soil"
+        ]
+      },
+      {
+        "id": 28,
+        "genre": "Science Basics",
+        "title": "How Paper Is Made",
+        "description": "A common-knowledge article about the basic process of turning wood into paper.",
+        "points": [
+          "where paper begins",
+          "main steps in making it",
+          "why recycling paper matters"
+        ]
+      },
+      {
+        "id": 29,
+        "genre": "Science Basics",
+        "title": "What Happens When We Mix Colors",
+        "description": "A common-knowledge article about combining colors in paint or light.",
+        "points": [
+          "basic colors used",
+          "new colors formed",
+          "where children use this idea"
+        ]
+      },
+      {
+        "id": 30,
+        "genre": "Science Basics",
+        "title": "How Sound Travels",
+        "description": "A common-knowledge article about how we hear sounds from voices, music, and moving objects.",
+        "points": [
+          "how sound starts",
+          "how it reaches our ears",
+          "why some sounds are louder than others"
+        ]
+      },
+      {
+        "id": 31,
+        "genre": "Health & Human Body",
+        "title": "How Muscles Help Us Move",
+        "description": "A common-knowledge article about muscles and the role they play in everyday movement.",
+        "points": [
+          "what muscles do",
+          "common movements they help with",
+          "why exercise helps muscles"
+        ]
+      },
+      {
+        "id": 32,
+        "genre": "Health & Human Body",
+        "title": "Why We Need Sleep",
+        "description": "A common-knowledge article about the way sleep helps the body and brain.",
+        "points": [
+          "how sleep helps the body",
+          "how sleep helps learning and mood",
+          "habits for better sleep"
+        ]
+      },
+      {
+        "id": 33,
+        "genre": "Health & Human Body",
+        "title": "The Job of the Heart",
+        "description": "A common-knowledge article about the heart and how it moves blood around the body.",
+        "points": [
+          "where the heart is",
+          "what blood carries",
+          "why keeping the heart healthy matters"
+        ]
+      },
+      {
+        "id": 34,
+        "genre": "Health & Human Body",
+        "title": "Bones and the Skeleton",
+        "description": "A common-knowledge article about the skeleton and why bones matter.",
+        "points": [
+          "what bones do",
+          "how bones protect the body",
+          "ways to keep bones strong"
+        ]
+      },
+      {
+        "id": 35,
+        "genre": "Health & Human Body",
+        "title": "Healthy Teeth",
+        "description": "A common-knowledge article about keeping teeth clean and strong.",
+        "points": [
+          "what teeth help us do",
+          "daily habits for healthy teeth",
+          "foods and habits that protect them"
+        ]
+      },
+      {
+        "id": 36,
+        "genre": "Health & Human Body",
+        "title": "Why We Breathe",
+        "description": "A common-knowledge article about breathing and how air helps the body work.",
+        "points": [
+          "what happens when we breathe in",
+          "how lungs help",
+          "why exercise changes breathing"
+        ]
+      },
+      {
+        "id": 37,
+        "genre": "Health & Human Body",
+        "title": "Food Groups for Children",
+        "description": "A common-knowledge article about different kinds of food and what they do for the body.",
+        "points": [
+          "main food groups",
+          "what each group gives us",
+          "why balance matters"
+        ]
+      },
+      {
+        "id": 38,
+        "genre": "Health & Human Body",
+        "title": "Keeping Germs Away",
+        "description": "A common-knowledge article about germs and the habits that stop them spreading.",
+        "points": [
+          "what germs are",
+          "how germs move from place to place",
+          "habits that protect health"
+        ]
+      },
+      {
+        "id": 39,
+        "genre": "Health & Human Body",
+        "title": "Why Water Matters for the Body",
+        "description": "A common-knowledge article about the role of water in staying healthy.",
+        "points": [
+          "what water helps the body do",
+          "signs we need a drink",
+          "ways to remember to drink water"
+        ]
+      },
+      {
+        "id": 40,
+        "genre": "Health & Human Body",
+        "title": "Exercise and Energy",
+        "description": "A common-knowledge article about how movement helps children feel strong and active.",
+        "points": [
+          "ways children exercise",
+          "how exercise helps the body",
+          "how it also helps mood and focus"
+        ]
+      },
+      {
+        "id": 41,
+        "genre": "Food & Farming",
+        "title": "From Farm to Table",
+        "description": "A common-knowledge article about the journey food takes before it reaches a family meal.",
+        "points": [
+          "where food begins",
+          "how it is moved and sold",
+          "why understanding this journey matters"
+        ]
+      },
+      {
+        "id": 42,
+        "genre": "Food & Farming",
+        "title": "How Rice Is Grown",
+        "description": "A common-knowledge article about growing rice and the work farmers do.",
+        "points": [
+          "where rice grows",
+          "main growing steps",
+          "why rice is important in many meals"
+        ]
+      },
+      {
+        "id": 43,
+        "genre": "Food & Farming",
+        "title": "The Life of an Apple",
+        "description": "A common-knowledge article about how apples grow from blossoms to fruit.",
+        "points": [
+          "how an apple tree changes",
+          "when fruit grows",
+          "how apples reach shops or homes"
+        ]
+      },
+      {
+        "id": 44,
+        "genre": "Food & Farming",
+        "title": "Where Milk Comes From",
+        "description": "A common-knowledge article about dairy farming and the journey of milk.",
+        "points": [
+          "animals that give milk",
+          "how milk is collected safely",
+          "products made from milk"
+        ]
+      },
+      {
+        "id": 45,
+        "genre": "Food & Farming",
+        "title": "Why Bees Help Farmers",
+        "description": "A common-knowledge article about pollination and why bees matter in farming.",
+        "points": [
+          "what pollination is",
+          "how bees help crops",
+          "why farmers care about bees"
+        ]
+      },
+      {
+        "id": 46,
+        "genre": "Food & Farming",
+        "title": "How Bread Is Made",
+        "description": "A common-knowledge article about turning grain into flour and flour into bread.",
+        "points": [
+          "where grain comes from",
+          "how dough is made",
+          "how bread is baked"
+        ]
+      },
+      {
+        "id": 47,
+        "genre": "Food & Farming",
+        "title": "Vegetables in the Garden",
+        "description": "A common-knowledge article about common garden vegetables and how they grow.",
+        "points": [
+          "vegetables people grow",
+          "what plants need",
+          "how families use these foods"
+        ]
+      },
+      {
+        "id": 48,
+        "genre": "Food & Farming",
+        "title": "Why We Store Food Safely",
+        "description": "A common-knowledge article about keeping food fresh and safe to eat.",
+        "points": [
+          "places where food is stored",
+          "why temperature matters",
+          "simple habits for food safety"
+        ]
+      },
+      {
+        "id": 49,
+        "genre": "Food & Farming",
+        "title": "Fish from Sea to Market",
+        "description": "A common-knowledge article about how fish are caught or raised and sold for food.",
+        "points": [
+          "where food fish come from",
+          "how they reach markets",
+          "why freshness matters"
+        ]
+      },
+      {
+        "id": 50,
+        "genre": "Food & Farming",
+        "title": "Local Foods and Seasonal Foods",
+        "description": "A common-knowledge article about foods that grow well in a place or time of year.",
+        "points": [
+          "what local food means",
+          "what seasonal food means",
+          "why both can be useful choices"
+        ]
+      },
+      {
+        "id": 51,
+        "genre": "Community & Culture",
+        "title": "Why Communities Need Rules",
+        "description": "A common-knowledge article about simple rules that help people live and work together.",
+        "points": [
+          "what rules do",
+          "places where rules matter",
+          "how rules keep people safe and fair"
+        ]
+      },
+      {
+        "id": 52,
+        "genre": "Community & Culture",
+        "title": "Celebrations Around the World",
+        "description": "A common-knowledge article about how people celebrate important days in different places.",
+        "points": [
+          "reasons people celebrate",
+          "things celebrations may include",
+          "what children can learn from traditions"
+        ]
+      },
+      {
+        "id": 53,
+        "genre": "Community & Culture",
+        "title": "The Work of Community Helpers",
+        "description": "A common-knowledge article about the different workers who help a town run well.",
+        "points": [
+          "examples of helpers",
+          "what each one does",
+          "why communities depend on them"
+        ]
+      },
+      {
+        "id": 54,
+        "genre": "Community & Culture",
+        "title": "How a Library Helps a Town",
+        "description": "A common-knowledge article about why libraries matter beyond borrowing books.",
+        "points": [
+          "things libraries offer",
+          "who uses them",
+          "why they help learning and community life"
+        ]
+      },
+      {
+        "id": 55,
+        "genre": "Community & Culture",
+        "title": "Markets in Different Places",
+        "description": "A common-knowledge article about how markets work and what they show about local life.",
+        "points": [
+          "what people buy and sell",
+          "how markets feel busy and social",
+          "what children learn there"
+        ]
+      },
+      {
+        "id": 56,
+        "genre": "Community & Culture",
+        "title": "School Traditions",
+        "description": "A common-knowledge article about traditions and special events that bring school communities together.",
+        "points": [
+          "common school traditions",
+          "why schools repeat them",
+          "how they build belonging"
+        ]
+      },
+      {
+        "id": 57,
+        "genre": "Community & Culture",
+        "title": "Music in Daily Life",
+        "description": "A common-knowledge article about the different times and places people listen to or make music.",
+        "points": [
+          "where people hear music",
+          "reasons music matters",
+          "how music can connect people"
+        ]
+      },
+      {
+        "id": 58,
+        "genre": "Community & Culture",
+        "title": "Simple Maps of a Town",
+        "description": "A common-knowledge article about maps and how they help people move around a community.",
+        "points": [
+          "what information a map shows",
+          "symbols or directions on a map",
+          "how children use maps"
+        ]
+      },
+      {
+        "id": 59,
+        "genre": "Community & Culture",
+        "title": "Respecting Different Customs",
+        "description": "A common-knowledge article about noticing and respecting different ways families live and celebrate.",
+        "points": [
+          "what customs are",
+          "examples children may notice",
+          "why respect matters"
+        ]
+      },
+      {
+        "id": 60,
+        "genre": "Community & Culture",
+        "title": "Why Public Parks Matter",
+        "description": "A common-knowledge article about the role of public parks in a community.",
+        "points": [
+          "what people do in parks",
+          "who uses these spaces",
+          "why towns need green places"
+        ]
+      },
+      {
+        "id": 61,
+        "genre": "Travel & Geography",
+        "title": "Mountains and Valleys",
+        "description": "A common-knowledge article about two kinds of landforms and how they are different.",
+        "points": [
+          "what mountains are like",
+          "what valleys are like",
+          "how people and animals live there"
+        ]
+      },
+      {
+        "id": 62,
+        "genre": "Travel & Geography",
+        "title": "Rivers and Lakes",
+        "description": "A common-knowledge article about two important kinds of fresh water on Earth.",
+        "points": [
+          "how rivers move",
+          "how lakes stay in one place",
+          "why people and animals need both"
+        ]
+      },
+      {
+        "id": 63,
+        "genre": "Travel & Geography",
+        "title": "Living Near the Coast",
+        "description": "A common-knowledge article about what life can be like near the sea.",
+        "points": [
+          "what the coast is",
+          "jobs or activities people do there",
+          "how the sea affects daily life"
+        ]
+      },
+      {
+        "id": 64,
+        "genre": "Travel & Geography",
+        "title": "Hot and Cold Places",
+        "description": "A common-knowledge article comparing places with very different climates.",
+        "points": [
+          "features of hot places",
+          "features of cold places",
+          "how people adapt"
+        ]
+      },
+      {
+        "id": 65,
+        "genre": "Travel & Geography",
+        "title": "What a Globe Shows",
+        "description": "A common-knowledge article about globes and the way they help children understand Earth.",
+        "points": [
+          "how a globe is different from a map",
+          "what oceans and continents look like",
+          "why globes help learning"
+        ]
+      },
+      {
+        "id": 66,
+        "genre": "Travel & Geography",
+        "title": "Busy Cities and Quiet Villages",
+        "description": "A common-knowledge article comparing city life and village life in simple terms.",
+        "points": [
+          "features of a city",
+          "features of a village",
+          "how daily life may be different"
+        ]
+      },
+      {
+        "id": 67,
+        "genre": "Travel & Geography",
+        "title": "Crossing a Bridge",
+        "description": "A common-knowledge article about bridges and why people build them.",
+        "points": [
+          "places where bridges are needed",
+          "how bridges help travel",
+          "different kinds of bridges children may know"
+        ]
+      },
+      {
+        "id": 68,
+        "genre": "Travel & Geography",
+        "title": "Travel by Train",
+        "description": "A common-knowledge article about trains and the reasons many people use them.",
+        "points": [
+          "how train travel works",
+          "what people notice on a train",
+          "why trains help connect places"
+        ]
+      },
+      {
+        "id": 69,
+        "genre": "Travel & Geography",
+        "title": "A Map of My Country",
+        "description": "A common-knowledge article about the kinds of information children can learn from a country map.",
+        "points": [
+          "places shown on the map",
+          "rivers, mountains, or cities",
+          "how a map helps people travel or learn"
+        ]
+      },
+      {
+        "id": 70,
+        "genre": "Travel & Geography",
+        "title": "Islands and Peninsulas",
+        "description": "A common-knowledge article about two landforms that reach into water.",
+        "points": [
+          "what an island is",
+          "what a peninsula is",
+          "how they are different"
+        ]
+      },
+      {
+        "id": 71,
+        "genre": "Environment & Recycling",
+        "title": "Why Recycling Matters",
+        "description": "A common-knowledge article about recycling and how it reduces waste.",
+        "points": [
+          "what recycling means",
+          "common materials people recycle",
+          "how recycling helps the environment"
+        ]
+      },
+      {
+        "id": 72,
+        "genre": "Environment & Recycling",
+        "title": "Saving Water at Home",
+        "description": "A common-knowledge article about small ways families can use less water.",
+        "points": [
+          "where water is used at home",
+          "simple water-saving habits",
+          "why water should not be wasted"
+        ]
+      },
+      {
+        "id": 73,
+        "genre": "Environment & Recycling",
+        "title": "Turning Off Lights",
+        "description": "A common-knowledge article about saving electricity with simple daily habits.",
+        "points": [
+          "where lights are used",
+          "why turning them off helps",
+          "other easy energy-saving habits"
+        ]
+      },
+      {
+        "id": 74,
+        "genre": "Environment & Recycling",
+        "title": "The Problem of Litter",
+        "description": "A common-knowledge article about litter and how it affects streets, parks, and animals.",
+        "points": [
+          "what litter is",
+          "problems it causes",
+          "how children and families can help"
+        ]
+      },
+      {
+        "id": 75,
+        "genre": "Environment & Recycling",
+        "title": "Planting More Trees",
+        "description": "A common-knowledge article about why tree planting helps people and nature.",
+        "points": [
+          "ways trees help the planet",
+          "where new trees may be planted",
+          "how communities can take part"
+        ]
+      },
+      {
+        "id": 76,
+        "genre": "Environment & Recycling",
+        "title": "Cleaning a Beach or Park",
+        "description": "A common-knowledge article about community clean-up days and why they matter.",
+        "points": [
+          "what happens during a clean-up",
+          "how the area changes after",
+          "why teamwork helps"
+        ]
+      },
+      {
+        "id": 77,
+        "genre": "Environment & Recycling",
+        "title": "Using Less Plastic",
+        "description": "A common-knowledge article about simple ways to reduce plastic waste.",
+        "points": [
+          "where plastic is common",
+          "problems too much plastic causes",
+          "alternatives families can choose"
+        ]
+      },
+      {
+        "id": 78,
+        "genre": "Environment & Recycling",
+        "title": "Compost for Gardens",
+        "description": "A common-knowledge article about turning food scraps into useful compost.",
+        "points": [
+          "what can go into compost",
+          "how it changes over time",
+          "why gardens benefit from it"
+        ]
+      },
+      {
+        "id": 79,
+        "genre": "Environment & Recycling",
+        "title": "Helping Birds in the City",
+        "description": "A common-knowledge article about small ways people can make towns better for birds.",
+        "points": [
+          "problems birds face in towns",
+          "ways people can help",
+          "why birds matter in urban spaces"
+        ]
+      },
+      {
+        "id": 80,
+        "genre": "Environment & Recycling",
+        "title": "Why Clean Air Matters",
+        "description": "A common-knowledge article about air quality and the importance of clean air for people and animals.",
+        "points": [
+          "what clean air means",
+          "things that can make air dirty",
+          "simple ways communities can help"
+        ]
+      },
+      {
+        "id": 81,
+        "genre": "Technology & Everyday Machines",
+        "title": "How a Bicycle Works",
+        "description": "A common-knowledge article about the simple parts of a bicycle and how they work together.",
+        "points": [
+          "main parts of a bicycle",
+          "how the parts help movement",
+          "why bicycles are useful transport"
+        ]
+      },
+      {
+        "id": 82,
+        "genre": "Technology & Everyday Machines",
+        "title": "The Refrigerator at Home",
+        "description": "A common-knowledge article about how a refrigerator keeps food cold and fresh.",
+        "points": [
+          "what a refrigerator does",
+          "foods people keep inside",
+          "why cold storage matters"
+        ]
+      },
+      {
+        "id": 83,
+        "genre": "Technology & Everyday Machines",
+        "title": "How a Washing Machine Helps",
+        "description": "A common-knowledge article about how washing machines clean clothes.",
+        "points": [
+          "what goes into the machine",
+          "what the machine does",
+          "why this saves time and effort"
+        ]
+      },
+      {
+        "id": 84,
+        "genre": "Technology & Everyday Machines",
+        "title": "Why We Use Elevators",
+        "description": "A common-knowledge article about elevators in tall buildings.",
+        "points": [
+          "where elevators are found",
+          "how they help people move",
+          "simple safety rules when using them"
+        ]
+      },
+      {
+        "id": 85,
+        "genre": "Technology & Everyday Machines",
+        "title": "What a Traffic Light Does",
+        "description": "A common-knowledge article about traffic lights and the way they control road movement.",
+        "points": [
+          "the meaning of each color",
+          "how lights help drivers and walkers",
+          "why following them matters"
+        ]
+      },
+      {
+        "id": 86,
+        "genre": "Technology & Everyday Machines",
+        "title": "How a Fan Cools a Room",
+        "description": "A common-knowledge article about fans and how moving air helps people feel cooler.",
+        "points": [
+          "what a fan does",
+          "when people use fans",
+          "how fans differ from other cooling machines"
+        ]
+      },
+      {
+        "id": 87,
+        "genre": "Technology & Everyday Machines",
+        "title": "Using a Tablet for Learning",
+        "description": "A common-knowledge article about how tablets can help children read, watch, and practice school work.",
+        "points": [
+          "what children can do on a tablet",
+          "how adults guide its use",
+          "why balance matters"
+        ]
+      },
+      {
+        "id": 88,
+        "genre": "Technology & Everyday Machines",
+        "title": "What Happens When We Make a Phone Call",
+        "description": "A common-knowledge article about simple communication through phones.",
+        "points": [
+          "how phones connect people",
+          "what children use calls for",
+          "why phone manners matter"
+        ]
+      },
+      {
+        "id": 89,
+        "genre": "Technology & Everyday Machines",
+        "title": "The Parts of a Camera",
+        "description": "A common-knowledge article about a camera and how it saves pictures.",
+        "points": [
+          "main parts of a camera",
+          "how a picture is taken",
+          "why people keep photos"
+        ]
+      },
+      {
+        "id": 90,
+        "genre": "Technology & Everyday Machines",
+        "title": "Simple Robots Around Us",
+        "description": "A common-knowledge article about basic machines that do jobs automatically.",
+        "points": [
+          "what a simple robot or machine can do",
+          "where people see them",
+          "why automation is useful"
+        ]
+      },
+      {
+        "id": 91,
+        "genre": "History & Famous People",
+        "title": "How Schools Were Different Long Ago",
+        "description": "A common-knowledge article about a few simple ways school life used to be different.",
+        "points": [
+          "what classrooms looked like",
+          "tools students used",
+          "how school changed over time"
+        ]
+      },
+      {
+        "id": 92,
+        "genre": "History & Famous People",
+        "title": "Travel in the Past",
+        "description": "A common-knowledge article about how people traveled before cars and planes were common.",
+        "points": [
+          "ways people traveled long ago",
+          "how travel took more time",
+          "why new transport changed daily life"
+        ]
+      },
+      {
+        "id": 93,
+        "genre": "History & Famous People",
+        "title": "The Story of Paper",
+        "description": "A common-knowledge article about the history of paper and why it changed communication.",
+        "points": [
+          "how people wrote before paper",
+          "how paper spread",
+          "why paper mattered in learning"
+        ]
+      },
+      {
+        "id": 94,
+        "genre": "History & Famous People",
+        "title": "A Famous Inventor",
+        "description": "A common-knowledge article about an inventor whose idea changed everyday life.",
+        "points": [
+          "who the inventor was",
+          "what they created",
+          "why the invention mattered"
+        ]
+      },
+      {
+        "id": 95,
+        "genre": "History & Famous People",
+        "title": "A Famous Explorer",
+        "description": "A common-knowledge article about an explorer and the reasons people remember them.",
+        "points": [
+          "where the explorer traveled",
+          "what they were trying to find",
+          "what people learned from the journey"
+        ]
+      },
+      {
+        "id": 96,
+        "genre": "History & Famous People",
+        "title": "The First Bicycles",
+        "description": "A common-knowledge article about how early bicycles were different from modern ones.",
+        "points": [
+          "what old bicycles looked like",
+          "how people used them",
+          "how bicycles improved later"
+        ]
+      },
+      {
+        "id": 97,
+        "genre": "History & Famous People",
+        "title": "How People Sent Messages Before Email",
+        "description": "A common-knowledge article about letters and older ways of sharing news.",
+        "points": [
+          "how letters were written and sent",
+          "how long messages could take",
+          "why old methods still mattered"
+        ]
+      },
+      {
+        "id": 98,
+        "genre": "History & Famous People",
+        "title": "A Child in the Past",
+        "description": "A common-knowledge article about daily life for children many years ago.",
+        "points": [
+          "work or chores children did",
+          "games or school life",
+          "how life differed from today"
+        ]
+      },
+      {
+        "id": 99,
+        "genre": "History & Famous People",
+        "title": "The History of the Library",
+        "description": "A common-knowledge article about why people began collecting books in shared places.",
+        "points": [
+          "why libraries were created",
+          "how they changed over time",
+          "why they still matter today"
+        ]
+      },
+      {
+        "id": 100,
+        "genre": "History & Famous People",
+        "title": "A Famous Animal Helper",
+        "description": "A common-knowledge article about an animal known for helping people in history or daily life.",
+        "points": [
+          "what kind of animal it was",
+          "how it helped people",
+          "why people remember such animals"
+        ]
+      }
+    ]
+  }
+}

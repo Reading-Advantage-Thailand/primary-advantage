@@ -1,0 +1,1109 @@
+{
+  "storyCollection": {
+    "title": "Primary Advantage YLE Movers Nonfiction Library",
+    "targetAudience": "Grades 3-6 (YLE Movers Level)",
+    "totalStories": 100,
+    "stories": [
+      {
+        "id": 1,
+        "genre": "Home & Daily Life",
+        "title": "My Family Weekend",
+        "description": "An everyday article about how a family spends time together at home and outside on the weekend.",
+        "points": [
+          "morning activities at home",
+          "an outing or shared activity",
+          "why weekends feel different from school days"
+        ]
+      },
+      {
+        "id": 2,
+        "genre": "Home & Daily Life",
+        "title": "Helping at Home",
+        "description": "An everyday article about simple jobs children can do to help their families at home.",
+        "points": [
+          "easy jobs children can do",
+          "when they do them",
+          "why helping makes home life easier"
+        ]
+      },
+      {
+        "id": 3,
+        "genre": "Home & Daily Life",
+        "title": "A Busy Morning at Home",
+        "description": "An everyday article about getting dressed, eating breakfast, and leaving home on time.",
+        "points": [
+          "things people do first",
+          "how family members get ready",
+          "why a plan helps busy mornings"
+        ]
+      },
+      {
+        "id": 4,
+        "genre": "Home & Daily Life",
+        "title": "After-School Time",
+        "description": "An everyday article about what children do after school before dinner.",
+        "points": [
+          "where children go after school",
+          "homework or play time",
+          "how the day slows down at home"
+        ]
+      },
+      {
+        "id": 5,
+        "genre": "Home & Daily Life",
+        "title": "Keeping My Room Tidy",
+        "description": "An everyday article about organizing clothes, books, and toys in a bedroom.",
+        "points": [
+          "things to put away",
+          "small cleaning habits",
+          "why a tidy room is useful"
+        ]
+      },
+      {
+        "id": 6,
+        "genre": "Home & Daily Life",
+        "title": "Family Meals",
+        "description": "An everyday article about the way families prepare, share, and enjoy meals together.",
+        "points": [
+          "who helps with the meal",
+          "what happens at the table",
+          "why meal times are important"
+        ]
+      },
+      {
+        "id": 7,
+        "genre": "Home & Daily Life",
+        "title": "A Rainy Day at Home",
+        "description": "An everyday article about indoor activities children can enjoy when the weather is wet.",
+        "points": [
+          "indoor games or reading",
+          "how families stay comfortable",
+          "why rainy days can still be fun"
+        ]
+      },
+      {
+        "id": 8,
+        "genre": "Home & Daily Life",
+        "title": "Getting Ready for Bed",
+        "description": "An everyday article about the bedtime routine children follow each night.",
+        "points": [
+          "steps before bed",
+          "why sleep matters",
+          "how a calm routine helps"
+        ]
+      },
+      {
+        "id": 9,
+        "genre": "Home & Daily Life",
+        "title": "My Favorite Room",
+        "description": "An everyday article about one room at home and the reasons a child likes it best.",
+        "points": [
+          "what is in the room",
+          "what the child does there",
+          "why it feels comfortable"
+        ]
+      },
+      {
+        "id": 10,
+        "genre": "Home & Daily Life",
+        "title": "A Visit from Cousins",
+        "description": "An everyday article about family visitors and the activities children do together at home.",
+        "points": [
+          "who comes to visit",
+          "things the children do together",
+          "why visits feel exciting"
+        ]
+      },
+      {
+        "id": 11,
+        "genre": "School & Learning",
+        "title": "A Good School Morning",
+        "description": "An everyday article about arriving at school, meeting friends, and getting ready to learn.",
+        "points": [
+          "what happens before class starts",
+          "how students prepare",
+          "why a good start helps the day"
+        ]
+      },
+      {
+        "id": 12,
+        "genre": "School & Learning",
+        "title": "Our School Library",
+        "description": "An everyday article about borrowing books and spending quiet reading time in the library.",
+        "points": [
+          "what students find there",
+          "how borrowing works",
+          "why the library is useful"
+        ]
+      },
+      {
+        "id": 13,
+        "genre": "School & Learning",
+        "title": "Working in Groups",
+        "description": "An everyday article about students sharing ideas and helping each other in class.",
+        "points": [
+          "how group work happens",
+          "ways students help each other",
+          "why teamwork matters"
+        ]
+      },
+      {
+        "id": 14,
+        "genre": "School & Learning",
+        "title": "A Science Lesson",
+        "description": "An everyday article about a simple science class activity at school.",
+        "points": [
+          "what students learn about",
+          "a simple class activity",
+          "why science feels interesting"
+        ]
+      },
+      {
+        "id": 15,
+        "genre": "School & Learning",
+        "title": "Art Class at School",
+        "description": "An everyday article about drawing, painting, and making things during art time.",
+        "points": [
+          "materials students use",
+          "what they make",
+          "why art lessons feel special"
+        ]
+      },
+      {
+        "id": 16,
+        "genre": "School & Learning",
+        "title": "Sports Day",
+        "description": "An everyday article about a school sports event and the activities children join.",
+        "points": [
+          "different sports or games",
+          "how students take part",
+          "why sports day is exciting"
+        ]
+      },
+      {
+        "id": 17,
+        "genre": "School & Learning",
+        "title": "Using the Computer Room",
+        "description": "An everyday article about using school computers to learn and make projects.",
+        "points": [
+          "what children do on computers",
+          "rules in the room",
+          "why computers help learning"
+        ]
+      },
+      {
+        "id": 18,
+        "genre": "School & Learning",
+        "title": "The School Garden",
+        "description": "An everyday article about plants grown at school and the jobs students do there.",
+        "points": [
+          "what grows in the garden",
+          "how students care for it",
+          "what they learn from it"
+        ]
+      },
+      {
+        "id": 19,
+        "genre": "School & Learning",
+        "title": "Lunch Break at School",
+        "description": "An everyday article about lunch time, friends, and rest between lessons.",
+        "points": [
+          "where children eat lunch",
+          "who they sit with",
+          "why breaks are important"
+        ]
+      },
+      {
+        "id": 20,
+        "genre": "School & Learning",
+        "title": "A Class Project",
+        "description": "An everyday article about planning and finishing a simple class project together.",
+        "points": [
+          "what the project is about",
+          "steps students follow",
+          "why projects help learning"
+        ]
+      },
+      {
+        "id": 21,
+        "genre": "Food & Cooking",
+        "title": "Making a Fruit Salad",
+        "description": "An everyday article about preparing a simple fruit salad with help from an adult.",
+        "points": [
+          "fruits used in the dish",
+          "easy preparation steps",
+          "why the snack is healthy"
+        ]
+      },
+      {
+        "id": 22,
+        "genre": "Food & Cooking",
+        "title": "What We Eat for Lunch",
+        "description": "An everyday article about common lunch foods at home or school.",
+        "points": [
+          "foods children often eat",
+          "how lunch gives energy",
+          "one healthy lunch idea"
+        ]
+      },
+      {
+        "id": 23,
+        "genre": "Food & Cooking",
+        "title": "Drinking Enough Water",
+        "description": "An everyday article about why children need water during the day.",
+        "points": [
+          "when children drink water",
+          "what water helps the body do",
+          "ways to remember to drink enough"
+        ]
+      },
+      {
+        "id": 24,
+        "genre": "Food & Cooking",
+        "title": "Cooking Rice",
+        "description": "An everyday article about making rice and eating it with simple foods.",
+        "points": [
+          "what rice is",
+          "basic cooking steps",
+          "foods people eat with rice"
+        ]
+      },
+      {
+        "id": 25,
+        "genre": "Food & Cooking",
+        "title": "My Favorite Sandwich",
+        "description": "An everyday article about a simple sandwich and the ingredients a child may choose.",
+        "points": [
+          "ingredients in the sandwich",
+          "how to make it",
+          "when children like to eat it"
+        ]
+      },
+      {
+        "id": 26,
+        "genre": "Food & Cooking",
+        "title": "Breakfast Before School",
+        "description": "An everyday article about choosing a good breakfast on school mornings.",
+        "points": [
+          "simple breakfast choices",
+          "why breakfast gives energy",
+          "how to make mornings easier"
+        ]
+      },
+      {
+        "id": 27,
+        "genre": "Food & Cooking",
+        "title": "A Family Picnic",
+        "description": "An everyday article about foods families pack and share during a picnic outside.",
+        "points": [
+          "foods packed for the picnic",
+          "where the family goes",
+          "why eating outside feels fun"
+        ]
+      },
+      {
+        "id": 28,
+        "genre": "Food & Cooking",
+        "title": "Vegetables on My Plate",
+        "description": "An everyday article about common vegetables children see at meals.",
+        "points": [
+          "different vegetables children know",
+          "ways families cook them",
+          "why vegetables are good for health"
+        ]
+      },
+      {
+        "id": 29,
+        "genre": "Food & Cooking",
+        "title": "Making Pancakes",
+        "description": "An everyday article about helping an adult mix and cook pancakes at home.",
+        "points": [
+          "ingredients used",
+          "simple cooking steps",
+          "how the meal is served"
+        ]
+      },
+      {
+        "id": 30,
+        "genre": "Food & Cooking",
+        "title": "Food from the Market",
+        "description": "An everyday article about buying fresh food at a local market.",
+        "points": [
+          "foods sold at the market",
+          "who buys them",
+          "why fresh food is useful"
+        ]
+      },
+      {
+        "id": 31,
+        "genre": "Hobbies & Sports",
+        "title": "Playing Football After School",
+        "description": "An everyday article about children playing football with friends after class.",
+        "points": [
+          "where they play",
+          "what skills they use",
+          "why the game is popular"
+        ]
+      },
+      {
+        "id": 32,
+        "genre": "Hobbies & Sports",
+        "title": "Learning to Swim",
+        "description": "An everyday article about swim lessons and how children become safe in water.",
+        "points": [
+          "what children learn first",
+          "how a teacher helps",
+          "why swimming is a useful skill"
+        ]
+      },
+      {
+        "id": 33,
+        "genre": "Hobbies & Sports",
+        "title": "Riding My Bicycle",
+        "description": "An everyday article about bike riding in a safe place near home.",
+        "points": [
+          "where children ride",
+          "what safety gear they use",
+          "why riding is fun exercise"
+        ]
+      },
+      {
+        "id": 34,
+        "genre": "Hobbies & Sports",
+        "title": "My Dance Class",
+        "description": "An everyday article about joining a dance class and learning steps with others.",
+        "points": [
+          "what happens in class",
+          "what children practice",
+          "why dance builds confidence"
+        ]
+      },
+      {
+        "id": 35,
+        "genre": "Hobbies & Sports",
+        "title": "Drawing for Fun",
+        "description": "An everyday article about drawing as a hobby children can enjoy at home or school.",
+        "points": [
+          "materials children use",
+          "things they like to draw",
+          "why drawing feels relaxing"
+        ]
+      },
+      {
+        "id": 36,
+        "genre": "Hobbies & Sports",
+        "title": "Reading Comic Books",
+        "description": "An everyday article about reading comic books for fun after school.",
+        "points": [
+          "what comic books are like",
+          "why children enjoy them",
+          "how reading becomes a hobby"
+        ]
+      },
+      {
+        "id": 37,
+        "genre": "Hobbies & Sports",
+        "title": "Playing the Piano",
+        "description": "An everyday article about practicing simple songs on the piano.",
+        "points": [
+          "what children learn first",
+          "how practice helps",
+          "why music feels rewarding"
+        ]
+      },
+      {
+        "id": 38,
+        "genre": "Hobbies & Sports",
+        "title": "A Weekend Basketball Game",
+        "description": "An everyday article about a children's basketball game on the weekend.",
+        "points": [
+          "what happens in the game",
+          "how players work together",
+          "why sports teach teamwork"
+        ]
+      },
+      {
+        "id": 39,
+        "genre": "Hobbies & Sports",
+        "title": "Collecting Stickers",
+        "description": "An everyday article about collecting and organizing stickers as a hobby.",
+        "points": [
+          "what children collect",
+          "how they keep the collection",
+          "why collecting feels exciting"
+        ]
+      },
+      {
+        "id": 40,
+        "genre": "Hobbies & Sports",
+        "title": "Flying a Kite",
+        "description": "An everyday article about flying a kite in an open place on a windy day.",
+        "points": [
+          "where children go",
+          "what wind does",
+          "why the activity feels special"
+        ]
+      },
+      {
+        "id": 41,
+        "genre": "Animals & Pets",
+        "title": "Looking After a Puppy",
+        "description": "An everyday article about feeding, walking, and playing with a young dog.",
+        "points": [
+          "what a puppy needs",
+          "daily care jobs",
+          "why routine helps the pet"
+        ]
+      },
+      {
+        "id": 42,
+        "genre": "Animals & Pets",
+        "title": "A Visit to the Farm",
+        "description": "An everyday article about seeing farm animals and learning what they do there.",
+        "points": [
+          "animals children may see",
+          "how the farm uses these animals",
+          "what children learn during the visit"
+        ]
+      },
+      {
+        "id": 43,
+        "genre": "Animals & Pets",
+        "title": "Why Cats Sleep So Much",
+        "description": "An everyday article about common cat behavior that children notice at home.",
+        "points": [
+          "times cats like to sleep",
+          "when they become active",
+          "why pets have different habits"
+        ]
+      },
+      {
+        "id": 44,
+        "genre": "Animals & Pets",
+        "title": "Birds in the Park",
+        "description": "An everyday article about birds children often see in a local park.",
+        "points": [
+          "kinds of birds children notice",
+          "what the birds do",
+          "how children can watch them quietly"
+        ]
+      },
+      {
+        "id": 45,
+        "genre": "Animals & Pets",
+        "title": "Keeping Fish in a Tank",
+        "description": "An everyday article about setting up and caring for a simple home fish tank.",
+        "points": [
+          "what goes in the tank",
+          "what fish need every day",
+          "why clean water matters"
+        ]
+      },
+      {
+        "id": 46,
+        "genre": "Animals & Pets",
+        "title": "How Rabbits Move",
+        "description": "An everyday article about the way rabbits hop, eat, and stay safe.",
+        "points": [
+          "how rabbits move",
+          "what they eat",
+          "where they like to stay"
+        ]
+      },
+      {
+        "id": 47,
+        "genre": "Animals & Pets",
+        "title": "Helping an Animal Shelter",
+        "description": "An everyday article about simple ways families can help animals without taking one home.",
+        "points": [
+          "what shelters do",
+          "ways families help",
+          "why the work matters"
+        ]
+      },
+      {
+        "id": 48,
+        "genre": "Animals & Pets",
+        "title": "A Horse at the Riding School",
+        "description": "An everyday article about a horse at a riding school and how children learn around it safely.",
+        "points": [
+          "what the horse needs",
+          "how children behave near it",
+          "what children learn there"
+        ]
+      },
+      {
+        "id": 49,
+        "genre": "Animals & Pets",
+        "title": "Why Bees Matter",
+        "description": "An everyday article about bees and one simple reason they are useful in nature.",
+        "points": [
+          "what bees do",
+          "where children may see them",
+          "why flowers and bees work together"
+        ]
+      },
+      {
+        "id": 50,
+        "genre": "Animals & Pets",
+        "title": "Our Class Pet",
+        "description": "An everyday article about caring for a small animal in the classroom.",
+        "points": [
+          "what the class pet needs",
+          "how students share the jobs",
+          "why the pet teaches responsibility"
+        ]
+      },
+      {
+        "id": 51,
+        "genre": "Weather & Seasons",
+        "title": "Weather in One Week",
+        "description": "An everyday article about how weather can change over a single week.",
+        "points": [
+          "different kinds of weather",
+          "how people dress for them",
+          "why children check the weather"
+        ]
+      },
+      {
+        "id": 52,
+        "genre": "Weather & Seasons",
+        "title": "Spring in the Park",
+        "description": "An everyday article about the things children notice in springtime outdoors.",
+        "points": [
+          "changes in plants",
+          "weather in spring",
+          "activities children enjoy"
+        ]
+      },
+      {
+        "id": 53,
+        "genre": "Weather & Seasons",
+        "title": "Hot Days in Summer",
+        "description": "An everyday article about how families stay cool and safe in summer weather.",
+        "points": [
+          "what summer weather feels like",
+          "ways to stay cool",
+          "clothes or drinks for hot days"
+        ]
+      },
+      {
+        "id": 54,
+        "genre": "Weather & Seasons",
+        "title": "Autumn Leaves",
+        "description": "An everyday article about leaves changing color and falling in autumn.",
+        "points": [
+          "what children see on trees",
+          "what happens on the ground",
+          "why autumn looks different"
+        ]
+      },
+      {
+        "id": 55,
+        "genre": "Weather & Seasons",
+        "title": "Cold Weather in Winter",
+        "description": "An everyday article about winter weather and the habits families use to stay warm.",
+        "points": [
+          "how winter weather feels",
+          "warm clothes people wear",
+          "activities children do in winter"
+        ]
+      },
+      {
+        "id": 56,
+        "genre": "Weather & Seasons",
+        "title": "Storm Safety",
+        "description": "An everyday article about simple safety habits when the weather becomes stormy.",
+        "points": [
+          "signs of a storm",
+          "where people go for safety",
+          "what children should remember"
+        ]
+      },
+      {
+        "id": 57,
+        "genre": "Weather & Seasons",
+        "title": "A Rainbow After Rain",
+        "description": "An everyday article about seeing a rainbow and the weather that comes before it.",
+        "points": [
+          "when a rainbow appears",
+          "what colors children may see",
+          "why it feels exciting"
+        ]
+      },
+      {
+        "id": 58,
+        "genre": "Weather & Seasons",
+        "title": "Wind at the Beach",
+        "description": "An everyday article about strong wind near the sea and what children notice there.",
+        "points": [
+          "what wind does to sand and water",
+          "what people wear or use",
+          "what activities work well"
+        ]
+      },
+      {
+        "id": 59,
+        "genre": "Weather & Seasons",
+        "title": "Clouds Before Rain",
+        "description": "An everyday article about how clouds can help people guess the weather.",
+        "points": [
+          "how clouds may change",
+          "what children notice in the sky",
+          "how people prepare for rain"
+        ]
+      },
+      {
+        "id": 60,
+        "genre": "Weather & Seasons",
+        "title": "The Best Clothes for Each Season",
+        "description": "An everyday article about choosing suitable clothes during the year.",
+        "points": [
+          "clothes for hot weather",
+          "clothes for cool weather",
+          "why the right clothes help"
+        ]
+      },
+      {
+        "id": 61,
+        "genre": "Community & Jobs",
+        "title": "The Doctor in Our Town",
+        "description": "An everyday article about what a doctor does and how doctors help families.",
+        "points": [
+          "where a doctor works",
+          "how doctors help patients",
+          "why this job matters"
+        ]
+      },
+      {
+        "id": 62,
+        "genre": "Community & Jobs",
+        "title": "A Visit to the Fire Station",
+        "description": "An everyday article about learning from firefighters and seeing their tools.",
+        "points": [
+          "what firefighters do",
+          "things found at the station",
+          "why the work is important"
+        ]
+      },
+      {
+        "id": 63,
+        "genre": "Community & Jobs",
+        "title": "The Librarian",
+        "description": "An everyday article about how a librarian helps children find and borrow books.",
+        "points": [
+          "where a librarian works",
+          "how they help visitors",
+          "why libraries are useful"
+        ]
+      },
+      {
+        "id": 64,
+        "genre": "Community & Jobs",
+        "title": "The Bus Driver",
+        "description": "An everyday article about the work of a bus driver in the local community.",
+        "points": [
+          "what a bus driver does",
+          "who uses the bus",
+          "why safe driving matters"
+        ]
+      },
+      {
+        "id": 65,
+        "genre": "Community & Jobs",
+        "title": "The Shopkeeper",
+        "description": "An everyday article about a local shopkeeper and how small shops help families.",
+        "points": [
+          "what the shop sells",
+          "what the shopkeeper does",
+          "why local shops matter"
+        ]
+      },
+      {
+        "id": 66,
+        "genre": "Community & Jobs",
+        "title": "The Dentist",
+        "description": "An everyday article about the dentist and the care people get during a check-up.",
+        "points": [
+          "what happens at the dentist",
+          "how children prepare",
+          "why check-ups are useful"
+        ]
+      },
+      {
+        "id": 67,
+        "genre": "Community & Jobs",
+        "title": "The Farmer",
+        "description": "An everyday article about the work a farmer does to grow food or care for animals.",
+        "points": [
+          "jobs on the farm",
+          "foods or animals the farmer cares for",
+          "why farming matters"
+        ]
+      },
+      {
+        "id": 68,
+        "genre": "Community & Jobs",
+        "title": "The Police Officer",
+        "description": "An everyday article about the ways police officers help keep streets safe.",
+        "points": [
+          "where police work",
+          "how they help people",
+          "why rules keep communities safe"
+        ]
+      },
+      {
+        "id": 69,
+        "genre": "Community & Jobs",
+        "title": "The Mail Carrier",
+        "description": "An everyday article about bringing letters and packages to homes.",
+        "points": [
+          "what the mail carrier delivers",
+          "how the route works",
+          "why this job is useful"
+        ]
+      },
+      {
+        "id": 70,
+        "genre": "Community & Jobs",
+        "title": "People Who Clean Our School",
+        "description": "An everyday article about the workers who keep a school clean and ready.",
+        "points": [
+          "what cleaning jobs they do",
+          "when they work",
+          "why clean spaces help everyone"
+        ]
+      },
+      {
+        "id": 71,
+        "genre": "Health & Safety",
+        "title": "Why Sleep Is Important",
+        "description": "An everyday article about sleep and how it helps children learn and grow.",
+        "points": [
+          "how sleep helps the body",
+          "how sleep helps the mind",
+          "good bedtime habits"
+        ]
+      },
+      {
+        "id": 72,
+        "genre": "Health & Safety",
+        "title": "Brushing Teeth Every Day",
+        "description": "An everyday article about daily tooth care and healthy habits.",
+        "points": [
+          "when to brush",
+          "how to brush well",
+          "why tooth care matters"
+        ]
+      },
+      {
+        "id": 73,
+        "genre": "Health & Safety",
+        "title": "Washing Before Meals",
+        "description": "An everyday article about cleaning hands before eating.",
+        "points": [
+          "when to wash hands",
+          "simple washing steps",
+          "how clean hands stop germs"
+        ]
+      },
+      {
+        "id": 74,
+        "genre": "Health & Safety",
+        "title": "Playing Safely in the Park",
+        "description": "An everyday article about safe habits on swings, slides, and climbing frames.",
+        "points": [
+          "safe play rules",
+          "watching other children",
+          "when to ask an adult for help"
+        ]
+      },
+      {
+        "id": 75,
+        "genre": "Health & Safety",
+        "title": "Healthy Snacks for School",
+        "description": "An everyday article about choosing simple snacks that give energy during the day.",
+        "points": [
+          "examples of healthy snacks",
+          "why they help children",
+          "how to pack them"
+        ]
+      },
+      {
+        "id": 76,
+        "genre": "Health & Safety",
+        "title": "When to Rest at Home",
+        "description": "An everyday article about knowing when the body needs a break.",
+        "points": [
+          "signs a child needs rest",
+          "quiet things to do",
+          "why rest helps the body recover"
+        ]
+      },
+      {
+        "id": 77,
+        "genre": "Health & Safety",
+        "title": "Road Safety Near School",
+        "description": "An everyday article about crossing roads carefully near traffic.",
+        "points": [
+          "how to look before crossing",
+          "where to cross safely",
+          "why adults and rules help"
+        ]
+      },
+      {
+        "id": 78,
+        "genre": "Health & Safety",
+        "title": "Staying Safe in the Sun",
+        "description": "An everyday article about hats, shade, and water on sunny days.",
+        "points": [
+          "why the sun can be strong",
+          "ways children stay safe",
+          "what to remember outside"
+        ]
+      },
+      {
+        "id": 79,
+        "genre": "Health & Safety",
+        "title": "Keeping Water Bottles Clean",
+        "description": "An everyday article about washing and refilling a water bottle properly.",
+        "points": [
+          "why clean bottles matter",
+          "how to wash them",
+          "how this helps health"
+        ]
+      },
+      {
+        "id": 80,
+        "genre": "Health & Safety",
+        "title": "What to Do with a Small Cut",
+        "description": "An everyday article about simple first-aid steps for a tiny cut.",
+        "points": [
+          "what to do first",
+          "how adults help",
+          "why clean care is important"
+        ]
+      },
+      {
+        "id": 81,
+        "genre": "Places & Travel",
+        "title": "A Trip to the Zoo",
+        "description": "An everyday article about visiting a zoo and learning from the animals there.",
+        "points": [
+          "animals children see",
+          "what the zoo teaches",
+          "why visits can be exciting"
+        ]
+      },
+      {
+        "id": 82,
+        "genre": "Places & Travel",
+        "title": "Riding the Bus",
+        "description": "An everyday article about taking a bus around town with family or classmates.",
+        "points": [
+          "what happens at the bus stop",
+          "how the ride works",
+          "rules for safe travel"
+        ]
+      },
+      {
+        "id": 83,
+        "genre": "Places & Travel",
+        "title": "At the Train Station",
+        "description": "An everyday article about waiting for a train and noticing signs and people.",
+        "points": [
+          "things seen at the station",
+          "what people do there",
+          "why stations need clear rules"
+        ]
+      },
+      {
+        "id": 84,
+        "genre": "Places & Travel",
+        "title": "Walking to the Market",
+        "description": "An everyday article about a short walk to a local market and the things a child notices.",
+        "points": [
+          "things seen on the way",
+          "what happens at the market",
+          "why local trips teach children about their town"
+        ]
+      },
+      {
+        "id": 85,
+        "genre": "Places & Travel",
+        "title": "Visiting the Museum",
+        "description": "An everyday article about seeing simple exhibits and learning new facts at a museum.",
+        "points": [
+          "what children may see",
+          "how museums help learning",
+          "why visits can be memorable"
+        ]
+      },
+      {
+        "id": 86,
+        "genre": "Places & Travel",
+        "title": "A Day at the Beach",
+        "description": "An everyday article about a family trip to the beach.",
+        "points": [
+          "what children do there",
+          "what they bring",
+          "how they stay safe in the sun and water"
+        ]
+      },
+      {
+        "id": 87,
+        "genre": "Places & Travel",
+        "title": "Going to the Swimming Pool",
+        "description": "An everyday article about a visit to a public pool and the rules children follow.",
+        "points": [
+          "what to bring",
+          "pool safety rules",
+          "why swimming is fun exercise"
+        ]
+      },
+      {
+        "id": 88,
+        "genre": "Places & Travel",
+        "title": "A Picnic in the Park",
+        "description": "An everyday article about planning and enjoying a picnic outdoors.",
+        "points": [
+          "food and things to bring",
+          "where people sit and play",
+          "how families keep the place clean"
+        ]
+      },
+      {
+        "id": 89,
+        "genre": "Places & Travel",
+        "title": "Seeing Our Town from the Bus",
+        "description": "An everyday article about noticing buildings, streets, and people during a bus ride.",
+        "points": [
+          "what children see from the window",
+          "places the bus passes",
+          "why public travel teaches about a town"
+        ]
+      },
+      {
+        "id": 90,
+        "genre": "Places & Travel",
+        "title": "A Visit to Grandparents in Another Town",
+        "description": "An everyday article about preparing for a short family trip to visit relatives.",
+        "points": [
+          "how the family travels",
+          "things they bring",
+          "why visits away from home feel special"
+        ]
+      },
+      {
+        "id": 91,
+        "genre": "Nature & Simple Science",
+        "title": "How a Seed Grows",
+        "description": "An everyday article about what a seed needs to become a small plant.",
+        "points": [
+          "what goes into the soil",
+          "what plants need to grow",
+          "changes children see over time"
+        ]
+      },
+      {
+        "id": 92,
+        "genre": "Nature & Simple Science",
+        "title": "Why the Moon Changes Shape",
+        "description": "An everyday article about the changing shapes of the moon in simple language.",
+        "points": [
+          "shapes children notice",
+          "when they see the moon",
+          "why the moon does not look the same every night"
+        ]
+      },
+      {
+        "id": 93,
+        "genre": "Nature & Simple Science",
+        "title": "What Makes a Shadow",
+        "description": "An everyday article about shadows and how light creates them.",
+        "points": [
+          "what light needs to make a shadow",
+          "where children see shadows",
+          "how shadows change"
+        ]
+      },
+      {
+        "id": 94,
+        "genre": "Nature & Simple Science",
+        "title": "Why Ice Melts",
+        "description": "An everyday article about what happens when ice gets warm.",
+        "points": [
+          "what ice feels like",
+          "what happens as it warms up",
+          "where children see melting ice"
+        ]
+      },
+      {
+        "id": 95,
+        "genre": "Nature & Simple Science",
+        "title": "How Rain Helps Plants",
+        "description": "An everyday article about rainwater and growing plants.",
+        "points": [
+          "what rain gives the soil",
+          "how plants use water",
+          "what children notice after rain"
+        ]
+      },
+      {
+        "id": 96,
+        "genre": "Nature & Simple Science",
+        "title": "Day and Night",
+        "description": "An everyday article about the difference between daytime and night-time.",
+        "points": [
+          "what children do in the day",
+          "what changes at night",
+          "how people use light and sleep"
+        ]
+      },
+      {
+        "id": 97,
+        "genre": "Nature & Simple Science",
+        "title": "Why We See Stars",
+        "description": "An everyday article about stars in the night sky.",
+        "points": [
+          "when stars appear",
+          "what they look like",
+          "why children do not see them in the day"
+        ]
+      },
+      {
+        "id": 98,
+        "genre": "Nature & Simple Science",
+        "title": "Simple Magnets",
+        "description": "An everyday article about magnets and the kinds of things they can pick up.",
+        "points": [
+          "what magnets do",
+          "materials magnets attract",
+          "why children find them interesting"
+        ]
+      },
+      {
+        "id": 99,
+        "genre": "Nature & Simple Science",
+        "title": "The Life of a Butterfly",
+        "description": "An everyday article about the simple stages of a butterfly's life.",
+        "points": [
+          "beginning as an egg or caterpillar",
+          "changing stage",
+          "adult butterfly life"
+        ]
+      },
+      {
+        "id": 100,
+        "genre": "Nature & Simple Science",
+        "title": "Why We Need Trees",
+        "description": "An everyday article about the simple ways trees help people and animals.",
+        "points": [
+          "what trees give",
+          "who uses trees for shelter or shade",
+          "why people should care for trees"
+        ]
+      }
+    ]
+  }
+}
