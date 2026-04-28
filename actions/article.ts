@@ -1,8 +1,6 @@
 "use server";
 
-import {
-  generateArticleContentController,
-} from "@/server/controllers/articleGenerationController";
+import { generateArticleContentController } from "@/server/controllers/articleGenerationController";
 import {
   deleteArticleByIdModel,
   getArticleActivity,
