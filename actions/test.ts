@@ -8,7 +8,7 @@ import {
 } from "@/server/utils/genaretors/audio-generator";
 import { generateWordLists } from "@/server/utils/genaretors/audio-word-generator";
 import { deleteFile, uploadToBucket } from "@/utils/storage";
-import { generateImage } from "@/server/utils/genaretors/image-generator";
+import { generatedImage } from "@/server/utils/genaretors/image-generator";
 // import { generateStotyImage } from "@/server/utils/genaretors/story-generator";
 import {
   generateAudioForFlashcard,
