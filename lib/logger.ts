@@ -104,3 +104,103 @@ export class StoryGenerationLogger {
     this.issues = [];
   }
 }
+
+// ─── ArticleGenerationLogger ─────────────────────────────────────────────────
+
+export interface ArticleIssue {
+  step:
+    | "article_generation"
+    | "evaluation"
+    | "rating_check"
+    | "cefr_band_check"
+    | "save_to_db"
+    | "image_generation"
+    | "image_upload"
+    | "audio_generation"
+    | "audio_upload"
+    | "flashcard_audio"
+    | "flashcard_audio_upload";
+  severity: "WARN" | "ERROR";
+  message: string;
+  attempt?: number;
+}
+
+export interface ArticleLogContext {
+  articleId?: string;
+  cefrLevel: string;
+  type: string;
+  genre: string;
+  topic: string;
+  totalAttempts: number;
+  finalStatus: "succeeded" | "failed";
+}
+
+export class ArticleGenerationLogger {
+  private issues: ArticleIssue[] = [];
+
+  addIssue(issue: ArticleIssue): void {
+    this.issues.push(issue);
+  }
+
+  hasIssues(): boolean {
+    return this.issues.length > 0;
+  }
+
+  /**
+   * Flush collected issues to the Prisma `Logs` table.
+   * Writes ONE consolidated record per article — only if there are issues.
+   */
+  async flush(context: ArticleLogContext): Promise<void> {
+    if (!this.hasIssues()) return;
+
+    const errorCount = this.issues.filter((i) => i.severity === "ERROR").length;
+    const warnCount = this.issues.filter((i) => i.severity === "WARN").length;
+    const highestLevel: LogLevel = errorCount > 0 ? "ERROR" : "WARN";
+
+    const articleLabel = context.articleId ?? "unknown";
+    const parts: string[] = [];
+    if (warnCount > 0) parts.push(`${warnCount} warning(s)`);
+    if (errorCount > 0) parts.push(`${errorCount} error(s)`);
+
+    const message = `Article generation [${articleLabel}]: ${parts.join(", ")} — ${context.finalStatus}`;
+    const firstError = this.issues.find((i) => i.severity === "ERROR");
+    const stackTrace = firstError?.message ?? null;
+
+    try {
+      await prisma.logs.create({
+        data: {
+          serviceName: "article-generation",
+          traceId: articleLabel,
+          level: highestLevel,
+          message,
+          stackTrace,
+          meta: {
+            articleId: context.articleId ?? null,
+            cefrLevel: context.cefrLevel,
+            type: context.type,
+            genre: context.genre,
+            topic: context.topic,
+            totalAttempts: context.totalAttempts,
+            finalStatus: context.finalStatus,
+            issues: this.issues as unknown as Prisma.InputJsonValue,
+          },
+        },
+      });
+    } catch (err) {
+      // Fallback to console if DB write fails — never let logging crash the app
+      console.error(
+        "[ArticleGenerationLogger] Failed to flush log to DB:",
+        err,
+      );
+      console.error(
+        "[ArticleGenerationLogger] Issues:",
+        JSON.stringify(this.issues, null, 2),
+      );
+    }
+  }
+
+  /** Reset issues for reuse (optional — usually create a new instance) */
+  reset(): void {
+    this.issues = [];
+  }
+}

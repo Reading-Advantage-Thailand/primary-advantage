@@ -132,10 +132,6 @@ export async function translateAndStoreSentences({
       throw new Error(`No sentences to translate for article ${articleId}`);
     }
 
-    console.log(
-      `Translating ${sentences.length} sentences for article ${articleId}...`,
-    );
-
     // Translate sentences
     const translatedSentences = await translateSentencesWithAI(
       sentences,
@@ -171,9 +167,6 @@ export async function translateAndStoreSentences({
       },
     });
 
-    console.log(
-      `Successfully translated and stored sentences for article ${articleId}`,
-    );
   } catch (error: any) {
     console.error(
       `Failed to translate sentences for article ${articleId}:`,

@@ -1,0 +1,1109 @@
+{
+  "storyCollection": {
+    "title": "Primary Advantage YLE Starters Nonfiction Library",
+    "targetAudience": "Grades 3-6 (YLE Starters Level)",
+    "totalStories": 100,
+    "stories": [
+      {
+        "id": 1,
+        "genre": "My Home & Family",
+        "title": "My Family",
+        "description": "A simple article about the people in a child's family and how they help each other every day.",
+        "points": [
+          "who is in the family",
+          "things family members do",
+          "why family feels important"
+        ]
+      },
+      {
+        "id": 2,
+        "genre": "My Home & Family",
+        "title": "My Mother",
+        "description": "A simple article about what a mother does at home and how a child can help her.",
+        "points": [
+          "things a mother may do",
+          "how a child spends time with her",
+          "one way to help at home"
+        ]
+      },
+      {
+        "id": 3,
+        "genre": "My Home & Family",
+        "title": "My Father",
+        "description": "A simple article about what a father does each day and how a family shares time together.",
+        "points": [
+          "things a father may do",
+          "a shared family activity",
+          "why spending time together matters"
+        ]
+      },
+      {
+        "id": 4,
+        "genre": "My Home & Family",
+        "title": "My Brother and Sister",
+        "description": "A simple article about brothers and sisters, the games they play, and how they share at home.",
+        "points": [
+          "who the brother or sister is",
+          "a game or activity together",
+          "how they help each other"
+        ]
+      },
+      {
+        "id": 5,
+        "genre": "My Home & Family",
+        "title": "My Grandparents",
+        "description": "A simple article about grandparents, visits with family, and special things they teach children.",
+        "points": [
+          "who the grandparents are",
+          "something they like to do together",
+          "what children can learn from them"
+        ]
+      },
+      {
+        "id": 6,
+        "genre": "My Home & Family",
+        "title": "My Bedroom",
+        "description": "A simple article about a bedroom and the things a child uses there every day.",
+        "points": [
+          "things in the room",
+          "what the child does there",
+          "why the room feels special"
+        ]
+      },
+      {
+        "id": 7,
+        "genre": "My Home & Family",
+        "title": "My Kitchen",
+        "description": "A simple article about a kitchen and the things people do there every day.",
+        "points": [
+          "things found in the kitchen",
+          "food or drink prepared there",
+          "how the family uses the room"
+        ]
+      },
+      {
+        "id": 8,
+        "genre": "My Home & Family",
+        "title": "My Home",
+        "description": "A simple article about a child's home, the rooms inside it, and the people who live there.",
+        "points": [
+          "rooms in the home",
+          "who lives there",
+          "why home feels safe"
+        ]
+      },
+      {
+        "id": 9,
+        "genre": "My Home & Family",
+        "title": "Our Family Dinner",
+        "description": "A simple article about family dinner time and how people eat and talk together.",
+        "points": [
+          "food on the table",
+          "who sits together",
+          "why dinner time is special"
+        ]
+      },
+      {
+        "id": 10,
+        "genre": "My Home & Family",
+        "title": "A New Baby at Home",
+        "description": "A simple article about a new baby in the family and the small ways older children can help.",
+        "points": [
+          "things a baby needs",
+          "how the family changes",
+          "one way a child can help"
+        ]
+      },
+      {
+        "id": 11,
+        "genre": "School & Classroom",
+        "title": "My Classroom",
+        "description": "A simple article about a classroom and the things children see and use there each day.",
+        "points": [
+          "things in the classroom",
+          "what students do there",
+          "why the room helps children learn"
+        ]
+      },
+      {
+        "id": 12,
+        "genre": "School & Classroom",
+        "title": "My Teacher",
+        "description": "A simple article about a teacher and how teachers help students every day at school.",
+        "points": [
+          "what a teacher does",
+          "how the class learns together",
+          "why teachers are important"
+        ]
+      },
+      {
+        "id": 13,
+        "genre": "School & Classroom",
+        "title": "My School Bag",
+        "description": "A simple article about a school bag and the useful things a child keeps inside it.",
+        "points": [
+          "things in the bag",
+          "when the bag is used",
+          "why packing helps the school day"
+        ]
+      },
+      {
+        "id": 14,
+        "genre": "School & Classroom",
+        "title": "My Pencil Case",
+        "description": "A simple article about a pencil case and the small school tools children use in class.",
+        "points": [
+          "things inside the case",
+          "how each item helps",
+          "why it is good to keep things together"
+        ]
+      },
+      {
+        "id": 15,
+        "genre": "School & Classroom",
+        "title": "My Desk",
+        "description": "A simple article about a school desk and the way children use it to learn and work.",
+        "points": [
+          "what is on the desk",
+          "how a child sits and works there",
+          "why keeping it tidy helps"
+        ]
+      },
+      {
+        "id": 16,
+        "genre": "School & Classroom",
+        "title": "My Best School Friend",
+        "description": "A simple article about a school friend and the ways friends help each other in class.",
+        "points": [
+          "who the friend is",
+          "things friends do together",
+          "why friendship helps school feel happy"
+        ]
+      },
+      {
+        "id": 17,
+        "genre": "School & Classroom",
+        "title": "My School Day",
+        "description": "A simple article about the order of a school day from morning to home time.",
+        "points": [
+          "what happens in the morning",
+          "activities during the day",
+          "how the day ends"
+        ]
+      },
+      {
+        "id": 18,
+        "genre": "School & Classroom",
+        "title": "Our Library Corner",
+        "description": "A simple article about a reading corner at school and how children use books there.",
+        "points": [
+          "what children find there",
+          "what they do with books",
+          "why reading time is useful"
+        ]
+      },
+      {
+        "id": 19,
+        "genre": "School & Classroom",
+        "title": "Our Art Table",
+        "description": "A simple article about an art table and the materials children use to draw and make things.",
+        "points": [
+          "art materials on the table",
+          "what children make",
+          "why art time is fun"
+        ]
+      },
+      {
+        "id": 20,
+        "genre": "School & Classroom",
+        "title": "Our Playground",
+        "description": "A simple article about a school playground and the games children play there.",
+        "points": [
+          "things in the playground",
+          "games children play",
+          "why play time is important"
+        ]
+      },
+      {
+        "id": 21,
+        "genre": "Food & Drinks",
+        "title": "My Breakfast",
+        "description": "A simple article about what a child eats and drinks in the morning before school.",
+        "points": [
+          "foods for breakfast",
+          "a drink in the morning",
+          "why breakfast helps the day start well"
+        ]
+      },
+      {
+        "id": 22,
+        "genre": "Food & Drinks",
+        "title": "My Lunch Box",
+        "description": "A simple article about a lunch box and the food a child takes to school.",
+        "points": [
+          "foods inside the lunch box",
+          "when children eat lunch",
+          "why bringing food is useful"
+        ]
+      },
+      {
+        "id": 23,
+        "genre": "Food & Drinks",
+        "title": "My Favorite Fruit",
+        "description": "A simple article about a favorite fruit, how it looks, and when children eat it.",
+        "points": [
+          "what the fruit looks like",
+          "how it tastes",
+          "when children like to eat it"
+        ]
+      },
+      {
+        "id": 24,
+        "genre": "Food & Drinks",
+        "title": "Milk and Water",
+        "description": "A simple article about two common drinks and when children choose each one.",
+        "points": [
+          "what milk is like",
+          "what water is like",
+          "when each drink is useful"
+        ]
+      },
+      {
+        "id": 25,
+        "genre": "Food & Drinks",
+        "title": "Bread and Rice",
+        "description": "A simple article about two common foods and how families eat them at meals.",
+        "points": [
+          "what bread is like",
+          "what rice is like",
+          "when families eat these foods"
+        ]
+      },
+      {
+        "id": 26,
+        "genre": "Food & Drinks",
+        "title": "A Healthy Snack",
+        "description": "A simple article about a small healthy snack for school or home.",
+        "points": [
+          "foods in the snack",
+          "when a child may eat it",
+          "why the snack is a good choice"
+        ]
+      },
+      {
+        "id": 27,
+        "genre": "Food & Drinks",
+        "title": "Soup for Lunch",
+        "description": "A simple article about a bowl of soup and why it is a warm meal for many families.",
+        "points": [
+          "what may be in the soup",
+          "when people eat it",
+          "why it feels good on some days"
+        ]
+      },
+      {
+        "id": 28,
+        "genre": "Food & Drinks",
+        "title": "My Dinner Table",
+        "description": "A simple article about dinner at home and the things a family puts on the table.",
+        "points": [
+          "things on the table",
+          "who eats together",
+          "why dinner time matters"
+        ]
+      },
+      {
+        "id": 29,
+        "genre": "Food & Drinks",
+        "title": "Apples and Bananas",
+        "description": "A simple article comparing two familiar fruits that many children know well.",
+        "points": [
+          "what apples are like",
+          "what bananas are like",
+          "why fruit is a good snack"
+        ]
+      },
+      {
+        "id": 30,
+        "genre": "Food & Drinks",
+        "title": "Tea Time with Family",
+        "description": "A simple article about a family sitting together for a drink and a small snack.",
+        "points": [
+          "what people drink",
+          "what snack they share",
+          "why sitting together feels nice"
+        ]
+      },
+      {
+        "id": 31,
+        "genre": "My Body & Feelings",
+        "title": "My Eyes and Ears",
+        "description": "A simple article about the body parts children use to see and hear the world.",
+        "points": [
+          "what eyes do",
+          "what ears do",
+          "why these parts help every day"
+        ]
+      },
+      {
+        "id": 32,
+        "genre": "My Body & Feelings",
+        "title": "My Hands",
+        "description": "A simple article about hands and the many small jobs children do with them.",
+        "points": [
+          "things hands can do",
+          "how hands help at school and home",
+          "why washing hands matters"
+        ]
+      },
+      {
+        "id": 33,
+        "genre": "My Body & Feelings",
+        "title": "My Feet",
+        "description": "A simple article about feet and how they help children walk, run, and play.",
+        "points": [
+          "what feet help us do",
+          "things children wear on their feet",
+          "why feet need care"
+        ]
+      },
+      {
+        "id": 34,
+        "genre": "My Body & Feelings",
+        "title": "My Teeth",
+        "description": "A simple article about teeth and the habits children need to keep them clean.",
+        "points": [
+          "what teeth help us do",
+          "how children clean teeth",
+          "why clean teeth are important"
+        ]
+      },
+      {
+        "id": 35,
+        "genre": "My Body & Feelings",
+        "title": "My Face",
+        "description": "A simple article about the parts of the face and how they help children show feelings.",
+        "points": [
+          "parts of the face",
+          "what these parts help us do",
+          "how faces show feelings"
+        ]
+      },
+      {
+        "id": 36,
+        "genre": "My Body & Feelings",
+        "title": "I Am Happy",
+        "description": "A simple article about feeling happy and some everyday times when children feel this way.",
+        "points": [
+          "what happy looks like",
+          "when children feel happy",
+          "how children share happy feelings"
+        ]
+      },
+      {
+        "id": 37,
+        "genre": "My Body & Feelings",
+        "title": "I Am Tired",
+        "description": "A simple article about feeling tired and what children can do to rest well.",
+        "points": [
+          "what tired feels like",
+          "times children feel tired",
+          "ways to rest and feel better"
+        ]
+      },
+      {
+        "id": 38,
+        "genre": "My Body & Feelings",
+        "title": "I Am Hungry",
+        "description": "A simple article about hunger and how children know it is time to eat.",
+        "points": [
+          "what hungry feels like",
+          "when children get hungry",
+          "foods that can help"
+        ]
+      },
+      {
+        "id": 39,
+        "genre": "My Body & Feelings",
+        "title": "I Am Sick",
+        "description": "A simple article about simple signs of being sick and how children can rest and get help.",
+        "points": [
+          "signs a child may feel sick",
+          "what helps at home",
+          "when an adult should help"
+        ]
+      },
+      {
+        "id": 40,
+        "genre": "My Body & Feelings",
+        "title": "My Body Can Move",
+        "description": "A simple article about simple movements the body can do every day.",
+        "points": [
+          "ways the body moves",
+          "where children move at school or home",
+          "why moving is good for the body"
+        ]
+      },
+      {
+        "id": 41,
+        "genre": "Pets & Animals",
+        "title": "My Dog",
+        "description": "A simple article about a pet dog and the care it needs each day.",
+        "points": [
+          "what a dog is like",
+          "how people care for it",
+          "why dogs can be good pets"
+        ]
+      },
+      {
+        "id": 42,
+        "genre": "Pets & Animals",
+        "title": "My Cat",
+        "description": "A simple article about a pet cat and the quiet and playful things it may do.",
+        "points": [
+          "what a cat is like",
+          "how people care for it",
+          "what children may enjoy about cats"
+        ]
+      },
+      {
+        "id": 43,
+        "genre": "Pets & Animals",
+        "title": "My Fish",
+        "description": "A simple article about a fish in a tank and the simple care it needs.",
+        "points": [
+          "where the fish lives",
+          "what it needs each day",
+          "why watching fish can be calming"
+        ]
+      },
+      {
+        "id": 44,
+        "genre": "Pets & Animals",
+        "title": "A Rabbit at Home",
+        "description": "A simple article about a pet rabbit and the safe space and food it needs.",
+        "points": [
+          "what a rabbit looks like",
+          "what it eats",
+          "how children can care for it"
+        ]
+      },
+      {
+        "id": 45,
+        "genre": "Pets & Animals",
+        "title": "A Bird in the Garden",
+        "description": "A simple article about a small bird that children may see near home.",
+        "points": [
+          "what the bird looks like",
+          "where it goes",
+          "what children may hear or see"
+        ]
+      },
+      {
+        "id": 46,
+        "genre": "Pets & Animals",
+        "title": "A Cow on the Farm",
+        "description": "A simple article about a cow and the way it lives on a farm.",
+        "points": [
+          "what a cow looks like",
+          "where it lives",
+          "what people get from cows"
+        ]
+      },
+      {
+        "id": 47,
+        "genre": "Pets & Animals",
+        "title": "A Chicken and Eggs",
+        "description": "A simple article about a chicken and the eggs it lays.",
+        "points": [
+          "what a chicken looks like",
+          "where it lives",
+          "why eggs are useful food"
+        ]
+      },
+      {
+        "id": 48,
+        "genre": "Pets & Animals",
+        "title": "A Duck in the Pond",
+        "description": "A simple article about a duck in a pond and what children may notice about it.",
+        "points": [
+          "where the duck lives",
+          "how it moves",
+          "what makes ducks easy to know"
+        ]
+      },
+      {
+        "id": 49,
+        "genre": "Pets & Animals",
+        "title": "A Horse at the Farm",
+        "description": "A simple article about a horse and the work or rides people may do with it.",
+        "points": [
+          "what a horse looks like",
+          "where it lives",
+          "how people may work with horses"
+        ]
+      },
+      {
+        "id": 50,
+        "genre": "Pets & Animals",
+        "title": "A Friendly Goat",
+        "description": "A simple article about a goat and the things children may learn when they see one on a farm.",
+        "points": [
+          "what a goat looks like",
+          "what it eats",
+          "how it acts around people"
+        ]
+      },
+      {
+        "id": 51,
+        "genre": "Weather & Clothes",
+        "title": "A Sunny Day",
+        "description": "A simple article about sunny weather and the things children like to do outside.",
+        "points": [
+          "what the sky looks like",
+          "what children do outside",
+          "what to wear on a sunny day"
+        ]
+      },
+      {
+        "id": 52,
+        "genre": "Weather & Clothes",
+        "title": "A Rainy Day",
+        "description": "A simple article about rain and the clothes or tools children use in wet weather.",
+        "points": [
+          "what rainy weather is like",
+          "things children use in rain",
+          "what children may do on rainy days"
+        ]
+      },
+      {
+        "id": 53,
+        "genre": "Weather & Clothes",
+        "title": "A Windy Day",
+        "description": "A simple article about wind and the things it can move outside.",
+        "points": [
+          "what wind does",
+          "what children notice on a windy day",
+          "how to stay comfortable outside"
+        ]
+      },
+      {
+        "id": 54,
+        "genre": "Weather & Clothes",
+        "title": "A Cold Day",
+        "description": "A simple article about cold weather and the warm clothes children wear.",
+        "points": [
+          "what cold weather feels like",
+          "warm clothes people wear",
+          "what children may do indoors or outdoors"
+        ]
+      },
+      {
+        "id": 55,
+        "genre": "Weather & Clothes",
+        "title": "My Coat and Hat",
+        "description": "A simple article about two common clothes children wear in cool weather.",
+        "points": [
+          "what a coat does",
+          "what a hat does",
+          "when children wear them"
+        ]
+      },
+      {
+        "id": 56,
+        "genre": "Weather & Clothes",
+        "title": "Boots for Rain",
+        "description": "A simple article about rain boots and how they help children keep their feet dry.",
+        "points": [
+          "what rain boots are like",
+          "when children wear them",
+          "why dry feet feel better"
+        ]
+      },
+      {
+        "id": 57,
+        "genre": "Weather & Clothes",
+        "title": "Summer Clothes",
+        "description": "A simple article about light clothes children wear on hot days.",
+        "points": [
+          "common summer clothes",
+          "why these clothes feel better in heat",
+          "where children wear them"
+        ]
+      },
+      {
+        "id": 58,
+        "genre": "Weather & Clothes",
+        "title": "Winter Clothes",
+        "description": "A simple article about the clothes children need when the weather is very cold.",
+        "points": [
+          "common winter clothes",
+          "how they keep the body warm",
+          "when children use them"
+        ]
+      },
+      {
+        "id": 59,
+        "genre": "Weather & Clothes",
+        "title": "An Umbrella Day",
+        "description": "A simple article about using an umbrella in rain.",
+        "points": [
+          "what an umbrella does",
+          "when people use it",
+          "why it is useful to carry one"
+        ]
+      },
+      {
+        "id": 60,
+        "genre": "Weather & Clothes",
+        "title": "The Four Simple Seasons",
+        "description": "A simple article about the four seasons and one easy idea about each one.",
+        "points": [
+          "spring weather or plants",
+          "summer and winter differences",
+          "what children notice in autumn"
+        ]
+      },
+      {
+        "id": 61,
+        "genre": "Play & Toys",
+        "title": "My Ball",
+        "description": "A simple article about a ball and the games children can play with it.",
+        "points": [
+          "what a ball looks like",
+          "games children play",
+          "why a ball is a useful toy"
+        ]
+      },
+      {
+        "id": 62,
+        "genre": "Play & Toys",
+        "title": "My Teddy Bear",
+        "description": "A simple article about a teddy bear and why many children keep one close.",
+        "points": [
+          "what a teddy bear looks like",
+          "where children keep it",
+          "why it feels special"
+        ]
+      },
+      {
+        "id": 63,
+        "genre": "Play & Toys",
+        "title": "My Doll",
+        "description": "A simple article about a doll and the ways children play with it.",
+        "points": [
+          "what the doll looks like",
+          "how children play with it",
+          "why dolls can feel important"
+        ]
+      },
+      {
+        "id": 64,
+        "genre": "Play & Toys",
+        "title": "Building with Blocks",
+        "description": "A simple article about toy blocks and the things children can make with them.",
+        "points": [
+          "what blocks are like",
+          "things children build",
+          "why block play helps children think"
+        ]
+      },
+      {
+        "id": 65,
+        "genre": "Play & Toys",
+        "title": "My Toy Car",
+        "description": "A simple article about a toy car and the pretend roads children make for it.",
+        "points": [
+          "what the toy car looks like",
+          "how children play with it",
+          "why pretend play is fun"
+        ]
+      },
+      {
+        "id": 66,
+        "genre": "Play & Toys",
+        "title": "A Kite in the Park",
+        "description": "A simple article about a kite and what children do on a windy day in the park.",
+        "points": [
+          "what a kite looks like",
+          "where children fly it",
+          "why wind helps the game"
+        ]
+      },
+      {
+        "id": 67,
+        "genre": "Play & Toys",
+        "title": "Jump Rope Time",
+        "description": "A simple article about jumping rope and the way children play this simple game.",
+        "points": [
+          "what a jump rope is",
+          "how children use it",
+          "why the game is good exercise"
+        ]
+      },
+      {
+        "id": 68,
+        "genre": "Play & Toys",
+        "title": "A Puzzle Game",
+        "description": "A simple article about a puzzle and how children put the pieces together.",
+        "points": [
+          "what a puzzle has",
+          "how children solve it",
+          "why puzzles are good for thinking"
+        ]
+      },
+      {
+        "id": 69,
+        "genre": "Play & Toys",
+        "title": "A Red Bicycle",
+        "description": "A simple article about a child's bicycle and how it is used for play and short trips.",
+        "points": [
+          "parts of the bicycle",
+          "where children ride it",
+          "why safety matters"
+        ]
+      },
+      {
+        "id": 70,
+        "genre": "Play & Toys",
+        "title": "Playing Tag",
+        "description": "A simple article about the game of tag and the way children run and laugh together.",
+        "points": [
+          "how the game works",
+          "where children play it",
+          "why it is a fun group game"
+        ]
+      },
+      {
+        "id": 71,
+        "genre": "Home Routines & How-To",
+        "title": "Washing My Hands",
+        "description": "A simple article about when and how children wash their hands.",
+        "points": [
+          "when to wash hands",
+          "simple hand-washing steps",
+          "why clean hands help health"
+        ]
+      },
+      {
+        "id": 72,
+        "genre": "Home Routines & How-To",
+        "title": "Brushing My Teeth",
+        "description": "A simple article about brushing teeth and the steps children follow each day.",
+        "points": [
+          "when children brush teeth",
+          "simple brushing steps",
+          "why brushing matters"
+        ]
+      },
+      {
+        "id": 73,
+        "genre": "Home Routines & How-To",
+        "title": "Making My Bed",
+        "description": "A simple article about making a bed and keeping a bedroom tidy.",
+        "points": [
+          "simple bed-making steps",
+          "what a tidy bed looks like",
+          "why a tidy room feels nice"
+        ]
+      },
+      {
+        "id": 74,
+        "genre": "Home Routines & How-To",
+        "title": "Packing My Bag",
+        "description": "A simple article about getting a school bag ready for the next day.",
+        "points": [
+          "things to put in the bag",
+          "when to pack it",
+          "why being ready helps the morning"
+        ]
+      },
+      {
+        "id": 75,
+        "genre": "Home Routines & How-To",
+        "title": "Cleaning My Room",
+        "description": "A simple article about putting things away and keeping a room clean.",
+        "points": [
+          "things children put away",
+          "simple cleaning jobs",
+          "why a clean room helps"
+        ]
+      },
+      {
+        "id": 76,
+        "genre": "Home Routines & How-To",
+        "title": "Getting Ready for School",
+        "description": "A simple article about the small steps children follow before school.",
+        "points": [
+          "clothes and washing",
+          "eating and packing",
+          "leaving home on time"
+        ]
+      },
+      {
+        "id": 77,
+        "genre": "Home Routines & How-To",
+        "title": "Putting on My Shoes",
+        "description": "A simple article about choosing the right shoes and putting them on by yourself.",
+        "points": [
+          "different kinds of shoes",
+          "how to put them on",
+          "why the right shoes help"
+        ]
+      },
+      {
+        "id": 78,
+        "genre": "Home Routines & How-To",
+        "title": "Setting the Table",
+        "description": "A simple article about helping set the table before a meal.",
+        "points": [
+          "things placed on the table",
+          "where each thing goes",
+          "why helping at home matters"
+        ]
+      },
+      {
+        "id": 79,
+        "genre": "Home Routines & How-To",
+        "title": "Watering a Plant",
+        "description": "A simple article about giving water to a plant and watching it grow.",
+        "points": [
+          "what a plant needs",
+          "how to water it",
+          "what children may notice later"
+        ]
+      },
+      {
+        "id": 80,
+        "genre": "Home Routines & How-To",
+        "title": "Feeding My Pet",
+        "description": "A simple article about feeding a pet at the right time each day.",
+        "points": [
+          "what the pet eats",
+          "when it eats",
+          "why regular care is important"
+        ]
+      },
+      {
+        "id": 81,
+        "genre": "Places Near Me",
+        "title": "My Street",
+        "description": "A simple article about the street near a child's home and the things they see there.",
+        "points": [
+          "things seen on the street",
+          "people or vehicles there",
+          "how children stay safe"
+        ]
+      },
+      {
+        "id": 82,
+        "genre": "Places Near Me",
+        "title": "The Park Near My Home",
+        "description": "A simple article about a local park and the things children do there.",
+        "points": [
+          "things in the park",
+          "activities children do there",
+          "why parks are useful places"
+        ]
+      },
+      {
+        "id": 83,
+        "genre": "Places Near Me",
+        "title": "The Shop Near My Home",
+        "description": "A simple article about a neighborhood shop and what families buy there.",
+        "points": [
+          "things sold in the shop",
+          "who goes there",
+          "why local shops are useful"
+        ]
+      },
+      {
+        "id": 84,
+        "genre": "Places Near Me",
+        "title": "The Bus Stop",
+        "description": "A simple article about a bus stop and what people do while they wait there.",
+        "points": [
+          "what a bus stop is",
+          "who waits there",
+          "how people stay safe near the road"
+        ]
+      },
+      {
+        "id": 85,
+        "genre": "Places Near Me",
+        "title": "The Playground",
+        "description": "A simple article about a playground and the equipment children use there.",
+        "points": [
+          "things in the playground",
+          "how children play there",
+          "simple safety ideas"
+        ]
+      },
+      {
+        "id": 86,
+        "genre": "Places Near Me",
+        "title": "The Garden",
+        "description": "A simple article about a home or school garden and the plants children may see there.",
+        "points": [
+          "plants in the garden",
+          "things children do there",
+          "why gardens change over time"
+        ]
+      },
+      {
+        "id": 87,
+        "genre": "Places Near Me",
+        "title": "The Living Room",
+        "description": "A simple article about the family room and the things people do there together.",
+        "points": [
+          "things in the room",
+          "family activities there",
+          "why it is a shared space"
+        ]
+      },
+      {
+        "id": 88,
+        "genre": "Places Near Me",
+        "title": "The Bathroom",
+        "description": "A simple article about a bathroom and the things children use there each day.",
+        "points": [
+          "things found there",
+          "daily jobs done there",
+          "why the room helps health"
+        ]
+      },
+      {
+        "id": 89,
+        "genre": "Places Near Me",
+        "title": "The Library",
+        "description": "A simple article about a small local library and the books children borrow there.",
+        "points": [
+          "what people find in a library",
+          "what children do there",
+          "why books are useful"
+        ]
+      },
+      {
+        "id": 90,
+        "genre": "Places Near Me",
+        "title": "The Clinic",
+        "description": "A simple article about a clinic and the adults who help children stay healthy there.",
+        "points": [
+          "who works at a clinic",
+          "why people go there",
+          "how adults help children feel safe"
+        ]
+      },
+      {
+        "id": 91,
+        "genre": "Nature Around Me",
+        "title": "A Tree",
+        "description": "A simple article about a tree and the parts children can see every day.",
+        "points": [
+          "main parts of a tree",
+          "things a tree gives",
+          "why trees are useful"
+        ]
+      },
+      {
+        "id": 92,
+        "genre": "Nature Around Me",
+        "title": "A Flower",
+        "description": "A simple article about a flower and the colors and shapes children notice.",
+        "points": [
+          "what a flower looks like",
+          "where flowers grow",
+          "why people like flowers"
+        ]
+      },
+      {
+        "id": 93,
+        "genre": "Nature Around Me",
+        "title": "The Sun",
+        "description": "A simple article about the sun and the light and warmth it gives.",
+        "points": [
+          "what the sun gives",
+          "how it helps people and plants",
+          "how children stay safe in strong sun"
+        ]
+      },
+      {
+        "id": 94,
+        "genre": "Nature Around Me",
+        "title": "The Moon",
+        "description": "A simple article about the moon and when children can see it in the sky.",
+        "points": [
+          "when the moon appears",
+          "what it looks like",
+          "why children notice it at night"
+        ]
+      },
+      {
+        "id": 95,
+        "genre": "Nature Around Me",
+        "title": "Clouds in the Sky",
+        "description": "A simple article about clouds and the shapes and colors children may see.",
+        "points": [
+          "what clouds look like",
+          "how clouds change",
+          "what children may notice before rain"
+        ]
+      },
+      {
+        "id": 96,
+        "genre": "Nature Around Me",
+        "title": "Rain in the Garden",
+        "description": "A simple article about rain and what happens in a garden after it falls.",
+        "points": [
+          "what rain does to the ground",
+          "how plants change after rain",
+          "what children may see outside"
+        ]
+      },
+      {
+        "id": 97,
+        "genre": "Nature Around Me",
+        "title": "A Small Seed",
+        "description": "A simple article about a seed and the way it can grow into a plant.",
+        "points": [
+          "what a seed is",
+          "what it needs to grow",
+          "what happens after some time"
+        ]
+      },
+      {
+        "id": 98,
+        "genre": "Nature Around Me",
+        "title": "A Butterfly",
+        "description": "A simple article about a butterfly and the way it looks and moves.",
+        "points": [
+          "what a butterfly looks like",
+          "how it moves",
+          "where children may see one"
+        ]
+      },
+      {
+        "id": 99,
+        "genre": "Nature Around Me",
+        "title": "A Rock",
+        "description": "A simple article about a rock and the different shapes and colors rocks can have.",
+        "points": [
+          "what rocks look like",
+          "where children find them",
+          "how rocks can feel"
+        ]
+      },
+      {
+        "id": 100,
+        "genre": "Nature Around Me",
+        "title": "A Puddle",
+        "description": "A simple article about a puddle after rain and the simple things children notice there.",
+        "points": [
+          "how a puddle forms",
+          "what children see in it",
+          "how it changes later"
+        ]
+      }
+    ]
+  }
+}

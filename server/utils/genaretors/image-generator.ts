@@ -1,14 +1,9 @@
-import { NoImageGeneratedError, APICallError, generateText, Output } from "ai";
-import { vertex } from "@ai-sdk/google-vertex";
-import fs from "fs";
-import path from "path";
-import sharp from "sharp";
-import { openai, openaiImages } from "@/utils/openai";
 import { google, googleImage, googleModelLite } from "@/utils/google";
 import { uploadToBucket } from "@/utils/storage";
+import { generateText, Output } from "ai";
+import fs from "fs";
+import path from "path";
 import { z } from "zod";
-import { Uploadable } from "openai/uploads";
-import { createLogFile } from "../logging";
 
 interface GenerateImageParams {
   imageDesc: string;
@@ -22,7 +17,7 @@ interface GeneratedImageResult {
   error?: string;
 }
 
-export async function generateImage(
+export async function generatedImage(
   params: GenerateImageParams,
   maxRetries = 5,
 ): Promise<GeneratedImageResult> {
@@ -51,40 +46,44 @@ export async function generateImage(
       );
 
       const { output: storyParts } = await generateText({
-        // model: openai("gpt-4o-mini"),
         model: google(googleModelLite),
         output: Output.object({
           schema: z.object({
-            prompt: z.array(z.string()),
+            prompt: z.array(z.string()).length(3),
             mainCharacter: z
               .string()
               .describe(
-                "create a character description for a story, make it detailed and consistent",
+                "Visual description of the character only (e.g. 'A small brown puppy with big ears')",
               ),
           }),
         }),
         system:
-          "You're a visual storyteller. Break a visual story into 3 image prompts.",
-        prompt: `Create 3 consecutive image generation prompts based on this story: "${imageDesc}". Each should describe a moment continuing from the last. return only the prompts, is array of prompts.`,
+          "You are a visual artist. Create 3 separate, highly detailed visual descriptions for an image generator. Focus only on what is seen.",
+        prompt: `Create 3 visual descriptions for these story parts: "${passage}". 
+           Each description must be standalone and visual. 
+           Character to keep consistent.`,
       });
 
-      const result = await generateText({
-        model: google(googleImage),
-        prompt: `Create a high-quality, stylistically consistent digital illustration that visually represents:
-        Main character: ${storyParts.mainCharacter}
+      const imageResults = [];
 
-        following are the image descriptions:
-        image 1: ${storyParts.prompt[0]}
-        image 2: ${storyParts.prompt[1]}
-        image 3: ${storyParts.prompt[2]}
+      for (const sceneDescription of storyParts.prompt) {
+        const result = await generateText({
+          model: google(googleImage),
+          prompt: `A professional digital illustration for a children's book.
+             Character: ${storyParts.mainCharacter}.
+             Action: ${sceneDescription}.
+             Style: bright colors, 2D flat vector art, cute cartoon, simple background.
 
-        
-        Style: brightly colored cartoon illustration, storybook style. Generate exactly 3 separate images, 1 image per file.`,
-      });
+             IMPORTANT: No text, no words, no letters, no labels, no signatures, no numbers.
+             Clear visual only. High quality.`,
+        });
+
+        imageResults.push(result);
+      }
 
       // Validate that exactly 3 files were generated
-      if (!result.files || result.files.length !== 3) {
-        const errorMsg = `Expected 3 images, but got ${result.files?.length || 0} images`;
+      if (!imageResults || imageResults.length !== 3) {
+        const errorMsg = `Expected 3 images, but got ${imageResults?.length || 0} images`;
         console.warn(errorMsg);
         errors.push(errorMsg);
         attempts++;
@@ -102,8 +101,11 @@ export async function generateImage(
       generatedImages = [];
       const tempFiles: string[] = [];
 
-      for (const [index, file] of result.files.entries()) {
-        const base64Image: Buffer = Buffer.from(file.base64, "base64");
+      for (const [index, image] of imageResults.entries()) {
+        const base64Image: Buffer = Buffer.from(
+          image.files[0].base64,
+          "base64",
+        );
         const localPath = path.join(imagesDir, `${articleId}_${index + 1}.png`);
         fs.writeFileSync(localPath, base64Image as Uint8Array);
         tempFiles.push(localPath);
@@ -123,10 +125,6 @@ export async function generateImage(
           );
         }
       }
-
-      console.log(
-        `Successfully generated and saved 3 images for article ${articleId}`,
-      );
       break; // Success - exit retry loop
     } catch (error) {
       const errorMsg = `Attempt ${attempts + 1} failed: ${error}`;
@@ -141,15 +139,6 @@ export async function generateImage(
       }
     }
   }
-
-  // Check final result
-  // if (generatedImages.length !== 3) {
-  //   createLogFile(articleId, errors, "error");
-  //   return {
-  //     success: false,
-  //     error: `Failed to generate exactly 3 images after ${maxRetries} attempts. Generated ${generatedImages.length} images. Errors: ${errors.join(", ")}`,
-  //   };
-  // }
 
   return {
     success: true,
