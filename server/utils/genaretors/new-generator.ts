@@ -8,7 +8,7 @@ import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
 import { evaluateRating } from "./evaluate-rating-generator";
 import { prisma } from "@/lib/prisma";
 import { convertCefrLevel } from "@/lib/utils";
-import { generateImage } from "./image-generator";
+import { generatedImage } from "./image-generator";
 import { generateAudio } from "./audio-generator";
 import { generateAudioForWord } from "./audio-word-generator";
 import { generateAudioForFlashcard } from "./audio-flashcard-generator";
@@ -129,7 +129,7 @@ export const generateArticleNew = async (
             });
 
             Promise.all([
-              generateImage({
+              generatedImage({
                 imageDesc: article.imageDesc,
                 articleId: createdArticle.id,
                 passage: article.passage,

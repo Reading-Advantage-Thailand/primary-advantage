@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { generateArticle, generateArticleNew } from "@/actions/article";
+import { generateArticle } from "@/actions/article";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -13,20 +13,13 @@ export default function ArticleTestGenerate() {
   const handleGenerate = async () => {
     startTransition(async () => {
       generateArticle(amount).then((result) => {
-        if (result[0].error) {
-          toast.error(result[0].error);
+        if (result.failed > 0) {
+          toast.error(`Generation completed with ${result.failed} failure(s)`);
         } else {
-          toast.success("Articles generated successfully");
+          toast.success(
+            `Articles generated successfully (${result.succeeded}/${result.total})`,
+          );
         }
-      });
-    });
-  };
-
-  const handleGenerateNew = async () => {
-    console.log("generate new");
-    startTransition(async () => {
-      generateArticleNew(amount).then((result) => {
-        console.log(result);
       });
     });
   };
@@ -42,12 +35,6 @@ export default function ArticleTestGenerate() {
       />
       <Button onClick={handleGenerate} disabled={isPending}>
         Generate
-      </Button>
-
-      <h1>New Generator</h1>
-
-      <Button onClick={handleGenerateNew} disabled={isPending}>
-        New Generator
       </Button>
     </div>
   );

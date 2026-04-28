@@ -82,6 +82,9 @@ const ArticleShowcaseCard = React.forwardRef<HTMLDivElement, Props>(
               <Badge className="max-w-max shadow-lg" variant="destructive">
                 {t("cefrLevel", { level: article.cefrLevel ?? 0 })}
               </Badge>
+              <Badge className="max-w-max shadow-lg capitalize" variant="destructive">
+                {article.type}, {article.genre}
+              </Badge>
               <Badge className="max-w-max shadow-lg" variant="destructive">
                 <StarRating initialRating={article.rating} readOnly />
               </Badge>

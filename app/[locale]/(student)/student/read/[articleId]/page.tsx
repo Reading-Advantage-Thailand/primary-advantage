@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { FileTextIcon } from "lucide-react";
 import ExportWorkbookButton from "@/components/export-workbook-button";
 import ArticleFlashcardAutoSave from "@/components/articles/article-flashcard-auto-save";
+import DeleteArticleButton from "@/components/articles/delete-article-button";
 import { WordFlashcard, SentenceFlashcard } from "@/types/story";
 
 export async function generateMetadata({
@@ -51,6 +52,8 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
     role.includes("teacher") ||
     role.includes("admin") ||
     role.includes("system");
+
+  const isSystem = (role: string) => role === "system";
 
   // Build activity status from user's activity log for the auto-save hook
   const userActivity = article.articleActivityLog[0];
@@ -95,6 +98,12 @@ export default async function ArticleQuizPage({ params }: { params: Params }) {
                 <AssignButton article={article} />
                 <ExportWorkbookButton {...article} />
               </>
+            )}
+            {isSystem(user.role as string) && (
+              <DeleteArticleButton
+                articleId={articleId}
+                articleTitle={article.title}
+              />
             )}
             {/* {isAboveTeacher(user.role) && (
               <ArticleActions

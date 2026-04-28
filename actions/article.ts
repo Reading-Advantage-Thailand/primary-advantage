@@ -1,9 +1,8 @@
 "use server";
 
 import {
-  generateAllArticle,
-  generateAllArticleNew,
-} from "@/server/controllers/articleController";
+  generateArticleContentController,
+} from "@/server/controllers/articleGenerationController";
 import {
   deleteArticleByIdModel,
   getArticleActivity,
@@ -12,13 +11,8 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
 import { ActivityType } from "@/types/enum";
 
-export async function generateArticle(amountPerGenre: number) {
-  const result = await generateAllArticle(amountPerGenre);
-  return result;
-}
-
-export async function generateArticleNew(amountPerGenre: number) {
-  const result = await generateAllArticleNew(amountPerGenre);
+export async function generateArticle(amountPerGen: number) {
+  const result = await generateArticleContentController(amountPerGen);
   return result;
 }
 

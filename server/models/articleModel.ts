@@ -9,7 +9,7 @@ import {
 import { generateTopic } from "../utils/genaretors/topic-generator";
 import { generateArticle } from "../utils/genaretors/article-generator";
 import { evaluateRating } from "../utils/genaretors/evaluate-rating-generator";
-import { generateImage } from "../utils/genaretors/image-generator";
+import { generatedImage } from "../utils/genaretors/image-generator";
 import { generateMCQuestion } from "../utils/genaretors/mc-question-generator";
 import { generateSAQuestion } from "../utils/genaretors/sa-question-generator";
 import { generateLAQuestion } from "../utils/genaretors/la-question-generator";
@@ -183,7 +183,7 @@ export async function saveArticleContent(
 
   await Promise.all([
     // Generate and save image
-    generateImage({
+    generatedImage({
       imageDesc: article.imageDesc || "",
       articleId,
       passage: article.passage,
@@ -720,7 +720,7 @@ export const updateAprovedCustomArticle = async (articleId: string) => {
 
     await Promise.all([
       // Generate and save image
-      generateImage({
+      generatedImage({
         imageDesc: article.imageDescription,
         articleId,
         passage: article.passage,
