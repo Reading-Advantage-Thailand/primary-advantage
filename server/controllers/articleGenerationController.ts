@@ -248,49 +248,49 @@ const processArticle = async (
       );
 
       // ── Steps 5-7: Media (allSettled — partial failure = warning, not error) ──
-      // const [imageResult, audioResult, flashcardAudioResult] =
-      const [audioResult, flashcardAudioResult] = await Promise.allSettled([
-        // generatedImage({
-        //   imageDesc: content.imageDesc,
-        //   articleId: savedArticleId!,
-        //   passage: content.passage,
-        // }),
-        generateAudio({
-          passage: content.passage,
-          sentences: content.sentences,
-          articleId: savedArticleId!,
-        }),
-        generateAudioForFlashcard({
-          sentences: content.flashcard,
-          words: content.wordlist.map((w) => ({
-            vocabulary: w.vocabulary,
-            definition: w.definitions,
-          })),
-          contentId: savedArticleId!,
-          job: "article",
-        }),
-      ]);
+      const [imageResult, audioResult, flashcardAudioResult] =
+        await Promise.allSettled([
+          generatedImage({
+            imageDesc: content.imageDesc,
+            articleId: savedArticleId!,
+            passage: content.passage,
+          }),
+          generateAudio({
+            passage: content.passage,
+            sentences: content.sentences,
+            articleId: savedArticleId!,
+          }),
+          generateAudioForFlashcard({
+            sentences: content.flashcard,
+            words: content.wordlist.map((w) => ({
+              vocabulary: w.vocabulary,
+              definition: w.definitions,
+            })),
+            contentId: savedArticleId!,
+            job: "article",
+          }),
+        ]);
 
       // ── Collect media step statuses ──
       let imageOk = true;
       let audioOk = true;
       let flashcardAudioOk = true;
 
-      // if (imageResult.status === "rejected") {
-      //   imageOk = false;
-      //   logger.addIssue({
-      //     step: "image_generation",
-      //     severity: "WARN",
-      //     message: imageResult.reason?.message || String(imageResult.reason),
-      //   });
-      // } else if (!imageResult.value.success) {
-      //   imageOk = false;
-      //   logger.addIssue({
-      //     step: "image_upload",
-      //     severity: "WARN",
-      //     message: imageResult.value.error ?? "Image generation/upload failed",
-      //   });
-      // }
+      if (imageResult.status === "rejected") {
+        imageOk = false;
+        logger.addIssue({
+          step: "image_generation",
+          severity: "WARN",
+          message: imageResult.reason?.message || String(imageResult.reason),
+        });
+      } else if (!imageResult.value.success) {
+        imageOk = false;
+        logger.addIssue({
+          step: "image_upload",
+          severity: "WARN",
+          message: imageResult.value.error ?? "Image generation/upload failed",
+        });
+      }
 
       if (audioResult.status === "rejected") {
         audioOk = false;
