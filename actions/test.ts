@@ -161,7 +161,7 @@ export async function generateImages(articleId: string) {
       select: { id: true, passage: true, imageDescription: true },
     });
 
-    const result = await generateImage({
+    const result = await generatedImage({
       imageDesc: articles?.imageDescription as string,
       articleId: articles?.id as string,
       passage: articles?.passage as string,
