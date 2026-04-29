@@ -30,11 +30,6 @@ export async function generatedImage(
     fs.mkdirSync(imagesDir, { recursive: true });
   }
 
-  const outDir = path.join(process.cwd(), "public/story");
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
-
   // Retry logic to ensure exactly 3 images are generated
   let attempts = 0;
   let generatedImages: string[] = [];
