@@ -125,7 +125,11 @@ export async function generatedImage(
           );
         }
       }
-      break; // Success - exit retry loop
+
+      return {
+        success: true,
+        imageUrls: generatedImages,
+      };
     } catch (error) {
       const errorMsg = `Attempt ${attempts + 1} failed: ${error}`;
       console.error(errorMsg);
@@ -134,14 +138,14 @@ export async function generatedImage(
 
       if (attempts < maxRetries) {
         const delay = Math.pow(2, attempts) * 1000; // Exponential backoff
-        console.log(`Waiting ${delay}ms before retry...`);
+        // console.log(`Waiting ${delay}ms before retry...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
   }
 
   return {
-    success: true,
-    imageUrls: generatedImages,
+    success: false,
+    error: `Failed after ${maxRetries} attempts: ${errors.join("; ")}`,
   };
 }

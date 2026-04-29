@@ -161,13 +161,18 @@ export async function generateImages(articleId: string) {
       select: { id: true, passage: true, imageDescription: true },
     });
 
+    if (!articles) {
+      throw new Error("Article not found");
+    }
+
     const result = await generatedImage({
-      imageDesc: articles?.imageDescription as string,
-      articleId: articles?.id as string,
-      passage: articles?.passage as string,
+      imageDesc: articles.imageDescription as string,
+      articleId: articles.id as string,
+      passage: articles.passage as string,
     });
 
     if (result.success) {
+      console.log("Images generated successfully");
       return { success: true, message: "Images generated successfully" };
     } else {
       return { error: true, message: "Failed to generate images" };
