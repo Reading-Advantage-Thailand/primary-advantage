@@ -1,0 +1,609 @@
+{
+  "storyCollection": {
+    "title": "Primary Advantage B1 Key Story Library",
+    "targetAudience": "Grades 5-6 (B1 Key for Schools Level)",
+    "totalStories": 100,
+    "stories": [
+      {
+        "id": 1,
+        "genre": "School & Friendship",
+        "title": "The Group Project Plan",
+        "description": "A class team must plan a project together and learn how to listen, divide jobs, and solve disagreements fairly."
+      },
+      {
+        "id": 2,
+        "genre": "School & Friendship",
+        "title": "The New Student Guide",
+        "description": "A student helps a new classmate understand the school and discovers that small acts of kindness build trust."
+      },
+      {
+        "id": 3,
+        "genre": "School & Friendship",
+        "title": "The Lunch Table Choice",
+        "description": "A child must decide whether to sit with old friends or include someone who is often left alone."
+      },
+      {
+        "id": 4,
+        "genre": "School & Friendship",
+        "title": "The Homework Club",
+        "description": "Students start a small homework club and learn how different strengths can help the whole group."
+      },
+      {
+        "id": 5,
+        "genre": "School & Friendship",
+        "title": "The Class Captain Vote",
+        "description": "A class election teaches students about responsibility, promises, and choosing a leader carefully."
+      },
+      {
+        "id": 6,
+        "genre": "School & Friendship",
+        "title": "The Lost Library Book",
+        "description": "A student loses a library book and learns to be honest while searching for a practical solution."
+      },
+      {
+        "id": 7,
+        "genre": "School & Friendship",
+        "title": "The Science Fair Team",
+        "description": "Friends prepare for a science fair and learn that teamwork matters more than winning first prize."
+      },
+      {
+        "id": 8,
+        "genre": "School & Friendship",
+        "title": "The Playground Promise",
+        "description": "A broken promise during recess causes a friendship problem that must be repaired with honesty."
+      },
+      {
+        "id": 9,
+        "genre": "School & Friendship",
+        "title": "The School Garden Helpers",
+        "description": "Students care for a school garden and learn that patient work can create something useful for everyone."
+      },
+      {
+        "id": 10,
+        "genre": "School & Friendship",
+        "title": "The Talent Show Nerves",
+        "description": "A nervous student prepares for a school talent show with help from friends and a supportive teacher."
+      },
+      {
+        "id": 11,
+        "genre": "Adventure & Discovery",
+        "title": "The Map in the Old Desk",
+        "description": "Children find an old map in a classroom desk and follow clues that teach them about their school history."
+      },
+      {
+        "id": 12,
+        "genre": "Adventure & Discovery",
+        "title": "The Cave Path",
+        "description": "A hiking group takes a safe cave path and learns to stay calm when the route becomes confusing."
+      },
+      {
+        "id": 13,
+        "genre": "Adventure & Discovery",
+        "title": "The Island Camp",
+        "description": "Students on a camp trip explore a small island and learn how to make careful choices outdoors."
+      },
+      {
+        "id": 14,
+        "genre": "Adventure & Discovery",
+        "title": "The River Crossing",
+        "description": "Friends must cross a shallow river during a nature walk and learn to plan before acting."
+      },
+      {
+        "id": 15,
+        "genre": "Adventure & Discovery",
+        "title": "The Missing Compass",
+        "description": "A group loses its compass during an outdoor activity and must use clues from nature to return safely."
+      },
+      {
+        "id": 16,
+        "genre": "Adventure & Discovery",
+        "title": "The Forest Shelter",
+        "description": "Children build a simple shelter during a camp challenge and learn how cooperation saves time."
+      },
+      {
+        "id": 17,
+        "genre": "Adventure & Discovery",
+        "title": "The Old Tower Steps",
+        "description": "A visit to an old tower becomes a lesson in courage, patience, and respecting historic places."
+      },
+      {
+        "id": 18,
+        "genre": "Adventure & Discovery",
+        "title": "The Mountain Weather Change",
+        "description": "A walking trip changes when clouds arrive, and the group learns why preparation matters."
+      },
+      {
+        "id": 19,
+        "genre": "Adventure & Discovery",
+        "title": "The Garden Maze",
+        "description": "Friends enter a garden maze and must use memory and teamwork to find the exit."
+      },
+      {
+        "id": 20,
+        "genre": "Adventure & Discovery",
+        "title": "The Hidden Courtyard",
+        "description": "Students discover a quiet courtyard at school and work to turn it into a shared reading space."
+      },
+      {
+        "id": 21,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Vanishing Paintbrush",
+        "description": "An art room mystery helps students practice careful observation before blaming anyone."
+      },
+      {
+        "id": 22,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Secret Code Note",
+        "description": "Friends decode a strange note and discover it is connected to a surprise school event."
+      },
+      {
+        "id": 23,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Missing Trophy",
+        "description": "A missing sports trophy leads students to investigate clues and learn the value of patience."
+      },
+      {
+        "id": 24,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Strange Footprints",
+        "description": "Footprints near the garden cause confusion until students use evidence to find a simple explanation."
+      },
+      {
+        "id": 25,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Locked Music Room",
+        "description": "A locked music room puzzle teaches students to ask the right questions and work with adults."
+      },
+      {
+        "id": 26,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Case of the Swapped Bags",
+        "description": "Two similar school bags are mixed up, and classmates must solve the problem before home time."
+      },
+      {
+        "id": 27,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Library Light",
+        "description": "A light seen in the library after school leads to a mystery about a forgotten class project."
+      },
+      {
+        "id": 28,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Disappearing Seeds",
+        "description": "Seeds vanish from the school garden, and students investigate what really happened to them."
+      },
+      {
+        "id": 29,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Broken Clock Clue",
+        "description": "A classroom clock stops at the same time every day, leading students to find a practical cause."
+      },
+      {
+        "id": 30,
+        "genre": "Mystery & Problem Solving",
+        "title": "The Mystery of the Empty Cage",
+        "description": "A class pet cage is empty, and students must stay calm while searching safely and carefully."
+      },
+      {
+        "id": 31,
+        "genre": "Sports & Personal Growth",
+        "title": "The Relay Team",
+        "description": "A relay team learns that trust and steady practice can matter more than natural speed."
+      },
+      {
+        "id": 32,
+        "genre": "Sports & Personal Growth",
+        "title": "The Basketball Tryout",
+        "description": "A student prepares for basketball tryouts and learns how to handle disappointment maturely."
+      },
+      {
+        "id": 33,
+        "genre": "Sports & Personal Growth",
+        "title": "The Long Swim",
+        "description": "A swimmer trains for a longer race and learns how small improvements build confidence."
+      },
+      {
+        "id": 34,
+        "genre": "Sports & Personal Growth",
+        "title": "The Football Captain",
+        "description": "A football captain must choose between showing off and helping every teammate improve."
+      },
+      {
+        "id": 35,
+        "genre": "Sports & Personal Growth",
+        "title": "The Table Tennis Challenge",
+        "description": "A student faces a stronger opponent and learns to focus on strategy instead of fear."
+      },
+      {
+        "id": 36,
+        "genre": "Sports & Personal Growth",
+        "title": "The School Run",
+        "description": "A school running event teaches a child how to pace effort and encourage others."
+      },
+      {
+        "id": 37,
+        "genre": "Sports & Personal Growth",
+        "title": "The Climbing Wall",
+        "description": "A climbing lesson helps a nervous student understand courage and safe risk-taking."
+      },
+      {
+        "id": 38,
+        "genre": "Sports & Personal Growth",
+        "title": "The Badminton Partner",
+        "description": "Two students with different styles learn how to communicate during a doubles match."
+      },
+      {
+        "id": 39,
+        "genre": "Sports & Personal Growth",
+        "title": "The Rainy Sports Day",
+        "description": "Bad weather changes sports day plans, and students learn to adapt without losing enthusiasm."
+      },
+      {
+        "id": 40,
+        "genre": "Sports & Personal Growth",
+        "title": "The Last-Minute Substitute",
+        "description": "A student joins a team at the last minute and learns that preparation includes attitude."
+      },
+      {
+        "id": 41,
+        "genre": "Family & Responsibility",
+        "title": "The Busy Family Morning",
+        "description": "A child takes more responsibility during a busy morning and discovers how small jobs help everyone."
+      },
+      {
+        "id": 42,
+        "genre": "Family & Responsibility",
+        "title": "The Grandparent Interview",
+        "description": "A school assignment leads a child to interview a grandparent and understand family history better."
+      },
+      {
+        "id": 43,
+        "genre": "Family & Responsibility",
+        "title": "The Younger Cousin Visit",
+        "description": "An older child cares for a younger cousin and learns patience during a family visit."
+      },
+      {
+        "id": 44,
+        "genre": "Family & Responsibility",
+        "title": "The Market Errand",
+        "description": "A child completes a market errand and learns how to plan, ask questions, and manage money carefully."
+      },
+      {
+        "id": 45,
+        "genre": "Family & Responsibility",
+        "title": "The Family Recipe",
+        "description": "A family recipe teaches a child about memory, tradition, and helping in the kitchen."
+      },
+      {
+        "id": 46,
+        "genre": "Family & Responsibility",
+        "title": "The Shared Bedroom Plan",
+        "description": "Siblings sharing a room learn how to set fair rules and respect each other."
+      },
+      {
+        "id": 47,
+        "genre": "Family & Responsibility",
+        "title": "The Pet Care Schedule",
+        "description": "A child creates a pet care schedule and learns that responsibility must be regular, not occasional."
+      },
+      {
+        "id": 48,
+        "genre": "Family & Responsibility",
+        "title": "The Moving Day Box",
+        "description": "A family move teaches a child how to handle change and keep important memories safe."
+      },
+      {
+        "id": 49,
+        "genre": "Family & Responsibility",
+        "title": "The Broken Vase Truth",
+        "description": "A child breaks a vase and must decide whether to hide the mistake or tell the truth."
+      },
+      {
+        "id": 50,
+        "genre": "Family & Responsibility",
+        "title": "The Weekend Chore Deal",
+        "description": "A family agrees on weekend chores and a child learns how fairness works at home."
+      },
+      {
+        "id": 51,
+        "genre": "Nature & Environment",
+        "title": "The Pond Clean-Up",
+        "description": "Students clean a local pond area and learn how litter affects animals and water."
+      },
+      {
+        "id": 52,
+        "genre": "Nature & Environment",
+        "title": "The Tree Planting Day",
+        "description": "A class plants young trees and learns that environmental care takes time and teamwork."
+      },
+      {
+        "id": 53,
+        "genre": "Nature & Environment",
+        "title": "The Injured Bird",
+        "description": "Children find an injured bird and learn the right way to get help from adults."
+      },
+      {
+        "id": 54,
+        "genre": "Nature & Environment",
+        "title": "The Recycling Contest",
+        "description": "A school recycling contest teaches students to reduce waste without turning everything into competition."
+      },
+      {
+        "id": 55,
+        "genre": "Nature & Environment",
+        "title": "The Butterfly Garden",
+        "description": "Students plan a butterfly garden and learn how small habitats support living things."
+      },
+      {
+        "id": 56,
+        "genre": "Nature & Environment",
+        "title": "The Beach After the Storm",
+        "description": "A family sees the beach after a storm and joins a clean-up effort."
+      },
+      {
+        "id": 57,
+        "genre": "Nature & Environment",
+        "title": "The Dry Garden Problem",
+        "description": "A school garden suffers during dry weather, and students design a water-saving plan."
+      },
+      {
+        "id": 58,
+        "genre": "Nature & Environment",
+        "title": "The Noisy Park Debate",
+        "description": "Children discuss how people and animals share a park when noise becomes a problem."
+      },
+      {
+        "id": 59,
+        "genre": "Nature & Environment",
+        "title": "The Lost Seedlings",
+        "description": "A class tries to save weak seedlings and learns what plants need to grow well."
+      },
+      {
+        "id": 60,
+        "genre": "Nature & Environment",
+        "title": "The Nature Journal",
+        "description": "A student keeps a nature journal and learns how careful observation changes understanding."
+      },
+      {
+        "id": 61,
+        "genre": "Technology & Invention",
+        "title": "The Broken Robot Kit",
+        "description": "A robot kit breaks before a demonstration, and students learn to test each part calmly."
+      },
+      {
+        "id": 62,
+        "genre": "Technology & Invention",
+        "title": "The Class Video Project",
+        "description": "A video project teaches students about planning, editing, and using technology responsibly."
+      },
+      {
+        "id": 63,
+        "genre": "Technology & Invention",
+        "title": "The Solar Car Race",
+        "description": "Students build small solar cars and learn how sunlight can become useful energy."
+      },
+      {
+        "id": 64,
+        "genre": "Technology & Invention",
+        "title": "The Helpful App Idea",
+        "description": "Friends design an app idea to solve a school problem and learn to think about users."
+      },
+      {
+        "id": 65,
+        "genre": "Technology & Invention",
+        "title": "The Old Radio Repair",
+        "description": "A child helps repair an old radio and learns how older technology connected people."
+      },
+      {
+        "id": 66,
+        "genre": "Technology & Invention",
+        "title": "The Coding Club Bug",
+        "description": "A coding club finds a difficult bug and learns that mistakes are part of building software."
+      },
+      {
+        "id": 67,
+        "genre": "Technology & Invention",
+        "title": "The 3D Printer Plan",
+        "description": "Students use a 3D printer to make a useful object and learn about design limits."
+      },
+      {
+        "id": 68,
+        "genre": "Technology & Invention",
+        "title": "The Digital Poster",
+        "description": "A student creates a digital poster and learns how images and words work together."
+      },
+      {
+        "id": 69,
+        "genre": "Technology & Invention",
+        "title": "The Weather Station",
+        "description": "A class builds a simple weather station and uses data to make better predictions."
+      },
+      {
+        "id": 70,
+        "genre": "Technology & Invention",
+        "title": "The Invention Notebook",
+        "description": "A young inventor keeps a notebook and discovers that ideas improve through testing."
+      },
+      {
+        "id": 71,
+        "genre": "Community & Culture",
+        "title": "The Community Festival Stall",
+        "description": "Students help at a festival stall and learn how community events bring different people together."
+      },
+      {
+        "id": 72,
+        "genre": "Community & Culture",
+        "title": "The Library Reading Day",
+        "description": "A reading day at the library helps students understand how public spaces support learning."
+      },
+      {
+        "id": 73,
+        "genre": "Community & Culture",
+        "title": "The Museum Volunteer",
+        "description": "A child volunteers at a small museum event and learns why local history matters."
+      },
+      {
+        "id": 74,
+        "genre": "Community & Culture",
+        "title": "The Neighborhood Noticeboard",
+        "description": "Friends use a noticeboard to share helpful information and solve a local problem."
+      },
+      {
+        "id": 75,
+        "genre": "Community & Culture",
+        "title": "The Food Drive",
+        "description": "A class organizes a food drive and learns how planning can help people in need."
+      },
+      {
+        "id": 76,
+        "genre": "Community & Culture",
+        "title": "The Cultural Dance Practice",
+        "description": "Students practice a cultural dance and learn to respect traditions while performing together."
+      },
+      {
+        "id": 77,
+        "genre": "Community & Culture",
+        "title": "The Town Map Project",
+        "description": "A class makes a town map and learns how places, services, and people connect."
+      },
+      {
+        "id": 78,
+        "genre": "Community & Culture",
+        "title": "The Thank-You Letters",
+        "description": "Students write letters to community helpers and discover how gratitude can strengthen relationships."
+      },
+      {
+        "id": 79,
+        "genre": "Community & Culture",
+        "title": "The New Park Bench",
+        "description": "Children help choose a place for a new park bench and learn about shared public spaces."
+      },
+      {
+        "id": 80,
+        "genre": "Community & Culture",
+        "title": "The School Exchange Day",
+        "description": "Students meet visitors from another school and learn how to ask respectful questions."
+      },
+      {
+        "id": 81,
+        "genre": "Feelings & Choices",
+        "title": "The Apology That Took Time",
+        "description": "A student learns that saying sorry matters most when it is honest and followed by better actions."
+      },
+      {
+        "id": 82,
+        "genre": "Feelings & Choices",
+        "title": "The Secret Worry",
+        "description": "A child carries a worry alone before learning how talking to a trusted adult can help."
+      },
+      {
+        "id": 83,
+        "genre": "Feelings & Choices",
+        "title": "The Jealous Friend",
+        "description": "A friendship becomes tense after one child wins an award, and both learn to handle jealousy."
+      },
+      {
+        "id": 84,
+        "genre": "Feelings & Choices",
+        "title": "The Brave Question",
+        "description": "A shy student asks a question in class and discovers that others were wondering too."
+      },
+      {
+        "id": 85,
+        "genre": "Feelings & Choices",
+        "title": "The Fair Choice",
+        "description": "A child must choose between an easy advantage and a fair solution during a class game."
+      },
+      {
+        "id": 86,
+        "genre": "Feelings & Choices",
+        "title": "The Forgotten Invitation",
+        "description": "A forgotten party invitation creates hurt feelings that friends must understand and repair."
+      },
+      {
+        "id": 87,
+        "genre": "Feelings & Choices",
+        "title": "The Quiet Leader",
+        "description": "A quiet student leads a small group and learns leadership does not always mean being loud."
+      },
+      {
+        "id": 88,
+        "genre": "Feelings & Choices",
+        "title": "The Angry Match",
+        "description": "A student becomes angry during a game and learns practical ways to pause and respond."
+      },
+      {
+        "id": 89,
+        "genre": "Feelings & Choices",
+        "title": "The Mistake on Stage",
+        "description": "A mistake during a performance teaches students how to recover and support each other."
+      },
+      {
+        "id": 90,
+        "genre": "Feelings & Choices",
+        "title": "The Choice to Share",
+        "description": "A child with a special item learns when sharing is generous and when setting limits is healthy."
+      },
+      {
+        "id": 91,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Missed Bus",
+        "description": "A missed bus teaches friends how to stay calm, ask for help, and solve a travel problem."
+      },
+      {
+        "id": 92,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Train Platform Mix-Up",
+        "description": "A family trip becomes confusing when students must read signs and listen carefully."
+      },
+      {
+        "id": 93,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Rainy Walk Home",
+        "description": "A rainy walk home teaches children how preparation makes everyday challenges easier."
+      },
+      {
+        "id": 94,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Airport First Time",
+        "description": "A first airport trip helps a child understand instructions, patience, and new routines."
+      },
+      {
+        "id": 95,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Bicycle Route",
+        "description": "Friends choose a safer bicycle route and learn how planning protects everyone."
+      },
+      {
+        "id": 96,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Market Bargain",
+        "description": "A child learns how to compare prices and make a careful choice at a busy market."
+      },
+      {
+        "id": 97,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Lost Ticket",
+        "description": "A lost ticket during a trip teaches a child to stay honest and ask the right adult for help."
+      },
+      {
+        "id": 98,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Long Car Ride",
+        "description": "A long ride challenges siblings to be patient and make the journey pleasant."
+      },
+      {
+        "id": 99,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Wrong Turn",
+        "description": "A walking trip takes a wrong turn, and children use landmarks to find the way back."
+      },
+      {
+        "id": 100,
+        "genre": "Travel & Everyday Challenges",
+        "title": "The Packed Suitcase",
+        "description": "A child packs for a trip and learns how to choose what is useful instead of bringing everything."
+      }
+    ]
+  }
+}

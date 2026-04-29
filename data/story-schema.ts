@@ -84,11 +84,14 @@ const storyBlueprintSchema = z.object({
   // Language Planning
   globalVocabularyList: z
     .array(z.string())
+    .min(20)
+    .max(30)
     .describe(
       "A master list of 20-30 vocabulary words that are challenging yet appropriate for the specific level (e.g., Starters whitelist for A0). These words must be distributed and taught throughout the story.",
     ),
   globalGrammarStructures: z
     .array(z.string())
+    .min(1)
     .describe(
       "A whitelist of grammar structures to be used, strictly adhering to the level constraints (e.g., A0: Present Simple only; B1: Past Perfect allowed).",
     ),
@@ -134,7 +137,7 @@ const storyBlueprintSchema = z.object({
 
 const chapterSchema = z.object({
   // Context
-  chapterNumber: z.number(),
+  chapterNumber: z.number().int().min(1).max(8),
   stage: harmonStageEnum,
 
   // Chapter-Specific Planning (Mini-Thinking)
@@ -142,6 +145,8 @@ const chapterSchema = z.object({
     .object({
       selectedVocabulary: z
         .array(z.string())
+        .min(3)
+        .max(8)
         .describe(
           "Select 3-8 specific words from the 'globalVocabularyList' to feature and reinforce in THIS chapter.",
         ),
@@ -198,12 +203,16 @@ const chapterSchema = z.object({
           .describe("Multilingual definition for this vocabulary word."),
       }),
     )
+    .min(3)
+    .max(8)
     .describe(
       "A list of 3-8 key vocabulary words extracted from THIS chapter.",
     ),
 
   sentences: z
     .array(z.string())
+    .min(3)
+    .max(5)
     .describe(
       "3-5 key sentences from the passage that demonstrate the 'grammarFocus'.",
     ),
@@ -214,6 +223,8 @@ const chapterSchema = z.object({
         translation: translationSchema,
       }),
     )
+    .min(3)
+    .max(5)
     .describe("Flashcards for the key sentences of this chapter."),
 
   // Assessment (Per Chapter)
@@ -232,6 +243,8 @@ const chapterSchema = z.object({
         answer: z.string().describe("The correct answer text."),
       }),
     )
+    .min(3)
+    .max(5)
     .describe(
       "3-5 Multiple Choice Questions testing detailed comprehension of this chapter.",
     ),
@@ -247,6 +260,8 @@ const chapterSchema = z.object({
         answer: z.string().describe("A model answer for the question."),
       }),
     )
+    .min(1)
+    .max(3)
     .describe(
       "1-3 Short Answer Questions testing recall and simple inference.",
     ),
@@ -259,6 +274,7 @@ const chapterSchema = z.object({
           .describe("A prompt for a longer, reflective response."),
       }),
     )
+    .length(1)
     .describe(
       "1 Long Answer Question encouraging personal connection or deeper analysis.",
     ),
@@ -277,6 +293,7 @@ export const storyGeneratorSchema = z.object({
   // ...then executes the chapters based on that plan.
   chapters: z
     .array(chapterSchema)
+    .length(8)
     .describe(
       "The 8 chapters generated sequentially, strictly following the 'blueprint'.",
     ),
