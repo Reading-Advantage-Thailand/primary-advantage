@@ -35,7 +35,7 @@ import { StoryGenerationLogger } from "@/lib/logger";
 // CEFR level batches for parallel processing (2-3 levels per batch to avoid API rate limits)
 const CEFR_BATCHES = [
   [ArticleBaseCefrLevel.A0, ArticleBaseCefrLevel.A1, ArticleBaseCefrLevel.A2],
-  [ArticleBaseCefrLevel.B1, ArticleBaseCefrLevel.B2],
+  //[ArticleBaseCefrLevel.B1, ArticleBaseCefrLevel.B2],
 ];
 
 const ALL_CEFR_LEVELS = CEFR_BATCHES.flat();
