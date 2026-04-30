@@ -401,6 +401,8 @@ export const storyGeneratorSchema = z.object({
               }),
             }),
           )
+          .min(3)
+          .max(5)
           .describe(
             "Extract the 3 to 5 most difficult sentence, phrases, or idioms from the chapter",
           ),
@@ -447,6 +449,7 @@ export const storyGeneratorSchema = z.object({
           ),
       }),
     )
+    .length(8)
     .describe("The chapters of the story"),
   characters: z
     .array(
