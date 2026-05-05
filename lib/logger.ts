@@ -221,6 +221,7 @@ export type ValidationStep =
   | "repair_chapter_translated_summary"
   | "repair_story_translated_summary"
   | "repair_chapter_flashcard_audio"
+  | "repair_chapter_flashcard_row"
   | "post_repair_checks"
   | "persist_state";
 
