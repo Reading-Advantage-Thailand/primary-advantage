@@ -160,6 +160,10 @@ model Article {
   brainstorming                String?                        @map("brainstorming")
   planning                     String?                        @map("planning")
   topic                        String?
+  validationStatus             ValidationStatus               @default(PENDING) @map("validation_status")
+  validatedAt                  DateTime?                      @map("validated_at")
+  repairAttempts               Int                            @default(0) @map("repair_attempts")
+  lastValidationIssues         Json?                          @map("last_validation_issues")
   articleActivityLog           ArticleActivityLog[]
   Assignment                   Assignment[]
   flashcardCards               FlashcardCard[]
@@ -169,6 +173,7 @@ model Article {
   shortAnswerQuestions         ShortAnswerQuestion[]
   userLessonProgress           UserLessonProgress[]
 
+  @@index([validationStatus, validatedAt])
   @@map("article")
 }
 
@@ -538,24 +543,29 @@ model Leaderboard {
 }
 
 model Story {
-  id                String         @id @default(cuid())
-  topic             String
-  title             String
-  summary           String
-  translatedSummary Json?
-  imageDescription  String
-  characters        Json?
-  type              String?
-  genre             String?
-  subGenre          String?
-  cefrLevel         String?
-  raLevel           Int?
-  rating            Float?
-  isPublished       Boolean        @default(false) @map("is_published")
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  storyChapters     StoryChapter[]
+  id                   String           @id @default(cuid())
+  topic                String
+  title                String
+  summary              String
+  translatedSummary    Json?
+  imageDescription     String
+  characters           Json?
+  type                 String?
+  genre                String?
+  subGenre             String?
+  cefrLevel            String?
+  raLevel              Int?
+  rating               Float?
+  isPublished          Boolean          @default(false) @map("is_published")
+  validationStatus     ValidationStatus @default(PENDING) @map("validation_status")
+  validatedAt          DateTime?        @map("validated_at")
+  repairAttempts       Int              @default(0) @map("repair_attempts")
+  lastValidationIssues Json?            @map("last_validation_issues")
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  storyChapters        StoryChapter[]
 
+  @@index([validationStatus, validatedAt])
   @@map("stories")
 }
 
@@ -581,6 +591,31 @@ model StoryChapter {
   sentencsAndWordsForFlashcards SentencsAndWordsForFlashcard[]
 
   @@map("story_chapters")
+}
+
+model ValidationRun {
+  id                     String    @id @default(cuid())
+  contentType            String    @map("content_type") // "article" | "story"
+  triggeredBy            String    @map("triggered_by") // "cron" | "manual" | "backfill"
+  startedAt              DateTime  @default(now()) @map("started_at")
+  finishedAt             DateTime? @map("finished_at")
+  durationMs             Int?      @map("duration_ms")
+  itemsChecked           Int       @default(0) @map("items_checked")
+  itemsOk                Int       @default(0) @map("items_ok")
+  itemsRepaired          Int       @default(0) @map("items_repaired")
+  itemsBroken            Int       @default(0) @map("items_broken")
+  itemsPermanentlyBroken Int       @default(0) @map("items_permanently_broken")
+  errors                 Json?
+
+  @@index([contentType, startedAt])
+  @@map("validation_runs")
+}
+
+enum ValidationStatus {
+  PENDING
+  OK
+  BROKEN
+  PERMANENTLY_BROKEN
 }
 
 enum AIInsightType {

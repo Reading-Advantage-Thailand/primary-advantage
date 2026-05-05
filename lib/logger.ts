@@ -204,3 +204,94 @@ export class ArticleGenerationLogger {
     this.issues = [];
   }
 }
+
+// ─── ValidationLogger ────────────────────────────────────────────────────────
+
+export type ValidationStep =
+  | "checks"
+  | "repair_images"
+  | "repair_audio"
+  | "repair_translated_passage"
+  | "repair_translated_summary"
+  | "repair_flashcard_audio"
+  | "repair_flashcard_row"
+  | "repair_story_cover"
+  | "repair_chapter_image"
+  | "repair_chapter_audio"
+  | "repair_chapter_translated_summary"
+  | "repair_story_translated_summary"
+  | "repair_chapter_flashcard_audio"
+  | "repair_chapter_flashcard_row"
+  | "post_repair_checks"
+  | "persist_state";
+
+export interface ValidationIssue {
+  step: ValidationStep;
+  severity: "WARN" | "ERROR";
+  message: string;
+}
+
+export interface ValidationLogContext {
+  contentType: "article" | "story";
+  contentId: string;
+  validationRunId: string;
+  finalStatus: "OK" | "BROKEN" | "PERMANENTLY_BROKEN";
+  attempts: number;
+}
+
+export class ValidationLogger {
+  private issues: ValidationIssue[] = [];
+
+  addIssue(issue: ValidationIssue): void {
+    this.issues.push(issue);
+  }
+
+  hasIssues(): boolean {
+    return this.issues.length > 0;
+  }
+
+  async flush(context: ValidationLogContext): Promise<void> {
+    if (!this.hasIssues()) return;
+
+    const errorCount = this.issues.filter((i) => i.severity === "ERROR").length;
+    const warnCount = this.issues.filter((i) => i.severity === "WARN").length;
+    const highestLevel: LogLevel = errorCount > 0 ? "ERROR" : "WARN";
+
+    const parts: string[] = [];
+    if (warnCount > 0) parts.push(`${warnCount} warning(s)`);
+    if (errorCount > 0) parts.push(`${errorCount} error(s)`);
+
+    const serviceName =
+      context.contentType === "article" ? "article-validation" : "story-validation";
+    const message = `Validation [${context.contentId}]: ${parts.join(", ")} — ${context.finalStatus}`;
+    const firstError = this.issues.find((i) => i.severity === "ERROR");
+    const stackTrace = firstError?.message ?? null;
+
+    try {
+      await prisma.logs.create({
+        data: {
+          serviceName,
+          traceId: context.contentId,
+          level: highestLevel,
+          message,
+          stackTrace,
+          meta: {
+            contentType: context.contentType,
+            contentId: context.contentId,
+            validationRunId: context.validationRunId,
+            finalStatus: context.finalStatus,
+            attempts: context.attempts,
+            issues: this.issues as unknown as Prisma.InputJsonValue,
+          },
+        },
+      });
+    } catch (err) {
+      console.error("[ValidationLogger] Failed to flush log to DB:", err);
+      console.error("[ValidationLogger] Issues:", JSON.stringify(this.issues, null, 2));
+    }
+  }
+
+  reset(): void {
+    this.issues = [];
+  }
+}

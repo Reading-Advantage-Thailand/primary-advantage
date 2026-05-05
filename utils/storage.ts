@@ -48,6 +48,23 @@ export const uploadToBucket = async (
   }
 };
 
+/**
+ * Returns true if the given object exists in the configured GCS bucket.
+ * Path is the destination key (e.g., "images/abc_1.png"), NOT a full URL.
+ */
+export async function fileExistsInBucket(destination: string): Promise<boolean> {
+  try {
+    const [exists] = await bucket
+      .bucket(process.env.STORAGE_BUCKET_NAME as string)
+      .file(destination)
+      .exists();
+    return exists;
+  } catch (err) {
+    console.error(`[fileExistsInBucket] error checking ${destination}:`, err);
+    return false; // treat unreachable as "missing" — repair will attempt regen
+  }
+}
+
 export async function deleteFile(fileName: string): Promise<{
   deleted: string[];
   failed: string[];
