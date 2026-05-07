@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { generateStoryImage } from "@/server/utils/genaretors/story-generator";
-import { generateChapterAudio } from "@/server/utils/genaretors/audio-generator";
+import { generateChapterAudio, splitIntoSentences } from "@/server/utils/genaretors/audio-generator";
 import { generateAudioForFlashcard } from "@/server/utils/genaretors/audio-flashcard-generator";
+import { regenerateFlashcardContent } from "@/server/utils/genaretors/flashcard-content-generator";
 import { translateSummary } from "@/server/utils/genaretors/summary-translator";
 import { Issue, RepairAction, RepairResult } from "@/server/utils/validators/types";
 
@@ -52,11 +53,16 @@ async function repairChapterAudio(
   story: StoryForRepair,
   chapter: ChapterForRepair,
 ): Promise<void> {
-  const sentences = Array.isArray(chapter.sentences)
-    ? (chapter.sentences as Array<{ sentence?: string } | string>).map((s) =>
-        typeof s === "string" ? s : (s.sentence ?? ""),
-      )
+  let sentences = Array.isArray(chapter.sentences)
+    ? (chapter.sentences as Array<{ sentence?: string } | string>)
+        .map((s) => (typeof s === "string" ? s : (s?.sentence ?? "")))
+        .filter((s) => s.length > 0)
     : [];
+  // Fall back to splitting the passage when stored sentences are empty —
+  // otherwise the timepoint aligner re-saves [] and the chapter stays broken.
+  if (sentences.length === 0) {
+    sentences = await splitIntoSentences(chapter.passage);
+  }
   await generateChapterAudio({
     passage: chapter.passage,
     sentences,
@@ -85,30 +91,71 @@ async function repairStoryTranslatedSummary(story: StoryForRepair): Promise<void
   });
 }
 
-async function repairChapterFlashcardAudio(chapter: ChapterForRepair): Promise<void> {
+async function repairChapterFlashcardAudio(
+  story: StoryForRepair,
+  chapter: ChapterForRepair,
+): Promise<void> {
   const row = await prisma.sentencsAndWordsForFlashcard.findFirst({
     where: { storyChapterId: chapter.id },
   });
-  if (!row || !row.sentence || !row.words) {
-    throw new Error("Cannot repair chapter flashcard audio — flashcard row missing or empty");
+  if (!row) {
+    throw new Error("Cannot repair chapter flashcard audio — flashcard row missing");
   }
+
+  // Flashcards are an AI-curated subset, not the full passage. If either
+  // column is null/empty, re-pick the missing side(s) via AI.
+  let sentenceData: unknown = row.sentence;
+  let wordsData: unknown = row.words;
+  const sentenceMissing =
+    !Array.isArray(row.sentence) || row.sentence.length === 0;
+  const wordsMissing = !Array.isArray(row.words) || row.words.length === 0;
+
+  if (sentenceMissing || wordsMissing) {
+    const regenerated = await regenerateFlashcardContent(
+      chapter.passage,
+      story.cefrLevel,
+    );
+    const updateData: Prisma.SentencsAndWordsForFlashcardUpdateInput = {};
+    if (sentenceMissing) {
+      sentenceData = regenerated.flashcard;
+      updateData.sentence = regenerated.flashcard as unknown as Prisma.InputJsonValue;
+    }
+    if (wordsMissing) {
+      wordsData = regenerated.wordlist;
+      updateData.words = regenerated.wordlist as unknown as Prisma.InputJsonValue;
+    }
+    await prisma.sentencsAndWordsForFlashcard.update({
+      where: { id: row.id },
+      data: updateData,
+    });
+  }
+
   await generateAudioForFlashcard({
-    sentences: row.sentence as never,
-    words: row.words as never,
+    sentences: (sentenceData ?? []) as never,
+    words: (wordsData ?? []) as never,
     contentId: chapter.id,
     job: "story",
   });
 }
 
 async function repairChapterFlashcardRow(
+  story: StoryForRepair,
   chapter: ChapterForRepair,
 ): Promise<void> {
-  // We can't reconstruct the sentence/word lists without re-running the
-  // generators that produce them. Throw so the controller registers the
-  // issue as still unresolved; manual intervention is required.
-  throw new Error(
-    `Cannot rebuild flashcard row for chapter ${chapter.id} — manual regeneration required`,
+  // Re-pick flashcard sentences + vocabulary via AI, matching the original
+  // generator's pedagogical curation.
+  const regenerated = await regenerateFlashcardContent(
+    chapter.passage,
+    story.cefrLevel,
   );
+  await prisma.sentencsAndWordsForFlashcard.create({
+    data: {
+      storyChapterId: chapter.id,
+      sentence: regenerated.flashcard as unknown as Prisma.InputJsonValue,
+      words: regenerated.wordlist as unknown as Prisma.InputJsonValue,
+    },
+  });
+  await repairChapterFlashcardAudio(story, chapter);
 }
 
 // ─── planStoryRepair: dispatch ───────────────────────────────────────────────
@@ -208,11 +255,11 @@ export function planStoryRepair(
       ));
     if (n.flashcardRow)
       actions.push(wrap(`repair_chapter_flashcard_row[${chapterId}]`, () =>
-        repairChapterFlashcardRow(chapter),
+        repairChapterFlashcardRow(ctx.story, chapter),
       ));
     else if (n.flashcardAudio)
       actions.push(wrap(`repair_chapter_flashcard_audio[${chapterId}]`, () =>
-        repairChapterFlashcardAudio(chapter),
+        repairChapterFlashcardAudio(ctx.story, chapter),
       ));
   }
 

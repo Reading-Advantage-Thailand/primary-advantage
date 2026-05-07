@@ -23,6 +23,10 @@ export interface RunArticleValidationParams {
   limit: number;
   dryRun: boolean;
   triggeredBy: "cron" | "manual" | "backfill";
+  // When true: include PERMANENTLY_BROKEN rows in the candidate set and
+  // treat each row's repairAttempts baseline as 0 for this run. Used to
+  // recover legacy permanents after a repair-logic fix.
+  force?: boolean;
 }
 
 const ARTICLE_SELECT = {
@@ -73,7 +77,12 @@ export async function runArticleValidation(
     for (const article of articles) {
       totals.itemsChecked++;
       try {
-        const outcome = await processArticle(article, params.dryRun, run.id);
+        const outcome = await processArticle(
+          article,
+          params.dryRun,
+          run.id,
+          params.force ?? false,
+        );
         if (outcome.status === "OK") totals.itemsOk++;
         else if (outcome.status === "BROKEN") {
           totals.itemsBroken++;
@@ -144,9 +153,15 @@ async function fetchCandidates(
       where = { isPublished: true };
       break;
     case "pending_and_broken":
-    default:
-      where = { validationStatus: { in: [ValidationStatus.PENDING, ValidationStatus.BROKEN] } };
+    default: {
+      const statuses: ValidationStatus[] = [
+        ValidationStatus.PENDING,
+        ValidationStatus.BROKEN,
+      ];
+      if (params.force) statuses.push(ValidationStatus.PERMANENTLY_BROKEN);
+      where = { validationStatus: { in: statuses } };
       break;
+    }
   }
 
   return prisma.article.findMany({
@@ -161,7 +176,11 @@ async function processArticle(
   article: Prisma.ArticleGetPayload<{ select: typeof ARTICLE_SELECT }>,
   dryRun: boolean,
   validationRunId: string,
+  force: boolean,
 ): Promise<ValidationOutcome> {
+  // When force=true, ignore the stored repairAttempts so the row is eligible
+  // for repair again — recovers rows incorrectly stuck at PERMANENTLY_BROKEN.
+  const baseAttempts = force ? 0 : article.repairAttempts;
   const logger = new ValidationLogger();
   const articleForCheck: ArticleForCheck = {
     id: article.id,
@@ -192,7 +211,7 @@ async function processArticle(
   }
 
   // ── Permanently broken? ──
-  if (article.repairAttempts >= MAX_REPAIR_ATTEMPTS) {
+  if (baseAttempts >= MAX_REPAIR_ATTEMPTS) {
     if (!dryRun) {
       await prisma.article.update({
         where: { id: article.id },
@@ -225,7 +244,7 @@ async function processArticle(
     return {
       id: article.id,
       status: ValidationStatus.BROKEN,
-      attempts: article.repairAttempts,
+      attempts: baseAttempts,
       issues: initialIssues,
       repairsRun: [],
     };
@@ -275,12 +294,12 @@ async function processArticle(
 
   // ── Persist final state ──
   let finalStatus: ValidationStatus;
-  let nextAttempts = article.repairAttempts;
+  let nextAttempts = baseAttempts;
   if (remainingIssues.length === 0) {
     finalStatus = ValidationStatus.OK;
     nextAttempts = 0;
   } else {
-    nextAttempts = article.repairAttempts + 1;
+    nextAttempts = baseAttempts + 1;
     finalStatus =
       nextAttempts >= MAX_REPAIR_ATTEMPTS
         ? ValidationStatus.PERMANENTLY_BROKEN

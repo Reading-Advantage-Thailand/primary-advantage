@@ -11,6 +11,7 @@ const validateRequestSchema = z.object({
   ids: z.array(z.string()).optional(),
   limit: z.number().int().min(1).max(MAX_BATCH_LIMIT).default(DEFAULT_BATCH_LIMIT),
   dryRun: z.boolean().default(false),
+  force: z.boolean().default(false),
 });
 
 function validateSchedulerRequest(req: NextRequest): boolean {
@@ -75,6 +76,7 @@ async function handle(
       limit: parsed.limit,
       dryRun: parsed.dryRun,
       triggeredBy: effectiveTriggeredBy,
+      force: parsed.force,
     });
 
     if (conflict) {

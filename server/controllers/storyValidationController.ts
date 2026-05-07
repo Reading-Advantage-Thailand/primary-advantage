@@ -27,6 +27,10 @@ export interface RunStoryValidationParams {
   limit: number;
   dryRun: boolean;
   triggeredBy: "cron" | "manual" | "backfill";
+  // When true: include PERMANENTLY_BROKEN rows in the candidate set and
+  // treat each row's repairAttempts baseline as 0 for this run. Used to
+  // recover legacy permanents after a repair-logic fix.
+  force?: boolean;
 }
 
 const STORY_INCLUDE = {
@@ -85,7 +89,12 @@ export async function runStoryValidation(
     for (const story of stories) {
       totals.itemsChecked++;
       try {
-        const outcome = await processStory(story, params.dryRun, run.id);
+        const outcome = await processStory(
+          story,
+          params.dryRun,
+          run.id,
+          params.force ?? false,
+        );
         if (outcome.status === "OK") totals.itemsOk++;
         else if (outcome.status === "BROKEN") {
           totals.itemsBroken++;
@@ -157,11 +166,15 @@ async function fetchCandidates(
       where = { isPublished: true };
       break;
     case "pending_and_broken":
-    default:
-      where = {
-        validationStatus: { in: [ValidationStatus.PENDING, ValidationStatus.BROKEN] },
-      };
+    default: {
+      const statuses: ValidationStatus[] = [
+        ValidationStatus.PENDING,
+        ValidationStatus.BROKEN,
+      ];
+      if (params.force) statuses.push(ValidationStatus.PERMANENTLY_BROKEN);
+      where = { validationStatus: { in: statuses } };
       break;
+    }
   }
 
   return prisma.story.findMany({
@@ -176,7 +189,11 @@ async function processStory(
   story: StoryWithChapters,
   dryRun: boolean,
   validationRunId: string,
+  force: boolean,
 ): Promise<ValidationOutcome> {
+  // When force=true, ignore the stored repairAttempts so the row is eligible
+  // for repair again — recovers rows incorrectly stuck at PERMANENTLY_BROKEN.
+  const baseAttempts = force ? 0 : story.repairAttempts;
   const logger = new ValidationLogger();
 
   const storyForCheck: StoryForCheck = {
@@ -216,7 +233,7 @@ async function processStory(
     };
   }
 
-  if (story.repairAttempts >= MAX_REPAIR_ATTEMPTS) {
+  if (baseAttempts >= MAX_REPAIR_ATTEMPTS) {
     if (!dryRun) {
       await prisma.story.update({
         where: { id: story.id },
@@ -248,7 +265,7 @@ async function processStory(
     return {
       id: story.id,
       status: ValidationStatus.BROKEN,
-      attempts: story.repairAttempts,
+      attempts: baseAttempts,
       issues: initialIssues,
       repairsRun: [],
     };
@@ -316,12 +333,12 @@ async function processStory(
     : initialIssues;
 
   let finalStatus: ValidationStatus;
-  let nextAttempts = story.repairAttempts;
+  let nextAttempts = baseAttempts;
   if (remainingIssues.length === 0) {
     finalStatus = ValidationStatus.OK;
     nextAttempts = 0;
   } else {
-    nextAttempts = story.repairAttempts + 1;
+    nextAttempts = baseAttempts + 1;
     finalStatus =
       nextAttempts >= MAX_REPAIR_ATTEMPTS
         ? ValidationStatus.PERMANENTLY_BROKEN
