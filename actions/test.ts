@@ -15,6 +15,7 @@ import {
   sentenceTranslation,
   wordTranslation,
 } from "@/server/utils/genaretors/audio-flashcard-generator";
+import { splitIntoSentences } from "@/server/utils/genaretors/audio-generator";
 
 export async function generateAudios(articleId: string) {
   try {
@@ -249,3 +250,26 @@ export async function generateStoryAudio(storyId: string) {
     return { error: true };
   }
 }
+
+export async function translateAndStoreSentencesForStory(articleId: string) {
+  try {
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+      select: {
+        id: true,
+        passage: true,
+      },
+    });
+
+    if (!article) {
+      throw new Error("Article not found");
+    }
+
+    await splitIntoSentences(article.passage);
+
+    return { success: true };
+  } catch (error) {
+    console.log("error", error);
+    return { error: true };
+  }
+} 
