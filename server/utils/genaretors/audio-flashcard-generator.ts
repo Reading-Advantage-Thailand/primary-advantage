@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import {
   AUDIO_WORDS_URL,
   AVAILABLE_VOICES,
@@ -77,9 +78,8 @@ interface TimePoint {
 function contentToSSML(content: string[]): string {
   let ssml = "<speak>";
   content.forEach((sentence, i) => {
-    ssml += `<s><mark name='sentence${
-      i + 1
-    }'/>${sentence}<break time="500ms"/></s>`;
+    ssml += `<s><mark name='sentence${i + 1
+      }'/>${sentence}<break time="500ms"/></s>`;
   });
   ssml += "</speak>";
   return ssml;
@@ -166,7 +166,7 @@ async function synthesizeAndUpload({
   }
 
   // Always clean up temp file after upload phase
-  await fsPromises.unlink(localPath).catch(() => {});
+  await fsPromises.unlink(localPath).catch(() => { });
 
   return {
     timePoints: ttsData?.timepoints ?? [],
@@ -175,6 +175,7 @@ async function synthesizeAndUpload({
     uploadError,
   };
 }
+
 
 export async function generateAudioForFlashcard({
   sentences,
@@ -254,29 +255,31 @@ export async function generateAudioForFlashcard({
     }));
   }
 
-  // ── Update DB — use null for URL if upload failed ──
-  await prisma.sentencsAndWordsForFlashcard.updateMany({
-    where: {
-      articleId: job === "article" ? contentId : undefined,
-      storyChapterId: job === "story" ? contentId : undefined,
-    },
-    data: {
-      sentence:
-        sentenceTimePoints.length > 0
-          ? JSON.parse(JSON.stringify(sentenceTimePoints))
-          : null,
-      audioSentencesUrl: sentenceUploadSuccess && sentenceTimePoints.length > 0
-        ? `${urlPath}/sentences/${contentId}.mp3`
-        : null,
-      words:
-        wordTimePoints.length > 0
-          ? JSON.parse(JSON.stringify(wordTimePoints))
-          : null,
-      wordsUrl: wordUploadSuccess && wordTimePoints.length > 0
-        ? `${urlPath}/words/${contentId}.mp3`
-        : null,
-    },
-  });
+  // ── Update DB — only touch the side(s) we actually regenerated.
+  // If a side had no input texts, skip its columns (undefined) so we never
+  // null out existing data that another run still depends on.
+  const data: Prisma.SentencsAndWordsForFlashcardUpdateManyMutationInput = {};
+  if (sentenceTexts.length > 0) {
+    data.sentence = JSON.parse(JSON.stringify(sentenceTimePoints));
+    data.audioSentencesUrl = sentenceUploadSuccess
+      ? `${urlPath}/sentences/${contentId}.mp3`
+      : null;
+  }
+  if (wordTexts.length > 0) {
+    data.words = JSON.parse(JSON.stringify(wordTimePoints));
+    data.wordsUrl = wordUploadSuccess
+      ? `${urlPath}/words/${contentId}.mp3`
+      : null;
+  }
+  if (Object.keys(data).length > 0) {
+    await prisma.sentencsAndWordsForFlashcard.updateMany({
+      where: {
+        articleId: job === "article" ? contentId : undefined,
+        storyChapterId: job === "story" ? contentId : undefined,
+      },
+      data,
+    });
+  }
 
   return {
     sentenceUploadSuccess,

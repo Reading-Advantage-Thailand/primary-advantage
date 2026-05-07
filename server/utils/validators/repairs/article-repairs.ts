@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { generatedImage } from "@/server/utils/genaretors/image-generator";
-import { generateAudio } from "@/server/utils/genaretors/audio-generator";
+import { generateAudio, splitIntoSentences } from "@/server/utils/genaretors/audio-generator";
 import { generateAudioForFlashcard } from "@/server/utils/genaretors/audio-flashcard-generator";
+import { regenerateFlashcardContent } from "@/server/utils/genaretors/flashcard-content-generator";
 import { translateAndStoreSentences } from "@/server/utils/genaretors/sentence-translator";
 import { translateSummary } from "@/server/utils/genaretors/summary-translator";
 import { Issue, RepairAction, RepairResult } from "@/server/utils/validators/types";
@@ -32,9 +33,16 @@ async function repairImages(article: ArticleForRepair): Promise<void> {
 }
 
 async function repairAudio(article: ArticleForRepair): Promise<void> {
-  const sentences = Array.isArray(article.sentences)
-    ? (article.sentences as Array<{ sentence: string }>).map((s) => s.sentence)
+  let sentences = Array.isArray(article.sentences)
+    ? (article.sentences as Array<{ sentence?: string }>)
+        .map((s) => s?.sentence ?? "")
+        .filter((s) => s.length > 0)
     : [];
+  // Fall back to splitting the passage when stored sentences are empty —
+  // otherwise the timepoint aligner re-saves [] and the row stays broken.
+  if (sentences.length === 0) {
+    sentences = await splitIntoSentences(article.passage);
+  }
   // generateAudio also rewrites article.sentences and triggers
   // translateAndStoreSentences — fixing audio side-effects translation too.
   await generateAudio({
@@ -57,32 +65,63 @@ async function repairTranslatedSummary(article: ArticleForRepair): Promise<void>
 }
 
 async function repairFlashcardAudio(article: ArticleForRepair): Promise<void> {
-  // Re-fetch flashcard row to get current sentence/word lists; if absent,
-  // throw so the controller registers the issue as still unresolved.
   const row = await prisma.sentencsAndWordsForFlashcard.findFirst({
     where: { articleId: article.id },
   });
-  if (!row || !row.sentence || !row.words) {
-    throw new Error("Cannot repair flashcard audio — flashcard row missing or empty");
+  if (!row) {
+    throw new Error("Cannot repair flashcard audio — flashcard row missing");
   }
+
+  // Flashcards are an AI-curated subset (3-5 difficult sentences + 10-15
+  // vocab), not the full passage. If either column is null/empty, the audio
+  // synthesizer has nothing to TTS and the repair becomes a no-op. Re-pick
+  // the missing side(s) via AI from the passage.
+  let sentenceData: unknown = row.sentence;
+  let wordsData: unknown = row.words;
+  const sentenceMissing =
+    !Array.isArray(row.sentence) || row.sentence.length === 0;
+  const wordsMissing = !Array.isArray(row.words) || row.words.length === 0;
+
+  if (sentenceMissing || wordsMissing) {
+    const regenerated = await regenerateFlashcardContent(
+      article.passage,
+      article.cefrLevel,
+    );
+    const updateData: Prisma.SentencsAndWordsForFlashcardUpdateInput = {};
+    if (sentenceMissing) {
+      sentenceData = regenerated.flashcard;
+      updateData.sentence = regenerated.flashcard as unknown as Prisma.InputJsonValue;
+    }
+    if (wordsMissing) {
+      wordsData = regenerated.wordlist;
+      updateData.words = regenerated.wordlist as unknown as Prisma.InputJsonValue;
+    }
+    await prisma.sentencsAndWordsForFlashcard.update({
+      where: { id: row.id },
+      data: updateData,
+    });
+  }
+
   await generateAudioForFlashcard({
-    sentences: row.sentence as never,
-    words: row.words as never,
+    sentences: (sentenceData ?? []) as never,
+    words: (wordsData ?? []) as never,
     contentId: article.id,
     job: "article",
   });
 }
 
 async function repairFlashcardRow(article: ArticleForRepair): Promise<void> {
-  // Best-effort rebuild from article.sentences and article.words.
-  if (!Array.isArray(article.sentences) || !Array.isArray(article.words)) {
-    throw new Error("Cannot rebuild flashcard row — article.sentences/words missing");
-  }
+  // Re-pick flashcard sentences + vocabulary via AI, matching the original
+  // generator's pedagogical curation (subset of the passage, not all of it).
+  const regenerated = await regenerateFlashcardContent(
+    article.passage,
+    article.cefrLevel,
+  );
   await prisma.sentencsAndWordsForFlashcard.create({
     data: {
       articleId: article.id,
-      sentence: article.sentences as unknown as Prisma.InputJsonValue,
-      words: article.words as unknown as Prisma.InputJsonValue,
+      sentence: regenerated.flashcard as unknown as Prisma.InputJsonValue,
+      words: regenerated.wordlist as unknown as Prisma.InputJsonValue,
     },
   });
   // Now run flashcard audio repair to populate the audio URLs.

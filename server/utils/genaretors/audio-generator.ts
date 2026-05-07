@@ -155,39 +155,39 @@ function splitSentences(text: string): string[] {
   const sentenceRegex = new RegExp(
     // Look for common sentence-ending punctuation.
     "([.?!])" +
-      // Capture optional whitespace and quote characters immediately after the punctuation.
-      // This handles cases like "sentence." or "sentence?" "Another".
-      "(\\s*[\"'`’„”«»]*\\s*)" +
-      // Negative lookahead to prevent splitting in the middle of:
-      // - A word (e.g., 'etc.and')
-      // - A number (e.g., '3.14')
-      // - Common abbreviations followed by a period (e.g., 'Mr.', 'Dr.', 'etc.')
-      // - Acronyms/initials (e.g., 'U.S.A.', 'J.P. Morgan')
-      "(?!" +
-      "\\s*" + // Optional whitespace
-      "(?:" +
-      "[a-z]" + // Lowercase letter (part of a word)
-      "|\\d+" + // A digit (part of a number/version)
-      "|" +
-      "(?:" + // Common abbreviations (non-exhaustive, add more if needed)
-      "\\b(?:Mr|Mrs|Ms|Dr|Prof|Gen|Col|Sr|Jr|Ave|Blvd|St|Rd|Apt|Pvt|Corp|Inc|Ltd|Co|etc|e\\.g|i\\.e)" +
-      "|" + // Or multi-initial acronyms (A.B.C.) - matches A.B. then expects C. for example
-      "(?:[A-Z]\\.){2,}" +
-      ")" +
-      "\\." + // The period specifically for abbreviations/acronyms
-      ")" +
-      ")" +
-      // Another negative lookahead: do not split if the punctuation is immediately followed by a quote
-      // UNLESS it's also followed by a capital letter or end of string.
-      // This helps manage dialogue flow: "He said, 'Hello.'" shouldn't split 'Hello.'
-      // but "He said, 'Hello.' She replied..." should split 'Hello.'.
-      "(?!['\"`’])" +
-      // Positive lookahead: Ensure the split point is valid.
-      // It must be followed by:
-      // - Optional whitespace, then a capital letter (start of new sentence)
-      // - OR optional whitespace, then a quote (start of new dialogue sentence)
-      // - OR the very end of the string ($) to capture the last sentence.
-      "(?=\\s*(?:[A-Z\"'`’]|$))",
+    // Capture optional whitespace and quote characters immediately after the punctuation.
+    // This handles cases like "sentence." or "sentence?" "Another".
+    "(\\s*[\"'`’„”«»]*\\s*)" +
+    // Negative lookahead to prevent splitting in the middle of:
+    // - A word (e.g., 'etc.and')
+    // - A number (e.g., '3.14')
+    // - Common abbreviations followed by a period (e.g., 'Mr.', 'Dr.', 'etc.')
+    // - Acronyms/initials (e.g., 'U.S.A.', 'J.P. Morgan')
+    "(?!" +
+    "\\s*" + // Optional whitespace
+    "(?:" +
+    "[a-z]" + // Lowercase letter (part of a word)
+    "|\\d+" + // A digit (part of a number/version)
+    "|" +
+    "(?:" + // Common abbreviations (non-exhaustive, add more if needed)
+    "\\b(?:Mr|Mrs|Ms|Dr|Prof|Gen|Col|Sr|Jr|Ave|Blvd|St|Rd|Apt|Pvt|Corp|Inc|Ltd|Co|etc|e\\.g|i\\.e)" +
+    "|" + // Or multi-initial acronyms (A.B.C.) - matches A.B. then expects C. for example
+    "(?:[A-Z]\\.){2,}" +
+    ")" +
+    "\\." + // The period specifically for abbreviations/acronyms
+    ")" +
+    ")" +
+    // Another negative lookahead: do not split if the punctuation is immediately followed by a quote
+    // UNLESS it's also followed by a capital letter or end of string.
+    // This helps manage dialogue flow: "He said, 'Hello.'" shouldn't split 'Hello.'
+    // but "He said, 'Hello.' She replied..." should split 'Hello.'.
+    "(?!['\"`’])" +
+    // Positive lookahead: Ensure the split point is valid.
+    // It must be followed by:
+    // - Optional whitespace, then a capital letter (start of new sentence)
+    // - OR optional whitespace, then a quote (start of new dialogue sentence)
+    // - OR the very end of the string ($) to capture the last sentence.
+    "(?=\\s*(?:[A-Z\"'`’]|$))",
     "g", // Global flag to find all matches
   );
 
@@ -242,53 +242,27 @@ function splitSentences(text: string): string[] {
 }
 
 // Improved helper function to split text into sentences properly
-async function splitIntoSentences(passage: string): Promise<string[]> {
+export async function splitIntoSentences(passage: string): Promise<string[]> {
   try {
-    //const prompt = `You are an SSML processing engine. Given the following text, break it into sentences and wrap each sentence in SSML tags. Add a <mark> tag before each sentence using the format <mark name='sentenceX'/> where X is the sentence number.\n\nHere is the text:\n---\n${article}\n---\n\nReturn only the SSML output, without explanations.`;
-    const systemPrompt = `You are a text processor. Given an article, split it into individual sentences.
-    Return only an array of strings, where each string is a complete sentence from the article.
-    Preserve the original punctuation and formatting within each sentence.`;
     const userPrompt = `Split the following text into complete sentences, keeping dialogue and attribution together:${passage}`;
 
-    //and Add a <speak> tag before and end article only.
     const { output: object } = await generateText({
       model: google(googleModelLite),
       output: Output.object({
         schema: z.object({
-          input: z
-            .object({
-              article: z
-                .string()
-                .min(10)
-                .describe(
-                  "The input article as a string. Must be at least 10 characters long.",
-                ),
-            })
-            .describe(
-              "The input object containing the article to be processed.",
-            ),
-
           output: z
-            .object({
-              sentences: z
-                .array(z.string().min(1))
-                .describe(
-                  "An array of sentences extracted from the article. Each sentence must be a non-empty string.",
-                ),
-            })
-            .describe("The output object containing the extracted sentences."),
+            .array(z.string())
+            .describe(
+              "An array of sentences extracted from the article. Each sentence must be a non-empty string.",
+            ),
         }),
       }),
-      system: SENTENCE_SPLITTER_SYSTEM_PROMPT,
       prompt: userPrompt,
-      temperature: 0.2,
     });
 
-    console.log(object.output.sentences);
-
-    return object.output.sentences;
+    return object.output;
   } catch (error: any) {
-    throw `failed to generate ssml: ${error}`;
+    throw `failed to generate sentences: ${error}`;
   }
 }
 
@@ -590,7 +564,7 @@ export async function generateChapterAudio({
   }
 
   // Always clean up temp file after upload phase (success or fail)
-  await fsPromises.unlink(localPath).catch(() => {});
+  await fsPromises.unlink(localPath).catch(() => { });
 
   // ── Phase 3: Process timestamps + update DB ──
   const sentenceTimepoints = processWordTimestampsIntoSentences(

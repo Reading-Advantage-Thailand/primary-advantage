@@ -212,9 +212,22 @@ export const articleGeneratorSchema = z.object({
     ),
   passage: z
     .string()
-    .describe(
-      "The reading passage written to the supplied specifications for both CEFR and type.Important: The passage should be returned in UTF-8 encoding format. and add some line breaks to make it more readable.and max 3 paragraphs ",
-    ),
+    .describe(`A reading passage written to the specified CEFR level and type.
+
+    REQUIREMENTS (strict):
+    - MUST contain exactly 2 to 3 paragraphs. Never more than 3.
+    - Separate paragraphs with a single blank line (\\n\\n).
+    - Use UTF-8 encoding.
+    - Do not add titles, headings, or markdown.`
+      //"The reading passage written to the supplied specifications for both CEFR and type.Important: The passage should be returned in UTF-8 encoding format. and add some line breaks to make it more readable.and max 3 paragraphs ",
+    ).refine((text) => {
+      const paragraphs = text
+        .split(/\n\s*\n/)
+        .filter((p) => p.trim().length > 0);
+      return paragraphs.length <= 3;
+    },
+      { message: "Passage must contain at most 3 paragraphs" })
+  ,
   summary: z
     .string()
     .describe(

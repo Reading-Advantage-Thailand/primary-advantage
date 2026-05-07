@@ -8,8 +8,7 @@ import { deleteAllArticles, generateImages } from "@/actions/test";
 // import FlashcardGame from "@/components/flashcards/flashcard-game";
 // import { FlashcardType } from "@/types/enum";
 import GenerateImages from "./generate-images";
-import { generateStoryContentController } from "@/server/controllers/storieController";
-import { after } from "next/server";
+import TranslateTest from "./traslate-test";
 
 export default async function TestFunctionality() {
   return (
@@ -38,6 +37,7 @@ export default async function TestFunctionality() {
       </Button>
       <UploadTest />
       <GenerateImages />
+      <TranslateTest />
       {/* <Button
         onClick={async () => {
           "use server";
