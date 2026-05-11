@@ -4,7 +4,7 @@ import {
   ArticleCefrLevel,
   ArticleType,
 } from "@/types/enum";
-import { google, googleModel } from "@/utils/google";
+import { google, googleModelLite } from "@/utils/google";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 
@@ -48,7 +48,7 @@ export async function evaluateRating(
 
   try {
     const { output: evaluated } = await generateText({
-      model: google(googleModel),
+      model: google(googleModelLite),
       output: Output.object({
         schema: z.object({
           reasoning: z.string(),

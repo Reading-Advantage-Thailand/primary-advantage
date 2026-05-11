@@ -1,9 +1,9 @@
-import { generateText, Output } from "ai";
-import { google, googleModel } from "@/utils/google";
 import { articleGeneratorSchema } from "@/lib/zod";
 import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
-import path from "path";
+import { google, googleModelPro } from "@/utils/google";
+import { generateText, Output } from "ai";
 import fs from "fs";
+import path from "path";
 import { z } from "zod";
 
 export type ArticleGeneratorResponse = z.infer<typeof articleGeneratorSchema>;
@@ -68,7 +68,7 @@ export async function generateArticleContent(
     .replace("{topic}", topic);
 
   const { output } = await generateText({
-    model: google(googleModel),
+    model: google(googleModelPro),
     output: Output.object({ schema: articleGeneratorSchema }),
     system: systemPrompt,
     prompt: `
