@@ -1,20 +1,16 @@
-import { generateText, Output, generateImage } from "ai";
+import { storyGeneratorSchema } from "@/lib/zod";
 import {
   google,
-  googleImage,
-  googleModel,
+  googleImagePro,
+  googleModelLite,
   googleModelPro,
-  googleImageModel,
 } from "@/utils/google";
-import { openai, newModel } from "@/utils/openai";
-import { storyGeneratorSchema } from "@/lib/zod";
-import { z } from "zod";
-import path from "path";
+import { uploadToBucket } from "@/utils/storage";
+import { generateImage, generateText, Output } from "ai";
 import fs from "fs";
 import fsPromises from "fs/promises";
-import { createLogFile } from "../logging";
-import sharp from "sharp";
-import { uploadToBucket } from "@/utils/storage";
+import path from "path";
+import { z } from "zod";
 
 export interface GenerateStoryParams {
   cefrLevel: string;
@@ -105,7 +101,7 @@ export const generateStoryTopic = async (
   Output as a JSON array.`;
   try {
     const { output } = await generateText({
-      model: google(aiModel),
+      model: google(googleModelLite),
       // model: openai(aiModel),
       output: Output.object({
         schema: z.object({
@@ -145,7 +141,9 @@ export const evaluateStoryContent = async (
   const linguisticCriteria = CEFR_LINGUISTIC_CRITERIA[cefrLevel];
 
   if (!linguisticCriteria) {
-    throw new Error(`No evaluation criteria configured for CEFR level: ${cefrLevel}`);
+    throw new Error(
+      `No evaluation criteria configured for CEFR level: ${cefrLevel}`,
+    );
   }
 
   const systemPrompt = `You are a dual-role evaluator: a children's literacy expert AND a language proficiency assessor for elementary students (grades 3-6).
@@ -192,7 +190,7 @@ Return a JSON object with keys 'cefrLevel' (string) and 'rating' (integer 1-5).`
 
   try {
     const { output: evaluation } = await generateText({
-      model: google(aiModel),
+      model: google(googleModelLite),
       output: Output.object({
         schema: z.object({
           cefrLevel: z
@@ -205,7 +203,9 @@ Return a JSON object with keys 'cefrLevel' (string) and 'rating' (integer 1-5).`
             .int()
             .min(1)
             .max(5)
-            .describe("Content quality rating 1-5, independent of language difficulty."),
+            .describe(
+              "Content quality rating 1-5, independent of language difficulty.",
+            ),
         }),
       }),
       system: systemPrompt,
@@ -292,7 +292,7 @@ const processSingleImage = async (
   while (generateAttempts < MAX_RETRIES && !generated) {
     try {
       const { images } = await generateImage({
-        model: google.image(googleImageModel),
+        model: google.image(googleImagePro),
         prompt: constructPrompt(scene.description, charDesc),
         aspectRatio: "4:3",
         n: 1,

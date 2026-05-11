@@ -1,18 +1,18 @@
-import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
-import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
-import { ArticleGenerationLogger, ArticleIssue } from "@/lib/logger";
-import {
-  generateArticleContent,
-  ArticleGeneratorResponse,
-} from "@/server/utils/genaretors/article-content-generator";
-import { evaluateRating } from "@/server/utils/genaretors/evaluate-rating-generator";
-import { generatedImage } from "@/server/utils/genaretors/image-generator";
-import { generateAudio } from "@/server/utils/genaretors/audio-generator";
-import { generateAudioForFlashcard } from "@/server/utils/genaretors/audio-flashcard-generator";
-import { convertCefrLevel } from "@/lib/utils";
 import { fictionTopics } from "@/data/title-fiction";
 import { nonFictionTopics } from "@/data/title-nonfiction";
+import { ArticleGenerationLogger } from "@/lib/logger";
+import { prisma } from "@/lib/prisma";
+import { convertCefrLevel } from "@/lib/utils";
+import {
+  ArticleGeneratorResponse,
+  generateArticleContent,
+} from "@/server/utils/genaretors/article-content-generator";
+import { generateAudioForFlashcard } from "@/server/utils/genaretors/audio-flashcard-generator";
+import { generateAudio } from "@/server/utils/genaretors/audio-generator";
+import { evaluateRating } from "@/server/utils/genaretors/evaluate-rating-generator";
+import { generatedImage } from "@/server/utils/genaretors/image-generator";
+import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
+import { Prisma } from "@prisma/client";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -104,7 +104,7 @@ async function saveArticleToDB(
         topic,
         brainstorming: content.brainstorming,
         planning: content.planning,
-        isPublished: true,
+        isPublished: false,
         multipleChoiceQuestions: {
           createMany: {
             data: content.multipleChoiceQuestions.map((q) => ({

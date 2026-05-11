@@ -1,4 +1,4 @@
-import { google, googleImage, googleModelLite } from "@/utils/google";
+import { google, googleImagePro, googleModelLite } from "@/utils/google";
 import { uploadToBucket } from "@/utils/storage";
 import { generateText, Output } from "ai";
 import fs from "fs";
@@ -63,7 +63,7 @@ export async function generatedImage(
 
       for (const sceneDescription of storyParts.prompt) {
         const result = await generateText({
-          model: google(googleImage),
+          model: google(googleImagePro),
           prompt: `A professional digital illustration for a children's book.
              Character: ${storyParts.mainCharacter}.
              Action: ${sceneDescription}.
