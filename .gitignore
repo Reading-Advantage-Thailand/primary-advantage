@@ -65,5 +65,6 @@ service-account.json
 .cursor/
 .github/
 .claude/
+tasks/
 CLAUDE.md
 skills-lock.json
