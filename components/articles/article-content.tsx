@@ -28,6 +28,12 @@ import { useTranslations } from "next-intl";
 import { fetchArticleActivity } from "@/actions/article";
 import Image from "next/image";
 import { getArticleImageUrl, getAudioUrl } from "@/lib/storage-config";
+import {
+  bucketItems,
+  bucketSentencesIntoParagraphs,
+  splitPassageIntoSentences,
+  TARGET_PARAGRAPH_COUNT,
+} from "@/lib/paragraph-utils";
 import { useAudioPlayer } from "@/hooks/use-audio-player";
 
 // --- Word alignment helpers ---
@@ -435,10 +441,6 @@ export default function ArticleContent({ article }: Props) {
     [togglePlayer, isPlaying, play, seekToWord],
   );
 
-  const paragraphs = article.passage
-    .split("\n\n")
-    .filter((p) => p.trim() !== "");
-
   return (
     <div className="flex flex-col gap-4">
       <div ref={controlsRef} className="flex flex-col gap-2 md:flex-row">
@@ -681,8 +683,10 @@ export default function ArticleContent({ article }: Props) {
 
       {(() => {
         if (!Array.isArray(article.sentences)) {
-          // Fallback to original paragraphs if no sentences
-          return paragraphs.map((p, index) => (
+          // Fallback: split passage into sentences and bucket into 3 paragraphs
+          const rawSentences = splitPassageIntoSentences(article.passage);
+          const paragraphTexts = bucketSentencesIntoParagraphs(rawSentences);
+          return paragraphTexts.map((p, index) => (
             <p
               key={index}
               className="font-article mb-2 indent-4 text-lg hyphens-auto whitespace-pre-wrap"
@@ -692,50 +696,21 @@ export default function ArticleContent({ article }: Props) {
           ));
         }
 
-        // Group sentences into paragraphs using sequential assignment.
-        // Walking sentenceIdx forward monotonically means each sentence is
-        // claimed by exactly one paragraph — no duplicates even when a short
-        // sentence text is a substring of multiple paragraph strings.
-        const groupSentencesIntoParagraphs = () => {
-          const paragraphGroups: { paragraph: string; sentences: number[] }[] =
-            [];
-          const allSentences = article.sentences as SentenceTimepoint[];
-          let sentenceIdx = 0;
+        // Bucket allSentences indices into TARGET_PARAGRAPH_COUNT (3) groups,
+        // then build paragraphGroups so the existing renderer works unchanged.
+        const allSentences = article.sentences as SentenceTimepoint[];
+        const allIndices = Array.from(
+          { length: allSentences.length },
+          (_, i) => i,
+        );
+        const indexBuckets = bucketItems(allIndices, TARGET_PARAGRAPH_COUNT);
 
-          paragraphs.forEach((paragraph) => {
-            const paragraphSentences: number[] = [];
-
-            // Consume consecutive sentences that appear in this paragraph text
-            while (sentenceIdx < allSentences.length) {
-              const sentText = allSentences[sentenceIdx].sentence.trim();
-              if (paragraph.includes(sentText)) {
-                paragraphSentences.push(sentenceIdx);
-                sentenceIdx++;
-              } else {
-                break;
-              }
-            }
-
-            if (paragraphSentences.length > 0) {
-              paragraphGroups.push({
-                paragraph,
-                sentences: paragraphSentences,
-              });
-            }
-          });
-
-          // Append any unmatched trailing sentences to the last paragraph
-          if (sentenceIdx < allSentences.length && paragraphGroups.length > 0) {
-            const last = paragraphGroups[paragraphGroups.length - 1];
-            while (sentenceIdx < allSentences.length) {
-              last.sentences.push(sentenceIdx++);
-            }
-          }
-
-          return paragraphGroups;
-        };
-
-        const paragraphGroups = groupSentencesIntoParagraphs();
+        const paragraphGroups = indexBuckets.map((bucket) => ({
+          paragraph: bucket
+            .map((i) => allSentences[i].sentence)
+            .join(" "),
+          sentences: bucket,
+        }));
 
         return paragraphGroups.map((group, groupIndex) => {
           return (
