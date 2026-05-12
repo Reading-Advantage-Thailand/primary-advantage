@@ -155,39 +155,39 @@ function splitSentences(text: string): string[] {
   const sentenceRegex = new RegExp(
     // Look for common sentence-ending punctuation.
     "([.?!])" +
-    // Capture optional whitespace and quote characters immediately after the punctuation.
-    // This handles cases like "sentence." or "sentence?" "Another".
-    "(\\s*[\"'`’„”«»]*\\s*)" +
-    // Negative lookahead to prevent splitting in the middle of:
-    // - A word (e.g., 'etc.and')
-    // - A number (e.g., '3.14')
-    // - Common abbreviations followed by a period (e.g., 'Mr.', 'Dr.', 'etc.')
-    // - Acronyms/initials (e.g., 'U.S.A.', 'J.P. Morgan')
-    "(?!" +
-    "\\s*" + // Optional whitespace
-    "(?:" +
-    "[a-z]" + // Lowercase letter (part of a word)
-    "|\\d+" + // A digit (part of a number/version)
-    "|" +
-    "(?:" + // Common abbreviations (non-exhaustive, add more if needed)
-    "\\b(?:Mr|Mrs|Ms|Dr|Prof|Gen|Col|Sr|Jr|Ave|Blvd|St|Rd|Apt|Pvt|Corp|Inc|Ltd|Co|etc|e\\.g|i\\.e)" +
-    "|" + // Or multi-initial acronyms (A.B.C.) - matches A.B. then expects C. for example
-    "(?:[A-Z]\\.){2,}" +
-    ")" +
-    "\\." + // The period specifically for abbreviations/acronyms
-    ")" +
-    ")" +
-    // Another negative lookahead: do not split if the punctuation is immediately followed by a quote
-    // UNLESS it's also followed by a capital letter or end of string.
-    // This helps manage dialogue flow: "He said, 'Hello.'" shouldn't split 'Hello.'
-    // but "He said, 'Hello.' She replied..." should split 'Hello.'.
-    "(?!['\"`’])" +
-    // Positive lookahead: Ensure the split point is valid.
-    // It must be followed by:
-    // - Optional whitespace, then a capital letter (start of new sentence)
-    // - OR optional whitespace, then a quote (start of new dialogue sentence)
-    // - OR the very end of the string ($) to capture the last sentence.
-    "(?=\\s*(?:[A-Z\"'`’]|$))",
+      // Capture optional whitespace and quote characters immediately after the punctuation.
+      // This handles cases like "sentence." or "sentence?" "Another".
+      "(\\s*[\"'`’„”«»]*\\s*)" +
+      // Negative lookahead to prevent splitting in the middle of:
+      // - A word (e.g., 'etc.and')
+      // - A number (e.g., '3.14')
+      // - Common abbreviations followed by a period (e.g., 'Mr.', 'Dr.', 'etc.')
+      // - Acronyms/initials (e.g., 'U.S.A.', 'J.P. Morgan')
+      "(?!" +
+      "\\s*" + // Optional whitespace
+      "(?:" +
+      "[a-z]" + // Lowercase letter (part of a word)
+      "|\\d+" + // A digit (part of a number/version)
+      "|" +
+      "(?:" + // Common abbreviations (non-exhaustive, add more if needed)
+      "\\b(?:Mr|Mrs|Ms|Dr|Prof|Gen|Col|Sr|Jr|Ave|Blvd|St|Rd|Apt|Pvt|Corp|Inc|Ltd|Co|etc|e\\.g|i\\.e)" +
+      "|" + // Or multi-initial acronyms (A.B.C.) - matches A.B. then expects C. for example
+      "(?:[A-Z]\\.){2,}" +
+      ")" +
+      "\\." + // The period specifically for abbreviations/acronyms
+      ")" +
+      ")" +
+      // Another negative lookahead: do not split if the punctuation is immediately followed by a quote
+      // UNLESS it's also followed by a capital letter or end of string.
+      // This helps manage dialogue flow: "He said, 'Hello.'" shouldn't split 'Hello.'
+      // but "He said, 'Hello.' She replied..." should split 'Hello.'.
+      "(?!['\"`’])" +
+      // Positive lookahead: Ensure the split point is valid.
+      // It must be followed by:
+      // - Optional whitespace, then a capital letter (start of new sentence)
+      // - OR optional whitespace, then a quote (start of new dialogue sentence)
+      // - OR the very end of the string ($) to capture the last sentence.
+      "(?=\\s*(?:[A-Z\"'`’]|$))",
     "g", // Global flag to find all matches
   );
 
@@ -564,7 +564,7 @@ export async function generateChapterAudio({
   }
 
   // Always clean up temp file after upload phase (success or fail)
-  await fsPromises.unlink(localPath).catch(() => { });
+  await fsPromises.unlink(localPath).catch(() => {});
 
   // ── Phase 3: Process timestamps + update DB ──
   const sentenceTimepoints = processWordTimestampsIntoSentences(
