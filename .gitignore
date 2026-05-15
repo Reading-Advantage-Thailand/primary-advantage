@@ -11,10 +11,14 @@
 !.yarn/versions
 .vscode/
 bun.lock
-vitest.config.ts
+
 
 # testing
 /coverage
+*.test.ts
+*.test.tsx
+vitest.config.ts
+vitest.setup.ts
 
 # next.js
 /.next/
@@ -49,6 +53,7 @@ next-env.d.ts
 
 # docker
 docker-compose.yml*
+Dockerfile*
 
 #file local
 cloud-sql-proxy

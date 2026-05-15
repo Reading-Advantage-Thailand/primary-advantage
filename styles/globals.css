@@ -171,3 +171,8 @@
 .animate-glow {
   animation: glow 1s ease-in-out infinite alternate;
 }
+
+/* Hide reCAPTCHA v3 badge — disclosure text is shown inline per Google's policy */
+.grecaptcha-badge {
+  visibility: hidden !important;
+}

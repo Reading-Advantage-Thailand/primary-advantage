@@ -11,25 +11,14 @@ import {
   Users,
 } from "lucide-react";
 import { FeatureBox } from "@/components/index/feature-box";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ContactForm } from "@/components/contact/contact-form";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -200,67 +189,19 @@ export default async function Home() {
           <p className="text-muted-foreground max-w-[85%] leading-normal sm:text-lg sm:leading-7">
             {t("contact.description")}
           </p>
-          <Card className="mt-10 w-full text-start">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl text-black dark:text-white">
-                {t("contact.formTitle")}
-              </CardTitle>
-              <CardDescription>{t("contact.formDescription")}</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">{t("contact.name")}</Label>
-                <Input id="name" placeholder={t("contact.namePlaceholder")} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="institution">{t("contact.institution")}</Label>
-                <Input
-                  id="institution"
-                  placeholder={t("contact.institutionPlaceholder")}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">{t("contact.email")}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder={t("contact.emailPlaceholder")}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="inquiry">{t("contact.inquiry")}</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={t("contact.inquiryPlaceholder")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sales">
-                      {t("contact.inquiryOptions.sales")}
-                    </SelectItem>
-                    <SelectItem value="support">
-                      {t("contact.inquiryOptions.support")}
-                    </SelectItem>
-                    <SelectItem value="partnerships">
-                      {t("contact.inquiryOptions.partnerships")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="message">{t("contact.message")}</Label>
-                <Textarea
-                  placeholder={t("contact.messagePlaceholder")}
-                  id="message"
-                  className="h-40"
-                />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full">{t("contact.sendMessage")}</Button>
-            </CardFooter>
-          </Card>
+          <div className="mt-10 w-full text-start">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("contact.formTitle")}</CardTitle>
+                <CardDescription>
+                  {t("contact.formDescription")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ContactForm />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
       <section

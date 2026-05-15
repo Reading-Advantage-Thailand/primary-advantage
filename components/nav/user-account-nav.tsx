@@ -147,8 +147,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         </div>
         <DropdownMenuItem asChild>
           <Link
-            target="_blank"
-            href="https://docs.google.com/forms/d/e/1FAIpQLSe_Ew100kef6j4O4IuiHm4ZeGhOj5FN6JRyJ7-0gvZV9eFgjQ/viewform?usp=sf_link"
+            href={`/contact${user?.name || user?.email ? `?${[user?.name ? `name=${encodeURIComponent(user.name)}` : "", user?.email ? `email=${encodeURIComponent(user.email)}` : ""].filter(Boolean).join("&")}` : ""}`}
             className="flex items-center"
           >
             <span>{t("contactUs")}</span>

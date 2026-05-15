@@ -43,11 +43,39 @@ export const signUpSchema = z
       .min(1, "Confirm password is required")
       .min(8, "Confirm password must be more than 8 characters")
       .max(32, "Confirm password must be less than 32 characters"),
+    recaptchaToken: z.string().min(1),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     error: "Passwords do not match",
   });
+
+export const contactFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be at most 100 characters"),
+  institution: z
+    .string()
+    .max(200, "Institution must be at most 200 characters")
+    .optional(),
+  email: z
+    .email("Invalid email address")
+    .max(200, "Email must be at most 200 characters")
+    .toLowerCase(),
+  inquiry: z.enum(["sales", "support", "partnerships"], {
+    error: () => "Inquiry must be one of: sales, support, partnerships",
+  }),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Message must be at least 10 characters")
+    .max(2000, "Message must be at most 2000 characters"),
+  recaptchaToken: z.string().min(1),
+});
+
+export type ContactFormInput = z.infer<typeof contactFormSchema>;
 
 export const classCodeSchema = z.object({
   classroomCode: z
@@ -477,6 +505,34 @@ export const storyGeneratorSchema = z.object({
     .describe("The characters of the story"),
 });
 
+// --- System Admin: Contact Messages ---
+
+export const contactMessageListQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  status: z
+    .enum(["NEW", "READ", "REPLIED", "ARCHIVED", "ALL"])
+    .default("ALL"),
+  inquiry: z
+    .enum(["SALES", "SUPPORT", "PARTNERSHIPS", "ALL"])
+    .default("ALL"),
+  search: z.string().trim().max(200).optional(),
+});
+
+export type ContactMessageListQuery = z.infer<
+  typeof contactMessageListQuerySchema
+>;
+
+export const contactMessageStatusUpdateSchema = z.object({
+  status: z.enum(["NEW", "READ", "REPLIED", "ARCHIVED"]),
+});
+
+export type ContactMessageStatusUpdate = z.infer<
+  typeof contactMessageStatusUpdateSchema
+>;
+
+// --- Article Response ---
+
 export const articleResponseSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -545,3 +601,4 @@ export const articleResponseSchema = z.object({
     ),
   }),
 });
+

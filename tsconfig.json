@@ -39,6 +39,8 @@
   "exclude": [
     "node_modules",
     "public/sw.js",
-    "app/sw.ts"
+    "app/sw.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }

@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { signInSchema, signUpSchema } from "@/lib/zod";
 import { headers } from "next/headers";
 import z from "zod";
+import { verifyRecaptchaToken } from "@/lib/recaptcha";
 
 export async function signInAction(value: z.infer<typeof signInSchema>) {
   const validation = signInSchema.safeParse(value);
@@ -42,6 +43,15 @@ export async function signUpAction(value: z.infer<typeof signUpSchema>) {
     return {
       error: "Invalid input data",
     };
+  }
+
+  const recaptchaResult = await verifyRecaptchaToken(
+    validation.data.recaptchaToken,
+    "signup",
+    0.5,
+  );
+  if (!recaptchaResult.ok) {
+    return { error: "Verification failed, please try again" };
   }
 
   try {
