@@ -22,6 +22,9 @@ import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import { signUpAction } from "@/actions/auth";
 import { redirect } from "next/navigation";
+import Script from "next/script";
+
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
 
 export function SignUpForm({
   className,
@@ -41,6 +44,7 @@ export function SignUpForm({
       email: "",
       password: "",
       confirmPassword: "",
+      recaptchaToken: "dev-skip",
     },
   });
 
@@ -48,8 +52,20 @@ export function SignUpForm({
     setError("");
     setSuccess("");
 
+    // Generate reCAPTCHA v3 token before calling the server action
+    let recaptchaToken = "dev-skip";
+    if (RECAPTCHA_SITE_KEY && typeof window !== "undefined" && window.grecaptcha) {
+      try {
+        recaptchaToken = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, {
+          action: "signup",
+        });
+      } catch {
+        // If token generation fails, proceed with dev-skip; server will fail-open if secret not set
+      }
+    }
+
     startTransition(() => {
-      signUpAction(value).then((data) => {
+      signUpAction({ ...value, recaptchaToken }).then((data) => {
         setError(data.error);
         setSuccess(data.success);
         if (data.success) {
@@ -62,6 +78,13 @@ export function SignUpForm({
   };
 
   return (
+    <>
+      {RECAPTCHA_SITE_KEY && (
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`}
+          strategy="lazyOnload"
+        />
+      )}
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -178,6 +201,28 @@ export function SignUpForm({
           {loading ? "Creating account..." : "Sign up"}
         </Button>
 
+        <p className="text-muted-foreground text-xs text-center">
+          This site is protected by reCAPTCHA and the Google{" "}
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2"
+          >
+            Privacy Policy
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://policies.google.com/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2"
+          >
+            Terms of Service
+          </a>{" "}
+          apply.
+        </p>
+
         <div className="text-center text-sm">
           Already have an account?{" "}
           <a href="/auth/signin" className="underline underline-offset-2">
@@ -186,5 +231,6 @@ export function SignUpForm({
         </div>
       </form>
     </Form>
+    </>
   );
 }

@@ -12,7 +12,9 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate-dev": "prisma migrate dev",
     "prisma:migrate-deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@ai-sdk/google-vertex": "^4.0.16",
@@ -104,8 +106,13 @@
     "@types/react-dom": "^19",
     "@types/sbd": "^1.0.5",
     "@types/sharp": "^0.31.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "esbuild": "^0.28.0",
+    "jsdom": "^26.1.0",
     "prettier": "^3.5.3",
+    "vitest": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "prisma": "^6.19.0",
     "serwist": "^9.5.7",

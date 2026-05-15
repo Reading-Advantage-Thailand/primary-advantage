@@ -41,6 +41,7 @@
     "systemdashboard": "System Dashboard",
     "licenses": "Licenses Dashboard",
     "schools": "Schools Dashboard",
+    "contactmessages": "Contact Messages",
     "teacherdashboard": "Teacher Dashboard",
     "reports": "Reports",
     "history": "History",
@@ -606,7 +607,11 @@
     "preview": {
       "button": "Preview",
       "title": "Data Preview",
-      "columns": { "name": "Name", "email": "Email", "role": "Role" }
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role"
+      }
     },
     "formatGuide": {
       "title": "CSV Format Guide",
@@ -913,7 +918,9 @@
         "description": "Intelligent analysis powered by real AI",
         "empty": "No insights available yet. Keep using the platform to generate personalized recommendations."
       },
-      "loading": { "skeleton": "Loading insights..." },
+      "loading": {
+        "skeleton": "Loading insights..."
+      },
       "toast": {
         "dismiss": {
           "title": "Insight dismissed",
@@ -936,7 +943,9 @@
           "description": "AI insights have been regenerated with latest data."
         }
       },
-      "actions": { "done": "Done" },
+      "actions": {
+        "done": "Done"
+      },
       "suggestions": {
         "title": "Smart Suggestions",
         "description": "Actionable recommendations to optimize your platform",
@@ -948,14 +957,20 @@
     "adoptionWidget": {
       "title": "Student Adoption by Level",
       "description": "Active students by {mode}",
-      "modes": { "grade": "grade", "cefr": "CEFR level" },
+      "modes": {
+        "grade": "grade",
+        "cefr": "CEFR level"
+      },
       "timeframe": {
         "7d": "Last 7 days",
         "30d": "Last 30 days",
         "90d": "Last 3 months"
       },
       "empty": "No student data available",
-      "view": { "cefr": "CEFR", "grade": "Grade" },
+      "view": {
+        "cefr": "CEFR",
+        "grade": "Grade"
+      },
       "item": {
         "activeStudents": "{count} active students",
         "avgXp": "{xp} avg XP"
@@ -970,7 +985,11 @@
       "unacknowledged": "unacknowledged alerts",
       "noAlerts": "No alerts at this time",
       "viewAll": "View All Alerts",
-      "filter": { "unread": "Unread", "critical": "Critical", "all": "All" },
+      "filter": {
+        "unread": "Unread",
+        "critical": "Critical",
+        "all": "All"
+      },
       "markRead": "Mark Read",
       "dialog": {
         "title": "All Alerts",
@@ -1072,7 +1091,10 @@
         },
         "tooltip": "{date}: {count} activities"
       },
-      "legend": { "less": "Less", "more": "More" },
+      "legend": {
+        "less": "Less",
+        "more": "More"
+      },
       "daily": {
         "title": "Daily Activity Trend",
         "description": "Activity levels over the selected period"
@@ -1237,10 +1259,19 @@
       "selectStudents": "Select students to notify",
       "deselectAll": "Deselect All",
       "selectAll": "Select All",
-      "studentStatus": { "completed": "Completed", "incomplete": "Incomplete" },
-      "history": { "empty": "No notification history", "sentTo": "Sent to" },
+      "studentStatus": {
+        "completed": "Completed",
+        "incomplete": "Incomplete"
+      },
+      "history": {
+        "empty": "No notification history",
+        "sentTo": "Sent to"
+      },
       "studentsLabel": "students",
-      "tabs": { "select": "Select", "history": "History" },
+      "tabs": {
+        "select": "Select",
+        "history": "History"
+      },
       "cancel": "Cancel",
       "sending": "Sending...",
       "sentSuccess": "Notifications sent successfully",
@@ -1299,7 +1330,11 @@
         "totalActivity": "Total Activity",
         "peakDay": "Peak Day"
       },
-      "legend": { "title": "Activity Level:", "less": "Less", "more": "More" },
+      "legend": {
+        "title": "Activity Level:",
+        "less": "Less",
+        "more": "More"
+      },
       "topActiveDays": "Top Active Days",
       "activities": "activities",
       "dow": {
@@ -1399,7 +1434,11 @@
         "articlesPerMonth": "Articles/Month",
         "trend": "Trend"
       },
-      "trend": { "up": "Up", "down": "Down", "stable": "Stable" },
+      "trend": {
+        "up": "Up",
+        "down": "Down",
+        "stable": "Stable"
+      },
       "stats": {
         "totalArticles": "Total Articles:",
         "totalWords": "Total Words:",
@@ -1421,7 +1460,10 @@
         "title": "Average Level",
         "description": "Class reading level"
       },
-      "totalXp": { "title": "Total XP", "description": "Cumulative class XP" },
+      "totalXp": {
+        "title": "Total XP",
+        "description": "Cumulative class XP"
+      },
       "activeAssignments": {
         "title": "Active Assignments",
         "description": "Currently ongoing"
@@ -1774,7 +1816,6 @@
     "clozeTest": "Cloze Test",
     "orderWord": "Order Word",
     "matching": "Matching",
-
     "matchingGame": {
       "title": "Translation Matching Game",
       "description": "Practice matching words with their meanings from your flashcard collection!",
@@ -2322,7 +2363,14 @@
       },
       "message": "Message",
       "messagePlaceholder": "Type your message here.",
-      "sendMessage": "Send Message"
+      "sendMessage": "Send Message",
+      "successTitle": "Message sent!",
+      "successDescription": "We received your message and will get back to you shortly.",
+      "errorTitle": "Something went wrong",
+      "errorDescription": "Failed to send your message. Please try again.",
+      "rateLimitDescription": "Too many submissions. Please wait a moment before trying again.",
+      "recaptchaFailed": "Verification failed, please try again.",
+      "recaptchaNotice": "This site is protected by reCAPTCHA and the Google <privacy>Privacy Policy</privacy> and <terms>Terms of Service</terms> apply."
     },
     "cta": {
       "title": "Ready for a Primary Adventure?",
@@ -2728,14 +2776,22 @@
         "title": "Key Sentences : {count} {count, plural, one {sentence} other {sentences}}",
         "more": "+{count} more {count, plural, one {sentence} other {sentences}} saved"
       },
-      "actions": { "backToRead": "Back to Read Page" },
-      "toast": { "failed": "Failed to load lesson summary" }
+      "actions": {
+        "backToRead": "Back to Read Page"
+      },
+      "toast": {
+        "failed": "Failed to load lesson summary"
+      }
     }
   },
   "LessonLanguageQuestion": {
     "title": "AI Reading Assistant",
-    "loading": { "conversation": "Loading conversation..." },
-    "status": { "online": "Online" },
+    "loading": {
+      "conversation": "Loading conversation..."
+    },
+    "status": {
+      "online": "Online"
+    },
     "header": {
       "readyWithName": "Ready to help {name} with questions",
       "ready": "Ready to help with your questions"
@@ -2750,7 +2806,10 @@
       "placeholderWithName": "{name}, ask about the article...",
       "placeholder": "Type your question about the article..."
     },
-    "buttons": { "send": "Send", "skip": "Skip" },
+    "buttons": {
+      "send": "Send",
+      "skip": "Skip"
+    },
     "tips": {
       "askVocabulary": "Ask about vocabulary",
       "discussTheme": "Discuss the main theme",
@@ -2767,7 +2826,9 @@
       "questionOf": "Question {current} of {total}",
       "completePercent": "{percent}% Complete"
     },
-    "timer": { "seconds": "{seconds}s" },
+    "timer": {
+      "seconds": "{seconds}s"
+    },
     "completed": {
       "title": "Quiz Completed",
       "description": "Great job finishing the quiz!",
@@ -2783,7 +2844,9 @@
     }
   },
   "LessonSAQ": {
-    "completed": { "title": "Quiz Completed" },
+    "completed": {
+      "title": "Quiz Completed"
+    },
     "labels": {
       "question": "Question:",
       "yourAnswer": "Your Answer:",
@@ -2791,15 +2854,23 @@
       "feedback": "Feedback:",
       "score": "Score:"
     },
-    "timer": { "elapsed": "Elapsed Time: {time}" },
+    "timer": {
+      "elapsed": "Elapsed Time: {time}"
+    },
     "form": {
-      "placeholder": { "answer": "Type your answer here..." },
+      "placeholder": {
+        "answer": "Type your answer here..."
+      },
       "help": {
         "detailedResponse": "Write a detailed response to demonstrate your understanding"
       },
-      "validation": { "answerRequired": "Please enter your answer" }
+      "validation": {
+        "answerRequired": "Please enter your answer"
+      }
     },
-    "actions": { "submit": "Submit" }
+    "actions": {
+      "submit": "Submit"
+    }
   },
   "LessonCloze": {
     "loading": {
@@ -2920,7 +2991,9 @@
     "prompt": {
       "thinkAndReveal": "Think about the meaning of this word, then reveal the answer."
     },
-    "buttons": { "showAnswer": "Show Answer" },
+    "buttons": {
+      "showAnswer": "Show Answer"
+    },
     "rating": {
       "prompt": "How well did you know this word?",
       "again": "Again",
@@ -2972,7 +3045,9 @@
       "archive": "Archive",
       "delete": "Delete"
     },
-    "search": { "placeholder": "Search" },
+    "search": {
+      "placeholder": "Search"
+    },
     "import": {
       "fromLabel": "Import a new class from",
       "googleClassroom": "Google Classroom",
@@ -2992,7 +3067,10 @@
         "aboutDescription": "This feature allows teachers to import Google Classroom students. Students will be automatically enrolled in your class."
       }
     },
-    "pagination": { "previous": "Previous", "next": "Next" },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
     "edit": {
       "title": "Edit Class",
       "description": "Are you sure you want to edit the class?",
@@ -3021,8 +3099,13 @@
     }
   },
   "TeacherCreateClass": {
-    "button": { "newClassroom": "New Classroom" },
-    "dialog": { "title": "Create Class", "description": "Create a new class" },
+    "button": {
+      "newClassroom": "New Classroom"
+    },
+    "dialog": {
+      "title": "Create Class",
+      "description": "Create a new class"
+    },
     "fields": {
       "className": "Class Name",
       "classNamePlaceholder": "Class Name",
@@ -3031,7 +3114,10 @@
       "gradePlaceholder": "Grade",
       "gradeItem": "Grade {grade}"
     },
-    "actions": { "create": "Create", "cancel": "Cancel" },
+    "actions": {
+      "create": "Create",
+      "cancel": "Cancel"
+    },
     "toast": {
       "attention": "Attention",
       "fillAllFields": "Please fill in all fields",
@@ -3331,7 +3417,9 @@
       }
     },
     "cefrSetter": {
-      "button": { "setLevel": "Set Level" },
+      "button": {
+        "setLevel": "Set Level"
+      },
       "dialog": {
         "title": "Set CEFR Level for {name}",
         "description": "Choose the appropriate CEFR level for this student. This will also update their reading level (RA level)."
@@ -3340,7 +3428,9 @@
         "currentLevel": "Current Level",
         "newLevel": "New Level"
       },
-      "select": { "placeholder": "Select CEFR Level" },
+      "select": {
+        "placeholder": "Select CEFR Level"
+      },
       "preview": {
         "title": "Preview:",
         "cefr": "CEFR Level:",
@@ -3719,7 +3809,9 @@
       "title": "Student Management",
       "subtitle": "Manage students and their progress"
     },
-    "page": { "title": "Students Management" },
+    "page": {
+      "title": "Students Management"
+    },
     "stats": {
       "totalStudents": "Total Students",
       "allClassrooms": "All classrooms",
@@ -3791,7 +3883,9 @@
       "loading": "Loading students...",
       "empty": "No students found matching your criteria."
     },
-    "badges": { "noClass": "No Class" },
+    "badges": {
+      "noClass": "No Class"
+    },
     "pagination": {
       "showing": "Showing {from} to {to} of {total} students",
       "previous": "Previous",
@@ -3851,7 +3945,11 @@
         "apiResponse": "API Response Time",
         "errorRate": "Error Rate",
         "uptime": "System Uptime",
-        "status": { "excellent": "Excellent", "good": "Good", "low": "Low" }
+        "status": {
+          "excellent": "Excellent",
+          "good": "Good",
+          "low": "Low"
+        }
       },
       "recentActivity": {
         "title": "Recent Activity",
@@ -3866,6 +3964,83 @@
       "noData": {
         "title": "No data available",
         "description": "Try adjusting your filters or refresh the page"
+      }
+    },
+    "ContactMessages": {
+      "title": "Contact Messages",
+      "description": "Triage and respond to public contact form submissions",
+      "tabs": {
+        "all": "All",
+        "new": "New",
+        "read": "Read",
+        "replied": "Replied",
+        "archived": "Archived"
+      },
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Search by name, email, or institution...",
+        "inquiry": "Inquiry",
+        "inquiryPlaceholder": "Filter by inquiry type",
+        "inquiryOptions": {
+          "all": "All Inquiries",
+          "sales": "Sales",
+          "support": "Support",
+          "partnerships": "Partnerships"
+        }
+      },
+      "columns": {
+        "createdAt": "Date",
+        "name": "Name",
+        "email": "Email",
+        "inquiry": "Inquiry",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "actions": {
+        "view": "View",
+        "copyEmail": "Copy Email",
+        "sendEmail": "Send Email",
+        "close": "Close",
+        "delete": "Delete"
+      },
+      "status": {
+        "NEW": "New",
+        "READ": "Read",
+        "REPLIED": "Replied",
+        "ARCHIVED": "Archived"
+      },
+      "inquiryLabels": {
+        "SALES": "Sales",
+        "SUPPORT": "Support",
+        "PARTNERSHIPS": "Partnerships"
+      },
+      "dialog": {
+        "title": "Contact Message Detail",
+        "from": "From",
+        "registeredUser": "Registered user",
+        "messageLabel": "Message",
+        "statusLabel": "Status",
+        "statusChangePlaceholder": "Mark as…",
+        "submittedAt": "Submitted at"
+      },
+      "empty": {
+        "title": "No messages found",
+        "description": "No contact messages have been submitted yet.",
+        "filteredDescription": "No messages match your current filters."
+      },
+      "confirmDelete": {
+        "title": "Delete this message?",
+        "description": "This action permanently deletes the contact message from {name}. This cannot be undone. (To temporarily hide a message without deleting it, use the Archive status instead.)",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      },
+      "toasts": {
+        "statusUpdated": "Status updated successfully",
+        "statusUpdateError": "Failed to update status. Please try again.",
+        "emailCopied": "Email address copied to clipboard",
+        "deleted": "Message deleted",
+        "deleteError": "Failed to delete message",
+        "alreadyDeleted": "Message already deleted"
       }
     }
   },
@@ -3920,5 +4095,53 @@
     "title": "Access Denied",
     "description": "You do not have permission to access this page. Please contact your administrator if you believe this is an error.",
     "backHome": "Back to Home"
+  },
+  "ContactPage": {
+    "metadata": {
+      "title": "Contact Us — Primary Advantage",
+      "description": "Reach our sales, support, or partnerships team. We respond within 1 business day."
+    },
+    "hero": {
+      "title": "Let's Talk",
+      "subtitle": "Whether you're a school evaluating the platform, need technical help, or want to explore a partnership — we'd love to hear from you."
+    },
+    "channels": {
+      "sales": {
+        "title": "Sales",
+        "description": "Pricing, trials, and school onboarding",
+        "cta": "Contact Sales"
+      },
+      "support": {
+        "title": "Support",
+        "description": "Technical help and platform questions",
+        "cta": "Get Support"
+      },
+      "partnerships": {
+        "title": "Partnerships",
+        "description": "Integrations, resellers, and content collaborations",
+        "cta": "Explore Partnerships"
+      }
+    },
+    "form": {
+      "title": "Send Us a Message",
+      "description": "Fill in the form and we'll get back to you promptly."
+    },
+    "info": {
+      "emailLabel": "Email us",
+      "emailValue": "admin@reading-advantage.com.",
+      "responseLabel": "Avg. response",
+      "responseValue": "1 business day",
+      "hoursLabel": "Office hours",
+      "hoursValue": "Mon–Fri, 9am–6pm ICT"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How is Primary Advantage priced?",
+      "a1": "We offer per-school annual licenses with volume discounts for districts. Contact our sales team for a custom quote.",
+      "q2": "Can I request a live demo?",
+      "a2": "Absolutely. Use the contact form to request a demo — our team will schedule a 30-minute walkthrough at a time that works for you.",
+      "q3": "Is Primary Advantage COPPA and PDPA compliant?",
+      "a3": "Yes. The platform is designed with COPPA and PDPA requirements in mind — no personally identifiable information from students under 13 is collected or shared with third parties."
+    }
   }
 }

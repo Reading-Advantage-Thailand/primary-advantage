@@ -39,6 +39,11 @@ export const systemPageConfig: PageConfig = {
       href: "/system/licenses",
       icon: "KeyIcon",
     },
+    {
+      title: "contactmessages",
+      href: "/system/contact-messages",
+      icon: "MessageSquareIcon",
+    },
     // {
     //   title: "testing",
     //   href: "/system/test",

@@ -3,7 +3,6 @@ import { siteConfig } from "@/configs/site-config";
 import { ThemeToggle } from "@/components/switchers/theme-switcher-toggle";
 import { LocaleSwitcher } from "@/components/switchers/locale-switcher";
 import { Link } from "@/i18n/navigation";
-import { Palette } from "lucide-react";
 // import { ThemeCustomizer } from "./theme-customizer";
 
 interface FooterProps {
@@ -17,10 +16,6 @@ const info = [
       { title: "About Us", href: "/about" },
       { title: "Features", href: "/#features" },
       { title: "Pricing", href: "/pricing" },
-      {
-        title: "Support",
-        href: "https://docs.google.com/forms/d/e/1FAIpQLSe_Ew100kef6j4O4IuiHm4ZeGhOj5FN6JRyJ7-0gvZV9eFgjQ/viewform?usp=sf_link",
-      },
     ],
   },
   {
@@ -80,6 +75,13 @@ export function Footer({ className }: FooterProps) {
                           <Link href={link.href}>{link.title}</Link>
                         </li>
                       ))}
+                      {item.title === "About" && (
+                        <li className="mb-4">
+                          <Link href="/contact" className="font-medium text-gray-400 hover:underline">
+                            Support
+                          </Link>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 </div>

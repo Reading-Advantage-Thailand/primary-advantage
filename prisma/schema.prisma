@@ -46,6 +46,7 @@ model User {
   sentNotifications     AssignmentNotification[] @relation("TeacherNotifications")
   aiinsights            AIInsight[]
   gameRankings          GameRanking[]
+  contactMessages       ContactMessage[]
 
   @@map("users")
 }
@@ -829,4 +830,36 @@ model GameRanking {
   @@unique([userId, gameType, difficulty])
   @@index([gameType, difficulty, totalXp])
   @@map("game_rankings")
+}
+
+enum InquiryType {
+  SALES
+  SUPPORT
+  PARTNERSHIPS
+}
+
+enum ContactMessageStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+model ContactMessage {
+  id          String               @id @default(cuid())
+  name        String
+  institution String?
+  email       String
+  inquiry     InquiryType
+  message     String               @db.Text
+  userId      String?              @map("user_id")
+  status      ContactMessageStatus @default(NEW)
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("contact_messages")
 }

@@ -43,6 +43,7 @@
     "systemdashboard": "Bảng điều khiển hệ thống",
     "licenses": "Bảng điều khiển giấy phép",
     "schools": "Bảng điều khiển trường học",
+    "contactmessages": "Tin nhắn liên hệ",
     "teacherdashboard": "Bảng điều khiển giáo viên",
     "reports": "Báo cáo",
     "myClasses": "Lớp học của tôi",
@@ -2316,7 +2317,14 @@
       },
       "message": "Tin nhắn",
       "messagePlaceholder": "Nhập tin nhắn của bạn ở đây.",
-      "sendMessage": "Gửi tin nhắn"
+      "sendMessage": "Gửi tin nhắn",
+      "successTitle": "Đã gửi tin nhắn!",
+      "successDescription": "Chúng tôi đã nhận được tin nhắn của bạn và sẽ liên hệ lại sớm.",
+      "errorTitle": "Đã xảy ra lỗi",
+      "errorDescription": "Không thể gửi tin nhắn. Vui lòng thử lại.",
+      "rateLimitDescription": "Quá nhiều lần gửi. Vui lòng đợi một chút trước khi thử lại.",
+      "recaptchaFailed": "Xác minh thất bại, vui lòng thử lại.",
+      "recaptchaNotice": "Trang web này được bảo vệ bởi reCAPTCHA và <privacy>Chính sách quyền riêng tư</privacy> cũng như <terms>Điều khoản dịch vụ</terms> của Google áp dụng."
     },
     "cta": {
       "title": "Sẵn sàng cho một cuộc phiêu lưu chính?",
@@ -3911,6 +3919,83 @@
         "title": "Không có dữ liệu",
         "description": "Thử điều chỉnh bộ lọc hoặc làm mới trang"
       }
+    },
+    "ContactMessages": {
+      "title": "Tin nhắn liên hệ",
+      "description": "Xem xét và phản hồi các yêu cầu liên hệ từ công chúng",
+      "tabs": {
+        "all": "Tất cả",
+        "new": "Mới",
+        "read": "Đã đọc",
+        "replied": "Đã trả lời",
+        "archived": "Đã lưu trữ"
+      },
+      "filters": {
+        "search": "Tìm kiếm",
+        "searchPlaceholder": "Tìm theo tên, email hoặc tổ chức...",
+        "inquiry": "Loại yêu cầu",
+        "inquiryPlaceholder": "Lọc theo loại yêu cầu",
+        "inquiryOptions": {
+          "all": "Tất cả yêu cầu",
+          "sales": "Bán hàng",
+          "support": "Hỗ trợ",
+          "partnerships": "Hợp tác"
+        }
+      },
+      "columns": {
+        "createdAt": "Ngày",
+        "name": "Họ tên",
+        "email": "Email",
+        "inquiry": "Loại yêu cầu",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "actions": {
+        "view": "Xem",
+        "copyEmail": "Sao chép email",
+        "sendEmail": "Gửi email",
+        "close": "Đóng",
+        "delete": "Xóa"
+      },
+      "status": {
+        "NEW": "Mới",
+        "READ": "Đã đọc",
+        "REPLIED": "Đã trả lời",
+        "ARCHIVED": "Đã lưu trữ"
+      },
+      "inquiryLabels": {
+        "SALES": "Bán hàng",
+        "SUPPORT": "Hỗ trợ",
+        "PARTNERSHIPS": "Hợp tác"
+      },
+      "dialog": {
+        "title": "Chi tiết tin nhắn liên hệ",
+        "from": "Từ",
+        "registeredUser": "Người dùng đã đăng ký",
+        "messageLabel": "Nội dung",
+        "statusLabel": "Trạng thái",
+        "statusChangePlaceholder": "Đánh dấu là…",
+        "submittedAt": "Gửi lúc"
+      },
+      "empty": {
+        "title": "Không tìm thấy tin nhắn",
+        "description": "Chưa có tin nhắn liên hệ nào được gửi.",
+        "filteredDescription": "Không có tin nhắn nào phù hợp với bộ lọc hiện tại."
+      },
+      "confirmDelete": {
+        "title": "Xóa tin nhắn này?",
+        "description": "Hành động này sẽ xóa vĩnh viễn tin nhắn liên hệ từ {name}. Không thể hoàn tác. (Để tạm thời ẩn tin nhắn mà không xóa, hãy dùng trạng thái Lưu trữ thay thế.)",
+        "confirm": "Xóa",
+        "cancel": "Hủy"
+      },
+      "toasts": {
+        "statusUpdated": "Cập nhật trạng thái thành công",
+        "statusUpdateError": "Cập nhật trạng thái thất bại. Vui lòng thử lại.",
+        "emailCopied": "Đã sao chép địa chỉ email vào clipboard",
+        "deleted": "Đã xóa tin nhắn",
+        "deleteError": "Xóa tin nhắn thất bại",
+        "alreadyDeleted": "Tin nhắn đã bị xóa trước đó"
+      }
     }
   },
   "GamesPage": {
@@ -3958,6 +4043,54 @@
         "title": "Wizard vs Zombie",
         "description": "Đánh vần từ chính xác để đánh bại đàn zombie với tư cách là một phù thủy hùng mạnh!"
       }
+    }
+  },
+  "ContactPage": {
+    "metadata": {
+      "title": "Liên hệ chúng tôi — Primary Advantage",
+      "description": "Liên hệ đội ngũ kinh doanh, hỗ trợ hoặc hợp tác của chúng tôi. Chúng tôi phản hồi trong vòng 1 ngày làm việc."
+    },
+    "hero": {
+      "title": "Hãy Trò Chuyện",
+      "subtitle": "Dù bạn là trường học đang đánh giá nền tảng, cần hỗ trợ kỹ thuật hay muốn khám phá cơ hội hợp tác — chúng tôi rất mong được nghe từ bạn."
+    },
+    "channels": {
+      "sales": {
+        "title": "Kinh doanh",
+        "description": "Giá cả, dùng thử và hướng dẫn triển khai cho trường học",
+        "cta": "Liên hệ Kinh doanh"
+      },
+      "support": {
+        "title": "Hỗ trợ",
+        "description": "Hỗ trợ kỹ thuật và giải đáp thắc mắc về nền tảng",
+        "cta": "Nhận hỗ trợ"
+      },
+      "partnerships": {
+        "title": "Hợp tác",
+        "description": "Tích hợp hệ thống, đại lý và cộng tác nội dung",
+        "cta": "Khám phá Hợp tác"
+      }
+    },
+    "form": {
+      "title": "Gửi tin nhắn cho chúng tôi",
+      "description": "Điền vào biểu mẫu và chúng tôi sẽ phản hồi bạn ngay."
+    },
+    "info": {
+      "emailLabel": "Gửi email cho chúng tôi",
+      "emailValue": "admin@reading-advantage.com",
+      "responseLabel": "Thời gian phản hồi TB",
+      "responseValue": "1 ngày làm việc",
+      "hoursLabel": "Giờ làm việc",
+      "hoursValue": "Thứ Hai–Thứ Sáu, 9:00–18:00 ICT"
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp",
+      "q1": "Primary Advantage có mức giá như thế nào?",
+      "a1": "Chúng tôi cung cấp giấy phép hàng năm theo từng trường học, kèm chiết khấu theo số lượng cho các quận/huyện. Liên hệ đội kinh doanh để nhận báo giá phù hợp.",
+      "q2": "Tôi có thể yêu cầu buổi demo trực tiếp không?",
+      "a2": "Hoàn toàn có thể. Sử dụng biểu mẫu liên hệ để đăng ký demo — đội ngũ của chúng tôi sẽ sắp xếp buổi hướng dẫn 30 phút vào thời gian phù hợp với bạn.",
+      "q3": "Primary Advantage có tuân thủ COPPA và PDPA không?",
+      "a3": "Có. Nền tảng được thiết kế tuân thủ các yêu cầu của COPPA và PDPA — không thu thập hay chia sẻ thông tin cá nhân của học sinh dưới 13 tuổi với bên thứ ba."
     }
   }
 }

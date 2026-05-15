@@ -43,6 +43,7 @@
     "systemdashboard": "系統儀表板",
     "licenses": "許可證儀表板",
     "schools": "學校儀表板",
+    "contactmessages": "聯絡訊息",
     "teacherdashboard": "教師儀表板",
     "reports": "報告",
     "myClasses": "我的班級",
@@ -2316,7 +2317,14 @@
       },
       "message": "訊息",
       "messagePlaceholder": "在此輸入您的訊息。",
-      "sendMessage": "發送訊息"
+      "sendMessage": "發送訊息",
+      "successTitle": "訊息已送出！",
+      "successDescription": "我們已收到您的訊息，將盡快與您聯繫。",
+      "errorTitle": "發生錯誤",
+      "errorDescription": "發送訊息失敗，請重試。",
+      "rateLimitDescription": "提交次數過多，請稍候再試。",
+      "recaptchaFailed": "驗證失敗，請重試。",
+      "recaptchaNotice": "本網站受 reCAPTCHA 保護，Google 的<privacy>隱私政策</privacy>和<terms>服務條款</terms>適用。"
     },
     "cta": {
       "title": "準備好開始主要冒險了嗎？",
@@ -3979,6 +3987,83 @@
         "title": "暫無資料",
         "description": "請嘗試調整篩選條件或重新整理頁面"
       }
+    },
+    "ContactMessages": {
+      "title": "聯絡訊息",
+      "description": "處理和回覆公開聯絡表單的提交內容",
+      "tabs": {
+        "all": "全部",
+        "new": "新訊息",
+        "read": "已讀",
+        "replied": "已回覆",
+        "archived": "已封存"
+      },
+      "filters": {
+        "search": "搜尋",
+        "searchPlaceholder": "依姓名、電子郵件或機構搜尋...",
+        "inquiry": "諮詢類型",
+        "inquiryPlaceholder": "依諮詢類型篩選",
+        "inquiryOptions": {
+          "all": "全部諮詢",
+          "sales": "銷售",
+          "support": "支援",
+          "partnerships": "合作夥伴"
+        }
+      },
+      "columns": {
+        "createdAt": "日期",
+        "name": "姓名",
+        "email": "電子郵件",
+        "inquiry": "諮詢類型",
+        "status": "狀態",
+        "actions": "操作"
+      },
+      "actions": {
+        "view": "查看",
+        "copyEmail": "複製電子郵件",
+        "sendEmail": "傳送郵件",
+        "close": "關閉",
+        "delete": "刪除"
+      },
+      "status": {
+        "NEW": "新訊息",
+        "READ": "已讀",
+        "REPLIED": "已回覆",
+        "ARCHIVED": "已封存"
+      },
+      "inquiryLabels": {
+        "SALES": "銷售",
+        "SUPPORT": "支援",
+        "PARTNERSHIPS": "合作夥伴"
+      },
+      "dialog": {
+        "title": "聯絡訊息詳情",
+        "from": "來自",
+        "registeredUser": "已註冊使用者",
+        "messageLabel": "訊息內容",
+        "statusLabel": "狀態",
+        "statusChangePlaceholder": "標記為…",
+        "submittedAt": "提交時間"
+      },
+      "empty": {
+        "title": "找不到訊息",
+        "description": "尚未收到任何聯絡訊息。",
+        "filteredDescription": "目前篩選條件下沒有符合的訊息。"
+      },
+      "confirmDelete": {
+        "title": "刪除此訊息？",
+        "description": "此操作將永久刪除來自 {name} 的聯絡訊息，無法復原。（若只是暫時隱藏訊息而不刪除，請改用「已封存」狀態。）",
+        "confirm": "刪除",
+        "cancel": "取消"
+      },
+      "toasts": {
+        "statusUpdated": "狀態更新成功",
+        "statusUpdateError": "更新狀態失敗，請重試。",
+        "emailCopied": "電子郵件地址已複製到剪貼簿",
+        "deleted": "訊息已刪除",
+        "deleteError": "刪除訊息失敗",
+        "alreadyDeleted": "訊息已被刪除"
+      }
     }
   },
   "GamesPage": {
@@ -4026,6 +4111,54 @@
         "title": "Wizard vs Zombie",
         "description": "作為強大巫師，正確拼寫單詞以擊敗殭屍大軍！"
       }
+    }
+  },
+  "ContactPage": {
+    "metadata": {
+      "title": "聯絡我們 — Primary Advantage",
+      "description": "聯絡我們的銷售、支援或合作夥伴團隊，我們將在1個工作天內回覆。"
+    },
+    "hero": {
+      "title": "歡迎與我們聯絡",
+      "subtitle": "無論您是正在評估平台的學校、需要技術協助，還是想探索合作機會——我們都很期待聽到您的聲音。"
+    },
+    "channels": {
+      "sales": {
+        "title": "銷售",
+        "description": "定價、試用及學校導入服務",
+        "cta": "聯絡銷售團隊"
+      },
+      "support": {
+        "title": "技術支援",
+        "description": "技術協助與平台使用問題解答",
+        "cta": "取得支援"
+      },
+      "partnerships": {
+        "title": "合作夥伴",
+        "description": "系統整合、經銷商及內容合作",
+        "cta": "探索合作機會"
+      }
+    },
+    "form": {
+      "title": "傳送訊息給我們",
+      "description": "填寫表單，我們將盡快與您聯繫。"
+    },
+    "info": {
+      "emailLabel": "寄送電子郵件",
+      "emailValue": "admin@reading-advantage.com",
+      "responseLabel": "平均回覆時間",
+      "responseValue": "1個工作天",
+      "hoursLabel": "辦公時間",
+      "hoursValue": "週一至週五，上午9點至下午6點（ICT）"
+    },
+    "faq": {
+      "title": "常見問題",
+      "q1": "Primary Advantage 的定價方式為何？",
+      "a1": "我們提供按學校計算的年度授權，學區批量採購可享折扣優惠。請聯絡我們的銷售團隊以取得客製化報價。",
+      "q2": "可以申請線上示範嗎？",
+      "a2": "當然可以。透過聯絡表單提出申請，我們的團隊將安排一場約30分鐘的示範說明，時間配合您的方便。",
+      "q3": "Primary Advantage 是否符合 COPPA 和 PDPA 規定？",
+      "a3": "是的。本平台的設計充分考量 COPPA 和 PDPA 的要求——不收集或向第三方分享13歲以下學生的任何個人識別資訊。"
     }
   }
 }
