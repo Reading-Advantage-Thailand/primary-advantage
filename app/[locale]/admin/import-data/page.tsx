@@ -157,7 +157,7 @@ export default function ImportDataPage() {
       }, 2000);
 
       // Upload file to API
-      const response = await fetch("/api/upload/classes ", {
+      const response = await fetch("/api/upload/classes", {
         method: "POST",
         body: formData,
       });
