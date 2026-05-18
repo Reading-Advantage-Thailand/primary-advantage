@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { addDays } from "date-fns";
-import { getCurrentUser } from "@/lib/session";
 import { UserWithRoles } from "@/server/utils/auth";
+import { UpdateClassroomInput } from "@/types/index";
 
 export const createClassCode = async (
   classrooomId: string,
@@ -392,45 +392,78 @@ export const getAllClassrooms = async (userWithRoles: UserWithRoles) => {
   }
 };
 
-// Update a classroom
+// Update a classroom — Task 3.1: transactional update with teacher-diff and cross-school validation
 export const updateClassroom = async (
   id: string,
-  data: {
-    name?: string;
-    grade?: string;
-    description?: string;
-  },
+  payload: UpdateClassroomInput,
+  actor: UserWithRoles,
 ) => {
-  try {
-    return await prisma.classroom.update({
+  return prisma.$transaction(async (tx: any) => {
+    const classroom = await tx.classroom.findUnique({
       where: { id },
-      data: {
-        name: data.name,
-        grade: data.grade,
-        // Note: grade and description are not in the current schema
-        // If needed, they should be added to the Prisma schema first
-        updatedAt: new Date(),
-      },
-      include: {
-        teachers: {
-          select: {
-            id: true,
-            user: { select: { id: true, name: true, email: true } },
-          },
-        },
-        students: {
-          include: {
-            student: {
-              select: { id: true, name: true, email: true },
-            },
-          },
-        },
-      },
+      include: { teachers: true },
     });
-  } catch (error) {
-    console.error("Error updating classroom:", error);
-    return null;
-  }
+    if (!classroom) throw new Error("NOT_FOUND");
+
+    if (actor.role !== "system" && classroom.schoolId !== actor.schoolId) {
+      throw new Error("FORBIDDEN");
+    }
+
+    // If teachers change requested, validate FIRST (before any mutation)
+    let toRemove: string[] = [];
+    let toAdd: string[] = [];
+    if (payload.assignedTeacherIds !== undefined) {
+      const wanted = payload.assignedTeacherIds;
+      if (wanted.length > 0) {
+        const valid = await tx.user.findMany({
+          where: { id: { in: wanted }, schoolId: classroom.schoolId },
+          select: { id: true },
+        });
+        if (valid.length !== wanted.length) {
+          throw new Error("CROSS_SCHOOL_TEACHER");
+        }
+      }
+      const current = new Set<string>(classroom.teachers.map((t: any) => t.userId as string));
+      const next = new Set<string>(wanted);
+      toRemove = [...current].filter((u) => !next.has(u));
+      toAdd = [...next].filter((u) => !current.has(u));
+    }
+
+    // Update simple fields
+    if (
+      payload.name !== undefined ||
+      payload.grade !== undefined ||
+      payload.passwordStudents !== undefined
+    ) {
+      await tx.classroom.update({
+        where: { id },
+        data: {
+          ...(payload.name !== undefined ? { name: payload.name } : {}),
+          ...(payload.grade !== undefined ? { grade: payload.grade } : {}),
+          ...(payload.passwordStudents !== undefined
+            ? { passwordStudents: payload.passwordStudents }
+            : {}),
+        },
+      });
+    }
+
+    // Apply teacher diff
+    if (toRemove.length) {
+      await tx.classroomTeachers.deleteMany({
+        where: { classroomId: id, userId: { in: toRemove } },
+      });
+    }
+    if (toAdd.length) {
+      await tx.classroomTeachers.createMany({
+        data: toAdd.map((userId: string) => ({ classroomId: id, userId })),
+      });
+    }
+
+    return tx.classroom.findUnique({
+      where: { id },
+      include: { teachers: { include: { user: true } } },
+    });
+  });
 };
 
 // Delete a classroom

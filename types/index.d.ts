@@ -426,6 +426,18 @@ export interface UpdateTeacherInput {
   cefrLevel?: string;
   password?: string;
   classroomIds?: string[];
+  /** Optional: new schoolId. If different from current, triggers school-change branch (system admin only). */
+  schoolId?: string;
+  /** Optional: classrooms to assign in the new school after a school-change. */
+  assignedClassroomIds?: string[];
+}
+
+export interface UpdateClassroomInput {
+  name?: string;
+  grade?: string;
+  passwordStudents?: string;
+  /** Optional: full replacement list of teacher user IDs. Must all belong to the classroom's school. */
+  assignedTeacherIds?: string[];
 }
 
 export interface CreateStudentInput {

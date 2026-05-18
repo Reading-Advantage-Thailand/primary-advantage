@@ -59,6 +59,8 @@ interface TeacherQueryParams {
   search: string;
   role: string;
   userWithRoles: UserWithRoles;
+  /** Explicit schoolId filter (already validated + role-gated by the controller) */
+  schoolId?: string;
 }
 
 // Get teachers with pagination and filtering
@@ -68,16 +70,24 @@ export const getTeachers = async (
   teachers: TeacherData[];
   totalCount: number;
 }> => {
-  const { page, limit, search, role, userWithRoles } = params;
+  const { page, limit, search, role, userWithRoles, schoolId } = params;
 
   try {
     // Calculate offset for pagination
     const offset = (page - 1) * limit;
 
-    // Determine school filter based on user's role
+    // Determine school filter.
+    // If an explicit schoolId was passed (already role-gated by the controller), use it.
+    // Otherwise fall back to the legacy behaviour: scope to the caller's school when they
+    // are a school admin.
     let schoolFilter: any = {};
-    if (userWithRoles.schoolId && userWithRoles.SchoolAdmins.length > 0) {
-      // School admin - only see teachers from their school
+    if (schoolId !== undefined) {
+      schoolFilter = { schoolId };
+    } else if (
+      userWithRoles.schoolId &&
+      userWithRoles.SchoolAdmins.length > 0
+    ) {
+      // School admin without an explicit schoolId — scope to their own school
       schoolFilter = { schoolId: userWithRoles.schoolId };
     }
 
@@ -615,6 +625,13 @@ async function updateExistingTeacherToSchool(params: {
   }
 }
 
+// Known error codes that must be surfaced to the caller, not swallowed.
+const KNOWN_UPDATE_ERRORS = new Set([
+  "FORBIDDEN_SCHOOL_CHANGE",
+  "CROSS_SCHOOL_CLASSROOM",
+  "Failed to fetch updated teacher",
+]);
+
 // Update teacher
 export const updateTeacher = async (
   id: string,
@@ -649,6 +666,16 @@ export const updateTeacher = async (
       return { success: false, error: "Teacher not found" };
     }
 
+    // Detect school change: payload has schoolId and it differs from current.
+    const isSchoolChange =
+      updateData.schoolId !== undefined &&
+      updateData.schoolId !== existingTeacher.schoolId;
+
+    // Defense-in-depth authz: only system admin may change a teacher's school.
+    if (isSchoolChange && userWithRoles.role !== "system") {
+      return { success: false, error: "FORBIDDEN_SCHOOL_CHANGE" };
+    }
+
     // Check if email is being updated and doesn't conflict
     if (updateData.email && updateData.email !== existingTeacher.email) {
       const normalizedEmail = updateData.email.toLowerCase().trim();
@@ -661,24 +688,7 @@ export const updateTeacher = async (
       }
     }
 
-    // Validate classroom IDs if provided
-    if (updateData.classroomIds) {
-      const validClassrooms = await prisma.classroom.findMany({
-        where: {
-          id: { in: updateData.classroomIds },
-          schoolId: existingTeacher.schoolId, // Ensure classrooms belong to the same school
-        },
-      });
-
-      if (validClassrooms.length !== updateData.classroomIds.length) {
-        return {
-          success: false,
-          error: "Some classroom IDs are invalid or not accessible",
-        };
-      }
-    }
-
-    // Prepare update data
+    // Prepare non-school update payload (name, email, cefrLevel, password).
     const updatePayload: any = {};
     if (updateData.name) updatePayload.name = updateData.name;
     if (updateData.email)
@@ -688,80 +698,185 @@ export const updateTeacher = async (
       updatePayload.password = await hashPassword(updateData.password);
     }
 
-    // Update the teacher and handle classroom assignments in a transaction
-    const updatedTeacher = await prisma.$transaction(async (tx) => {
-      // Update user data
-      const user = await tx.user.update({
-        where: { id },
-        data: updatePayload,
-      });
+    let updatedTeacher: any;
 
-      // Handle role update if specified
-      if (updateData.role) {
-        const roleRecord = await tx.role.findFirst({
-          where: { name: updateData.role },
-        });
+    if (isSchoolChange) {
+      // ---- SCHOOL-CHANGE BRANCH ------------------------------------------------
+      // Accept either assignedClassroomIds (new) or classroomIds (legacy) so
+      // callers using either field name get the same behaviour.
+      const newClassroomIds =
+        updateData.assignedClassroomIds ?? updateData.classroomIds ?? [];
 
-        if (roleRecord) {
-          // Remove existing roles and add new one
-          await tx.user.update({
-            where: { id },
-            data: {
-              role: roleRecord.name,
-              roleId: roleRecord.id,
+      updatedTeacher = await prisma.$transaction(async (tx) => {
+        // 1. Validate every new classroomId belongs to the new school FIRST —
+        //    fail before any writes on the happy-miss path.
+        if (newClassroomIds.length > 0) {
+          const valid = await tx.classroom.findMany({
+            where: {
+              id: { in: newClassroomIds },
+              schoolId: updateData.schoolId,
             },
+            select: { id: true },
           });
+          if (valid.length !== newClassroomIds.length) {
+            throw new Error("CROSS_SCHOOL_CLASSROOM");
+          }
         }
-      }
 
-      // Handle classroom assignments if specified
-      if (updateData.classroomIds !== undefined) {
-        // Remove existing classroom assignments
-        await tx.classroomTeachers.deleteMany({
-          where: { userId: id },
+        // 2. Apply non-school field updates.
+        if (Object.keys(updatePayload).length > 0) {
+          await tx.user.update({ where: { id }, data: updatePayload });
+        }
+
+        // Handle role update if specified.
+        if (updateData.role) {
+          const roleRecord = await tx.role.findFirst({
+            where: { name: updateData.role },
+          });
+          if (roleRecord) {
+            await tx.user.update({
+              where: { id },
+              data: { role: roleRecord.name, roleId: roleRecord.id },
+            });
+          }
+        }
+
+        // 3. Wipe all existing classroom assignments.
+        await tx.classroomTeachers.deleteMany({ where: { userId: id } });
+
+        // 4. Update the teacher's schoolId.
+        await tx.user.update({
+          where: { id },
+          data: { schoolId: updateData.schoolId },
         });
 
-        // Add new classroom assignments
-        if (updateData.classroomIds.length > 0) {
+        // 5. Insert new classroom assignments (skipped when list is empty).
+        if (newClassroomIds.length > 0) {
           await tx.classroomTeachers.createMany({
-            data: updateData.classroomIds.map((classroomId) => ({
+            data: newClassroomIds.map((classroomId) => ({
               classroomId,
               userId: id,
             })),
-            skipDuplicates: true,
           });
         }
-      }
 
-      // Fetch the complete updated teacher data
-      const completeTeacher = await tx.user.findUnique({
-        where: { id },
-        include: {
-          ClassroomTeachers: {
-            include: {
-              classroom: {
-                include: {
-                  students: true,
+        // Fetch the complete updated teacher for the response.
+        const completeTeacher = await tx.user.findUnique({
+          where: { id },
+          include: {
+            ClassroomTeachers: {
+              include: {
+                classroom: {
+                  include: { students: true },
                 },
               },
             },
           },
-        },
-      });
+        });
 
-      if (!completeTeacher) {
-        throw new Error("Failed to fetch updated teacher");
+        if (!completeTeacher) {
+          throw new Error("Failed to fetch updated teacher");
+        }
+
+        return completeTeacher;
+      });
+    } else {
+      // ---- SAME-SCHOOL PATH (existing behavior — preserved verbatim) -----------
+
+      // Validate classroom IDs if provided
+      if (updateData.classroomIds) {
+        const validClassrooms = await prisma.classroom.findMany({
+          where: {
+            id: { in: updateData.classroomIds },
+            schoolId: existingTeacher.schoolId, // Ensure classrooms belong to the same school
+          },
+        });
+
+        if (validClassrooms.length !== updateData.classroomIds.length) {
+          return {
+            success: false,
+            error: "Some classroom IDs are invalid or not accessible",
+          };
+        }
       }
 
-      return completeTeacher;
-    });
+      updatedTeacher = await prisma.$transaction(async (tx) => {
+        // Update user data
+        const user = await tx.user.update({
+          where: { id },
+          data: updatePayload,
+        });
 
-    // Format response
+        // Handle role update if specified
+        if (updateData.role) {
+          const roleRecord = await tx.role.findFirst({
+            where: { name: updateData.role },
+          });
+
+          if (roleRecord) {
+            // Remove existing roles and add new one
+            await tx.user.update({
+              where: { id },
+              data: {
+                role: roleRecord.name,
+                roleId: roleRecord.id,
+              },
+            });
+          }
+        }
+
+        // Handle classroom assignments if specified
+        if (updateData.classroomIds !== undefined) {
+          // Remove existing classroom assignments
+          await tx.classroomTeachers.deleteMany({
+            where: { userId: id },
+          });
+
+          // Add new classroom assignments
+          if (updateData.classroomIds.length > 0) {
+            await tx.classroomTeachers.createMany({
+              data: updateData.classroomIds.map((classroomId) => ({
+                classroomId,
+                userId: id,
+              })),
+              skipDuplicates: true,
+            });
+          }
+        }
+
+        // Fetch the complete updated teacher data
+        const completeTeacher = await tx.user.findUnique({
+          where: { id },
+          include: {
+            ClassroomTeachers: {
+              include: {
+                classroom: {
+                  include: {
+                    students: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        if (!completeTeacher) {
+          throw new Error("Failed to fetch updated teacher");
+        }
+
+        return completeTeacher;
+      });
+    }
+
+    // Format response (same for both branches)
     const primaryRole = updatedTeacher.role || "teacher";
 
-    const totalStudents = updatedTeacher.ClassroomTeachers.reduce((sum, ct) => {
-      return sum + ct.classroom.students.length;
-    }, 0);
+    const totalStudents = updatedTeacher.ClassroomTeachers.reduce(
+      (sum: number, ct: any) => {
+        return sum + ct.classroom.students.length;
+      },
+      0,
+    );
 
     const totalClasses = updatedTeacher.ClassroomTeachers.length;
 
@@ -776,7 +891,7 @@ export const updateTeacher = async (
       cefrLevel: updatedTeacher.cefrLevel,
       totalStudents,
       totalClasses,
-      assignedClassrooms: updatedTeacher.ClassroomTeachers.map((ct) => ({
+      assignedClassrooms: updatedTeacher.ClassroomTeachers.map((ct: any) => ({
         id: ct.classroom.id,
         name: ct.classroom.name,
         grade: ct.classroom.grade,
@@ -785,6 +900,10 @@ export const updateTeacher = async (
 
     return { success: true, teacher: teacherData };
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (KNOWN_UPDATE_ERRORS.has(message)) {
+      return { success: false, error: message };
+    }
     console.error("Teacher Model: Error updating teacher:", error);
     return { success: false, error: "Failed to update teacher" };
   }
