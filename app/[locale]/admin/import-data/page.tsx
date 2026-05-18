@@ -49,8 +49,27 @@ import React, { useState, useRef, useEffect } from "react";
 import { parse } from "csv/sync";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
+import { ClassroomConflictModal } from "@/components/admin/classroom-conflict-modal";
 
 type School = { id: string; name: string };
+
+interface ConflictItem {
+  name: string;
+  existingId: string;
+  existingMeta?: Record<string, unknown>;
+}
+
+interface ConflictSummary {
+  newClassroomsToCreate: string[];
+  parsedRows: number;
+}
+
+interface CreatedClassroom {
+  name: string;
+  id: string;
+  wasSuffixed: boolean;
+  originalName?: string;
+}
 
 export default function ImportDataPage() {
   const t = useTranslations("ImportData");
@@ -70,6 +89,14 @@ export default function ImportDataPage() {
   // System admin: school selector state
   const [schools, setSchools] = useState<School[]>([]);
   const [selectedSchoolId, setSelectedSchoolId] = useState<string>("");
+
+  // Conflict modal state
+  const [conflictModalOpen, setConflictModalOpen] = useState(false);
+  const [pendingConflicts, setPendingConflicts] = useState<ConflictItem[]>([]);
+  const [pendingConflictSummary, setPendingConflictSummary] =
+    useState<ConflictSummary>({ newClassroomsToCreate: [], parsedRows: 0 });
+  // Holds the FormData for re-submission after conflict resolution
+  const pendingFormDataRef = useRef<FormData | null>(null);
 
   useEffect(() => {
     if (!isSystemAdmin) return;
@@ -134,6 +161,17 @@ export default function ImportDataPage() {
     reader.readAsText(file);
   };
 
+  /**
+   * Core fetch helper. Sends FormData to /api/upload/classes.
+   * Returns the raw Response so callers can branch on status.
+   */
+  const postImport = (formData: FormData): Promise<Response> => {
+    return fetch("/api/upload/classes", {
+      method: "POST",
+      body: formData,
+    });
+  };
+
   const handleUpload = async () => {
     if (!selectedFile) return;
     if (isSystemAdmin && !selectedSchoolId) return;
@@ -144,7 +182,6 @@ export default function ImportDataPage() {
     setUploadProgress(0);
 
     try {
-      // Create FormData to send file
       const formData = new FormData();
       formData.append("file", selectedFile);
       if (isSystemAdmin && selectedSchoolId) {
@@ -156,16 +193,24 @@ export default function ImportDataPage() {
         setUploadProgress((prev) => Math.min(prev + 10, 90));
       }, 2000);
 
-      // Upload file to API
-      const response = await fetch("/api/upload/classes", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await postImport(formData);
 
       clearInterval(progressInterval);
       setUploadProgress(100);
 
       const result = await response.json();
+
+      if (response.status === 409 && result.canResolve) {
+        // Conflict — open modal; stash FormData for re-submission
+        pendingFormDataRef.current = formData;
+        setPendingConflicts(result.conflicts ?? []);
+        setPendingConflictSummary(
+          result.summary ?? { newClassroomsToCreate: [], parsedRows: 0 },
+        );
+        setConflictModalOpen(true);
+        setUploadProgress(0);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(result.details || t("errors.uploadFailed"));
@@ -185,6 +230,71 @@ export default function ImportDataPage() {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleConflictConfirm = async (
+    choices: Record<string, "existing" | "new">,
+  ) => {
+    setConflictModalOpen(false);
+
+    const formData = pendingFormDataRef.current;
+    if (!formData) return;
+
+    // Append choices to the same FormData and re-POST
+    formData.append("choices", JSON.stringify(choices));
+
+    setIsUploading(true);
+    setUploadError("");
+    setUploadResult(null);
+    setUploadProgress(0);
+
+    try {
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => Math.min(prev + 10, 90));
+      }, 2000);
+
+      const response = await postImport(formData);
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      const result = await response.json();
+
+      if (response.status === 409 && result.canResolve) {
+        // Defensive: server returned another 409 — re-open modal with updated conflicts
+        pendingFormDataRef.current = formData;
+        setPendingConflicts(result.conflicts ?? []);
+        setPendingConflictSummary(
+          result.summary ?? { newClassroomsToCreate: [], parsedRows: 0 },
+        );
+        setConflictModalOpen(true);
+        setUploadProgress(0);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(result.details || t("errors.uploadFailed"));
+      }
+
+      setUploadResult(result);
+
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 2000);
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : t("errors.uploadFailed"),
+      );
+      setUploadProgress(0);
+    } finally {
+      setIsUploading(false);
+      pendingFormDataRef.current = null;
+    }
+  };
+
+  const handleConflictCancel = () => {
+    setConflictModalOpen(false);
+    // Leave existing error/idle state; do NOT clear the file selection
   };
 
   const downloadTemplate = (type: string) => {
@@ -223,6 +333,9 @@ export default function ImportDataPage() {
     setUploadProgress(0);
     setPreviewData([]);
     setSelectedSchoolId("");
+    setConflictModalOpen(false);
+    setPendingConflicts([]);
+    pendingFormDataRef.current = null;
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -386,21 +499,52 @@ export default function ImportDataPage() {
                   <AlertTitle>{t("upload.successTitle")}</AlertTitle>
                   <AlertDescription>
                     <div className="mt-2 space-y-1">
-                      <p>
-                        <strong>{t("upload.success.file")}:</strong>{" "}
-                        {uploadResult.originalName}
-                      </p>
-                      <p>
-                        <strong>{t("upload.success.size")}:</strong>{" "}
-                        {(uploadResult.size / 1024).toFixed(2)} KB
-                      </p>
-                      <p>
-                        <strong>{t("upload.success.savedAs")}:</strong>{" "}
-                        {uploadResult.fileName}
-                      </p>
+                      {/* Envelope fields — present on students/teachers path; absent on classes path */}
+                      {uploadResult.originalName && (
+                        <p>
+                          <strong>{t("upload.success.file")}:</strong>{" "}
+                          {uploadResult.originalName}
+                        </p>
+                      )}
+                      {typeof uploadResult.size === "number" && (
+                        <p>
+                          <strong>{t("upload.success.size")}:</strong>{" "}
+                          {(uploadResult.size / 1024).toFixed(2)} KB
+                        </p>
+                      )}
+                      {uploadResult.fileName && (
+                        <p>
+                          <strong>{t("upload.success.savedAs")}:</strong>{" "}
+                          {uploadResult.fileName}
+                        </p>
+                      )}
                       <p className="text-muted-foreground text-sm">
                         {t("upload.success.nextSteps")}
                       </p>
+                      {/* Show classrooms that were created with a suffix (classes path) */}
+                      {Array.isArray(uploadResult.createdClassrooms) &&
+                        uploadResult.createdClassrooms.some(
+                          (c: CreatedClassroom) => c.wasSuffixed,
+                        ) && (
+                          <ul className="mt-2 space-y-0.5 border-t pt-2">
+                            {(
+                              uploadResult.createdClassrooms as CreatedClassroom[]
+                            )
+                              .filter((c) => c.wasSuffixed)
+                              .map((c) => (
+                                <li
+                                  key={c.id}
+                                  className="text-muted-foreground flex items-center gap-1.5 text-xs"
+                                >
+                                  <CheckCircle className="h-3.5 w-3.5 shrink-0 text-green-500" />
+                                  {tAdmin("result.suffixedCreated", {
+                                    newName: c.name,
+                                    originalName: c.originalName ?? c.name,
+                                  })}
+                                </li>
+                              ))}
+                          </ul>
+                        )}
                     </div>
                   </AlertDescription>
                 </Alert>
@@ -718,6 +862,15 @@ export default function ImportDataPage() {
           </Card>
         </div>
       </div>
+
+      {/* Classroom conflict resolution modal */}
+      <ClassroomConflictModal
+        open={conflictModalOpen}
+        conflicts={pendingConflicts}
+        summary={pendingConflictSummary}
+        onCancel={handleConflictCancel}
+        onConfirm={handleConflictConfirm}
+      />
     </div>
   );
 }
