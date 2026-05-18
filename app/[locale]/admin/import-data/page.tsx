@@ -11,6 +11,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -38,12 +45,19 @@ import {
   GraduationCap,
   Info,
 } from "lucide-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { parse } from "csv/sync";
 import { useTranslations } from "next-intl";
+import { authClient } from "@/lib/auth-client";
+
+type School = { id: string; name: string };
 
 export default function ImportDataPage() {
   const t = useTranslations("ImportData");
+  const tAdmin = useTranslations("importAdmin");
+  const { data: session } = authClient.useSession();
+  const isSystemAdmin = session?.user?.role === "system";
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -52,6 +66,24 @@ export default function ImportDataPage() {
   const [uploadResult, setUploadResult] = useState<any>(null);
   const [uploadError, setUploadError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // System admin: school selector state
+  const [schools, setSchools] = useState<School[]>([]);
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string>("");
+
+  useEffect(() => {
+    if (!isSystemAdmin) return;
+    fetch("/api/schools")
+      .then((res) => res.json())
+      .then((data: Array<{ id: string; name: string }>) => {
+        if (Array.isArray(data)) {
+          setSchools(data.map((s) => ({ id: s.id, name: s.name })));
+        }
+      })
+      .catch(() => {
+        // non-fatal; dropdown will be empty
+      });
+  }, [isSystemAdmin]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -104,6 +136,7 @@ export default function ImportDataPage() {
 
   const handleUpload = async () => {
     if (!selectedFile) return;
+    if (isSystemAdmin && !selectedSchoolId) return;
 
     setIsUploading(true);
     setUploadError("");
@@ -114,6 +147,9 @@ export default function ImportDataPage() {
       // Create FormData to send file
       const formData = new FormData();
       formData.append("file", selectedFile);
+      if (isSystemAdmin && selectedSchoolId) {
+        formData.append("schoolId", selectedSchoolId);
+      }
 
       // Simulate progress while uploading
       const progressInterval = setInterval(() => {
@@ -186,6 +222,7 @@ export default function ImportDataPage() {
     setUploadError("");
     setUploadProgress(0);
     setPreviewData([]);
+    setSelectedSchoolId("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -260,6 +297,29 @@ export default function ImportDataPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {isSystemAdmin && (
+                <div className="space-y-2">
+                  <Label htmlFor="school-select">{tAdmin("targetSchool")}</Label>
+                  <Select
+                    value={selectedSchoolId}
+                    onValueChange={setSelectedSchoolId}
+                  >
+                    <SelectTrigger id="school-select" className="w-full">
+                      <SelectValue placeholder={tAdmin("selectSchoolPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {schools.map((school) => (
+                        <SelectItem key={school.id} value={school.id}>
+                          {school.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-muted-foreground text-xs">
+                    {tAdmin("targetSchoolHint")}
+                  </p>
+                </div>
+              )}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="file-upload">{t("upload.selectFile")}</Label>
@@ -359,8 +419,17 @@ export default function ImportDataPage() {
               <div className="flex gap-2">
                 <Button
                   onClick={handleUpload}
-                  disabled={!selectedFile || isUploading}
+                  disabled={
+                    !selectedFile ||
+                    isUploading ||
+                    (isSystemAdmin && !selectedSchoolId)
+                  }
                   className="flex-1"
+                  title={
+                    isSystemAdmin && !selectedSchoolId
+                      ? tAdmin("selectSchoolFirst")
+                      : undefined
+                  }
                 >
                   {isUploading ? (
                     <>

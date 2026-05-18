@@ -203,6 +203,37 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File;
     fileTimer.log("Form data extracted");
 
+    // Resolve the effective schoolId:
+    // - system admin: required from request body; validated against DB
+    // - admin/teacher: always use their own schoolId (ignore any client-supplied value)
+    let effectiveSchoolId: string | null = currentUser.schoolId;
+    if (currentUserRoles === "system") {
+      const clientSchoolId = formData.get("schoolId");
+      if (!clientSchoolId || typeof clientSchoolId !== "string" || clientSchoolId.trim() === "") {
+        return NextResponse.json(
+          {
+            error: "schoolId is required for system administrators",
+            details: ["Please specify the target school for this import."],
+          },
+          { status: 400 },
+        );
+      }
+      const targetSchool = await prisma.school.findUnique({
+        where: { id: clientSchoolId.trim() },
+        select: { id: true },
+      });
+      if (!targetSchool) {
+        return NextResponse.json(
+          {
+            error: "School not found",
+            details: [`No school exists with id '${clientSchoolId.trim()}'.`],
+          },
+          { status: 400 },
+        );
+      }
+      effectiveSchoolId = targetSchool.id;
+    }
+
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
@@ -445,7 +476,7 @@ export async function POST(request: NextRequest) {
       if (allClassroomNames.size > 0) {
         classroomValidationResult = await validateClassroomNames(
           Array.from(allClassroomNames),
-          currentUser.schoolId,
+          effectiveSchoolId,
         );
       }
 
@@ -542,7 +573,7 @@ export async function POST(request: NextRequest) {
           email: validatedRow.email.toLowerCase().trim(),
           name: validatedRow.name.trim(),
           password: null,
-          schoolId: currentUser.schoolId,
+          schoolId: effectiveSchoolId,
           classroomNames:
             validatedRow.role !== "admin"
               ? parseClassroomNames(validatedRow.classroom_name)
@@ -621,7 +652,7 @@ export async function POST(request: NextRequest) {
         existingClassrooms = await prisma.classroom.findMany({
           where: {
             name: { in: validClassroomNames },
-            schoolId: currentUser.schoolId,
+            schoolId: effectiveSchoolId,
           },
           select: { name: true },
         });
@@ -657,7 +688,7 @@ export async function POST(request: NextRequest) {
         const classroomData = {
           name: validatedRow.classroom_name.trim(),
           classCode: generateRandomClassCode(),
-          schoolId: currentUser.schoolId,
+          schoolId: effectiveSchoolId,
         };
 
         processedClasses.push(classroomData);
@@ -820,7 +851,7 @@ export async function POST(request: NextRequest) {
         const classrooms = await prisma.classroom.findMany({
           where: {
             name: { in: Array.from(uniqueClassroomNames) },
-            schoolId: currentUser.schoolId,
+            schoolId: effectiveSchoolId,
           },
           select: { id: true, name: true },
         });
@@ -1018,10 +1049,9 @@ export async function POST(request: NextRequest) {
         totalExecutionTime: totalTime,
         processedAt: new Date().toISOString(),
       },
-      schoolInfo: currentUser.School
+      schoolInfo: effectiveSchoolId
         ? {
-            id: currentUser.School.id,
-            name: currentUser.School.name,
+            id: effectiveSchoolId,
             note:
               filename === "students.csv" || filename === "teachers.csv"
                 ? "All imported users have been assigned to this school"
