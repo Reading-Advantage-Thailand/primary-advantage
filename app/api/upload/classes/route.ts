@@ -122,6 +122,56 @@ const validateClassroomNames = async (
   return { valid, invalid };
 };
 
+// ---------------------------------------------------------------------------
+// Suffix-name helpers for classroom conflict resolution
+// ---------------------------------------------------------------------------
+
+/**
+ * Parse the numeric suffix N from "<baseName> (N)".
+ * Returns null if the string is not a suffixed variant of baseName.
+ */
+const parseSuffixN = (baseName: string, candidate: string): number | null => {
+  const escaped = baseName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = new RegExp(`^${escaped} \\((\\d+)\\)$`).exec(candidate);
+  if (!match) return null;
+  return parseInt(match[1], 10);
+};
+
+/**
+ * Find the next available suffix name for <baseName> in the given school.
+ * Fetches all classrooms whose name starts with baseName, extracts existing
+ * suffix numbers (treating bare baseName as N=1), then returns
+ * "<baseName> (maxN + 1)".
+ */
+const computeSuffixedName = async (
+  baseName: string,
+  schoolId: string | null,
+): Promise<string> => {
+  // Use startsWith to get all candidates in one query
+  const candidates = await prisma.classroom.findMany({
+    where: {
+      schoolId,
+      name: { startsWith: baseName },
+    },
+    select: { name: true },
+  });
+
+  let maxN = 1; // bare baseName counts as N=1
+
+  for (const { name } of candidates) {
+    if (name === baseName) {
+      // bare match — already counted as 1
+      continue;
+    }
+    const n = parseSuffixN(baseName, name);
+    if (n !== null && n > maxN) {
+      maxN = n;
+    }
+  }
+
+  return `${baseName} (${maxN + 1})`;
+};
+
 // Timing utility
 const createTimer = (label: string) => {
   const startTime = Date.now();
@@ -591,7 +641,9 @@ export async function POST(request: NextRequest) {
     if (filename === "classes.csv") {
       console.log("🏫 Starting classes CSV validation and processing...");
 
-      // Pre-process and validate all rows first
+      // ------------------------------------------------------------------
+      // Step 1: Row-level Zod validation + dedup within upload
+      // ------------------------------------------------------------------
       const validatedRows: Array<{
         row: any;
         rowNumber: number;
@@ -599,7 +651,6 @@ export async function POST(request: NextRequest) {
         error?: string;
       }> = [];
 
-      // First pass: Zod validation and basic format checks
       for (let i = 0; i < csvData.length; i++) {
         const row = csvData[i];
         const rowNumber = i + 2;
@@ -628,76 +679,215 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Check for duplicate classroom names within the current upload
-      const classroomNameSet = new Set<string>();
+      // Dedup within the upload (case-insensitive)
+      const uploadNameSet = new Set<string>();
       for (const item of validatedRows) {
         if (item.validatedData) {
-          const name = item.validatedData.classroom_name.trim().toLowerCase();
-          if (classroomNameSet.has(name)) {
+          const key = item.validatedData.classroom_name.trim().toLowerCase();
+          if (uploadNameSet.has(key)) {
             item.error = `Row ${item.rowNumber}: Duplicate classroom name '${item.validatedData.classroom_name.trim()}' within the same upload`;
             item.validatedData = undefined;
           } else {
-            classroomNameSet.add(name);
+            uploadNameSet.add(key);
           }
         }
       }
 
-      // Batch check existing classrooms in database (single query instead of N queries)
-      const validClassroomNames = validatedRows
-        .filter((item) => item.validatedData && !item.error)
-        .map((item) => item.validatedData!.classroom_name.trim());
-
-      let existingClassrooms: Array<{ name: string }> = [];
-      if (validClassroomNames.length > 0) {
-        existingClassrooms = await prisma.classroom.findMany({
-          where: {
-            name: { in: validClassroomNames },
-            schoolId: effectiveSchoolId,
-          },
-          select: { name: true },
-        });
-      }
-
-      const existingClassroomNameSet = new Set(
-        existingClassrooms.map((c) => c.name.toLowerCase()),
-      );
-
-      // Second pass: Process validated rows and apply business logic
+      // Collect row-level format errors
       for (const item of validatedRows) {
         if (item.error || !item.validatedData) {
           errors.push(item.error!);
-          continue;
         }
-
-        const validatedRow = item.validatedData;
-        const rowNumber = item.rowNumber;
-
-        // Check for duplicate classroom names in the same school
-        if (
-          existingClassroomNameSet.has(
-            validatedRow.classroom_name.trim().toLowerCase(),
-          )
-        ) {
-          errors.push(
-            `Row ${rowNumber}: Classroom '${validatedRow.classroom_name.trim()}' already exists in this school`,
-          );
-          continue;
-        }
-
-        // Prepare classroom data
-        const classroomData = {
-          name: validatedRow.classroom_name.trim(),
-          classCode: generateRandomClassCode(),
-          schoolId: effectiveSchoolId,
-        };
-
-        processedClasses.push(classroomData);
       }
 
-      validationTimer.log(
-        "Classes validation completed",
-        `Processed: ${processedClasses.length}, Errors: ${errors.length}`,
+      if (errors.length > 0) {
+        // Format errors — bail out before any DB work
+        unlink(filePath, (err) => {
+          if (err) console.error("Error deleting temp file:", err);
+        });
+        return NextResponse.json(
+          {
+            error: "Validation failed",
+            details: errors,
+            validatedRows: 0,
+            totalRows: csvData.length,
+          },
+          { status: 400 },
+        );
+      }
+
+      // ------------------------------------------------------------------
+      // Step 2: Preflight — split names into matching vs missing
+      // ------------------------------------------------------------------
+      const parsedNames = validatedRows
+        .filter((item) => item.validatedData)
+        .map((item) => item.validatedData!.classroom_name.trim() as string);
+
+      // Parse choices from request (JSON string)
+      let choices: Record<string, "existing" | "new"> = {};
+      const rawChoices = formData.get("choices");
+      if (rawChoices && typeof rawChoices === "string") {
+        try {
+          const parsed = JSON.parse(rawChoices);
+          // Only keep valid entries
+          for (const [k, v] of Object.entries(parsed)) {
+            if (v === "existing" || v === "new") {
+              choices[k] = v;
+            }
+          }
+        } catch {
+          return NextResponse.json(
+            { error: "Invalid choices format", details: ["choices must be a valid JSON string"] },
+            { status: 400 },
+          );
+        }
+      }
+
+      // Fetch existing classrooms matching these names (exact match)
+      const existingClassrooms = await prisma.classroom.findMany({
+        where: {
+          name: { in: parsedNames },
+          schoolId: effectiveSchoolId,
+        },
+        select: { id: true, name: true, grade: true },
+      });
+
+      const existingByName = new Map(
+        existingClassrooms.map((c) => [c.name, c]),
       );
+
+      const matchingNames = parsedNames.filter((n) => existingByName.has(n));
+      const missingNames = parsedNames.filter((n) => !existingByName.has(n));
+
+      // Determine which matching names are not yet covered by choices
+      const uncoveredConflicts = matchingNames.filter((n) => !choices[n]);
+
+      if (uncoveredConflicts.length > 0) {
+        // 409 — return conflict list; do NOT write anything
+        unlink(filePath, (err) => {
+          if (err) console.error("Error deleting temp file:", err);
+        });
+        return NextResponse.json(
+          {
+            error: "Classroom name conflicts",
+            conflicts: uncoveredConflicts.map((name) => {
+              const existing = existingByName.get(name)!;
+              return {
+                name,
+                existingId: existing.id,
+                existingMeta: { grade: existing.grade ?? null },
+              };
+            }),
+            canResolve: true,
+            summary: {
+              newClassroomsToCreate: missingNames,
+              parsedRows: parsedNames.length,
+            },
+          },
+          { status: 409 },
+        );
+      }
+
+      // ------------------------------------------------------------------
+      // Step 3: Apply — build the work list, then execute in a transaction
+      // ------------------------------------------------------------------
+      // classesResult is built inside the transaction and surfaced after
+      type ClassroomResult = {
+        name: string;
+        id: string;
+        wasSuffixed: boolean;
+        originalName?: string;
+      };
+
+      // Gather suffix names BEFORE the transaction (reads only, safe outside)
+      const suffixNameMap = new Map<string, string>(); // originalName → suffixedName
+      for (const name of matchingNames) {
+        if (choices[name] === "new") {
+          const suffixed = await computeSuffixedName(name, effectiveSchoolId);
+          suffixNameMap.set(name, suffixed);
+        }
+      }
+
+      const classroomResults: ClassroomResult[] = await prisma.$transaction(
+        async (tx) => {
+          const results: ClassroomResult[] = [];
+
+          // Auto-create missing classrooms
+          for (const name of missingNames) {
+            const created = await tx.classroom.create({
+              data: {
+                name,
+                classCode: generateRandomClassCode(),
+                schoolId: effectiveSchoolId,
+              },
+              select: { id: true, name: true },
+            });
+            results.push({ name: created.name, id: created.id, wasSuffixed: false });
+          }
+
+          // Resolve matching classrooms
+          for (const name of matchingNames) {
+            const choice = choices[name];
+            if (choice === "existing") {
+              const existing = existingByName.get(name)!;
+              results.push({
+                name: existing.name,
+                id: existing.id,
+                wasSuffixed: false,
+              });
+            } else if (choice === "new") {
+              const suffixedName = suffixNameMap.get(name)!;
+              const created = await tx.classroom.create({
+                data: {
+                  name: suffixedName,
+                  classCode: generateRandomClassCode(),
+                  schoolId: effectiveSchoolId,
+                },
+                select: { id: true, name: true },
+              });
+              results.push({
+                name: created.name,
+                id: created.id,
+                wasSuffixed: true,
+                originalName: name,
+              });
+            }
+          }
+
+          return results;
+        },
+      );
+
+      validationTimer.log(
+        "Classes validation + apply completed",
+        `Created/resolved: ${classroomResults.length}`,
+      );
+
+      // Skip the remaining generic validation error check — we already handled all early exits
+      unlink(filePath, (err) => {
+        if (err) console.error("Error deleting temp file:", err);
+      });
+
+      const totalTime = apiTimer.end("Upload classes API request completed");
+      return NextResponse.json({
+        success: true,
+        message: "Classes uploaded and created successfully",
+        stats: {
+          totalRows: csvData.length,
+          errors: 0,
+          processedClasses: parsedNames.length,
+          createdClassrooms: classroomResults.length,
+        },
+        createdClassrooms: classroomResults,
+        performanceStats: {
+          totalExecutionTime: totalTime,
+          processedAt: new Date().toISOString(),
+        },
+        schoolInfo: effectiveSchoolId
+          ? { id: effectiveSchoolId, note: "All imported classes have been assigned to this school" }
+          : { note: "system user - data imported without school assignment" },
+        note: "Classes created successfully. You can now import students and teachers to assign them to these classes.",
+      });
     }
     validationTimer.end("Data validation and processing completed");
     console.log("errors: ", errors);
@@ -976,19 +1166,6 @@ export async function POST(request: NextRequest) {
       createdClassrooms = [];
     }
 
-    if (filename === "classes.csv") {
-      console.log("🏫 Creating classroom records...");
-      const classCreationTimer = createTimer("CLASS_CREATION");
-      await prisma.classroom.createMany({
-        data: processedClasses,
-        skipDuplicates: true,
-      });
-      classCreationTimer.end("Classroom creation completed");
-      dbTimer.log(
-        "Classes created",
-        `Total classes: ${processedClasses.length}`,
-      );
-    }
     dbTimer.end("All database operations completed");
 
     // Delete temp file
