@@ -440,7 +440,7 @@ export default function ImportDataPage() {
                     {t("upload.maxSize")}
                   </span>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                   <Input
                     id="file-upload"
                     type="file"
@@ -451,6 +451,7 @@ export default function ImportDataPage() {
                   />
                   <Button
                     variant="outline"
+                    className="w-full sm:w-auto"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <FileText className="mr-2 h-4 w-4" />
@@ -560,7 +561,7 @@ export default function ImportDataPage() {
                 </div>
               )}
 
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <Button
                   onClick={handleUpload}
                   disabled={
@@ -568,7 +569,7 @@ export default function ImportDataPage() {
                     isUploading ||
                     (isSystemAdmin && !selectedSchoolId)
                   }
-                  className="flex-1"
+                  className="w-full sm:w-auto sm:flex-1"
                   title={
                     isSystemAdmin && !selectedSchoolId
                       ? tAdmin("selectSchoolFirst")
@@ -589,7 +590,11 @@ export default function ImportDataPage() {
                 </Button>
 
                 {(selectedFile || uploadResult) && (
-                  <Button variant="outline" onClick={resetUpload}>
+                  <Button
+                    variant="outline"
+                    onClick={resetUpload}
+                    className="w-full sm:w-auto"
+                  >
                     {t("upload.clear")}
                   </Button>
                 )}
@@ -597,7 +602,7 @@ export default function ImportDataPage() {
                 {previewData.length > 0 && (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline">
+                      <Button variant="outline" className="w-full sm:w-auto">
                         <Eye className="mr-2 h-4 w-4" />
                         {t("preview.button")}
                       </Button>
@@ -607,26 +612,28 @@ export default function ImportDataPage() {
                         <DialogTitle>{t("preview.title")}</DialogTitle>
                       </DialogHeader>
                       <ScrollArea className="h-96">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>{t("preview.columns.name")}</TableHead>
-                              <TableHead>
-                                {t("preview.columns.email")}
-                              </TableHead>
-                              <TableHead>{t("preview.columns.role")}</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {previewData.map((row, index) => (
-                              <TableRow key={index}>
-                                <TableCell>{row.name}</TableCell>
-                                <TableCell>{row.email}</TableCell>
-                                <TableCell>{row.role}</TableCell>
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>{t("preview.columns.name")}</TableHead>
+                                <TableHead>
+                                  {t("preview.columns.email")}
+                                </TableHead>
+                                <TableHead>{t("preview.columns.role")}</TableHead>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                            </TableHeader>
+                            <TableBody>
+                              {previewData.map((row, index) => (
+                                <TableRow key={index}>
+                                  <TableCell>{row.name}</TableCell>
+                                  <TableCell>{row.email}</TableCell>
+                                  <TableCell>{row.role}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
                       </ScrollArea>
                     </DialogContent>
                   </Dialog>
@@ -648,24 +655,30 @@ export default function ImportDataPage() {
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger
                     value="students"
-                    className="flex items-center gap-2"
+                    className="flex min-h-11 items-center gap-1 sm:gap-2"
                   >
-                    <GraduationCap className="h-4 w-4" />
-                    {t("formatGuide.tabs.students")}
+                    <GraduationCap className="h-4 w-4 shrink-0" />
+                    <span className="truncate text-xs sm:text-sm">
+                      {t("formatGuide.tabs.students")}
+                    </span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="teachers"
-                    className="flex items-center gap-2"
+                    className="flex min-h-11 items-center gap-1 sm:gap-2"
                   >
-                    <Users className="h-4 w-4" />
-                    {t("formatGuide.tabs.teachers")}
+                    <Users className="h-4 w-4 shrink-0" />
+                    <span className="truncate text-xs sm:text-sm">
+                      {t("formatGuide.tabs.teachers")}
+                    </span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="classes"
-                    className="flex items-center gap-2"
+                    className="flex min-h-11 items-center gap-1 sm:gap-2"
                   >
-                    <BookOpen className="h-4 w-4" />
-                    {t("formatGuide.tabs.classes")}
+                    <BookOpen className="h-4 w-4 shrink-0" />
+                    <span className="truncate text-xs sm:text-sm">
+                      {t("formatGuide.tabs.classes")}
+                    </span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -693,34 +706,36 @@ export default function ImportDataPage() {
                   <div className="space-y-2">
                     <Label>{t("formatGuide.exampleData")}</Label>
                     <ScrollArea className="h-48 rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            {currentFormat.headers.map((header, index) => (
-                              <TableHead
-                                key={index}
-                                className="whitespace-nowrap"
-                              >
-                                {header}
-                              </TableHead>
-                            ))}
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {currentFormat.example.map((row, rowIndex) => (
-                            <TableRow key={rowIndex}>
-                              {row.map((cell, cellIndex) => (
-                                <TableCell
-                                  key={cellIndex}
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              {currentFormat.headers.map((header, index) => (
+                                <TableHead
+                                  key={index}
                                   className="whitespace-nowrap"
                                 >
-                                  {cell}
-                                </TableCell>
+                                  {header}
+                                </TableHead>
                               ))}
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                          </TableHeader>
+                          <TableBody>
+                            {currentFormat.example.map((row, rowIndex) => (
+                              <TableRow key={rowIndex}>
+                                {row.map((cell, cellIndex) => (
+                                  <TableCell
+                                    key={cellIndex}
+                                    className="whitespace-nowrap"
+                                  >
+                                    {cell}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
                     </ScrollArea>
                   </div>
 
