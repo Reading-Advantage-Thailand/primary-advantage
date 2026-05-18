@@ -88,16 +88,20 @@ const validateClassroomNameFormat = (className: string): boolean => {
   return /^[\p{L}\p{M}\p{N}\s\-\/_(),.]+$/u.test(className);
 };
 
-// Helper function to validate classroom names exist in database
-const validateClassroomNames = async (
+// Helper function to classify classroom names for students/teachers import.
+// Returns:
+//   exists   — name found exactly once in the school (safe to assign)
+//   missing  — name not found (will be auto-created)
+//   ambiguous — name found 2+ times in the school (caller must reject the row)
+const classifyClassroomNames = async (
   classroomNames: string[],
   schoolId: string | null,
-): Promise<{ valid: string[]; invalid: string[] }> => {
+): Promise<{ exists: string[]; missing: string[]; ambiguous: string[] }> => {
   if (classroomNames.length === 0) {
-    return { valid: [], invalid: [] };
+    return { exists: [], missing: [], ambiguous: [] };
   }
 
-  // Batch fetch all classrooms at once instead of individual queries
+  // Fetch all matching classrooms — intentionally not distinct so duplicates show up
   const existingClassrooms = await prisma.classroom.findMany({
     where: {
       name: { in: classroomNames },
@@ -106,20 +110,28 @@ const validateClassroomNames = async (
     select: { name: true },
   });
 
-  const existingClassroomNames = new Set(existingClassrooms.map((c) => c.name));
+  // Count occurrences per name
+  const countByName = new Map<string, number>();
+  for (const { name } of existingClassrooms) {
+    countByName.set(name, (countByName.get(name) ?? 0) + 1);
+  }
 
-  const valid: string[] = [];
-  const invalid: string[] = [];
+  const exists: string[] = [];
+  const missing: string[] = [];
+  const ambiguous: string[] = [];
 
   for (const className of classroomNames) {
-    if (existingClassroomNames.has(className)) {
-      valid.push(className);
+    const count = countByName.get(className) ?? 0;
+    if (count === 0) {
+      missing.push(className);
+    } else if (count === 1) {
+      exists.push(className);
     } else {
-      invalid.push(className);
+      ambiguous.push(className);
     }
   }
 
-  return { valid, invalid };
+  return { exists, missing, ambiguous };
 };
 
 // ---------------------------------------------------------------------------
@@ -427,6 +439,8 @@ export async function POST(request: NextRequest) {
     const processedClasses: any[] = [];
     const processedUsers: any[] = [];
     const errors: string[] = [];
+    // Classroom names that need auto-creation (populated in students/teachers validation pass)
+    let missingClassroomSet = new Set<string>();
 
     if (filename === "students.csv" || filename === "teachers.csv") {
       console.log("📊 Starting users CSV validation and processing...");
@@ -518,20 +532,22 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Batch validate all classroom names at once
-      let classroomValidationResult: { valid: string[]; invalid: string[] } = {
-        valid: [],
-        invalid: [],
+      // Classify all classroom names: exists (1 match), missing (0 → auto-create), ambiguous (2+ → reject row)
+      let classroomClassification: { exists: string[]; missing: string[]; ambiguous: string[] } = {
+        exists: [],
+        missing: [],
+        ambiguous: [],
       };
       if (allClassroomNames.size > 0) {
-        classroomValidationResult = await validateClassroomNames(
+        classroomClassification = await classifyClassroomNames(
           Array.from(allClassroomNames),
           effectiveSchoolId,
         );
       }
 
-      const validClassroomSet = new Set(classroomValidationResult.valid);
-      const invalidClassroomSet = new Set(classroomValidationResult.invalid);
+      const existingClassroomSet = new Set(classroomClassification.exists);
+      missingClassroomSet = new Set(classroomClassification.missing);
+      const ambiguousClassroomSet = new Set(classroomClassification.ambiguous);
 
       // Second pass: Process validated rows and apply business logic
       for (const item of validatedRows) {
@@ -606,16 +622,19 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          // Validate that all classroom names exist in database (using pre-fetched results)
-          const invalidClassrooms = classroomNames.filter((name) =>
-            invalidClassroomSet.has(name),
+          // Reject row if any referenced classroom name is ambiguous (2+ matches in school)
+          const ambiguousClassrooms = classroomNames.filter((name) =>
+            ambiguousClassroomSet.has(name),
           );
-          if (invalidClassrooms.length > 0) {
-            errors.push(
-              `Row ${rowNumber}: Invalid classroom names: ${invalidClassrooms.join(", ")}. These classrooms do not exist in your school.`,
-            );
+          if (ambiguousClassrooms.length > 0) {
+            for (const name of ambiguousClassrooms) {
+              errors.push(
+                `Row ${rowNumber}: Ambiguous classroom name "${name}" matches multiple classrooms in your school. Please consolidate or rename them before importing.`,
+              );
+            }
             continue;
           }
+          // Names in missingClassroomSet will be auto-created before user assignment (no rejection)
         }
 
         // Prepare user data with default values and school assignment
@@ -1036,7 +1055,27 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Batch fetch all classrooms at once
+      // Auto-create classrooms that were classified as missing during validation
+      // (missingClassroomSet was built in the validation pass above)
+      const namesToAutoCreate = Array.from(uniqueClassroomNames).filter((n) =>
+        missingClassroomSet.has(n),
+      );
+      if (namesToAutoCreate.length > 0) {
+        await prisma.$transaction(async (tx) => {
+          for (const name of namesToAutoCreate) {
+            await tx.classroom.create({
+              data: {
+                name,
+                classCode: generateRandomClassCode(),
+                schoolId: effectiveSchoolId,
+              },
+            });
+          }
+        });
+        dbTimer.log("Auto-created missing classrooms", `Count: ${namesToAutoCreate.length}`);
+      }
+
+      // Batch fetch all classrooms at once (includes freshly auto-created ones)
       if (uniqueClassroomNames.size > 0) {
         const classrooms = await prisma.classroom.findMany({
           where: {
