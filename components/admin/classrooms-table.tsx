@@ -79,11 +79,8 @@ interface Classroom {
   }>;
   teachers?: Array<{
     id: string;
-    user: {
-      id: string;
-      name: string;
-      email: string;
-    };
+    name: string | null;
+    email: string | null;
   }>;
 }
 
@@ -118,7 +115,7 @@ export function ClassroomsTable() {
   useEffect(() => {
     if (isEditDialogOpen && selectedClassroom) {
       setAssignedTeacherIds(
-        selectedClassroom.teachers?.map((t) => t.user.id) ?? [],
+        selectedClassroom.teachers?.map((t) => t.id) ?? [],
       );
     }
   }, [isEditDialogOpen, selectedClassroom]);
