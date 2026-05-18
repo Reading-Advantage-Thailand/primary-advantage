@@ -94,14 +94,8 @@ export const getTeachers = async (
     // Build the where clause for filtering
     const whereClause: any = {
       ...schoolFilter,
-      roles: {
-        some: {
-          role: {
-            name: {
-              in: role ? [role] : ["teacher", "admin"],
-            },
-          },
-        },
+      role: {
+        in: role ? [role] : ["teacher", "admin"],
       },
     };
 
@@ -650,14 +644,8 @@ export const updateTeacher = async (
       where: {
         id,
         ...schoolFilter,
-        roles: {
-          some: {
-            role: {
-              name: {
-                in: ["teacher", "admin"],
-              },
-            },
-          },
+        role: {
+          in: ["teacher", "admin"],
         },
       },
     });
@@ -963,14 +951,8 @@ export const getTeacherStatistics = async (userWithRoles: UserWithRoles) => {
 
     const whereClause = {
       ...schoolFilter,
-      roles: {
-        some: {
-          role: {
-            name: {
-              in: ["teacher", "admin"],
-            },
-          },
-        },
+      role: {
+        in: ["teacher", "admin"],
       },
     };
 
