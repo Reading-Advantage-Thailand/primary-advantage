@@ -14,7 +14,8 @@ import {
   getAllStudentsByAdmin,
 } from "@/server/models/classroomModel";
 import { getCurrentUser } from "@/lib/session";
-import { validateUser } from "../utils/auth";
+import { validateUser, checkAdminPermissions } from "../utils/auth";
+import { updateClassroomInputSchema } from "@/lib/zod";
 
 // GET /api/classroom - Get all classrooms for a teacher
 export async function fetchClassrooms() {
@@ -109,7 +110,7 @@ export async function createClassroomController(
   }
 }
 
-// PATCH /api/classroom/[id] - Update a classroom
+// PUT /api/classrooms/[id] - Update a classroom (Task 3.1)
 export async function updateClassroomController(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -120,33 +121,51 @@ export async function updateClassroomController(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const userWithRoles = await validateUser(user.id);
+    if (!userWithRoles) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const hasPermission = await checkAdminPermissions(userWithRoles);
+    if (!hasPermission) {
+      return NextResponse.json(
+        { error: "Forbidden - Admin access required" },
+        { status: 403 },
+      );
+    }
+
     const { id } = await params;
     const body = await req.json();
-    const { classroomName, grade, description } = body;
 
-    if (!classroomName) {
+    const parseResult = updateClassroomInputSchema.safeParse(body);
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: "Classroom name is required" },
+        { error: "Invalid request body", details: parseResult.error.flatten() },
         { status: 400 },
       );
     }
 
-    const classroom = await updateClassroom(id, {
-      name: classroomName,
-      grade,
-      description,
-    });
-
-    if (!classroom) {
-      return NextResponse.json(
-        { error: "Classroom not found" },
-        { status: 404 },
-      );
-    }
+    const classroom = await updateClassroom(id, parseResult.data, userWithRoles);
 
     return NextResponse.json({ classroom }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating classroom:", error);
+    const msg = error?.message ?? "";
+    if (msg === "NOT_FOUND") {
+      return NextResponse.json({ error: "Classroom not found" }, { status: 404 });
+    }
+    if (msg === "FORBIDDEN") {
+      return NextResponse.json(
+        { error: "Forbidden - cannot update classroom in another school" },
+        { status: 403 },
+      );
+    }
+    if (msg === "CROSS_SCHOOL_TEACHER") {
+      return NextResponse.json(
+        { error: "One or more teachers do not belong to this classroom's school" },
+        { status: 400 },
+      );
+    }
     return NextResponse.json(
       { error: "Failed to update classroom" },
       { status: 500 },

@@ -88,16 +88,20 @@ const validateClassroomNameFormat = (className: string): boolean => {
   return /^[\p{L}\p{M}\p{N}\s\-\/_(),.]+$/u.test(className);
 };
 
-// Helper function to validate classroom names exist in database
-const validateClassroomNames = async (
+// Helper function to classify classroom names for students/teachers import.
+// Returns:
+//   exists   — name found exactly once in the school (safe to assign)
+//   missing  — name not found (will be auto-created)
+//   ambiguous — name found 2+ times in the school (caller must reject the row)
+const classifyClassroomNames = async (
   classroomNames: string[],
   schoolId: string | null,
-): Promise<{ valid: string[]; invalid: string[] }> => {
+): Promise<{ exists: string[]; missing: string[]; ambiguous: string[] }> => {
   if (classroomNames.length === 0) {
-    return { valid: [], invalid: [] };
+    return { exists: [], missing: [], ambiguous: [] };
   }
 
-  // Batch fetch all classrooms at once instead of individual queries
+  // Fetch all matching classrooms — intentionally not distinct so duplicates show up
   const existingClassrooms = await prisma.classroom.findMany({
     where: {
       name: { in: classroomNames },
@@ -106,20 +110,78 @@ const validateClassroomNames = async (
     select: { name: true },
   });
 
-  const existingClassroomNames = new Set(existingClassrooms.map((c) => c.name));
+  // Count occurrences per name
+  const countByName = new Map<string, number>();
+  for (const { name } of existingClassrooms) {
+    countByName.set(name, (countByName.get(name) ?? 0) + 1);
+  }
 
-  const valid: string[] = [];
-  const invalid: string[] = [];
+  const exists: string[] = [];
+  const missing: string[] = [];
+  const ambiguous: string[] = [];
 
   for (const className of classroomNames) {
-    if (existingClassroomNames.has(className)) {
-      valid.push(className);
+    const count = countByName.get(className) ?? 0;
+    if (count === 0) {
+      missing.push(className);
+    } else if (count === 1) {
+      exists.push(className);
     } else {
-      invalid.push(className);
+      ambiguous.push(className);
     }
   }
 
-  return { valid, invalid };
+  return { exists, missing, ambiguous };
+};
+
+// ---------------------------------------------------------------------------
+// Suffix-name helpers for classroom conflict resolution
+// ---------------------------------------------------------------------------
+
+/**
+ * Parse the numeric suffix N from "<baseName> (N)".
+ * Returns null if the string is not a suffixed variant of baseName.
+ */
+const parseSuffixN = (baseName: string, candidate: string): number | null => {
+  const escaped = baseName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = new RegExp(`^${escaped} \\((\\d+)\\)$`).exec(candidate);
+  if (!match) return null;
+  return parseInt(match[1], 10);
+};
+
+/**
+ * Find the next available suffix name for <baseName> in the given school.
+ * Fetches all classrooms whose name starts with baseName, extracts existing
+ * suffix numbers (treating bare baseName as N=1), then returns
+ * "<baseName> (maxN + 1)".
+ */
+const computeSuffixedName = async (
+  baseName: string,
+  schoolId: string | null,
+): Promise<string> => {
+  // Use startsWith to get all candidates in one query
+  const candidates = await prisma.classroom.findMany({
+    where: {
+      schoolId,
+      name: { startsWith: baseName },
+    },
+    select: { name: true },
+  });
+
+  let maxN = 1; // bare baseName counts as N=1
+
+  for (const { name } of candidates) {
+    if (name === baseName) {
+      // bare match — already counted as 1
+      continue;
+    }
+    const n = parseSuffixN(baseName, name);
+    if (n !== null && n > maxN) {
+      maxN = n;
+    }
+  }
+
+  return `${baseName} (${maxN + 1})`;
 };
 
 // Timing utility
@@ -202,6 +264,37 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file") as File;
     fileTimer.log("Form data extracted");
+
+    // Resolve the effective schoolId:
+    // - system admin: required from request body; validated against DB
+    // - admin/teacher: always use their own schoolId (ignore any client-supplied value)
+    let effectiveSchoolId: string | null = currentUser.schoolId;
+    if (currentUserRoles === "system") {
+      const clientSchoolId = formData.get("schoolId");
+      if (!clientSchoolId || typeof clientSchoolId !== "string" || clientSchoolId.trim() === "") {
+        return NextResponse.json(
+          {
+            error: "schoolId is required for system administrators",
+            details: ["Please specify the target school for this import."],
+          },
+          { status: 400 },
+        );
+      }
+      const targetSchool = await prisma.school.findUnique({
+        where: { id: clientSchoolId.trim() },
+        select: { id: true },
+      });
+      if (!targetSchool) {
+        return NextResponse.json(
+          {
+            error: "School not found",
+            details: [`No school exists with id '${clientSchoolId.trim()}'.`],
+          },
+          { status: 400 },
+        );
+      }
+      effectiveSchoolId = targetSchool.id;
+    }
 
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -346,6 +439,8 @@ export async function POST(request: NextRequest) {
     const processedClasses: any[] = [];
     const processedUsers: any[] = [];
     const errors: string[] = [];
+    // Classroom names that need auto-creation (populated in students/teachers validation pass)
+    let missingClassroomSet = new Set<string>();
 
     if (filename === "students.csv" || filename === "teachers.csv") {
       console.log("📊 Starting users CSV validation and processing...");
@@ -437,20 +532,22 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Batch validate all classroom names at once
-      let classroomValidationResult: { valid: string[]; invalid: string[] } = {
-        valid: [],
-        invalid: [],
+      // Classify all classroom names: exists (1 match), missing (0 → auto-create), ambiguous (2+ → reject row)
+      let classroomClassification: { exists: string[]; missing: string[]; ambiguous: string[] } = {
+        exists: [],
+        missing: [],
+        ambiguous: [],
       };
       if (allClassroomNames.size > 0) {
-        classroomValidationResult = await validateClassroomNames(
+        classroomClassification = await classifyClassroomNames(
           Array.from(allClassroomNames),
-          currentUser.schoolId,
+          effectiveSchoolId,
         );
       }
 
-      const validClassroomSet = new Set(classroomValidationResult.valid);
-      const invalidClassroomSet = new Set(classroomValidationResult.invalid);
+      const existingClassroomSet = new Set(classroomClassification.exists);
+      missingClassroomSet = new Set(classroomClassification.missing);
+      const ambiguousClassroomSet = new Set(classroomClassification.ambiguous);
 
       // Second pass: Process validated rows and apply business logic
       for (const item of validatedRows) {
@@ -525,16 +622,19 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          // Validate that all classroom names exist in database (using pre-fetched results)
-          const invalidClassrooms = classroomNames.filter((name) =>
-            invalidClassroomSet.has(name),
+          // Reject row if any referenced classroom name is ambiguous (2+ matches in school)
+          const ambiguousClassrooms = classroomNames.filter((name) =>
+            ambiguousClassroomSet.has(name),
           );
-          if (invalidClassrooms.length > 0) {
-            errors.push(
-              `Row ${rowNumber}: Invalid classroom names: ${invalidClassrooms.join(", ")}. These classrooms do not exist in your school.`,
-            );
+          if (ambiguousClassrooms.length > 0) {
+            for (const name of ambiguousClassrooms) {
+              errors.push(
+                `Row ${rowNumber}: Ambiguous classroom name "${name}" matches multiple classrooms in your school. Please consolidate or rename them before importing.`,
+              );
+            }
             continue;
           }
+          // Names in missingClassroomSet will be auto-created before user assignment (no rejection)
         }
 
         // Prepare user data with default values and school assignment
@@ -542,7 +642,8 @@ export async function POST(request: NextRequest) {
           email: validatedRow.email.toLowerCase().trim(),
           name: validatedRow.name.trim(),
           password: null,
-          schoolId: currentUser.schoolId,
+          role: validatedRow.role, // carry the CSV role through to user creation
+          schoolId: effectiveSchoolId,
           classroomNames:
             validatedRow.role !== "admin"
               ? parseClassroomNames(validatedRow.classroom_name)
@@ -560,7 +661,9 @@ export async function POST(request: NextRequest) {
     if (filename === "classes.csv") {
       console.log("🏫 Starting classes CSV validation and processing...");
 
-      // Pre-process and validate all rows first
+      // ------------------------------------------------------------------
+      // Step 1: Row-level Zod validation + dedup within upload
+      // ------------------------------------------------------------------
       const validatedRows: Array<{
         row: any;
         rowNumber: number;
@@ -568,7 +671,6 @@ export async function POST(request: NextRequest) {
         error?: string;
       }> = [];
 
-      // First pass: Zod validation and basic format checks
       for (let i = 0; i < csvData.length; i++) {
         const row = csvData[i];
         const rowNumber = i + 2;
@@ -597,76 +699,215 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Check for duplicate classroom names within the current upload
-      const classroomNameSet = new Set<string>();
+      // Dedup within the upload (case-insensitive)
+      const uploadNameSet = new Set<string>();
       for (const item of validatedRows) {
         if (item.validatedData) {
-          const name = item.validatedData.classroom_name.trim().toLowerCase();
-          if (classroomNameSet.has(name)) {
+          const key = item.validatedData.classroom_name.trim().toLowerCase();
+          if (uploadNameSet.has(key)) {
             item.error = `Row ${item.rowNumber}: Duplicate classroom name '${item.validatedData.classroom_name.trim()}' within the same upload`;
             item.validatedData = undefined;
           } else {
-            classroomNameSet.add(name);
+            uploadNameSet.add(key);
           }
         }
       }
 
-      // Batch check existing classrooms in database (single query instead of N queries)
-      const validClassroomNames = validatedRows
-        .filter((item) => item.validatedData && !item.error)
-        .map((item) => item.validatedData!.classroom_name.trim());
-
-      let existingClassrooms: Array<{ name: string }> = [];
-      if (validClassroomNames.length > 0) {
-        existingClassrooms = await prisma.classroom.findMany({
-          where: {
-            name: { in: validClassroomNames },
-            schoolId: currentUser.schoolId,
-          },
-          select: { name: true },
-        });
-      }
-
-      const existingClassroomNameSet = new Set(
-        existingClassrooms.map((c) => c.name.toLowerCase()),
-      );
-
-      // Second pass: Process validated rows and apply business logic
+      // Collect row-level format errors
       for (const item of validatedRows) {
         if (item.error || !item.validatedData) {
           errors.push(item.error!);
-          continue;
         }
-
-        const validatedRow = item.validatedData;
-        const rowNumber = item.rowNumber;
-
-        // Check for duplicate classroom names in the same school
-        if (
-          existingClassroomNameSet.has(
-            validatedRow.classroom_name.trim().toLowerCase(),
-          )
-        ) {
-          errors.push(
-            `Row ${rowNumber}: Classroom '${validatedRow.classroom_name.trim()}' already exists in this school`,
-          );
-          continue;
-        }
-
-        // Prepare classroom data
-        const classroomData = {
-          name: validatedRow.classroom_name.trim(),
-          classCode: generateRandomClassCode(),
-          schoolId: currentUser.schoolId,
-        };
-
-        processedClasses.push(classroomData);
       }
 
-      validationTimer.log(
-        "Classes validation completed",
-        `Processed: ${processedClasses.length}, Errors: ${errors.length}`,
+      if (errors.length > 0) {
+        // Format errors — bail out before any DB work
+        unlink(filePath, (err) => {
+          if (err) console.error("Error deleting temp file:", err);
+        });
+        return NextResponse.json(
+          {
+            error: "Validation failed",
+            details: errors,
+            validatedRows: 0,
+            totalRows: csvData.length,
+          },
+          { status: 400 },
+        );
+      }
+
+      // ------------------------------------------------------------------
+      // Step 2: Preflight — split names into matching vs missing
+      // ------------------------------------------------------------------
+      const parsedNames = validatedRows
+        .filter((item) => item.validatedData)
+        .map((item) => item.validatedData!.classroom_name.trim() as string);
+
+      // Parse choices from request (JSON string)
+      let choices: Record<string, "existing" | "new"> = {};
+      const rawChoices = formData.get("choices");
+      if (rawChoices && typeof rawChoices === "string") {
+        try {
+          const parsed = JSON.parse(rawChoices);
+          // Only keep valid entries
+          for (const [k, v] of Object.entries(parsed)) {
+            if (v === "existing" || v === "new") {
+              choices[k] = v;
+            }
+          }
+        } catch {
+          return NextResponse.json(
+            { error: "Invalid choices format", details: ["choices must be a valid JSON string"] },
+            { status: 400 },
+          );
+        }
+      }
+
+      // Fetch existing classrooms matching these names (exact match)
+      const existingClassrooms = await prisma.classroom.findMany({
+        where: {
+          name: { in: parsedNames },
+          schoolId: effectiveSchoolId,
+        },
+        select: { id: true, name: true, grade: true },
+      });
+
+      const existingByName = new Map(
+        existingClassrooms.map((c) => [c.name, c]),
       );
+
+      const matchingNames = parsedNames.filter((n) => existingByName.has(n));
+      const missingNames = parsedNames.filter((n) => !existingByName.has(n));
+
+      // Determine which matching names are not yet covered by choices
+      const uncoveredConflicts = matchingNames.filter((n) => !choices[n]);
+
+      if (uncoveredConflicts.length > 0) {
+        // 409 — return conflict list; do NOT write anything
+        unlink(filePath, (err) => {
+          if (err) console.error("Error deleting temp file:", err);
+        });
+        return NextResponse.json(
+          {
+            error: "Classroom name conflicts",
+            conflicts: uncoveredConflicts.map((name) => {
+              const existing = existingByName.get(name)!;
+              return {
+                name,
+                existingId: existing.id,
+                existingMeta: { grade: existing.grade ?? null },
+              };
+            }),
+            canResolve: true,
+            summary: {
+              newClassroomsToCreate: missingNames,
+              parsedRows: parsedNames.length,
+            },
+          },
+          { status: 409 },
+        );
+      }
+
+      // ------------------------------------------------------------------
+      // Step 3: Apply — build the work list, then execute in a transaction
+      // ------------------------------------------------------------------
+      // classesResult is built inside the transaction and surfaced after
+      type ClassroomResult = {
+        name: string;
+        id: string;
+        wasSuffixed: boolean;
+        originalName?: string;
+      };
+
+      // Gather suffix names BEFORE the transaction (reads only, safe outside)
+      const suffixNameMap = new Map<string, string>(); // originalName → suffixedName
+      for (const name of matchingNames) {
+        if (choices[name] === "new") {
+          const suffixed = await computeSuffixedName(name, effectiveSchoolId);
+          suffixNameMap.set(name, suffixed);
+        }
+      }
+
+      const classroomResults: ClassroomResult[] = await prisma.$transaction(
+        async (tx) => {
+          const results: ClassroomResult[] = [];
+
+          // Auto-create missing classrooms
+          for (const name of missingNames) {
+            const created = await tx.classroom.create({
+              data: {
+                name,
+                classCode: generateRandomClassCode(),
+                schoolId: effectiveSchoolId,
+              },
+              select: { id: true, name: true },
+            });
+            results.push({ name: created.name, id: created.id, wasSuffixed: false });
+          }
+
+          // Resolve matching classrooms
+          for (const name of matchingNames) {
+            const choice = choices[name];
+            if (choice === "existing") {
+              const existing = existingByName.get(name)!;
+              results.push({
+                name: existing.name,
+                id: existing.id,
+                wasSuffixed: false,
+              });
+            } else if (choice === "new") {
+              const suffixedName = suffixNameMap.get(name)!;
+              const created = await tx.classroom.create({
+                data: {
+                  name: suffixedName,
+                  classCode: generateRandomClassCode(),
+                  schoolId: effectiveSchoolId,
+                },
+                select: { id: true, name: true },
+              });
+              results.push({
+                name: created.name,
+                id: created.id,
+                wasSuffixed: true,
+                originalName: name,
+              });
+            }
+          }
+
+          return results;
+        },
+      );
+
+      validationTimer.log(
+        "Classes validation + apply completed",
+        `Created/resolved: ${classroomResults.length}`,
+      );
+
+      // Skip the remaining generic validation error check — we already handled all early exits
+      unlink(filePath, (err) => {
+        if (err) console.error("Error deleting temp file:", err);
+      });
+
+      const totalTime = apiTimer.end("Upload classes API request completed");
+      return NextResponse.json({
+        success: true,
+        message: "Classes uploaded and created successfully",
+        stats: {
+          totalRows: csvData.length,
+          errors: 0,
+          processedClasses: parsedNames.length,
+          createdClassrooms: classroomResults.length,
+        },
+        createdClassrooms: classroomResults,
+        performanceStats: {
+          totalExecutionTime: totalTime,
+          processedAt: new Date().toISOString(),
+        },
+        schoolInfo: effectiveSchoolId
+          ? { id: effectiveSchoolId, note: "All imported classes have been assigned to this school" }
+          : { note: "system user - data imported without school assignment" },
+        note: "Classes created successfully. You can now import students and teachers to assign them to these classes.",
+      });
     }
     validationTimer.end("Data validation and processing completed");
     console.log("errors: ", errors);
@@ -720,6 +961,8 @@ export async function POST(request: NextRequest) {
           email: userData.email,
           name: userData.name,
           password: userData.password,
+          role: userData.role, // set role from CSV — not the schema default "user"
+          roleId: roleMap.get(userData.role) ?? null, // FK to Role table; null if role not found
           cefrLevel: "A0-", // Default CEFR level
           level: 1, // Default level
           xp: 0, // Default XP
@@ -815,12 +1058,32 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Batch fetch all classrooms at once
+      // Auto-create classrooms that were classified as missing during validation
+      // (missingClassroomSet was built in the validation pass above)
+      const namesToAutoCreate = Array.from(uniqueClassroomNames).filter((n) =>
+        missingClassroomSet.has(n),
+      );
+      if (namesToAutoCreate.length > 0) {
+        await prisma.$transaction(async (tx) => {
+          for (const name of namesToAutoCreate) {
+            await tx.classroom.create({
+              data: {
+                name,
+                classCode: generateRandomClassCode(),
+                schoolId: effectiveSchoolId,
+              },
+            });
+          }
+        });
+        dbTimer.log("Auto-created missing classrooms", `Count: ${namesToAutoCreate.length}`);
+      }
+
+      // Batch fetch all classrooms at once (includes freshly auto-created ones)
       if (uniqueClassroomNames.size > 0) {
         const classrooms = await prisma.classroom.findMany({
           where: {
             name: { in: Array.from(uniqueClassroomNames) },
-            schoolId: currentUser.schoolId,
+            schoolId: effectiveSchoolId,
           },
           select: { id: true, name: true },
         });
@@ -945,19 +1208,6 @@ export async function POST(request: NextRequest) {
       createdClassrooms = [];
     }
 
-    if (filename === "classes.csv") {
-      console.log("🏫 Creating classroom records...");
-      const classCreationTimer = createTimer("CLASS_CREATION");
-      await prisma.classroom.createMany({
-        data: processedClasses,
-        skipDuplicates: true,
-      });
-      classCreationTimer.end("Classroom creation completed");
-      dbTimer.log(
-        "Classes created",
-        `Total classes: ${processedClasses.length}`,
-      );
-    }
     dbTimer.end("All database operations completed");
 
     // Delete temp file
@@ -1018,10 +1268,9 @@ export async function POST(request: NextRequest) {
         totalExecutionTime: totalTime,
         processedAt: new Date().toISOString(),
       },
-      schoolInfo: currentUser.School
+      schoolInfo: effectiveSchoolId
         ? {
-            id: currentUser.School.id,
-            name: currentUser.School.name,
+            id: effectiveSchoolId,
             note:
               filename === "students.csv" || filename === "teachers.csv"
                 ? "All imported users have been assigned to this school"

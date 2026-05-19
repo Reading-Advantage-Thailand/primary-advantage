@@ -76,13 +76,7 @@ export const getStudents = async (
 
     // Build where clause based on user's permissions
     let whereClause: any = {
-      roles: {
-        some: {
-          role: {
-            name: "student",
-          },
-        },
-      },
+      role: "student",
     };
 
     // If user is school admin, only show students from their school
@@ -183,13 +177,7 @@ export const getStudentById = async (
     // Build where clause based on user's permissions
     let whereClause: any = {
       id,
-      roles: {
-        some: {
-          role: {
-            name: "student",
-          },
-        },
-      },
+      role: "student",
     };
 
     // If user is school admin, only show students from their school
@@ -373,13 +361,7 @@ export const updateStudent = async (
     // Build where clause based on user's permissions
     let whereClause: any = {
       id,
-      roles: {
-        some: {
-          role: {
-            name: "student",
-          },
-        },
-      },
+      role: "student",
     };
 
     // If user is school admin, only allow updates to students from their school

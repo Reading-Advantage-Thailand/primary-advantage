@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,6 +13,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Table,
   TableBody,
@@ -44,6 +56,7 @@ import {
   Search,
   Loader2,
   School,
+  AlertTriangle,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
@@ -54,6 +67,32 @@ import {
   UpdateTeacherRequest,
 } from "@/types/index.d";
 import { useTranslations } from "next-intl";
+import { authClient } from "@/lib/auth-client";
+
+// Minimal school shape returned by GET /api/schools (array, not { schools: [...] })
+interface SchoolListItem {
+  id: string;
+  name: string;
+}
+
+/**
+ * useSchools — fetches the flat school list from GET /api/schools.
+ * Only enabled when the current user is a system admin.
+ * The API returns a raw array (not { schools: [...] }).
+ */
+function useSchools(enabled: boolean) {
+  return useQuery({
+    queryKey: ["schools", "list"],
+    enabled,
+    queryFn: async (): Promise<SchoolListItem[]> => {
+      const res = await fetch("/api/schools");
+      if (!res.ok) throw new Error("Failed to load schools");
+      const data = await res.json();
+      // API returns a raw array; guard both shapes just in case.
+      return Array.isArray(data) ? data : (data.schools ?? []);
+    },
+  });
+}
 
 // Updated Teacher interface to match API response
 interface Teacher extends Omit<TeacherData, "createdAt"> {
@@ -73,6 +112,19 @@ interface Classroom {
 
 export function TeachersTable() {
   const t = useTranslations("AdminTeachers.Table");
+  const tt = useTranslations("teachers");
+
+  // Determine current user role for system-admin-only features.
+  const { data: session } = authClient.useSession();
+  const isSystemAdmin = session?.user?.role === "system";
+
+  // School filter — only active for system admins.
+  const [schoolFilter, setSchoolFilter] = useState<string>("all");
+
+  // Fetch schools list (only when user is a system admin).
+  const { data: schools = [], isLoading: isSchoolsLoading } =
+    useSchools(isSystemAdmin);
+
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [statistics, setStatistics] = useState({
@@ -102,16 +154,24 @@ export function TeachersTable() {
     name: "",
     email: "",
     role: "teacher" as "teacher" | "admin",
+    schoolId: "",
     assignedClassroomIds: [] as string[],
     password: "",
   });
   const [showPasswordField, setShowPasswordField] = useState(false);
+  // Controls the two-step school-change confirmation AlertDialog.
+  const [isPendingSchoolMove, setIsPendingSchoolMove] = useState(false);
 
-  // Fetch teachers data from API
-  const fetchTeachers = async () => {
+  // Fetch teachers data from API, optionally filtered by schoolId.
+  const fetchTeachers = async (activeSchoolFilter: string = schoolFilter) => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/teachers");
+      const url =
+        isSystemAdmin && activeSchoolFilter !== "all"
+          ? `/api/teachers?schoolId=${encodeURIComponent(activeSchoolFilter)}`
+          : "/api/teachers";
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error("Failed to fetch teachers");
@@ -168,11 +228,60 @@ export function TeachersTable() {
     }
   };
 
-  // Load data on component mount
+  // Load classrooms once on mount (not filter-driven).
   useEffect(() => {
-    fetchTeachers();
     fetchClassrooms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /**
+   * Classrooms scoped to the school currently selected in the edit form.
+   * Used by the edit dialog's classroom checkboxes. Re-fetches whenever
+   * formData.schoolId changes (system admin only) or when the dialog opens
+   * for non-system admins.
+   */
+  const editDialogClassroomsQuery = useQuery({
+    queryKey: ["classrooms", "by-school", formData.schoolId],
+    enabled: isEditDialogOpen && !!formData.schoolId,
+    queryFn: async (): Promise<Classroom[]> => {
+      const url = formData.schoolId
+        ? `/api/classrooms?schoolId=${encodeURIComponent(formData.schoolId)}`
+        : "/api/classrooms";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to load classrooms");
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data : (data.classrooms ?? []);
+      return arr;
+    },
+  });
+
+  // Classrooms visible in the edit dialog: prefer the scoped query when it
+  // has data; fall back to the global list fetched at mount.
+  const editDialogClassrooms: Classroom[] =
+    editDialogClassroomsQuery.data ?? classrooms;
+  const editDialogClassroomsLoading =
+    editDialogClassroomsQuery.isFetching || isClassroomsLoading;
+
+  // Fetch teachers on initial render and whenever schoolFilter or isSystemAdmin changes.
+  // Adding isSystemAdmin fixes the async session race: when the session resolves and
+  // isSystemAdmin flips to true, the effect re-fires and re-fetches with the correct role.
+  useEffect(() => {
+    fetchTeachers(schoolFilter);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schoolFilter, isSystemAdmin]);
+
+  // Handle school filter change.
+  const handleSchoolFilterChange = (value: string) => {
+    setSchoolFilter(value);
+  };
+
+  // Resolve a school name from the fetched schools list given a schoolId.
+  const resolveSchoolName = (
+    schoolId: string | null | undefined,
+  ): string | null => {
+    if (!schoolId) return null;
+    return schools.find((s) => s.id === schoolId)?.name ?? null;
+  };
 
   // Filter teachers based on search term
   const filteredTeachers = teachers.filter(
@@ -253,18 +362,65 @@ export function TeachersTable() {
     }
   };
 
+  /**
+   * School-change derived state — computed at render time so it's available
+   * in both the inline warning and the submit guard.
+   */
+  const schoolChanged =
+    isSystemAdmin &&
+    selectedTeacher !== null &&
+    formData.schoolId !== (selectedTeacher.schoolId ?? "");
+
+  const originalClassroomCount =
+    selectedTeacher?.assignedClassrooms?.length ?? 0;
+
+  // Resolve the original school name via the schools cache (Task 4.1 pattern).
+  const originalSchoolName =
+    resolveSchoolName(selectedTeacher?.schoolId) ?? tt("theirCurrentSchool");
+
+  // Resolve the target school name from the schools cache.
+  const targetSchoolName =
+    resolveSchoolName(formData.schoolId) ?? tt("theSelectedSchool");
+
+  /**
+   * Called when the school select changes. Clears classroom selections
+   * because previously selected classrooms are invalid in the new school.
+   */
+  const handleSchoolChange = (newSchoolId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      schoolId: newSchoolId,
+      assignedClassroomIds: [],
+    }));
+  };
+
+  /**
+   * Intercepts the form submit. If the school changed, opens the two-step
+   * confirmation AlertDialog instead of immediately submitting.
+   */
+  const handleEditDialogSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (schoolChanged) {
+      setIsPendingSchoolMove(true);
+      return;
+    }
+    handleEditTeacher();
+  };
+
   const handleEditTeacher = async () => {
     if (!selectedTeacher) return;
 
     try {
       const requestData: UpdateTeacherRequest & {
-        classroomIds?: string[];
+        schoolId?: string;
+        assignedClassroomIds?: string[];
         password?: string;
       } = {
         name: formData.name,
         email: formData.email,
         role: formData.role,
-        classroomIds: formData.assignedClassroomIds,
+        ...(isSystemAdmin && { schoolId: formData.schoolId }),
+        assignedClassroomIds: formData.assignedClassroomIds,
         ...(formData.password && { password: formData.password }),
       };
 
@@ -282,11 +438,10 @@ export function TeachersTable() {
         throw new Error(errorData.error || "Failed to update teacher");
       }
 
-      const result = await response.json();
-
       toast.success("Teacher updated successfully");
 
       setIsEditDialogOpen(false);
+      setIsPendingSchoolMove(false);
       resetForm();
       setSelectedTeacher(null);
       fetchTeachers(); // Refresh the list
@@ -326,10 +481,12 @@ export function TeachersTable() {
       name: teacher.name || "",
       email: teacher.email || "",
       role: teacher.role as "teacher" | "admin",
+      schoolId: teacher.schoolId ?? "",
       assignedClassroomIds: teacher.assignedClassrooms?.map((c) => c.id) || [],
       password: "",
     });
     setShowPasswordField(false);
+    setIsPendingSchoolMove(false);
     setIsEditDialogOpen(true);
   };
 
@@ -343,10 +500,12 @@ export function TeachersTable() {
       name: "",
       email: "",
       role: "teacher",
+      schoolId: "",
       assignedClassroomIds: [],
       password: "",
     });
     setShowPasswordField(false);
+    setIsPendingSchoolMove(false);
   };
 
   const getInitials = (name: string | null) => {
@@ -371,15 +530,41 @@ export function TeachersTable() {
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
-      <div className="relative max-w-sm">
-        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-        <Input
-          placeholder={t("searchPlaceholder")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
+      {/* Toolbar: Search + (system admin) School filter */}
+      <div className="flex flex-col gap-2 md:flex-row md:items-center">
+        <div className="relative max-w-sm flex-1">
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+          <Input
+            placeholder={t("searchPlaceholder")}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {/* School filter — system admin only */}
+        {isSystemAdmin && (
+          <div className="w-full md:w-56">
+            <Select
+              value={schoolFilter}
+              onValueChange={handleSchoolFilterChange}
+              disabled={isSchoolsLoading}
+            >
+              <SelectTrigger>
+                <School className="mr-2 h-4 w-4 shrink-0" />
+                <SelectValue placeholder={tt("filterBySchool")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{tt("allSchools")}</SelectItem>
+                {schools.map((school) => (
+                  <SelectItem key={school.id} value={school.id}>
+                    {school.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* Statistics Cards */}
@@ -605,10 +790,16 @@ export function TeachersTable() {
                 <TableHead>{t("tableHeaders.teacher")}</TableHead>
                 <TableHead>{t("tableHeaders.email")}</TableHead>
                 <TableHead>{t("tableHeaders.role")}</TableHead>
+                {/* School column — system admin only */}
+                {isSystemAdmin && (
+                  <TableHead className="hidden md:table-cell">
+                    {tt("school")}
+                  </TableHead>
+                )}
                 <TableHead>{t("tableHeaders.assignedClassrooms")}</TableHead>
-                <TableHead>{t("tableHeaders.students")}</TableHead>
+                {/* <TableHead>{t("tableHeaders.students")}</TableHead>
                 <TableHead>{t("tableHeaders.classes")}</TableHead>
-                <TableHead>{t("tableHeaders.joined")}</TableHead>
+                <TableHead>{t("tableHeaders.joined")}</TableHead> */}
                 <TableHead className="text-right">
                   {t("tableHeaders.actions")}
                 </TableHead>
@@ -617,7 +808,10 @@ export function TeachersTable() {
             <TableBody>
               {filteredTeachers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="py-8 text-center">
+                  <TableCell
+                    colSpan={isSystemAdmin ? 10 : 9}
+                    className="py-8 text-center"
+                  >
                     <div className="flex flex-col items-center gap-2">
                       {isLoading ? (
                         <>
@@ -655,6 +849,17 @@ export function TeachersTable() {
                         </Avatar>
                         <div>
                           <p className="font-medium">{teacher.name || "N/A"}</p>
+                          {/* Mobile fallback: school name as sub-line (system admin only, hidden on md+) */}
+                          {isSystemAdmin && (
+                            <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs md:hidden">
+                              <School className="h-3 w-3 shrink-0" />
+                              {resolveSchoolName(teacher.schoolId) ?? (
+                                <span className="italic">
+                                  {tt("unassigned")}
+                                </span>
+                              )}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </TableCell>
@@ -669,6 +874,23 @@ export function TeachersTable() {
                         {teacher.role}
                       </Badge>
                     </TableCell>
+                    {/* School cell — system admin only, hidden on mobile */}
+                    {isSystemAdmin && (
+                      <TableCell className="hidden md:table-cell">
+                        {resolveSchoolName(teacher.schoolId) ? (
+                          <div className="flex items-center gap-1.5">
+                            <School className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+                            <span className="text-sm">
+                              {resolveSchoolName(teacher.schoolId)}
+                            </span>
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="text-xs">
+                            {tt("unassigned")}
+                          </Badge>
+                        )}
+                      </TableCell>
+                    )}
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {teacher.assignedClassrooms &&
@@ -690,11 +912,11 @@ export function TeachersTable() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{teacher.totalStudents}</TableCell>
+                    {/* <TableCell>{teacher.totalStudents}</TableCell>
                     <TableCell>{teacher.totalClasses}</TableCell>
                     <TableCell>
                       {teacher.createdAt.toLocaleDateString()}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button
@@ -728,162 +950,247 @@ export function TeachersTable() {
             <DialogTitle>{t("editDialog.title")}</DialogTitle>
             <DialogDescription>{t("editDialog.description")}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="edit-name">{t("form.name")}</Label>
-              <Input
-                id="edit-name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                placeholder={t("form.namePlaceholder")}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-email">{t("form.email")}</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={formData.email}
-                disabled
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                placeholder={t("form.emailPlaceholder")}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-role">{t("form.role")}</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value: "teacher" | "admin") =>
-                  setFormData({ ...formData, role: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("form.rolePlaceholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="teacher">{t("roles.teacher")}</SelectItem>
-                  <SelectItem value="admin">{t("roles.admin")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center justify-between">
-                <Label>{t("form.resetPassword")}</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowPasswordField(!showPasswordField)}
-                >
-                  {showPasswordField
-                    ? t("actions.cancel")
-                    : t("form.setNewPassword")}
-                </Button>
-              </div>
-              {showPasswordField && (
+          <form onSubmit={handleEditDialogSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-name">{t("form.name")}</Label>
                 <Input
-                  id="edit-password"
-                  type="password"
-                  value={formData.password}
+                  id="edit-name"
+                  value={formData.name}
                   onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
+                    setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder={t("form.newPasswordPlaceholder")}
+                  placeholder={t("form.namePlaceholder")}
                 />
-              )}
-            </div>
-            <div className="grid gap-2">
-              <Label>{t("form.assignClassrooms")}</Label>
-              <div className="rounded-lg border p-3">
-                {isClassroomsLoading ? (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    <span className="text-muted-foreground text-sm">
-                      {t("classrooms.loading")}
-                    </span>
-                  </div>
-                ) : classrooms.length === 0 ? (
-                  <p className="text-muted-foreground py-4 text-center text-sm">
-                    {t("classrooms.empty")}
-                  </p>
-                ) : (
-                  <ScrollArea className="h-32">
-                    <div className="space-y-2">
-                      {classrooms.map((classroom) => (
-                        <div
-                          key={classroom.id}
-                          className="flex items-center space-x-2"
-                        >
-                          <Checkbox
-                            id={`edit-classroom-${classroom.id}`}
-                            checked={formData.assignedClassroomIds.includes(
-                              classroom.id,
-                            )}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setFormData({
-                                  ...formData,
-                                  assignedClassroomIds: [
-                                    ...formData.assignedClassroomIds,
-                                    classroom.id,
-                                  ],
-                                });
-                              } else {
-                                setFormData({
-                                  ...formData,
-                                  assignedClassroomIds:
-                                    formData.assignedClassroomIds.filter(
-                                      (id) => id !== classroom.id,
-                                    ),
-                                });
-                              }
-                            }}
-                          />
-                          <Label
-                            htmlFor={`edit-classroom-${classroom.id}`}
-                            className="flex cursor-pointer items-center gap-2 text-sm font-normal"
-                          >
-                            <School className="h-3 w-3" />
-                            {classroom.name}
-                            {classroom.grade && (
-                              <Badge variant="outline" className="text-xs">
-                                {classroom.grade}
-                              </Badge>
-                            )}
-                            <span className="text-muted-foreground">
-                              {t("classrooms.studentsCount", {
-                                count: classroom.studentCount,
-                              })}
-                            </span>
-                          </Label>
-                        </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-email">{t("form.email")}</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={formData.email}
+                  disabled
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  placeholder={t("form.emailPlaceholder")}
+                />
+              </div>
+
+              {/* School field — above Role per spec §5.1.2 */}
+              <div className="grid gap-2">
+                <Label htmlFor="edit-school">{tt("school")}</Label>
+                {isSystemAdmin ? (
+                  <Select
+                    value={formData.schoolId}
+                    onValueChange={handleSchoolChange}
+                  >
+                    <SelectTrigger id="edit-school">
+                      <SelectValue placeholder={tt("selectSchool")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {schools.map((school) => (
+                        <SelectItem key={school.id} value={school.id}>
+                          {school.name}
+                        </SelectItem>
                       ))}
-                    </div>
-                  </ScrollArea>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id="edit-school"
+                    value={
+                      resolveSchoolName(selectedTeacher?.schoolId) ??
+                      selectedTeacher?.schoolId ??
+                      ""
+                    }
+                    disabled
+                  />
                 )}
               </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-role">{t("form.role")}</Label>
+                <Select
+                  value={formData.role}
+                  onValueChange={(value: "teacher" | "admin") =>
+                    setFormData({ ...formData, role: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("form.rolePlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="teacher">
+                      {t("roles.teacher")}
+                    </SelectItem>
+                    <SelectItem value="admin">{t("roles.admin")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <Label>{t("form.resetPassword")}</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPasswordField(!showPasswordField)}
+                  >
+                    {showPasswordField
+                      ? t("actions.cancel")
+                      : t("form.setNewPassword")}
+                  </Button>
+                </div>
+                {showPasswordField && (
+                  <Input
+                    id="edit-password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    placeholder={t("form.newPasswordPlaceholder")}
+                  />
+                )}
+              </div>
+
+              {/* Inline warning when school is changing and teacher has existing classrooms */}
+              {schoolChanged && originalClassroomCount > 0 && (
+                <Alert className="border-yellow-300 bg-yellow-50 dark:border-yellow-700 dark:bg-yellow-950">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                  <AlertDescription className="text-yellow-800 dark:text-yellow-200">
+                    {tt("changeSchoolWarning", {
+                      count: originalClassroomCount,
+                      schoolName: originalSchoolName,
+                    })}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <div className="grid gap-2">
+                <Label>{t("form.assignClassrooms")}</Label>
+                <div className="rounded-lg border p-3">
+                  {editDialogClassroomsLoading ? (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <span className="text-muted-foreground text-sm">
+                        {t("classrooms.loading")}
+                      </span>
+                    </div>
+                  ) : editDialogClassrooms.length === 0 ? (
+                    <p className="text-muted-foreground py-4 text-center text-sm">
+                      {t("classrooms.empty")}
+                    </p>
+                  ) : (
+                    <ScrollArea className="h-32">
+                      <div className="space-y-2">
+                        {editDialogClassrooms.map((classroom) => (
+                          <div
+                            key={classroom.id}
+                            className="flex items-center space-x-2"
+                          >
+                            <Checkbox
+                              id={`edit-classroom-${classroom.id}`}
+                              checked={formData.assignedClassroomIds.includes(
+                                classroom.id,
+                              )}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData({
+                                    ...formData,
+                                    assignedClassroomIds: [
+                                      ...formData.assignedClassroomIds,
+                                      classroom.id,
+                                    ],
+                                  });
+                                } else {
+                                  setFormData({
+                                    ...formData,
+                                    assignedClassroomIds:
+                                      formData.assignedClassroomIds.filter(
+                                        (id) => id !== classroom.id,
+                                      ),
+                                  });
+                                }
+                              }}
+                            />
+                            <Label
+                              htmlFor={`edit-classroom-${classroom.id}`}
+                              className="flex cursor-pointer items-center gap-2 text-sm font-normal"
+                            >
+                              <School className="h-3 w-3" />
+                              {classroom.name}
+                              {classroom.grade && (
+                                <Badge variant="outline" className="text-xs">
+                                  {classroom.grade}
+                                </Badge>
+                              )}
+                              <span className="text-muted-foreground">
+                                {t("classrooms.studentsCount", {
+                                  count: classroom.studentCount,
+                                })}
+                              </span>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditDialogOpen(false)}
-            >
-              {t("actions.cancel")}
-            </Button>
-            <Button
-              onClick={handleEditTeacher}
-              disabled={!formData.name || !formData.email}
-            >
-              {t("actions.update")}
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                {t("actions.cancel")}
+              </Button>
+              <Button
+                type="submit"
+                disabled={!formData.name || !formData.email}
+              >
+                {t("actions.update")}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
+
+      {/* Two-step school-change confirmation AlertDialog */}
+      <AlertDialog
+        open={isPendingSchoolMove}
+        onOpenChange={setIsPendingSchoolMove}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {tt("moveTeacherConfirmTitle", { schoolName: targetSchoolName })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {tt("moveTeacherConfirmBody", {
+                count: originalClassroomCount,
+                oldSchoolName: originalSchoolName,
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsPendingSchoolMove(false)}>
+              {t("actions.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setIsPendingSchoolMove(false);
+                handleEditTeacher();
+              }}
+            >
+              {tt("moveTeacherAction")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

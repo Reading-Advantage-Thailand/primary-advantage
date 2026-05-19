@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -77,17 +79,15 @@ interface Classroom {
   }>;
   teachers?: Array<{
     id: string;
-    user: {
-      id: string;
-      name: string;
-      email: string;
-    };
+    name: string | null;
+    email: string | null;
   }>;
 }
 
 export function ClassroomsTable() {
   const t = useTranslations("Admin.Classrooms");
   const tc = useTranslations("TeacherCreateClass");
+  const tt = useTranslations("teachers");
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -104,6 +104,35 @@ export function ClassroomsTable() {
     grade: "",
     classCode: generateRandomClassCode(),
     passwordStudents: "",
+  });
+
+  // Teacher picker state for the edit dialog
+  const [assignedTeacherIds, setAssignedTeacherIds] = useState<string[]>([]);
+
+  // Seed teacher selection whenever the edit dialog opens (or the target classroom
+  // changes). Including isEditDialogOpen in deps ensures re-seeding even when the
+  // same classroom object is reopened after the user made unsaved toggle changes.
+  useEffect(() => {
+    if (isEditDialogOpen && selectedClassroom) {
+      setAssignedTeacherIds(
+        selectedClassroom.teachers?.map((t) => t.id) ?? [],
+      );
+    }
+  }, [isEditDialogOpen, selectedClassroom]);
+
+  // Fetch teachers scoped to the editing classroom's school.
+  // Only runs when the edit dialog is open and the classroom has a schoolId.
+  const schoolTeachersQuery = useQuery({
+    queryKey: ["teachers", "by-school", selectedClassroom?.schoolId],
+    enabled: isEditDialogOpen && !!selectedClassroom?.schoolId,
+    queryFn: async (): Promise<Array<{ id: string; name: string | null; email: string | null }>> => {
+      const res = await fetch(
+        `/api/teachers?schoolId=${encodeURIComponent(selectedClassroom!.schoolId!)}`,
+      );
+      if (!res.ok) throw new Error("Failed to load teachers");
+      const data = await res.json();
+      return data.teachers ?? [];
+    },
   });
 
   // Fetch classroom data from API
@@ -182,10 +211,19 @@ export function ClassroomsTable() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/classroom/${selectedClassroom.id}`, {
-        method: "PATCH",
+      const response = await fetch(`/api/classrooms/${selectedClassroom.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name,
+          // Omit grade/passwordStudents when empty — an empty string would
+          // overwrite a stored value; treat "" as "no change requested".
+          ...(formData.grade !== "" ? { grade: formData.grade } : {}),
+          ...(formData.passwordStudents !== ""
+            ? { passwordStudents: formData.passwordStudents }
+            : {}),
+          assignedTeacherIds,
+        }),
       });
 
       if (!response.ok) {
@@ -195,6 +233,7 @@ export function ClassroomsTable() {
 
       setIsEditDialogOpen(false);
       setSelectedClassroom(null);
+      setAssignedTeacherIds([]);
       setFormData({
         name: "",
         grade: "",
@@ -532,6 +571,65 @@ export function ClassroomsTable() {
                 placeholder={t("studentPasswordPlaceholder")}
               />
             </div>
+
+            {/* Teacher picker — only shown when classroom has a schoolId */}
+            {selectedClassroom?.schoolId && (
+              <div className="grid gap-2" data-testid="teacher-picker">
+                <Label>{tt("teachersLabel")}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {tt("teachersInSchoolOnly")}
+                </p>
+                <div className="max-h-56 overflow-y-auto rounded-md border p-2">
+                  {schoolTeachersQuery.isLoading ? (
+                    <p className="text-muted-foreground py-2 text-center text-sm">
+                      {tt("loading")}
+                    </p>
+                  ) : !schoolTeachersQuery.data ||
+                    schoolTeachersQuery.data.length === 0 ? (
+                    <p className="text-muted-foreground py-2 text-center text-sm">
+                      {tt("noTeachersInSchool")}
+                    </p>
+                  ) : (
+                    schoolTeachersQuery.data.map((teacher) => (
+                      <div
+                        key={teacher.id}
+                        className="flex cursor-pointer items-center gap-2 rounded px-1 py-1.5 hover:bg-accent"
+                        onClick={() =>
+                          setAssignedTeacherIds((prev) =>
+                            prev.includes(teacher.id)
+                              ? prev.filter((id) => id !== teacher.id)
+                              : [...prev, teacher.id],
+                          )
+                        }
+                      >
+                        <Checkbox
+                          id={`teacher-${teacher.id}`}
+                          checked={assignedTeacherIds.includes(teacher.id)}
+                          onCheckedChange={(checked) =>
+                            setAssignedTeacherIds((prev) =>
+                              checked
+                                ? [...prev, teacher.id]
+                                : prev.filter((id) => id !== teacher.id),
+                            )
+                          }
+                          aria-label={teacher.name ?? teacher.email ?? teacher.id}
+                        />
+                        <label
+                          htmlFor={`teacher-${teacher.id}`}
+                          className="flex flex-1 cursor-pointer items-center gap-2 text-sm select-none"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span className="flex-1">{teacher.name ?? "—"}</span>
+                          <span className="text-muted-foreground truncate text-xs">
+                            {teacher.email}
+                          </span>
+                        </label>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button

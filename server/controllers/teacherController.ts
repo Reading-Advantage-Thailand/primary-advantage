@@ -19,9 +19,9 @@ import {
   TeacherData,
   TeachersResponse,
   CreateTeacherInput,
-  UpdateTeacherInput,
 } from "@/types/index";
 import { CreateGoalInput } from "@/types/learning-goals";
+import { listTeachersQuerySchema, updateTeacherInputSchema } from "@/lib/zod";
 
 // GET Controller - Fetch teachers
 export const getTeachersController = async (
@@ -47,20 +47,75 @@ export const getTeachersController = async (
       );
     }
 
-    // Parse query parameters
+    // Parse and validate query parameters
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "50");
-    const search = searchParams.get("search") || "";
-    const role = searchParams.get("role") || "";
+    const rawQuery = {
+      page: searchParams.get("page") ?? undefined,
+      limit: searchParams.get("limit") ?? undefined,
+      search: searchParams.get("search") ?? undefined,
+      role: searchParams.get("role") ?? undefined,
+      schoolId: searchParams.get("schoolId") ?? undefined,
+    };
+
+    const queryResult = listTeachersQuerySchema.safeParse(rawQuery);
+    if (!queryResult.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid query parameters",
+          details: queryResult.error.flatten(),
+        },
+        { status: 400 },
+      );
+    }
+
+    const {
+      page: parsedPage,
+      limit: parsedLimit,
+      search,
+      role,
+      schoolId: requestedSchoolId,
+    } = queryResult.data;
+
+    const page = parsedPage ?? 1;
+    const limit = parsedLimit ?? 50;
+
+    // Apply role-based effective schoolId.
+    // System admins can request any school or all (omit schoolId).
+    // Non-system admins: if they request a schoolId that differs from their own,
+    // return empty rather than leaking foreign-school data (200 + empty, consistent
+    // with the classroom endpoint's implicit behaviour).
+    let effectiveSchoolId: string | undefined;
+    if (userWithRoles.role === "system") {
+      effectiveSchoolId = requestedSchoolId;
+    } else {
+      if (requestedSchoolId && requestedSchoolId !== userWithRoles.schoolId) {
+        // Cross-school request blocked — return empty response without hitting the DB
+        const emptyResponse: TeachersResponse = {
+          teachers: [],
+          statistics: {
+            totalTeachers: 0,
+            totalStudents: 0,
+            totalClasses: 0,
+            averageStudentsPerTeacher: 0,
+            activeTeachers: 0,
+          },
+          pagination: { page, limit, total: 0, totalPages: 0 },
+        };
+        return NextResponse.json(emptyResponse, { status: 200 });
+      }
+      // Use the caller's own schoolId (may be null for platform-level admins without a school)
+      effectiveSchoolId =
+        requestedSchoolId ?? userWithRoles.schoolId ?? undefined;
+    }
 
     // Get teachers data using model
     const { teachers, totalCount } = await getTeachers({
       page,
       limit,
-      search,
-      role,
+      search: search ?? "",
+      role: role ?? "",
       userWithRoles,
+      schoolId: effectiveSchoolId,
     });
 
     // Get statistics
@@ -268,12 +323,33 @@ export const updateTeacherController = async (
     }
 
     const body = await request.json();
-    const updateData = body as UpdateTeacherInput;
+    const parsed = updateTeacherInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid update payload" },
+        { status: 400 },
+      );
+    }
+    const updateData = parsed.data;
+
+    // School-change authz: only system admin may change a teacher's schoolId.
+    // Checked here (early out) and again in the model (defense in depth).
+    if (updateData.schoolId && userWithRoles.role !== "system") {
+      return NextResponse.json(
+        { error: "FORBIDDEN_SCHOOL_CHANGE" },
+        { status: 403 },
+      );
+    }
 
     // Update teacher using model
     const result = await updateTeacher(id, updateData, userWithRoles);
     if (!result.success) {
-      const status = result.error === "Teacher not found" ? 404 : 400;
+      const statusMap: Record<string, number> = {
+        "Teacher not found": 404,
+        FORBIDDEN_SCHOOL_CHANGE: 403,
+        CROSS_SCHOOL_CLASSROOM: 400,
+      };
+      const status = statusMap[result.error ?? ""] ?? 400;
       return NextResponse.json(
         { error: result.error || "Failed to update teacher" },
         { status },

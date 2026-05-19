@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { listClassroomsQuerySchema } from "@/lib/zod";
 
 interface ClassroomData {
   id: string;
@@ -19,6 +20,22 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Validate query parameters
+    const { searchParams } = new URL(request.url);
+    const queryResult = listClassroomsQuerySchema.safeParse({
+      schoolId: searchParams.get("schoolId") ?? undefined,
+    });
+    if (!queryResult.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid query parameters",
+          details: queryResult.error.flatten(),
+        },
+        { status: 400 },
+      );
+    }
+    const { schoolId: requestedSchoolId } = queryResult.data;
 
     // Check if user has admin permissions
     const userWithRoles = await prisma.user.findUnique({
@@ -42,15 +59,37 @@ export async function GET(
       );
     }
 
-    // Build where clause based on user's permissions
+    // Build where clause based on user's permissions and requested schoolId.
+    // System admins can filter to any school or see all (no filter when omitted).
+    // Non-system admins: if they request a schoolId that differs from their own,
+    // return empty rather than leaking foreign-school data (200 + [], consistent
+    // with the teacher endpoint behaviour).
     let whereClause: any = {};
 
-    // If user is school admin, only show classrooms from their school
-    if (
-      userWithRoles.SchoolAdmins.length > 0 &&
-      userWithRoles.role !== "system"
-    ) {
-      whereClause.schoolId = userWithRoles.schoolId;
+    if (userWithRoles.role === "system") {
+      if (requestedSchoolId) {
+        whereClause.schoolId = requestedSchoolId;
+      }
+      // else no filter — system sees all
+    } else {
+      // Non-system path
+      if (requestedSchoolId && requestedSchoolId !== userWithRoles.schoolId) {
+        // Cross-school request blocked — return empty without hitting the DB
+        return NextResponse.json([], { status: 200 });
+      }
+
+      // Scope to the user's own school when applicable
+      if (requestedSchoolId) {
+        whereClause.schoolId = requestedSchoolId;
+      } else if (userWithRoles.schoolId) {
+        whereClause.schoolId = userWithRoles.schoolId;
+      } else if (!isAdmin) {
+        // Non-system admin without schoolId: no classrooms visible
+        return NextResponse.json(
+          { error: "Forbidden - Admin access required" },
+          { status: 403 },
+        );
+      }
     }
 
     // Fetch classrooms with student count

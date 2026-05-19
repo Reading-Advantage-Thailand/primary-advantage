@@ -11,6 +11,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -37,13 +44,40 @@ import {
   BookOpen,
   GraduationCap,
   Info,
+  ChevronDown,
 } from "lucide-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { parse } from "csv/sync";
 import { useTranslations } from "next-intl";
+import { authClient } from "@/lib/auth-client";
+import { ClassroomConflictModal } from "@/components/admin/classroom-conflict-modal";
+
+type School = { id: string; name: string };
+
+interface ConflictItem {
+  name: string;
+  existingId: string;
+  existingMeta?: Record<string, unknown>;
+}
+
+interface ConflictSummary {
+  newClassroomsToCreate: string[];
+  parsedRows: number;
+}
+
+interface CreatedClassroom {
+  name: string;
+  id: string;
+  wasSuffixed: boolean;
+  originalName?: string;
+}
 
 export default function ImportDataPage() {
   const t = useTranslations("ImportData");
+  const tAdmin = useTranslations("importAdmin");
+  const { data: session } = authClient.useSession();
+  const isSystemAdmin = session?.user?.role === "system";
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -52,6 +86,33 @@ export default function ImportDataPage() {
   const [uploadResult, setUploadResult] = useState<any>(null);
   const [uploadError, setUploadError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [formatGuideOpen, setFormatGuideOpen] = useState(false);
+
+  // System admin: school selector state
+  const [schools, setSchools] = useState<School[]>([]);
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string>("");
+
+  // Conflict modal state
+  const [conflictModalOpen, setConflictModalOpen] = useState(false);
+  const [pendingConflicts, setPendingConflicts] = useState<ConflictItem[]>([]);
+  const [pendingConflictSummary, setPendingConflictSummary] =
+    useState<ConflictSummary>({ newClassroomsToCreate: [], parsedRows: 0 });
+  // Holds the FormData for re-submission after conflict resolution
+  const pendingFormDataRef = useRef<FormData | null>(null);
+
+  useEffect(() => {
+    if (!isSystemAdmin) return;
+    fetch("/api/schools")
+      .then((res) => res.json())
+      .then((data: Array<{ id: string; name: string }>) => {
+        if (Array.isArray(data)) {
+          setSchools(data.map((s) => ({ id: s.id, name: s.name })));
+        }
+      })
+      .catch(() => {
+        // non-fatal; dropdown will be empty
+      });
+  }, [isSystemAdmin]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -102,8 +163,20 @@ export default function ImportDataPage() {
     reader.readAsText(file);
   };
 
+  /**
+   * Core fetch helper. Sends FormData to /api/upload/classes.
+   * Returns the raw Response so callers can branch on status.
+   */
+  const postImport = (formData: FormData): Promise<Response> => {
+    return fetch("/api/upload/classes", {
+      method: "POST",
+      body: formData,
+    });
+  };
+
   const handleUpload = async () => {
     if (!selectedFile) return;
+    if (isSystemAdmin && !selectedSchoolId) return;
 
     setIsUploading(true);
     setUploadError("");
@@ -111,25 +184,35 @@ export default function ImportDataPage() {
     setUploadProgress(0);
 
     try {
-      // Create FormData to send file
       const formData = new FormData();
       formData.append("file", selectedFile);
+      if (isSystemAdmin && selectedSchoolId) {
+        formData.append("schoolId", selectedSchoolId);
+      }
 
       // Simulate progress while uploading
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => Math.min(prev + 10, 90));
       }, 2000);
 
-      // Upload file to API
-      const response = await fetch("/api/upload/classes ", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await postImport(formData);
 
       clearInterval(progressInterval);
       setUploadProgress(100);
 
       const result = await response.json();
+
+      if (response.status === 409 && result.canResolve) {
+        // Conflict — open modal; stash FormData for re-submission
+        pendingFormDataRef.current = formData;
+        setPendingConflicts(result.conflicts ?? []);
+        setPendingConflictSummary(
+          result.summary ?? { newClassroomsToCreate: [], parsedRows: 0 },
+        );
+        setConflictModalOpen(true);
+        setUploadProgress(0);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(result.details || t("errors.uploadFailed"));
@@ -149,6 +232,71 @@ export default function ImportDataPage() {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleConflictConfirm = async (
+    choices: Record<string, "existing" | "new">,
+  ) => {
+    setConflictModalOpen(false);
+
+    const formData = pendingFormDataRef.current;
+    if (!formData) return;
+
+    // Append choices to the same FormData and re-POST
+    formData.append("choices", JSON.stringify(choices));
+
+    setIsUploading(true);
+    setUploadError("");
+    setUploadResult(null);
+    setUploadProgress(0);
+
+    try {
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => Math.min(prev + 10, 90));
+      }, 2000);
+
+      const response = await postImport(formData);
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      const result = await response.json();
+
+      if (response.status === 409 && result.canResolve) {
+        // Defensive: server returned another 409 — re-open modal with updated conflicts
+        pendingFormDataRef.current = formData;
+        setPendingConflicts(result.conflicts ?? []);
+        setPendingConflictSummary(
+          result.summary ?? { newClassroomsToCreate: [], parsedRows: 0 },
+        );
+        setConflictModalOpen(true);
+        setUploadProgress(0);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(result.details || t("errors.uploadFailed"));
+      }
+
+      setUploadResult(result);
+
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 2000);
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : t("errors.uploadFailed"),
+      );
+      setUploadProgress(0);
+    } finally {
+      setIsUploading(false);
+      pendingFormDataRef.current = null;
+    }
+  };
+
+  const handleConflictCancel = () => {
+    setConflictModalOpen(false);
+    // Leave existing error/idle state; do NOT clear the file selection
   };
 
   const downloadTemplate = (type: string) => {
@@ -186,6 +334,10 @@ export default function ImportDataPage() {
     setUploadError("");
     setUploadProgress(0);
     setPreviewData([]);
+    setSelectedSchoolId("");
+    setConflictModalOpen(false);
+    setPendingConflicts([]);
+    pendingFormDataRef.current = null;
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -260,6 +412,29 @@ export default function ImportDataPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {isSystemAdmin && (
+                <div className="space-y-2">
+                  <Label htmlFor="school-select">{tAdmin("targetSchool")}</Label>
+                  <Select
+                    value={selectedSchoolId}
+                    onValueChange={setSelectedSchoolId}
+                  >
+                    <SelectTrigger id="school-select" className="h-11 w-full">
+                      <SelectValue placeholder={tAdmin("selectSchoolPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {schools.map((school) => (
+                        <SelectItem key={school.id} value={school.id}>
+                          {school.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-muted-foreground text-xs">
+                    {tAdmin("targetSchoolHint")}
+                  </p>
+                </div>
+              )}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="file-upload">{t("upload.selectFile")}</Label>
@@ -267,17 +442,21 @@ export default function ImportDataPage() {
                     {t("upload.maxSize")}
                   </span>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                  {/* Hidden on mobile — surfaced by the Browse button below */}
                   <Input
                     id="file-upload"
                     type="file"
                     accept=".csv"
                     onChange={handleFileSelect}
                     ref={fileInputRef}
-                    className="flex-1"
+                    className="hidden flex-1 sm:flex"
                   />
+                  {/* Mobile: full-width Browse button (sole entry point for file pick) */}
+                  {/* sm+: compact button beside the native input */}
                   <Button
                     variant="outline"
+                    className="h-11 w-full sm:h-9 sm:w-auto"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <FileText className="mr-2 h-4 w-4" />
@@ -326,21 +505,52 @@ export default function ImportDataPage() {
                   <AlertTitle>{t("upload.successTitle")}</AlertTitle>
                   <AlertDescription>
                     <div className="mt-2 space-y-1">
-                      <p>
-                        <strong>{t("upload.success.file")}:</strong>{" "}
-                        {uploadResult.originalName}
-                      </p>
-                      <p>
-                        <strong>{t("upload.success.size")}:</strong>{" "}
-                        {(uploadResult.size / 1024).toFixed(2)} KB
-                      </p>
-                      <p>
-                        <strong>{t("upload.success.savedAs")}:</strong>{" "}
-                        {uploadResult.fileName}
-                      </p>
+                      {/* Envelope fields — present on students/teachers path; absent on classes path */}
+                      {uploadResult.originalName && (
+                        <p>
+                          <strong>{t("upload.success.file")}:</strong>{" "}
+                          {uploadResult.originalName}
+                        </p>
+                      )}
+                      {typeof uploadResult.size === "number" && (
+                        <p>
+                          <strong>{t("upload.success.size")}:</strong>{" "}
+                          {(uploadResult.size / 1024).toFixed(2)} KB
+                        </p>
+                      )}
+                      {uploadResult.fileName && (
+                        <p>
+                          <strong>{t("upload.success.savedAs")}:</strong>{" "}
+                          {uploadResult.fileName}
+                        </p>
+                      )}
                       <p className="text-muted-foreground text-sm">
                         {t("upload.success.nextSteps")}
                       </p>
+                      {/* Show classrooms that were created with a suffix (classes path) */}
+                      {Array.isArray(uploadResult.createdClassrooms) &&
+                        uploadResult.createdClassrooms.some(
+                          (c: CreatedClassroom) => c.wasSuffixed,
+                        ) && (
+                          <ul className="mt-2 space-y-0.5 border-t pt-2">
+                            {(
+                              uploadResult.createdClassrooms as CreatedClassroom[]
+                            )
+                              .filter((c) => c.wasSuffixed)
+                              .map((c) => (
+                                <li
+                                  key={c.id}
+                                  className="text-muted-foreground flex items-center gap-1.5 text-xs"
+                                >
+                                  <CheckCircle className="h-3.5 w-3.5 shrink-0 text-green-500" />
+                                  {tAdmin("result.suffixedCreated", {
+                                    newName: c.name,
+                                    originalName: c.originalName ?? c.name,
+                                  })}
+                                </li>
+                              ))}
+                          </ul>
+                        )}
                     </div>
                   </AlertDescription>
                 </Alert>
@@ -356,11 +566,20 @@ export default function ImportDataPage() {
                 </div>
               )}
 
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <Button
                   onClick={handleUpload}
-                  disabled={!selectedFile || isUploading}
-                  className="flex-1"
+                  disabled={
+                    !selectedFile ||
+                    isUploading ||
+                    (isSystemAdmin && !selectedSchoolId)
+                  }
+                  className="h-11 w-full sm:h-9 sm:w-auto sm:flex-1"
+                  title={
+                    isSystemAdmin && !selectedSchoolId
+                      ? tAdmin("selectSchoolFirst")
+                      : undefined
+                  }
                 >
                   {isUploading ? (
                     <>
@@ -376,7 +595,11 @@ export default function ImportDataPage() {
                 </Button>
 
                 {(selectedFile || uploadResult) && (
-                  <Button variant="outline" onClick={resetUpload}>
+                  <Button
+                    variant="outline"
+                    onClick={resetUpload}
+                    className="h-11 w-full sm:h-9 sm:w-auto"
+                  >
                     {t("upload.clear")}
                   </Button>
                 )}
@@ -384,7 +607,7 @@ export default function ImportDataPage() {
                 {previewData.length > 0 && (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline">
+                      <Button variant="outline" className="h-11 w-full sm:h-9 sm:w-auto">
                         <Eye className="mr-2 h-4 w-4" />
                         {t("preview.button")}
                       </Button>
@@ -394,26 +617,28 @@ export default function ImportDataPage() {
                         <DialogTitle>{t("preview.title")}</DialogTitle>
                       </DialogHeader>
                       <ScrollArea className="h-96">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>{t("preview.columns.name")}</TableHead>
-                              <TableHead>
-                                {t("preview.columns.email")}
-                              </TableHead>
-                              <TableHead>{t("preview.columns.role")}</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {previewData.map((row, index) => (
-                              <TableRow key={index}>
-                                <TableCell>{row.name}</TableCell>
-                                <TableCell>{row.email}</TableCell>
-                                <TableCell>{row.role}</TableCell>
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>{t("preview.columns.name")}</TableHead>
+                                <TableHead>
+                                  {t("preview.columns.email")}
+                                </TableHead>
+                                <TableHead>{t("preview.columns.role")}</TableHead>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                            </TableHeader>
+                            <TableBody>
+                              {previewData.map((row, index) => (
+                                <TableRow key={index}>
+                                  <TableCell>{row.name}</TableCell>
+                                  <TableCell>{row.email}</TableCell>
+                                  <TableCell>{row.role}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
                       </ScrollArea>
                     </DialogContent>
                   </Dialog>
@@ -422,37 +647,56 @@ export default function ImportDataPage() {
             </CardContent>
           </Card>
 
-          {/* Format Guide */}
+          {/* Format Guide — collapsible on mobile to keep upload area reachable */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Info className="h-5 w-5" />
-                {t("formatGuide.title")}
-              </CardTitle>
+              <button
+                type="button"
+                onClick={() => setFormatGuideOpen((v) => !v)}
+                aria-expanded={formatGuideOpen}
+                className="flex w-full items-center justify-between text-left md:pointer-events-none"
+              >
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  {t("formatGuide.title")}
+                </CardTitle>
+                <ChevronDown
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition-transform md:hidden"
+                  aria-hidden
+                  style={{ transform: formatGuideOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                />
+              </button>
             </CardHeader>
+            <div className={formatGuideOpen ? "block" : "hidden md:block"}>
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid h-auto w-full grid-cols-3">
                   <TabsTrigger
                     value="students"
-                    className="flex items-center gap-2"
+                    className="flex min-h-11 items-center gap-1 sm:gap-2"
                   >
-                    <GraduationCap className="h-4 w-4" />
-                    {t("formatGuide.tabs.students")}
+                    <GraduationCap className="h-4 w-4 shrink-0" />
+                    <span className="truncate text-xs sm:text-sm">
+                      {t("formatGuide.tabs.students")}
+                    </span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="teachers"
-                    className="flex items-center gap-2"
+                    className="flex min-h-11 items-center gap-1 sm:gap-2"
                   >
-                    <Users className="h-4 w-4" />
-                    {t("formatGuide.tabs.teachers")}
+                    <Users className="h-4 w-4 shrink-0" />
+                    <span className="truncate text-xs sm:text-sm">
+                      {t("formatGuide.tabs.teachers")}
+                    </span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="classes"
-                    className="flex items-center gap-2"
+                    className="flex min-h-11 items-center gap-1 sm:gap-2"
                   >
-                    <BookOpen className="h-4 w-4" />
-                    {t("formatGuide.tabs.classes")}
+                    <BookOpen className="h-4 w-4 shrink-0" />
+                    <span className="truncate text-xs sm:text-sm">
+                      {t("formatGuide.tabs.classes")}
+                    </span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -480,34 +724,36 @@ export default function ImportDataPage() {
                   <div className="space-y-2">
                     <Label>{t("formatGuide.exampleData")}</Label>
                     <ScrollArea className="h-48 rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            {currentFormat.headers.map((header, index) => (
-                              <TableHead
-                                key={index}
-                                className="whitespace-nowrap"
-                              >
-                                {header}
-                              </TableHead>
-                            ))}
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {currentFormat.example.map((row, rowIndex) => (
-                            <TableRow key={rowIndex}>
-                              {row.map((cell, cellIndex) => (
-                                <TableCell
-                                  key={cellIndex}
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              {currentFormat.headers.map((header, index) => (
+                                <TableHead
+                                  key={index}
                                   className="whitespace-nowrap"
                                 >
-                                  {cell}
-                                </TableCell>
+                                  {header}
+                                </TableHead>
                               ))}
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                          </TableHeader>
+                          <TableBody>
+                            {currentFormat.example.map((row, rowIndex) => (
+                              <TableRow key={rowIndex}>
+                                {row.map((cell, cellIndex) => (
+                                  <TableCell
+                                    key={cellIndex}
+                                    className="whitespace-nowrap"
+                                  >
+                                    {cell}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
                     </ScrollArea>
                   </div>
 
@@ -531,7 +777,7 @@ export default function ImportDataPage() {
                   <Button
                     variant="outline"
                     onClick={() => downloadTemplate(activeTab)}
-                    className="w-full"
+                    className="h-11 w-full sm:h-9"
                   >
                     <Download className="mr-2 h-4 w-4" />
                     {t("formatGuide.downloadTemplate", { type: activeTab })}
@@ -539,6 +785,7 @@ export default function ImportDataPage() {
                 </TabsContent>
               </Tabs>
             </CardContent>
+            </div>
           </Card>
         </div>
 
@@ -649,6 +896,15 @@ export default function ImportDataPage() {
           </Card>
         </div>
       </div>
+
+      {/* Classroom conflict resolution modal */}
+      <ClassroomConflictModal
+        open={conflictModalOpen}
+        conflicts={pendingConflicts}
+        summary={pendingConflictSummary}
+        onCancel={handleConflictCancel}
+        onConfirm={handleConflictConfirm}
+      />
     </div>
   );
 }
