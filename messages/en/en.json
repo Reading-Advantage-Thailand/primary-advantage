@@ -3891,6 +3891,15 @@
       "previous": "Previous",
       "next": "Next",
       "pageOf": "Page {page} of {totalPages}"
+    },
+    "toasts": {
+      "fetchError": "Failed to load students",
+      "addError": "Failed to add student",
+      "addSuccess": "Student added successfully",
+      "updateError": "Failed to update student",
+      "updateSuccess": "Student updated successfully",
+      "deleteError": "Failed to delete student",
+      "deleteSuccess": "Student deleted successfully"
     }
   },
   "System": {

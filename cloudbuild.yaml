@@ -101,7 +101,7 @@ steps:
       - "--set-env-vars=CONTACT_EMAIL_ENABLED=true"
       - "--set-env-vars=RESEND_FROM_EMAIL=support@reading-advantage.com"
       - "--set-env-vars=CONTACT_NOTIFY_EMAIL=support@reading-advantage.com"
-      - "--set-env-vars=APP_URL=${_NEXT_PUBLIC_BETTER_AUTH_URL}:latest"
+      - "--set-secrets=APP_URL=${_APP_URL}:latest"
 
 # Substitutions
 substitutions:
@@ -123,6 +123,7 @@ substitutions:
   _STORAGE_CLIENT_EMAIL: "STORAGE_CLIENT_EMAIL"
   _STORAGE_PRIVATE_KEY: "STORAGE_PRIVATE_KEY"
   _ACCESS_KEY: "ACCESS_KEY"
+  _APP_URL: "APP_URL"
   _CLOUD_SQL_INSTANCE: "reading-advantage:asia-southeast1:cloud-sql"
 
 # Secrets

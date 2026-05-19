@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { unlink, readdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
+import os from "os";
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const tempDir = path.join(process.cwd(), "temp");
+    const tempDir = path.join(os.tmpdir(), "pa-uploads");
     const filePath = path.join(tempDir, fileName);
 
     // Check if file exists
@@ -42,7 +43,7 @@ export async function DELETE(request: NextRequest) {
 // Clean up old temporary files (older than 24 hours)
 export async function POST() {
   try {
-    const tempDir = path.join(process.cwd(), "temp");
+    const tempDir = path.join(os.tmpdir(), "pa-uploads");
 
     if (!existsSync(tempDir)) {
       return NextResponse.json({
