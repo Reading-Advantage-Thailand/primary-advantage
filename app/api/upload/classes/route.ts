@@ -642,6 +642,7 @@ export async function POST(request: NextRequest) {
           email: validatedRow.email.toLowerCase().trim(),
           name: validatedRow.name.trim(),
           password: null,
+          role: validatedRow.role, // carry the CSV role through to user creation
           schoolId: effectiveSchoolId,
           classroomNames:
             validatedRow.role !== "admin"
@@ -960,6 +961,8 @@ export async function POST(request: NextRequest) {
           email: userData.email,
           name: userData.name,
           password: userData.password,
+          role: userData.role, // set role from CSV — not the schema default "user"
+          roleId: roleMap.get(userData.role) ?? null, // FK to Role table; null if role not found
           cefrLevel: "A0-", // Default CEFR level
           level: 1, // Default level
           xp: 0, // Default XP

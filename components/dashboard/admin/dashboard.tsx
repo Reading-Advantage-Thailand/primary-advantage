@@ -97,8 +97,6 @@ export function AdminDashboardContent() {
 
   const timeframeLabel = getTimeframeLabel(dateRange);
 
-  console.log(user);
-
   if (isPending && !isPlaceholderData) {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

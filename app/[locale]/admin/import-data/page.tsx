@@ -44,6 +44,7 @@ import {
   BookOpen,
   GraduationCap,
   Info,
+  ChevronDown,
 } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { parse } from "csv/sync";
@@ -85,6 +86,7 @@ export default function ImportDataPage() {
   const [uploadResult, setUploadResult] = useState<any>(null);
   const [uploadError, setUploadError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [formatGuideOpen, setFormatGuideOpen] = useState(false);
 
   // System admin: school selector state
   const [schools, setSchools] = useState<School[]>([]);
@@ -417,7 +419,7 @@ export default function ImportDataPage() {
                     value={selectedSchoolId}
                     onValueChange={setSelectedSchoolId}
                   >
-                    <SelectTrigger id="school-select" className="w-full">
+                    <SelectTrigger id="school-select" className="h-11 w-full">
                       <SelectValue placeholder={tAdmin("selectSchoolPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -441,17 +443,20 @@ export default function ImportDataPage() {
                   </span>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                  {/* Hidden on mobile — surfaced by the Browse button below */}
                   <Input
                     id="file-upload"
                     type="file"
                     accept=".csv"
                     onChange={handleFileSelect}
                     ref={fileInputRef}
-                    className="flex-1"
+                    className="hidden flex-1 sm:flex"
                   />
+                  {/* Mobile: full-width Browse button (sole entry point for file pick) */}
+                  {/* sm+: compact button beside the native input */}
                   <Button
                     variant="outline"
-                    className="w-full sm:w-auto"
+                    className="h-11 w-full sm:h-9 sm:w-auto"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <FileText className="mr-2 h-4 w-4" />
@@ -569,7 +574,7 @@ export default function ImportDataPage() {
                     isUploading ||
                     (isSystemAdmin && !selectedSchoolId)
                   }
-                  className="w-full sm:w-auto sm:flex-1"
+                  className="h-11 w-full sm:h-9 sm:w-auto sm:flex-1"
                   title={
                     isSystemAdmin && !selectedSchoolId
                       ? tAdmin("selectSchoolFirst")
@@ -593,7 +598,7 @@ export default function ImportDataPage() {
                   <Button
                     variant="outline"
                     onClick={resetUpload}
-                    className="w-full sm:w-auto"
+                    className="h-11 w-full sm:h-9 sm:w-auto"
                   >
                     {t("upload.clear")}
                   </Button>
@@ -602,7 +607,7 @@ export default function ImportDataPage() {
                 {previewData.length > 0 && (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className="w-full sm:w-auto">
+                      <Button variant="outline" className="h-11 w-full sm:h-9 sm:w-auto">
                         <Eye className="mr-2 h-4 w-4" />
                         {t("preview.button")}
                       </Button>
@@ -642,17 +647,30 @@ export default function ImportDataPage() {
             </CardContent>
           </Card>
 
-          {/* Format Guide */}
+          {/* Format Guide — collapsible on mobile to keep upload area reachable */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Info className="h-5 w-5" />
-                {t("formatGuide.title")}
-              </CardTitle>
+              <button
+                type="button"
+                onClick={() => setFormatGuideOpen((v) => !v)}
+                aria-expanded={formatGuideOpen}
+                className="flex w-full items-center justify-between text-left md:pointer-events-none"
+              >
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  {t("formatGuide.title")}
+                </CardTitle>
+                <ChevronDown
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition-transform md:hidden"
+                  aria-hidden
+                  style={{ transform: formatGuideOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                />
+              </button>
             </CardHeader>
+            <div className={formatGuideOpen ? "block" : "hidden md:block"}>
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid h-auto w-full grid-cols-3">
                   <TabsTrigger
                     value="students"
                     className="flex min-h-11 items-center gap-1 sm:gap-2"
@@ -759,7 +777,7 @@ export default function ImportDataPage() {
                   <Button
                     variant="outline"
                     onClick={() => downloadTemplate(activeTab)}
-                    className="w-full"
+                    className="h-11 w-full sm:h-9"
                   >
                     <Download className="mr-2 h-4 w-4" />
                     {t("formatGuide.downloadTemplate", { type: activeTab })}
@@ -767,6 +785,7 @@ export default function ImportDataPage() {
                 </TabsContent>
               </Tabs>
             </CardContent>
+            </div>
           </Card>
         </div>
 

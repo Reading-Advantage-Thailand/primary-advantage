@@ -143,7 +143,7 @@ export const getTeachers = async (
     // Transform data to match the expected interface
     const teachersData: TeacherData[] = teachers.map((teacher) => {
       // Get primary role (first role or most important one)
-      const primaryRole = teacher.role === "admin" || teacher.role || "teacher";
+      const primaryRole = teacher.role === "admin" ? "admin" : (teacher.role ?? "teacher");
 
       // Calculate total students across all classrooms
       const totalStudents = teacher.ClassroomTeachers.reduce((sum, ct) => {
@@ -223,7 +223,7 @@ export const getTeacherById = async (
     }
 
     // Transform data
-    const primaryRole = teacher.role === "admin" || teacher.role || "teacher";
+    const primaryRole = teacher.role === "admin" ? "admin" : (teacher.role ?? "teacher");
 
     const totalStudents = teacher.ClassroomTeachers.reduce((sum, ct) => {
       return sum + ct.classroom.students.length;
@@ -771,16 +771,23 @@ export const updateTeacher = async (
     } else {
       // ---- SAME-SCHOOL PATH (existing behavior — preserved verbatim) -----------
 
+      // Accept either assignedClassroomIds (new) or classroomIds (legacy) so
+      // callers using either field name get the same behaviour (mirrors school-change branch).
+      const sameSchoolClassroomIds =
+        updateData.assignedClassroomIds !== undefined
+          ? updateData.assignedClassroomIds
+          : updateData.classroomIds;
+
       // Validate classroom IDs if provided
-      if (updateData.classroomIds) {
+      if (sameSchoolClassroomIds !== undefined) {
         const validClassrooms = await prisma.classroom.findMany({
           where: {
-            id: { in: updateData.classroomIds },
+            id: { in: sameSchoolClassroomIds },
             schoolId: existingTeacher.schoolId, // Ensure classrooms belong to the same school
           },
         });
 
-        if (validClassrooms.length !== updateData.classroomIds.length) {
+        if (validClassrooms.length !== sameSchoolClassroomIds.length) {
           return {
             success: false,
             error: "Some classroom IDs are invalid or not accessible",
@@ -814,16 +821,16 @@ export const updateTeacher = async (
         }
 
         // Handle classroom assignments if specified
-        if (updateData.classroomIds !== undefined) {
+        if (sameSchoolClassroomIds !== undefined) {
           // Remove existing classroom assignments
           await tx.classroomTeachers.deleteMany({
             where: { userId: id },
           });
 
           // Add new classroom assignments
-          if (updateData.classroomIds.length > 0) {
+          if (sameSchoolClassroomIds.length > 0) {
             await tx.classroomTeachers.createMany({
-              data: updateData.classroomIds.map((classroomId) => ({
+              data: sameSchoolClassroomIds.map((classroomId) => ({
                 classroomId,
                 userId: id,
               })),

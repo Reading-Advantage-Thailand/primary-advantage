@@ -106,16 +106,14 @@ export function ClassroomConflictModal({
             <div className="flex w-full gap-2 sm:w-auto">
               <Button
                 variant="outline"
-                size="sm"
-                className="flex-1 text-xs sm:flex-none"
+                className="h-11 flex-1 text-xs sm:h-9 sm:flex-none"
                 onClick={() => applyToAll("existing")}
               >
                 {t("conflict.applyToAllExisting")}
               </Button>
               <Button
                 variant="outline"
-                size="sm"
-                className="flex-1 text-xs sm:flex-none"
+                className="h-11 flex-1 text-xs sm:h-9 sm:flex-none"
                 onClick={() => applyToAll("new")}
               >
                 {t("conflict.applyToAllNew")}
@@ -137,38 +135,38 @@ export function ClassroomConflictModal({
                     onValueChange={(val) =>
                       setChoice(conflict.name, val as ConflictChoice)
                     }
-                    className="gap-3"
+                    className="gap-1"
                   >
-                    {/* Use existing */}
-                    <div className="flex items-center gap-3">
+                    {/* Use existing — tap area is the full row height */}
+                    <Label
+                      htmlFor={`existing-${conflict.name}`}
+                      className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-1 hover:bg-muted/50"
+                    >
                       <RadioGroupItem
                         value="existing"
                         id={`existing-${conflict.name}`}
                       />
-                      <Label
-                        htmlFor={`existing-${conflict.name}`}
-                        className="cursor-pointer text-sm"
-                      >
+                      <span className="text-sm font-normal">
                         {t("conflict.useExisting")}
-                      </Label>
-                    </div>
+                      </span>
+                    </Label>
 
                     {/* Create new */}
                     <div className="space-y-1">
-                      <div className="flex items-center gap-3">
+                      <Label
+                        htmlFor={`new-${conflict.name}`}
+                        className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-1 hover:bg-muted/50"
+                      >
                         <RadioGroupItem
                           value="new"
                           id={`new-${conflict.name}`}
                         />
-                        <Label
-                          htmlFor={`new-${conflict.name}`}
-                          className="cursor-pointer text-sm"
-                        >
+                        <span className="text-sm font-normal">
                           {t("conflict.createNew")}
-                        </Label>
-                      </div>
+                        </span>
+                      </Label>
                       {current === "new" && (
-                        <p className="text-muted-foreground ml-7 text-xs">
+                        <p className="text-muted-foreground ml-10 text-xs">
                           {t("conflict.createNewHint", {
                             name: conflict.name,
                           })}
@@ -205,14 +203,14 @@ export function ClassroomConflictModal({
             <Button
               variant="outline"
               onClick={onCancel}
-              className="flex-1 sm:flex-none"
+              className="h-11 flex-1 sm:h-9 sm:flex-none"
             >
               {t("conflict.cancel")}
             </Button>
             <Button
               onClick={handleConfirm}
               disabled={!allResolved}
-              className="flex-1 sm:flex-none"
+              className="h-11 flex-1 sm:h-9 sm:flex-none"
             >
               {t("conflict.confirm")}
             </Button>

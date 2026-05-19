@@ -122,10 +122,8 @@ export function TeachersTable() {
   const [schoolFilter, setSchoolFilter] = useState<string>("all");
 
   // Fetch schools list (only when user is a system admin).
-  const {
-    data: schools = [],
-    isLoading: isSchoolsLoading,
-  } = useSchools(isSystemAdmin);
+  const { data: schools = [], isLoading: isSchoolsLoading } =
+    useSchools(isSystemAdmin);
 
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
@@ -278,7 +276,9 @@ export function TeachersTable() {
   };
 
   // Resolve a school name from the fetched schools list given a schoolId.
-  const resolveSchoolName = (schoolId: string | null | undefined): string | null => {
+  const resolveSchoolName = (
+    schoolId: string | null | undefined,
+  ): string | null => {
     if (!schoolId) return null;
     return schools.find((s) => s.id === schoolId)?.name ?? null;
   };
@@ -371,7 +371,8 @@ export function TeachersTable() {
     selectedTeacher !== null &&
     formData.schoolId !== (selectedTeacher.schoolId ?? "");
 
-  const originalClassroomCount = selectedTeacher?.assignedClassrooms?.length ?? 0;
+  const originalClassroomCount =
+    selectedTeacher?.assignedClassrooms?.length ?? 0;
 
   // Resolve the original school name via the schools cache (Task 4.1 pattern).
   const originalSchoolName =
@@ -796,9 +797,9 @@ export function TeachersTable() {
                   </TableHead>
                 )}
                 <TableHead>{t("tableHeaders.assignedClassrooms")}</TableHead>
-                <TableHead>{t("tableHeaders.students")}</TableHead>
+                {/* <TableHead>{t("tableHeaders.students")}</TableHead>
                 <TableHead>{t("tableHeaders.classes")}</TableHead>
-                <TableHead>{t("tableHeaders.joined")}</TableHead>
+                <TableHead>{t("tableHeaders.joined")}</TableHead> */}
                 <TableHead className="text-right">
                   {t("tableHeaders.actions")}
                 </TableHead>
@@ -807,7 +808,10 @@ export function TeachersTable() {
             <TableBody>
               {filteredTeachers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={isSystemAdmin ? 10 : 9} className="py-8 text-center">
+                  <TableCell
+                    colSpan={isSystemAdmin ? 10 : 9}
+                    className="py-8 text-center"
+                  >
                     <div className="flex flex-col items-center gap-2">
                       {isLoading ? (
                         <>
@@ -850,7 +854,9 @@ export function TeachersTable() {
                             <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs md:hidden">
                               <School className="h-3 w-3 shrink-0" />
                               {resolveSchoolName(teacher.schoolId) ?? (
-                                <span className="italic">{tt("unassigned")}</span>
+                                <span className="italic">
+                                  {tt("unassigned")}
+                                </span>
                               )}
                             </p>
                           )}
@@ -906,11 +912,11 @@ export function TeachersTable() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{teacher.totalStudents}</TableCell>
+                    {/* <TableCell>{teacher.totalStudents}</TableCell>
                     <TableCell>{teacher.totalClasses}</TableCell>
                     <TableCell>
                       {teacher.createdAt.toLocaleDateString()}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button
@@ -1015,7 +1021,9 @@ export function TeachersTable() {
                     <SelectValue placeholder={t("form.rolePlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="teacher">{t("roles.teacher")}</SelectItem>
+                    <SelectItem value="teacher">
+                      {t("roles.teacher")}
+                    </SelectItem>
                     <SelectItem value="admin">{t("roles.admin")}</SelectItem>
                   </SelectContent>
                 </Select>

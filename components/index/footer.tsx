@@ -29,10 +29,10 @@ const info = [
     title: "Contact",
     links: [
       {
-        title: "Email: info@primaryadvantage.com",
-        href: "mailto:info@primaryadvantage.com",
+        title: "Email: support@reading-advantage.com",
+        href: "mailto:support@reading-advantage.com",
       },
-      { title: "Phone: +1 (123) 456-7890", href: "tel:+11234567890" },
+      // { title: "Phone: +1 (123) 456-7890", href: "tel:+11234567890" },
     ],
   },
 ];
@@ -77,7 +77,10 @@ export function Footer({ className }: FooterProps) {
                       ))}
                       {item.title === "About" && (
                         <li className="mb-4">
-                          <Link href="/contact" className="font-medium text-gray-400 hover:underline">
+                          <Link
+                            href="/contact"
+                            className="font-medium text-gray-400 hover:underline"
+                          >
                             Support
                           </Link>
                         </li>

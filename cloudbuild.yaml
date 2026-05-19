@@ -98,7 +98,10 @@ steps:
       - "--set-env-vars=PROJECT_ID=${_PROJECT_ID}"
       - "--set-env-vars=NODE_ENV=${_NODE_ENV}"
       - "--set-env-vars=AUTH_TRUST_HOST=true"
-      - "--set-env-vars=CONTACT_EMAIL_ENABLED=false"
+      - "--set-env-vars=CONTACT_EMAIL_ENABLED=true"
+      - "--set-env-vars=RESEND_FROM_EMAIL=support@reading-advantage.com"
+      - "--set-env-vars=CONTACT_NOTIFY_EMAIL=support@reading-advantage.com"
+      - "--set-env-vars=APP_URL=${_NEXT_PUBLIC_BETTER_AUTH_URL}:latest"
 
 # Substitutions
 substitutions:
