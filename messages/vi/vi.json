@@ -3845,6 +3845,15 @@
       "previous": "Trước",
       "next": "Tiếp",
       "pageOf": "Trang {page} trên {totalPages}"
+    },
+    "toasts": {
+      "fetchError": "Không thể tải danh sách học sinh",
+      "addError": "Không thể thêm học sinh",
+      "addSuccess": "Đã thêm học sinh thành công",
+      "updateError": "Không thể cập nhật học sinh",
+      "updateSuccess": "Đã cập nhật học sinh thành công",
+      "deleteError": "Không thể xóa học sinh",
+      "deleteSuccess": "Đã xóa học sinh thành công"
     }
   },
   "System": {

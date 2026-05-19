@@ -54,8 +54,9 @@ import {
   Loader2,
   X,
 } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 // Student interface based on the API response
 interface Student {
@@ -186,7 +187,6 @@ export default function StudentsPage() {
       const response = await fetch("/api/classrooms");
 
       if (!response.ok) {
-        const errorText = await response.text();
         throw new Error(
           `Failed to fetch classrooms: ${response.status} ${response.statusText}`,
         );
@@ -265,25 +265,31 @@ export default function StudentsPage() {
   };
 
   // Handle add student
-  const handleAddStudent = () => {
-    const newStudent: Student = {
-      id: Date.now().toString(),
-      name: formData.name,
-      email: formData.email,
-      cefrLevel: formData.cefrLevel,
-      xp: 0,
-      role: formData.role,
-      createdAt: new Date().toISOString().split("T")[0],
-      className: null,
-      classroomId: null,
-    };
+  const handleAddStudent = async () => {
+    try {
+      const response = await fetch("/api/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          cefrLevel: formData.cefrLevel,
+        }),
+      });
 
-    setStudents((prev) => [...prev, newStudent]);
-    setIsAddDialogOpen(false);
-    resetForm();
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || t("toasts.addError"));
+        return;
+      }
 
-    // Refresh data from server
-    fetchStudents();
+      setIsAddDialogOpen(false);
+      resetForm();
+      toast.success(t("toasts.addSuccess"));
+      fetchStudents();
+    } catch {
+      toast.error(t("toasts.addError"));
+    }
   };
 
   // Handle edit student
@@ -299,36 +305,56 @@ export default function StudentsPage() {
   };
 
   // Handle update student
-  const handleUpdateStudent = () => {
+  const handleUpdateStudent = async () => {
     if (!editingStudent) return;
 
-    setStudents((prev) =>
-      prev.map((student) =>
-        student.id === editingStudent.id
-          ? {
-              ...student,
-              name: formData.name,
-              email: formData.email,
-              cefrLevel: formData.cefrLevel,
-              role: formData.role,
-            }
-          : student,
-      ),
-    );
+    try {
+      const response = await fetch(`/api/students/${editingStudent.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          cefrLevel: formData.cefrLevel,
+          role: formData.role,
+        }),
+      });
 
-    setIsEditDialogOpen(false);
-    setEditingStudent(null);
-    resetForm();
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || t("toasts.updateError"));
+        return;
+      }
 
-    // Refresh data from server
-    fetchStudents();
+      setIsEditDialogOpen(false);
+      setEditingStudent(null);
+      resetForm();
+      toast.success(t("toasts.updateSuccess"));
+      fetchStudents();
+    } catch {
+      toast.error(t("toasts.updateError"));
+    }
   };
 
   // Handle delete student
-  const handleDeleteStudent = (id: string) => {
-    setStudents((prev) => prev.filter((student) => student.id !== id));
-    // Refresh data from server
-    fetchStudents();
+  const handleDeleteStudent = async (id: string) => {
+    try {
+      const response = await fetch(`/api/students/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || t("toasts.deleteError"));
+        return;
+      }
+
+      toast.success(t("toasts.deleteSuccess"));
+      fetchStudents();
+    } catch {
+      toast.error(t("toasts.deleteError"));
+    }
   };
 
   // Get role badge variant

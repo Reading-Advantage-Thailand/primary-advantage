@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import { existsSync, unlink } from "fs";
 import path from "path";
+import os from "os";
 import { parse } from "csv/sync";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create temp directory if it doesn't exist
-    const tempDir = path.join(process.cwd(), "temp");
+    const tempDir = path.join(os.tmpdir(), "pa-uploads");
     if (!existsSync(tempDir)) {
       await mkdir(tempDir, { recursive: true });
     }
