@@ -1,7 +1,7 @@
 import { storyGeneratorSchema } from "@/lib/zod";
 import {
   google,
-  googleImagePro,
+  googleImage,
   googleModelLite,
   googleModelPro,
 } from "@/utils/google";
@@ -11,6 +11,7 @@ import fs from "fs";
 import fsPromises from "fs/promises";
 import path from "path";
 import { z } from "zod";
+import { classifyAiError, withAiRetry } from "./ai-retry";
 
 export interface GenerateStoryParams {
   cefrLevel: string;
@@ -222,7 +223,7 @@ Return a JSON object with keys 'cefrLevel' (string) and 'rating' (integer 1-5).`
 // Constants
 const MAX_RETRIES = 3;
 const RETRY_DELAY_BASE = 1000;
-const CONCURRENCY_LIMIT = 5;
+const CONCURRENCY_LIMIT = 3; // reduced from 5 — Imagen QPM quota is tight
 const IMAGES_DIR = path.join(process.cwd(), "data/images");
 
 interface StoryImageResult {
@@ -281,51 +282,61 @@ const processSingleImage = async (
   scene: Record<string, string>,
   charDesc: string,
 ): Promise<SingleImageResult> => {
-  const imageLabel = index === 0 ? "Cover" : `${index}`;
+  const imageLabel = index === 0 ? "Cover" : `Scene ${index}`;
   const localPath = path.join(IMAGES_DIR, `${scene.id}.png`);
   const cloudPath = `images/story/${scene.id}.png`;
 
-  // ── Phase 1: Generate + write to disk (retry on AI/write failure) ──
-  let generateAttempts = 0;
-  let generated = false;
-
-  while (generateAttempts < MAX_RETRIES && !generated) {
-    try {
-      const { images } = await generateImage({
-        model: google.image(googleImagePro),
-        prompt: constructPrompt(scene.description, charDesc),
-        aspectRatio: "4:3",
-        n: 1,
-      });
-
-      const base64Image = Buffer.from(images[0].base64, "base64");
-      await fsPromises.writeFile(localPath, base64Image);
-      generated = true;
-    } catch (error) {
-      generateAttempts++;
-      if (generateAttempts >= MAX_RETRIES) {
-        return {
-          index,
-          url: null,
-          error: `Image generation failed for ${imageLabel} after ${MAX_RETRIES} attempts: ${error}`,
-          tempFile: null,
-        };
-      }
-      const delay = Math.pow(2, generateAttempts) * RETRY_DELAY_BASE;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
+  // ── Phase 1: Generate + write to disk ──────────────────────────────────
+  // withAiRetry handles RESOURCE_EXHAUSTED / UNAVAILABLE with backoff+jitter.
+  // Non-retryable errors (content policy, bad args) surface immediately.
+  try {
+    await withAiRetry(
+      async () => {
+        const { images } = await generateImage({
+          model: google.image(googleImage),
+          prompt: constructPrompt(scene.description, charDesc),
+          aspectRatio: "4:3",
+          n: 1,
+        });
+        const base64Image = Buffer.from(images[0].base64, "base64");
+        await fsPromises.writeFile(localPath, base64Image);
+      },
+      {
+        maxAttempts: MAX_RETRIES,
+        baseDelayMs: RETRY_DELAY_BASE,
+        maxDelayMs: 30_000,
+      },
+      `story-image-gen:${scene.id}:${imageLabel}`,
+    );
+  } catch (error) {
+    const kind = (error as any).errorKind ?? classifyAiError(error);
+    console.error(
+      `[story-generator] image generation failed — label=${imageLabel} sceneId=${scene.id} kind=${kind} error=${error instanceof Error ? error.message : String(error)}`,
+    );
+    return {
+      index,
+      url: null,
+      error: `Image generation failed for ${imageLabel} (kind=${kind}): ${error instanceof Error ? error.message : String(error)}`,
+      tempFile: null,
+    };
   }
 
   // ── Phase 2: Upload from the saved file (retry without re-generating) ──
+  // Upload errors are not quota-related; use simple bounded retry.
   let uploadAttempts = 0;
-
   while (uploadAttempts < MAX_RETRIES) {
     try {
       await uploadToBucket(localPath, cloudPath);
+      console.info(
+        `[story-generator] image uploaded — label=${imageLabel} sceneId=${scene.id} path=${cloudPath}`,
+      );
       return { index, url: cloudPath, error: null, tempFile: localPath };
     } catch (error) {
       uploadAttempts++;
       if (uploadAttempts >= MAX_RETRIES) {
+        console.error(
+          `[story-generator] upload failed — label=${imageLabel} sceneId=${scene.id} attempts=${MAX_RETRIES} error=${error}`,
+        );
         return {
           index,
           url: null,
@@ -334,6 +345,9 @@ const processSingleImage = async (
         };
       }
       const delay = Math.pow(2, uploadAttempts) * RETRY_DELAY_BASE;
+      console.warn(
+        `[story-generator] upload attempt ${uploadAttempts}/${MAX_RETRIES} failed, retrying in ${delay}ms — label=${imageLabel}`,
+      );
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
