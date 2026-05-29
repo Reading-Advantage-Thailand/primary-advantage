@@ -39,6 +39,10 @@ interface FlashcardGameInlineProps {
   onBack: () => void;
 }
 
+/**
+ * Renders an interactive flashcard study game with flip animation.
+ * Handles card rating, progress tracking, and session completion with XP updates.
+ */
 export function FlashcardGameInline({
   deck,
   cards: initialCards,

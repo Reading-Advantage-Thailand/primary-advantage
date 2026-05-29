@@ -62,6 +62,9 @@ const chartConfig = {
   },
 };
 
+/**
+ * Renders an area chart showing weekly activity overview with student and teacher metrics.
+ */
 export function WeeklyActivityChart() {
   return (
     <Card>
@@ -115,6 +118,9 @@ export function WeeklyActivityChart() {
   );
 }
 
+/**
+ * Renders a horizontal bar chart showing class engagement metrics across different learning activities.
+ */
 export function ClassEngagementChart() {
   return (
     <Card>
@@ -151,6 +157,9 @@ export function ClassEngagementChart() {
   );
 }
 
+/**
+ * Renders an area chart showing content activity with articles read and questions answered throughout the week.
+ */
 export function ActivityMetricsChart() {
   return (
     <Card>
@@ -210,6 +219,9 @@ export function ActivityMetricsChart() {
   );
 }
 
+/**
+ * Renders four summary cards showing total weekly active users, articles read, questions answered, and average engagement.
+ */
 export function ActivitySummaryCards() {
   const totalStudents = weeklyActivityData.reduce(
     (sum, day) => sum + day.students,

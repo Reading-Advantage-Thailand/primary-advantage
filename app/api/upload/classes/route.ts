@@ -141,6 +141,9 @@ const createTimer = (label: string) => {
   };
 };
 
+/**
+ * Handles CSV upload for classes, students, or teachers. Creates users/classrooms and assigns roles/classrooms.
+ */
 export async function POST(request: NextRequest) {
   const apiTimer = createTimer("UPLOAD_CLASSES_API");
   console.log("🚀 Starting upload classes API request");

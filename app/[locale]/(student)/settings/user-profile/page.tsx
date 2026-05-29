@@ -14,6 +14,9 @@ import { auth } from "@/lib/auth";
 import { Role } from "@/types/enum";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * User profile settings page for managing account details, level, XP, and license.
+ */
 export default async function UserProfileSettingsPage() {
   const session = await auth();
   const t = await getTranslations("Settings.userProfile");

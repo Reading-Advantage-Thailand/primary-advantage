@@ -19,6 +19,9 @@ const createLessonChatbotQuestionSchema = z.object({
   isInitial: z.boolean().optional().default(false),
 });
 
+/**
+ * Handles lesson chatbot conversation, streaming AI responses based on article context.
+ */
 export async function POST(request: NextRequest) {
   try {
     const param = await request.json();

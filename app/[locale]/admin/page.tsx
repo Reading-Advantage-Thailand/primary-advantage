@@ -27,6 +27,9 @@ interface AdminPageProps {
   params: Promise<{ locale: string }>;
 }
 
+/**
+ * Renders the admin dashboard home page (placeholder).
+ */
 export default async function AdminPage({ params }: AdminPageProps) {
   const { locale } = await params;
   const t = await getTranslations("AdminDashboard");

@@ -89,6 +89,10 @@ interface ClickableWord {
   partOfSpeech?: string;
 }
 
+/**
+ * Word ordering game component where users click words to form correct sentences.
+ * Shuffles words and tracks user-selected order against the correct sentence order.
+ */
 export function OrderWordGame({ deckId, sentences = [] }: OrderWordGameProps) {
   const router = useRouter();
   const t = useTranslations("SentencesPage.orderWordGame");

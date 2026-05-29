@@ -30,6 +30,10 @@ import { Eye, EyeOff, User, Mail, Lock, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
+/**
+ * Renders the page for adding a new student with a form containing name and email fields.
+ * Submits student data to the API and redirects to the students list on success.
+ */
 export default function AddStudentPage() {
   const t = useTranslations("Admin.Students.Add");
   const [isSubmitting, setIsSubmitting] = useState(false);

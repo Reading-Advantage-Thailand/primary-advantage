@@ -5,6 +5,11 @@ import { signInSchema } from "@/lib/zod";
 import { AuthError } from "next-auth";
 import { z } from "zod";
 
+/**
+ * Handles user sign in with credentials validation.
+ * @param value - The sign in data validated against signInSchema
+ * @param callbackUrl - Optional URL to redirect to after successful sign in
+ */
 export async function signInAction(
   value: z.infer<typeof signInSchema>,
   callbackUrl?: string,

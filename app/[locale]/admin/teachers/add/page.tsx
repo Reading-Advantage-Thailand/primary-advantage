@@ -40,6 +40,10 @@ interface TeacherFormData {
   confirmPassword: string;
 }
 
+/**
+ * Renders the page for adding a new teacher with a form containing name, email, role, and password fields.
+ * Validates password confirmation and submits to the API on success.
+ */
 export default function AddTeacherPage() {
   const t = useTranslations("AdminTeachers.Add");
   const tRoles = useTranslations("AdminTeachers.Table.roles");

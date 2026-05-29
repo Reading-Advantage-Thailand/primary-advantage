@@ -4,6 +4,9 @@ import { Separator } from "@/components/ui/separator";
 import React from "react";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders the teachers management page with a header and teachers table.
+ */
 export default async function TeachersPage() {
   const t = await getTranslations("AdminTeachers.page");
   return (

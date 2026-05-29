@@ -13,6 +13,9 @@ interface SchoolLeaderboardData {
   results: LeaderboardResult[];
 }
 
+/**
+ * Updates the school leaderboard rankings for all schools based on student XP earned this month.
+ */
 export const updateSchoolRankingModel = async () => {
   try {
     // Get current month date range
@@ -208,6 +211,11 @@ export const updateSchoolRankingModel = async () => {
   }
 };
 
+/**
+ * Fetches the leaderboard for a school, including a user's rank if they're not in the top 5.
+ * @param schoolId - The school ID (optional)
+ * @param userId - The user ID to include in results if not in top 5 (optional)
+ */
 export const getSchoolLeaderboardModel = async (
   schoolId?: string,
   userId?: string,

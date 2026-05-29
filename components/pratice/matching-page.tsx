@@ -4,6 +4,10 @@ import { Header } from "@/components/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Page component for the matching game practice activity.
+ * Fetches the flashcard deck ID and renders the MatchingGame component.
+ */
 export default async function MatchingGamePage() {
   const t = await getTranslations("SentencesPage.matchingGame");
   const deckResult = await getFlashcardDeckId();

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// Debug endpoint to check school data
+/**
+ * Debug endpoint to check school data and licenses for the current user.
+ */
 export async function GET() {
   try {
     const session = await auth();

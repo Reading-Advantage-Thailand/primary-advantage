@@ -71,6 +71,9 @@ interface StudentFormData {
   role: string;
 }
 
+/**
+ * Renders the admin students management page (placeholder with student state management).
+ */
 export default function DashboardPage() {
   // Sample data - replace with actual API calls
   const [students, setStudents] = useState<Student[]>([

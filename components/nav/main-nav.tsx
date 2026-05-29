@@ -17,6 +17,10 @@ interface MainNavProps {
   items?: MainNavItem[];
 }
 
+/**
+ * Main navigation component for desktop view.
+ * Displays site logo, navigation links, and a mobile menu toggle button.
+ */
 export function MainNav({ children, items }: MainNavProps) {
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const segment = useSelectedLayoutSegment();

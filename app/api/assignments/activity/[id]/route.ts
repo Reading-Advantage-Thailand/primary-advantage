@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 import { fetchAssignmentActivityById } from "@/server/controllers/assignmentController";
 
+/**
+ * Fetches assignment activity by ID.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

@@ -120,6 +120,9 @@ function getPartOfSpeech(
   return "noun"; // Default to noun
 }
 
+/**
+ * Retrieves sentence flashcards formatted as word ordering game data.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ deckId: string }> },
@@ -288,6 +291,9 @@ export async function GET(
   }
 }
 
+/**
+ * Records a word ordering activity and awards XP based on score.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ deckId: string }> },

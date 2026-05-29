@@ -5,6 +5,10 @@ import React from "react";
 import LessonVocabularyMatching from "../games/lesson-vocabulary-matching";
 import { useTranslations } from "next-intl";
 
+/**
+ * Task component for vocabulary matching activity.
+ * Displays a header with title/description and renders the LessonVocabularyMatching game component.
+ */
 export default function TaskVocabularyMatching({
   articleId,
 }: {

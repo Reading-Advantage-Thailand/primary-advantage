@@ -3,8 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
 import bcrypt from "bcryptjs";
 
-// Replace lines 31-47 in your current API with this corrected version:
-
+/**
+ * Updates a user's profile information including name, email, XP, level, CEFR level, and password.
+ * Supports role updates when specified. Uses a transaction to handle user data and role updates atomically.
+ * @param request - The incoming request with update data
+ * @param params - Route parameters containing the user ID
+ */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

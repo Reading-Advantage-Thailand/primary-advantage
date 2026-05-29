@@ -7,7 +7,11 @@ const addAdminSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
 });
 
-// POST /api/users/me/school/admins - Add a user as school admin
+/**
+ * Adds a user as a school admin for the current user's school.
+ * Only the school owner can add admins. Upgrades the user's role to admin if they were a user or teacher.
+ * @param request - The incoming request with the userId to add as admin
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();

@@ -13,6 +13,10 @@ function makeQueryClient() {
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
+/**
+ * Returns a QueryClient instance. Creates a new one on the server for each request,
+ * or returns a singleton instance on the client to preserve cache.
+ */
 export function getQueryClient() {
   if (isServer) {
     // บน Server: สร้าง client ใหม่เสมอสำหรับ "ทุก request"

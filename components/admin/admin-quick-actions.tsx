@@ -14,6 +14,10 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
+/**
+ * Renders quick action buttons for admin tasks including add teacher, add student,
+ * create article, import data, view reports, and manage classrooms.
+ */
 export function AdminQuickActions() {
   const t = useTranslations("AdminDashboard");
 

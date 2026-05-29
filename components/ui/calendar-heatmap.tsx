@@ -41,6 +41,9 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
 } & VariantDatesInput;
 
 /// utlity functions
+/**
+ * Custom hook for applying modifiers and modifier class names to calendar variants.
+ */
 function useModifers(
   variantClassnames: Classname[],
   datesPerVariant: Date[][],
@@ -70,6 +73,9 @@ function useModifers(
   return [modifiers, modifiersClassNames];
 }
 
+/**
+ * Sorts weighted dates and categorizes them into groups based on weight distribution.
+ */
 function categorizeDatesPerVariant(
   weightedDates: WeightedDateEntry[],
   noOfVariants: number,
@@ -208,4 +214,8 @@ function CalendarHeatmap({
 }
 CalendarHeatmap.displayName = "CalendarHeatmap";
 
+/**
+ * CalendarHeatmap displays a calendar with color-coded cells based on weighted date values.
+ * Supports multiple variants with custom classnames and can accept pre-categorized dates or weighted dates for auto-categorization.
+ */
 export { CalendarHeatmap };

@@ -85,6 +85,10 @@ interface ClassroomData {
 
 // type ViewMode = "grid" | "list";
 
+/**
+ * Enhanced class roster with search, filtering, and student management features.
+ * Displays student cards with CEFR levels, XP, and activity status. Includes enrollment and code generation.
+ */
 export default function EnhancedClassRoster() {
   const router = useRouter();
   const params = useParams();

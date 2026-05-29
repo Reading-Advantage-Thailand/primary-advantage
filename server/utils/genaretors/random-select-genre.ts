@@ -11,6 +11,10 @@ export interface randomSelectGenreResponse {
   subgenre: string;
 }
 
+/**
+ * Randomly selects a genre and subgenre for a given article type from the genres data file.
+ * @param params - Parameters including the article type (fiction or nonfiction)
+ */
 export async function randomSelectGenre(
   params: RandomSelectGenreParams
 ): Promise<randomSelectGenreResponse> {

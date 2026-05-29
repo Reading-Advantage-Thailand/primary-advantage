@@ -736,6 +736,10 @@ function LessonVocabularyFlashcardCardContent({
   );
 }
 
+/**
+ * Vocabulary flashcard game using FSRS algorithm for spaced repetition.
+ * Users rate cards (Again/Hard/Good/Easy) to optimize learning retention.
+ */
 export default function LessonVocabularyFlashcardGame({
   articleId,
 }: {

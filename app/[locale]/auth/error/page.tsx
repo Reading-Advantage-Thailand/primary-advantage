@@ -1,3 +1,6 @@
+/**
+ * Renders an authentication error message when the auth flow fails.
+ */
 const AuthErrorPage = () => {
   return (
     <div>

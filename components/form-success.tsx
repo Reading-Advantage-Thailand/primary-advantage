@@ -4,6 +4,10 @@ interface FormSuccessProps {
   message?: string;
 }
 
+/**
+ * Renders a success message alert with a check icon.
+ * Returns null if no message is provided.
+ */
 export function FormSuccess({ message }: FormSuccessProps) {
   if (!message) return null;
   return (

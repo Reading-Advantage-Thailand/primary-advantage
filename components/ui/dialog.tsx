@@ -6,30 +6,45 @@ import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Root component for dialog, provides open/close state management.
+ */
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
+/**
+ * Trigger component that opens the dialog when activated.
+ */
 function DialogTrigger({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
+/**
+ * Portals the dialog content to the body element.
+ */
 function DialogPortal({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
+/**
+ * Close button component for dismissing the dialog.
+ */
 function DialogClose({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
+/**
+ * Semi-transparent overlay behind the dialog content.
+ */
 function DialogOverlay({
   className,
   ...props
@@ -46,6 +61,9 @@ function DialogOverlay({
   );
 }
 
+/**
+ * Main content panel of the dialog with close button support.
+ */
 function DialogContent({
   className,
   children,
@@ -77,6 +95,9 @@ function DialogContent({
   );
 }
 
+/**
+ * Header section typically containing title and description.
+ */
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -87,6 +108,9 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/**
+ * Footer section typically containing action buttons.
+ */
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -100,6 +124,9 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/**
+ * Title heading for the dialog.
+ */
 function DialogTitle({
   className,
   ...props
@@ -113,6 +140,9 @@ function DialogTitle({
   );
 }
 
+/**
+ * Descriptive text for the dialog content.
+ */
 function DialogDescription({
   className,
   ...props
@@ -126,6 +156,9 @@ function DialogDescription({
   );
 }
 
+/**
+ * Dialog component with trigger, overlay, content, header, footer, title, and description sub-components.
+ */
 export {
   Dialog,
   DialogClose,

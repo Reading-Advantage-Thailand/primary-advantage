@@ -22,6 +22,11 @@ interface AssignmentActivity {
   isSentenceClozeTestCompleted: boolean;
 }
 
+/**
+ * Sentence activities hub providing access to 4 sentence-based games:
+ * order sentences, cloze test, order words, and matching.
+ * Shows completion status and allows activity selection.
+ */
 export default function TaskSentenceActivities({
   articleId,
 }: {

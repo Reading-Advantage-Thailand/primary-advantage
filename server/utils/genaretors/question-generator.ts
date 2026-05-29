@@ -32,6 +32,10 @@ interface PromptFileType {
   nonfiction: PromptsFileType[];
 }
 
+/**
+ * Generates a question (MC, SA, or LA) for an article using AI based on CEFR level and prompt templates.
+ * @param params - Generation parameters including CEFR level, article type, passage, title, summary, image description, and Zod schema
+ */
 export async function generateQuestion<T>(
   params: GenerateQuestionParams<T>
 ): Promise<GenerateQuestionResponse<T>> {

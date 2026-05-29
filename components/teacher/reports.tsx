@@ -77,6 +77,10 @@ interface Classes {
   googleClassroomId: string;
 }
 
+/**
+ * Table displaying classroom reports with student XP, levels, and activity data.
+ * Allows navigation to individual student progress pages.
+ */
 export default function Reports() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

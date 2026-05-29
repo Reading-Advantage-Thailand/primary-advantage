@@ -45,6 +45,10 @@ interface SAQFeedback {
   feedback: string;
 }
 
+/**
+ * Renders the content for Short Answer questions with an input field.
+ * Displays feedback and score in a modal dialog before final submission.
+ */
 export default function SAQuestionContent({
   articleId,
   questions,

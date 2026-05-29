@@ -32,6 +32,10 @@ interface TaskIntroductionProps {
   onCompleteChange: (complete: boolean) => void;
 }
 
+/**
+ * Introduction task displaying article preview, summary, and learning objectives.
+ * Shows article metadata including CEFR level, RA level, and estimated read time.
+ */
 export default function TaskIntroduction({
   article,
   onCompleteChange,

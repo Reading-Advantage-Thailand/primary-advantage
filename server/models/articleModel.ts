@@ -148,6 +148,10 @@ async function generateContent(
   };
 }
 
+/**
+ * Saves generated article content including the article, questions, image, and audio.
+ * @param content - Object containing article, mcq, saq, and laq data
+ */
 export async function saveArticleContent(
   content: GeneratedContent,
 ): Promise<void> {
@@ -234,6 +238,9 @@ export async function saveArticleContent(
   return;
 }
 
+/**
+ * Generates MCQ, SAQ, and LAQ questions for an article based on type, level, and content.
+ */
 export const generateQuestions = async (
   type: ArticleType,
   cefrLevel: ArticleBaseCefrLevel,
@@ -271,6 +278,11 @@ export const generateQuestions = async (
   return { mcq, saq, laq };
 };
 
+/**
+ * Generates multiple articles across types and levels, saving them to the database.
+ * @param type - Article type (FICTION/NONFICTION)
+ * @param level - CEFR level for the articles
+ */
 export const generateArticles = async ({
   type,
   level,
@@ -334,6 +346,9 @@ export const generateArticles = async ({
   }
 };
 
+/**
+ * Fetches articles with optional filtering by title, type, genre, subgenre, cefrLevel and pagination.
+ */
 export const getArticlesWithParams = async (params: {
   title?: string;
   type?: string;
@@ -373,6 +388,10 @@ export const getArticlesWithParams = async (params: {
   };
 };
 
+/**
+ * Fetches a single article by ID with its flashcards and activity logs.
+ * @param articleId - The article ID
+ */
 export const getArticleById = async (articleId: string) => {
   const article = await prisma.article.findUnique({
     where: { id: articleId },
@@ -389,6 +408,11 @@ export const getArticleById = async (articleId: string) => {
   return { article };
 };
 
+/**
+ * Fetches questions for an article by activity type, returning existing progress if completed.
+ * @param articleId - The article ID
+ * @param type - Activity type (MC_QUESTION, SA_QUESTION, LA_QUESTION)
+ */
 export const getQuestionsByArticleId = async (
   articleId: string,
   type: ActivityType,
@@ -495,6 +519,10 @@ export const getQuestionsByArticleId = async (
   }
 };
 
+/**
+ * Deletes an article and its associated files from storage.
+ * @param articleId - The article ID to delete
+ */
 export const deleteArticleByIdModel = async (articleId: string) => {
   try {
     await prisma.$transaction(async (tx) => {
@@ -516,6 +544,10 @@ export const deleteArticleByIdModel = async (articleId: string) => {
   }
 };
 
+/**
+ * Fetches all sentence-type flashcards for a user.
+ * @param userId - The user ID
+ */
 export const getAllFlashcards = async (userId: string) => {
   return await prisma.flashcardDeck.findFirst({
     where: {
@@ -528,6 +560,10 @@ export const getAllFlashcards = async (userId: string) => {
   });
 };
 
+/**
+ * Deletes a flashcard by its ID.
+ * @param flashcardId - The flashcard ID to delete
+ */
 export const deleteFlashcardById = async (flashcardId: string) => {
   return await prisma.flashcardCard.delete({
     where: {
@@ -536,6 +572,10 @@ export const deleteFlashcardById = async (flashcardId: string) => {
   });
 };
 
+/**
+ * Tracks article read activity for the current user, creating a new activity record if none exists.
+ * @param articleId - The article ID
+ */
 export const getArticleActivity = async (articleId: string) => {
   try {
     const user = await currentUser();
@@ -590,6 +630,13 @@ export const getArticleActivity = async (articleId: string) => {
   }
 };
 
+/**
+ * Saves an article as a draft without publishing or generating questions.
+ * @param article - The article data
+ * @param type - Article type
+ * @param genre - Genre
+ * @param subgenre - Subgenre
+ */
 export const saveArticleAsDraftModel = async (
   article: GeneratedContent["article"],
   type: ArticleType,
@@ -631,6 +678,10 @@ export const saveArticleAsDraftModel = async (
   }
 };
 
+/**
+ * Fetches all articles authored by a specific user.
+ * @param userId - The user ID
+ */
 export const getCustomArticle = async (userId: string) => {
   try {
     return await prisma.article.findMany({
@@ -644,6 +695,10 @@ export const getCustomArticle = async (userId: string) => {
   }
 };
 
+/**
+ * Creates a custom article with generated questions and publishes it.
+ * @param article - The article data
+ */
 export const createdArticleCustom = async (
   article: GeneratedContent["article"],
 ) => {
@@ -695,6 +750,10 @@ export const createdArticleCustom = async (
   }
 };
 
+/**
+ * Updates a custom article: generates questions, images, audio, and marks as published/approved.
+ * @param articleId - The article ID to update
+ */
 export const updateAprovedCustomArticle = async (articleId: string) => {
   try {
     const article = await prisma.article.findUnique({
@@ -780,6 +839,10 @@ export const updateAprovedCustomArticle = async (articleId: string) => {
   }
 };
 
+/**
+ * Checks if an article exists by ID.
+ * @param articleId - The article ID
+ */
 export const checkExistingArticle = async (articleId: string) => {
   try {
     return await prisma.article.findUnique({ where: { id: articleId } });

@@ -22,10 +22,17 @@ interface AppLayoutProps {
   disableLeaderboard?: boolean;
 }
 
+/**
+ * Base props interface for app layout components.
+ */
 export interface BaseAppLayoutProps {
   children?: React.ReactNode;
 }
 
+/**
+ * Main application layout component with navigation, progress bar for students,
+ * leaderboard, and sidebar. Handles session authentication and redirects.
+ */
 export default async function AppLayout({
   children,
   mainNavConfig,

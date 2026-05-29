@@ -64,6 +64,10 @@ type PaginationInfo = {
   limit: number;
 };
 
+/**
+ * Table displaying student's assignments with filtering, sorting, and pagination.
+ * Shows assignment details, due dates, status, and allows navigation to lessons.
+ */
 export default function StudentAssignmentTable() {
   const [sorting, setSorting] = React.useState<SortingState>([
     {

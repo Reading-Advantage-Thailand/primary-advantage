@@ -20,6 +20,10 @@ import Image from "next/image";
 import { getArticleImageUrl, getAudioUrl } from "@/lib/storage-config";
 import { useTranslations } from "next-intl";
 
+/**
+ * First reading component with synchronized audio playback and word highlighting.
+ * Allows click-to-seek to specific words and speed control.
+ */
 export default function TaskFirstReading({ article }: { article: Article }) {
   const t = useTranslations("Lesson.Reading");
   const [readingSpeed, setReadingSpeed] = useState("1");

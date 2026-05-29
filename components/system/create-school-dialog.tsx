@@ -17,6 +17,10 @@ interface CreateSchoolDialogProps {
   onSchoolCreated?: () => void;
 }
 
+/**
+ * Dialog component for creating a new school.
+ * Opens a modal containing the school creation form.
+ */
 export function CreateSchoolDialog({
   onSchoolCreated,
 }: CreateSchoolDialogProps) {

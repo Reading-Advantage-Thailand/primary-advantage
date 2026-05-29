@@ -6,6 +6,10 @@ import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 
+/**
+ * Toggle button to switch between dark and light themes.
+ * Shows sun icon in dark mode and moon icon in light mode.
+ */
 export function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
 

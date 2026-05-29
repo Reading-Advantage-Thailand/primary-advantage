@@ -22,6 +22,11 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
+/**
+ * Renders the admin dashboard header with title, subtitle, and action buttons.
+ * Displays different layouts for desktop and mobile views including import data,
+ * reports, add teacher buttons, and notifications.
+ */
 export function AdminDashboardHeader() {
   const t = useTranslations("AdminDashboard");
 

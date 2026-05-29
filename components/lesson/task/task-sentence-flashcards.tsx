@@ -5,6 +5,10 @@ import React from "react";
 import LessonSentenceFlashcardGame from "../games/lesson-sentence-flashcard";
 import { useTranslations } from "next-intl";
 
+/**
+ * Task component for sentence flashcards activity.
+ * Displays a header with title/description and renders the LessonSentenceFlashcardGame.
+ */
 export default function TaskSentenceFlashcards({
   articleId,
 }: {

@@ -7,6 +7,10 @@ type Props = {
   icon?: LucideIcon;
 };
 
+/**
+ * Renders a feature box card with icon, title, and description.
+ * Hover effect with scale and rotate animation.
+ */
 export function FeatureBox(props: Props) {
   return (
     <div className="relative overflow-hidden rounded-lg border p-2 shadow-2xl bg-[#1d2e64] hover:bg-[#2f3e7f] hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer hover:rotate-2 text-white border-none">

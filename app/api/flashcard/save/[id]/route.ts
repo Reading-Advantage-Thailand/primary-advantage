@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Saves a flashcard for an article.
+ */
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> },

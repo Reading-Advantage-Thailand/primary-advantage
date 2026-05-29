@@ -14,6 +14,10 @@ interface FlashcardDashboardProps {
   type?: "VOCABULARY" | "SENTENCE";
 }
 
+/**
+ * Renders the main flashcard dashboard with deck list or empty state.
+ * Fetches dashboard data and displays appropriate view based on deck existence.
+ */
 export default async function FlashcardDashboard({
   type,
 }: FlashcardDashboardProps) {

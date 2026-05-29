@@ -5,6 +5,9 @@ import * as LabelPrimitive from "@radix-ui/react-label"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Accessible label for form inputs built on Radix primitives.
+ */
 function Label({
   className,
   ...props
@@ -21,4 +24,7 @@ function Label({
   )
 }
 
+/**
+ * Label component for form inputs with Radix primitive, adds accessible labeling.
+ */
 export { Label }

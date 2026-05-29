@@ -2,6 +2,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FlashcardDashboard from "@/components/flashcards/flashcard-dashboard";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders the vocabulary page with flashcards.
+ */
 export default async function VocabularyPage() {
   const t = await getTranslations("VocabularyPage");
   return (

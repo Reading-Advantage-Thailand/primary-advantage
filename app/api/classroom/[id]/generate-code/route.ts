@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateClassCodeController } from "@/server/controllers/classroomController";
 
-// POST /api/classroom/[id]/generate-code - Generate a new class code
+/**
+ * Generates a new class code for a classroom.
+ */
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

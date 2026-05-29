@@ -72,6 +72,10 @@ const FormSchema = z.object({
   }),
 });
 
+/**
+ * Renders a form for creating a new license with fields for name, school, subscription type, max users, status, start date, and expiry duration.
+ * Submits to the API and redirects to the licenses list on success.
+ */
 export function CreateLicenseForm() {
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof FormSchema>>({

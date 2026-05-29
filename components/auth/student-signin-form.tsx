@@ -32,6 +32,10 @@ import { FormError } from "../form-error";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
+/**
+ * Renders a two-step sign-in form for students: first enter classroom code, then select the student name.
+ * Uses class codes to fetch and display available students for selection.
+ */
 export function StudentSignInForm({
   className,
   ...props

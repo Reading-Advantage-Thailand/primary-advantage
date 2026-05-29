@@ -35,6 +35,10 @@ export interface StandaloneLessonProps {
   article: Article;
 }
 
+/**
+ * Standalone lesson progress bar for non-assignment lessons.
+ * Manages 14 learning tasks with timer and progress tracking.
+ */
 export default function StandaloneLessonProgressBar({
   article,
 }: StandaloneLessonProps) {

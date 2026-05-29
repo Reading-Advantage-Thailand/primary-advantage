@@ -11,6 +11,9 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 
+/**
+ * Calendar component based on react-day-picker with shadcn/ui styling and navigation controls.
+ */
 function Calendar({
   className,
   classNames,
@@ -172,6 +175,9 @@ function Calendar({
   );
 }
 
+/**
+ * Calendar day button component for rendering individual day cells.
+ */
 function CalendarDayButton({
   className,
   day,
@@ -210,4 +216,7 @@ function CalendarDayButton({
   );
 }
 
+/**
+ * Calendar component based on react-day-picker with shadcn/ui styling and navigation controls.
+ */
 export { Calendar, CalendarDayButton };

@@ -60,6 +60,10 @@ interface SchoolProfileFormProps {
   onCancel?: () => void;
 }
 
+/**
+ * Form for creating a new school profile with name, contact name, and contact email.
+ * Creates school via POST request and updates user session if role is upgraded.
+ */
 export function SchoolProfileForm({
   onSuccess,
   onCancel,

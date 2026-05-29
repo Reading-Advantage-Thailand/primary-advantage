@@ -55,6 +55,10 @@ interface TeacherProgressReportsProps {
   currentUser: User;
 }
 
+/**
+ * Component displaying teacher progress reports with classroom and student statistics.
+ * Shows aggregate stats, allows filtering by classroom, and displays individual student details.
+ */
 export default function TeacherProgressReports({
   classrooms,
   students,

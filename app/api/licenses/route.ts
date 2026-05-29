@@ -17,6 +17,9 @@ const CreateLicenseSchema = z.object({
   subscriptionType: z.enum(["basic", "premium", "enterprise"]),
 });
 
+/**
+ * Creates a new license with generated key and calculated expiry date.
+ */
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
@@ -94,6 +97,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * Retrieves a paginated list of licenses with optional status and search filtering.
+ */
 export async function GET(request: NextRequest) {
   try {
     // Check authentication
@@ -160,6 +166,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/**
+ * Deletes a license by ID provided as query parameter.
+ */
 export async function DELETE(request: NextRequest) {
   try {
     const user = await currentUser();

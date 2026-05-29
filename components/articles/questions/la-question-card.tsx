@@ -13,6 +13,10 @@ import LAQuestionContent from "./la-question-content";
 import { LAQuestion, QuestionResponse } from "@/types";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders a Long Answer question card that displays LA questions for an article.
+ * Fetches questions by articleId and shows loading, error, incomplete, or completed states.
+ */
 export default async function LAQuestionCard({
   articleId,
 }: {

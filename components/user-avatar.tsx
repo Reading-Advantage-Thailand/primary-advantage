@@ -7,6 +7,9 @@ interface UserAvatarProps extends AvatarProps {
   user: Pick<User, "image" | "name">;
 }
 
+/**
+ * Avatar component displaying user image with fallback to icon when no image.
+ */
 export function UserAvatar({ user, ...props }: UserAvatarProps) {
   return (
     <Avatar {...props}>

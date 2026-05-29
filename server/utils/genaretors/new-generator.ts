@@ -30,6 +30,11 @@ import { se } from "date-fns/locale";
 //   status: "pending" | "processing" | "completed" | "failed";
 // }
 
+/**
+ * Generates a new article with questions, images, and audio using AI. Creates article, questions (MC, SA, LA), images, and audio flashcards in a transaction.
+ * Validates rating >= 2 before saving. If rating is lower, retries up to 3 times.
+ * @param levels - The CEFR level for the article (e.g., A1, A2, B1, B2)
+ */
 export const generateArticleNew = async (
   levels: ArticleBaseCefrLevel,
 ): Promise<void> => {

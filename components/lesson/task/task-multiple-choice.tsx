@@ -6,6 +6,10 @@ import { Article } from "@/types";
 import LessonMCQContent from "../pratice/lesson-task-mcq";
 import { useTranslations } from "next-intl";
 
+/**
+ * Multiple choice quiz task wrapper with themed header.
+ * Embeds the LessonMCQContent component for the quiz functionality.
+ */
 export default function TaskMultipleChoice({ article }: { article: Article }) {
   const t = useTranslations("Lesson.tasks");
 

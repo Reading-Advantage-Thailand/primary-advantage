@@ -25,6 +25,9 @@ const FormSchema = z.object({
   license: z.string().uuid({ message: "Invalid UUID format" }),
 });
 
+/**
+ * Form component for updating a user's license key with UUID validation.
+ */
 export function UpdateUserLicenseForm({
   username,
   userId,

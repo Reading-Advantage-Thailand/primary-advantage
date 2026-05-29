@@ -5,6 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { ActivityType } from "@/types/enum";
 import { calculateLevelAndCefrLevel } from "@/lib/utils";
 
+/**
+ * Updates user activity, recording XP earned and updating level/CEFR based on activity.
+ * @param articleId - The ID of the article associated with the activity
+ * @param type - The type of activity performed
+ * @param xpEarned - Amount of XP earned from the activity
+ * @param timer - Time spent on the activity in seconds
+ * @param data - Additional activity data including score and details
+ */
 export async function updateUserActivity(
   articleId: string,
   type: ActivityType,

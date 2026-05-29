@@ -86,6 +86,10 @@ interface DraggableSentence {
   isFromFlashcard?: boolean;
 }
 
+/**
+ * Sentence ordering game where users drag and drop sentences into correct order.
+ * Features audio hints, progress tracking, timer, and scoring.
+ */
 export default function LessonSentenceOrder({
   articleId,
 }: {

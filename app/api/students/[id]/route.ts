@@ -6,6 +6,9 @@ import {
 } from "@/server/controllers/studentController";
 
 // GET /api/students/[id] - Get specific student
+/**
+ * Retrieves a specific student by ID.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -14,6 +17,9 @@ export async function GET(
 }
 
 // PUT /api/students/[id] - Update student
+/**
+ * Updates a specific student's information.
+ */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -22,6 +28,9 @@ export async function PUT(
 }
 
 // DELETE /api/students/[id] - Delete student
+/**
+ * Deletes a specific student.
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

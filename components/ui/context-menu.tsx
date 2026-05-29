@@ -6,12 +6,18 @@ import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Root context menu component that wraps the Radix context menu primitive.
+ */
 function ContextMenu({
   ...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.Root>) {
   return <ContextMenuPrimitive.Root data-slot="context-menu" {...props} />
 }
 
+/**
+ * Trigger element that opens the context menu when activated.
+ */
 function ContextMenuTrigger({
   ...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.Trigger>) {
@@ -20,6 +26,9 @@ function ContextMenuTrigger({
   )
 }
 
+/**
+ * Groups context menu items together.
+ */
 function ContextMenuGroup({
   ...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.Group>) {
@@ -28,6 +37,9 @@ function ContextMenuGroup({
   )
 }
 
+/**
+ * Portals the context menu content to the body element.
+ */
 function ContextMenuPortal({
   ...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.Portal>) {
@@ -36,12 +48,18 @@ function ContextMenuPortal({
   )
 }
 
+/**
+ * Creates a sub-menu within the context menu.
+ */
 function ContextMenuSub({
   ...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.Sub>) {
   return <ContextMenuPrimitive.Sub data-slot="context-menu-sub" {...props} />
 }
 
+/**
+ * RadioGroup for selecting among multiple options in a context menu.
+ */
 function ContextMenuRadioGroup({
   ...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.RadioGroup>) {
@@ -53,6 +71,9 @@ function ContextMenuRadioGroup({
   )
 }
 
+/**
+ * Trigger that opens a sub-menu when clicked.
+ */
 function ContextMenuSubTrigger({
   className,
   inset,
@@ -77,6 +98,9 @@ function ContextMenuSubTrigger({
   )
 }
 
+/**
+ * Content displayed when a sub-menu trigger is activated.
+ */
 function ContextMenuSubContent({
   className,
   ...props
@@ -93,6 +117,9 @@ function ContextMenuSubContent({
   )
 }
 
+/**
+ * Content displayed when the context menu is open.
+ */
 function ContextMenuContent({
   className,
   ...props
@@ -111,6 +138,9 @@ function ContextMenuContent({
   )
 }
 
+/**
+ * Individual item within the context menu.
+ */
 function ContextMenuItem({
   className,
   inset,
@@ -126,7 +156,7 @@ function ContextMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive=*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -134,6 +164,9 @@ function ContextMenuItem({
   )
 }
 
+/**
+ * Checkbox item that can be checked or unchecked within the context menu.
+ */
 function ContextMenuCheckboxItem({
   className,
   children,
@@ -160,6 +193,9 @@ function ContextMenuCheckboxItem({
   )
 }
 
+/**
+ * Radio item for selecting a single option within the context menu.
+ */
 function ContextMenuRadioItem({
   className,
   children,
@@ -184,6 +220,9 @@ function ContextMenuRadioItem({
   )
 }
 
+/**
+ * Label displayed within the context menu.
+ */
 function ContextMenuLabel({
   className,
   inset,
@@ -204,6 +243,9 @@ function ContextMenuLabel({
   )
 }
 
+/**
+ * Separator line between menu items.
+ */
 function ContextMenuSeparator({
   className,
   ...props
@@ -217,6 +259,9 @@ function ContextMenuSeparator({
   )
 }
 
+/**
+ * Keyboard shortcut display for menu items.
+ */
 function ContextMenuShortcut({
   className,
   ...props
@@ -233,6 +278,9 @@ function ContextMenuShortcut({
   )
 }
 
+/**
+ * ContextMenu component with full suite of sub-components for building accessible context menus.
+ */
 export {
   ContextMenu,
   ContextMenuTrigger,

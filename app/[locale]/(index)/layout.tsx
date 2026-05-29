@@ -10,6 +10,10 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ReactNode } from "react";
 
+/**
+ * Root layout for the public index pages with navigation and footer.
+ * Shows different header content based on authentication status.
+ */
 export default async function Layout({ children }: { children: ReactNode }) {
   const session = await auth();
   const t = await getTranslations("MainNav");

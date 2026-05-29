@@ -8,6 +8,10 @@ import { Button } from "@/components/ui/button";
 import { LucideIcon } from "lucide-react";
 import * as IconsLucide from "lucide-react";
 
+/**
+ * New main navigation component using Next.js Link and Button components.
+ * Renders navigation items as buttons with optional icons.
+ */
 export function MainNav({
   items,
   className,

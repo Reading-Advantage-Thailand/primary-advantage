@@ -99,6 +99,10 @@ const formSchema = z.object({
   dueDate: z.coerce.date(),
 });
 
+/**
+ * Button component that opens a dialog to create a new assignment for an article.
+ * Allows teachers to select a classroom, assign students, and set a due date.
+ */
 export default function AssignmentButton({
   article,
   articleId,

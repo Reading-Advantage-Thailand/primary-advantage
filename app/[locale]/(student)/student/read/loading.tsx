@@ -8,6 +8,9 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * Renders a skeleton loading state for the article selection page.
+ */
 export default async function Loading() {
   return (
     <>

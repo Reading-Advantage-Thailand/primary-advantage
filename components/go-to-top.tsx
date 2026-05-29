@@ -5,6 +5,9 @@ import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
 
+/**
+ * Renders a floating button that scrolls the page to the top when clicked.
+ */
 export function GoToTop() {
   return (
     <div className="fixed right-4 bottom-4 z-50">

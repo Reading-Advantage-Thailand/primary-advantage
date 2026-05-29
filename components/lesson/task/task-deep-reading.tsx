@@ -20,6 +20,10 @@ import Image from "next/image";
 import { getArticleImageUrl, getAudioUrl } from "@/lib/storage-config";
 import { useTranslations } from "next-intl";
 
+/**
+ * Deep reading component with audio playback and word highlighting.
+ * Includes translation overlay, speed control, and click-to-seek functionality.
+ */
 export default function TaskFirstReading({ article }: { article: Article }) {
   const t = useTranslations("Lesson.Reading");
   const [readingSpeed, setReadingSpeed] = useState("1");

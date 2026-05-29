@@ -19,6 +19,10 @@ const alertVariants = cva(
   }
 )
 
+/**
+ * Alert component for displaying important messages to users.
+ * Supports default and destructive variants.
+ */
 function Alert({
   className,
   variant,
@@ -34,6 +38,9 @@ function Alert({
   )
 }
 
+/**
+ * Title text for the alert component.
+ */
 function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -47,6 +54,9 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * Description text for the alert component.
+ */
 function AlertDescription({
   className,
   ...props

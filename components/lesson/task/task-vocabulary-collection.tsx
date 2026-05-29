@@ -19,6 +19,10 @@ interface WordList {
   audioUrl: string;
 }
 
+/**
+ * Task component for vocabulary collection/word list activity.
+ * Loads and displays vocabulary words from an article with clickable word cards showing definitions and audio playback.
+ */
 export default function TaskVocabularyCollection({
   article,
 }: {

@@ -14,6 +14,10 @@ import { finishQuiz } from "@/actions/question";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 
+/**
+ * Renders the content for Multiple Choice questions with shuffled options.
+ * Tracks user responses, shows progress indicators, and handles quiz completion.
+ */
 export default function MCQuestionContent({
   articleId,
   questions,

@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// DELETE /api/users/me/school/admins/[adminId] - Remove a school admin
+/**
+ * Removes a school admin from the current user's school.
+ * Only the school owner can remove admins. Downgrades the admin's role to teacher if they have no other admin responsibilities.
+ * @param request - The incoming request
+ * @param params - Route parameters containing the adminId
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ adminId: string }> },

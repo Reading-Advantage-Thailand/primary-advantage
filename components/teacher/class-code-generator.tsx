@@ -29,6 +29,10 @@ interface ClassCodeGeneratorProps {
   buttonVariant?: "default" | "outline" | "ghost" | "secondary";
 }
 
+/**
+ * Component for generating and managing class codes for student self-enrollment.
+ * Displays current class code, expiration status, and allows copying enrollment instructions.
+ */
 export default function ClassCodeGenerator({
   classroomId,
   classroomName,

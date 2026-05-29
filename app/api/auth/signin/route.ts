@@ -3,6 +3,9 @@ import { signIn } from "@/lib/auth";
 import { signInSchema } from "@/lib/zod";
 import { AuthError } from "next-auth";
 
+/**
+ * Handles user sign in with email/password authentication.
+ */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

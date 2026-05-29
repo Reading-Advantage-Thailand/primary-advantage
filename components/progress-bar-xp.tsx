@@ -2,6 +2,9 @@ import React from "react";
 import { Progress } from "./ui/progress";
 import { LEVELS_XP } from "@/lib/utils";
 
+/**
+ * Displays an XP progress bar showing current level and XP progress toward the next level.
+ */
 export default function ProgressBar({
   currentXP,
   currentLevel,

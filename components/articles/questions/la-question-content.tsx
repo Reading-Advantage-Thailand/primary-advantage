@@ -60,6 +60,10 @@ interface FeedbackData {
   answer?: string;
 }
 
+/**
+ * Renders the content for Long Answer questions with a textarea input for user answers.
+ * Provides feedback on the answer and allows submitting the quiz when finished.
+ */
 export default function LAQuestionContent({
   articleId,
   questions,

@@ -13,6 +13,10 @@ import { useTransition } from "react";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useParams } from "next/navigation";
 
+/**
+ * Dropdown component for switching between available locales.
+ * Uses Next's navigation to replace the locale without page reload.
+ */
 export function LocaleSwitcher() {
   const locale = useLocale();
   const t = useTranslations("LocaleSwitcher");

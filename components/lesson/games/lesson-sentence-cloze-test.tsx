@@ -98,6 +98,10 @@ const AVAILABLE_LANGUAGES = {
   },
 } as const;
 
+/**
+ * Renders a cloze test game where users fill in blanks within sentences.
+ * Supports difficulty selection, audio hints, timer, and progress tracking.
+ */
 export default function LessonSentenceClozeTest({
   articleId,
 }: {

@@ -5,12 +5,16 @@ import {
 } from "@/server/controllers/classroomController";
 import { currentUser } from "@/lib/session";
 
-// GET /api/classroom - Get all classrooms for a teacher
+/**
+ * Gets all classrooms for the authenticated teacher.
+ */
 export async function GET() {
   return await fetchClassrooms();
 }
 
-// POST /api/classroom - Create a new classroom
+/**
+ * Creates a new classroom.
+ */
 export async function POST(request: NextRequest) {
   try {
     const user = await currentUser();

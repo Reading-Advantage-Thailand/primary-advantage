@@ -1,5 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+/**
+ * Renders a skeleton loading state for the article page.
+ */
 export default function ArticleLoading() {
   return (
     <div className="md:mb-5 md:flex md:flex-row md:gap-3">

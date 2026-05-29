@@ -44,6 +44,10 @@ interface StudentEnrollmentButtonProps {
   disabled?: boolean;
 }
 
+/**
+ * Button that opens a dialog to enroll available students into a classroom.
+ * Displays list of available students with search functionality and enrollment status.
+ */
 export default function StudentEnrollmentButton({
   classroomId,
   classroomName,

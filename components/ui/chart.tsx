@@ -24,6 +24,9 @@ type ChartContextProps = {
 
 const ChartContext = React.createContext<ChartContextProps | null>(null)
 
+/**
+ * Hook that provides access to the chart context from ChartContainer.
+ */
 function useChart() {
   const context = React.useContext(ChartContext)
 
@@ -34,6 +37,9 @@ function useChart() {
   return context
 }
 
+/**
+ * Provides chart context and renders a responsive chart container with themed styling.
+ */
 function ChartContainer({
   id,
   className,
@@ -69,6 +75,9 @@ function ChartContainer({
   )
 }
 
+/**
+ * Generates CSS styles for chart theming based on light/dark modes.
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -104,6 +113,9 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+/**
+ * Renders custom tooltip content for charts with formatting support for labels, indicators, and values.
+ */
 function ChartTooltipContent({
   active,
   payload,
@@ -250,6 +262,12 @@ function ChartTooltipContent({
 
 const ChartLegend = RechartsPrimitive.Legend
 
+/**
+ * Renders custom legend content for charts with configurable icons and labels.
+ */
+/**
+ * Renders custom legend content for charts with configurable icons and labels.
+ */
 function ChartLegendContent({
   className,
   hideIcon = false,
@@ -304,7 +322,12 @@ function ChartLegendContent({
   )
 }
 
-// Helper to extract item config from a payload.
+/**
+ * Extracts configuration from a chart payload based on the data key.
+ */
+/**
+ * Extracts configuration from a chart payload based on the data key.
+ */
 function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,
@@ -343,6 +366,9 @@ function getPayloadConfigFromPayload(
     : config[key as keyof typeof config]
 }
 
+/**
+ * Chart components including ChartContainer, ChartTooltip, ChartLegend, and helper functions.
+ */
 export {
   ChartContainer,
   ChartTooltip,

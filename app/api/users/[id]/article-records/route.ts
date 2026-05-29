@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { fetchUserActivity } from "@/server/controllers/userController";
 import { currentUser } from "@/lib/session";
 
+/**
+ * Retrieves user activity records for a specific user including article progress.
+ * Only accessible by teachers, system users, or the user themselves.
+ * @param request - The incoming request
+ * @param params - Route parameters containing the user ID
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

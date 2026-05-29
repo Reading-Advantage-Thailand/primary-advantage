@@ -7,6 +7,9 @@ import { Rating } from "ts-fsrs";
 import { ActivityType } from "@/types/enum";
 import { FlashcardCard } from "@/types";
 
+/**
+ * Processes a flashcard review, updating card scheduling via FSRS and recording the review.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ cardId: string }> },

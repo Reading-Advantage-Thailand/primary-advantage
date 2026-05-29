@@ -44,6 +44,12 @@ const SUPPORTED_LANGUAGES = {
   tw: "🇹🇼 Chinese (Traditional)",
 };
 
+/**
+ * Renders article content with audio playback, sentence highlighting, word-level click navigation,
+ * translation support for multiple languages, and flashcard saving functionality.
+ * Features auto-scroll, speed controls, and both fixed and inline player controls.
+ * @param props - Contains the article object with sentences, translations, and audio
+ */
 export default function ArticleContent({ article }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentSentenceRef = useRef<HTMLSpanElement | null>(null);

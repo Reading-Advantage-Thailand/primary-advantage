@@ -7,10 +7,17 @@ import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
+/**
+ * Copies the given string to the browser clipboard.
+ * @param value - The string value to copy to clipboard
+ */
 export function copyToClipboardWithMeta(value: string) {
   navigator.clipboard.writeText(value);
 }
 
+/**
+ * CopyButton renders a button that copies the specified value to clipboard with visual feedback.
+ */
 export function CopyButton({
   value,
   className,

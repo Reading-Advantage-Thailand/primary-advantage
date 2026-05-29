@@ -2,6 +2,9 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Styled input component with consistent shadcn/ui theming and accessibility.
+ */
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <input
@@ -18,4 +21,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   )
 }
 
+/**
+ * Input component with consistent shadcn/ui styling and accessibility support.
+ */
 export { Input }

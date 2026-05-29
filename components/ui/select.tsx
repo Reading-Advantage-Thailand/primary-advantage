@@ -6,24 +6,36 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Root select component that wraps Radix UI Select primitive.
+ */
 function Select({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
+/**
+ * Groups select items together with a label.
+ */
 function SelectGroup({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />;
 }
 
+/**
+ * Displays the selected value in a select trigger.
+ */
 function SelectValue({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />;
 }
 
+/**
+ * Trigger button that opens the select dropdown.
+ */
 function SelectTrigger({
   className,
   size = "default",
@@ -50,6 +62,9 @@ function SelectTrigger({
   );
 }
 
+/**
+ * Content panel that displays the select dropdown items.
+ */
 function SelectContent({
   className,
   children,
@@ -85,6 +100,9 @@ function SelectContent({
   );
 }
 
+/**
+ * Label displayed above select items in a group.
+ */
 function SelectLabel({
   className,
   ...props
@@ -98,6 +116,9 @@ function SelectLabel({
   );
 }
 
+/**
+ * Individual select option item.
+ */
 function SelectItem({
   className,
   children,
@@ -122,6 +143,9 @@ function SelectItem({
   );
 }
 
+/**
+ * Horizontal divider between select items.
+ */
 function SelectSeparator({
   className,
   ...props
@@ -135,6 +159,9 @@ function SelectSeparator({
   );
 }
 
+/**
+ * Button to scroll up in the select dropdown when content overflows.
+ */
 function SelectScrollUpButton({
   className,
   ...props
@@ -153,6 +180,9 @@ function SelectScrollUpButton({
   );
 }
 
+/**
+ * Button to scroll down in the select dropdown when content overflows.
+ */
 function SelectScrollDownButton({
   className,
   ...props

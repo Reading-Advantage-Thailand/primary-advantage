@@ -84,6 +84,10 @@ interface Classes {
   googleClassroomId: string;
 }
 
+/**
+ * Table displaying students enrolled in a classroom with search and filtering.
+ * Allows teachers to view student details, reset progress, and unenroll students.
+ */
 export default function ClassRoster() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

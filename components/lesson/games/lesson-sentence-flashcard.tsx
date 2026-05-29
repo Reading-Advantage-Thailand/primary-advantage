@@ -728,6 +728,10 @@ function LessonSentenceFlashcardCardContent({
   );
 }
 
+/**
+ * Renders a sentence flashcard study game with flipping cards and rating buttons.
+ * Tracks progress, elapsed time, and submits card ratings on completion.
+ */
 export default function LessonSentenceFlashcardGame({
   articleId,
 }: {

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Retrieves the user's sentence flashcard deck ID if there are due cards.
+ */
 export async function GET() {
   try {
     const user = await currentUser();

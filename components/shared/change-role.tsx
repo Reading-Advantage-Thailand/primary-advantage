@@ -23,6 +23,10 @@ type Props = {
   className?: string;
 };
 
+/**
+ * Component for changing user role between Student, Teacher, Admin, and System roles.
+ * In development mode, shows additional Admin and System role options.
+ */
 export default function ChangeRole({ userId, userRole, className }: Props) {
   const roles = [
     {

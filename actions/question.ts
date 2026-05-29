@@ -6,6 +6,11 @@ import { calculateLevelAndCefrLevel } from "@/lib/utils";
 import { getLaqFeedback, getSaqFeedback } from "@/server/utils/assistant";
 import { ActivityType, UserXpEarned } from "@/types/enum";
 
+/**
+ * Deletes a user's quiz activity to allow retaking the quiz.
+ * @param articleId - The ID of the article
+ * @param type - The activity type (quiz type)
+ */
 export async function retakeQuiz(articleId: string, type: ActivityType) {
   try {
     const user = await currentUser();
@@ -40,6 +45,12 @@ export async function retakeQuiz(articleId: string, type: ActivityType) {
   }
 }
 
+/**
+ * Finishes a quiz, recording the user's activity, XP earned, and updating their level/CEFR.
+ * @param articleId - The ID of the article
+ * @param data - Quiz data including question, answer, score, etc.
+ * @param type - The activity type (SA_QUESTION, LA_QUESTION, MC_QUESTION)
+ */
 export async function finishQuiz(
   articleId: string,
   data: {
@@ -161,6 +172,10 @@ export async function finishQuiz(
   return { success: true };
 }
 
+/**
+ * Gets AI feedback for a user's answer to a question.
+ * @param value - Contains articleId, question, answer, and activity type
+ */
 export async function getFeedback(value: {
   data: {
     articleId: string;

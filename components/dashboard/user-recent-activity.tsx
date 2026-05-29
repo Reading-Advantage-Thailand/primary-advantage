@@ -24,6 +24,10 @@ interface UserActiviryChartProps {
   data: UserActivityLog[];
 }
 
+/**
+ * Displays the user's most recent activity with a collapsible list of all activities.
+ * Shows activity type, timestamp, and completion status badges.
+ */
 export default function UserRecentActivity({ data }: UserActiviryChartProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const t = useTranslations("Reports");

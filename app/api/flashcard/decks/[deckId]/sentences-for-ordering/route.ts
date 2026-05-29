@@ -4,6 +4,9 @@ import { currentUser } from "@/lib/session";
 import { ActivityType, FlashcardType } from "@/types/enum";
 import { getAudioUrl } from "@/lib/storage-config";
 
+/**
+ * Retrieves sentence flashcards formatted as sentence ordering game groups.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ deckId: string }> },
@@ -162,6 +165,9 @@ export async function GET(
   }
 }
 
+/**
+ * Records a sentence ordering activity and awards XP based on score.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ deckId: string }> },

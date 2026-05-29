@@ -6,6 +6,10 @@ import TeacherProgressReports from "@/components/teacher/teacher-progress-report
 import { fetchClassrooms } from "@/server/controllers/classroomController";
 import { fetchStudentsByRole } from "@/server/controllers/classroomController";
 
+/**
+ * Renders the teacher progress reports page.
+ * Fetches classrooms and students data for authenticated teachers.
+ */
 export default async function ReportsPage() {
   const user = await currentUser();
 

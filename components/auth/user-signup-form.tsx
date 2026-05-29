@@ -22,6 +22,10 @@ import { signUpAction } from "@/actions/signupAction";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 
+/**
+ * Renders a user registration form with name, email, and password fields.
+ * Submits the signup action and redirects to signin on success.
+ */
 export function SignUpForm({
   className,
   ...props

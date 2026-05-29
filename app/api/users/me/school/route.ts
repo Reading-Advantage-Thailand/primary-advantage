@@ -9,7 +9,10 @@ const schoolSchema = z.object({
   contactEmail: z.string().email().optional(),
 });
 
-// GET /api/users/me/school - Get current user's school
+/**
+ * Retrieves the current user's school information including admins, licenses, and user count.
+ * @returns The school data with owner and license information
+ */
 export async function GET() {
   try {
     const session = await auth();
@@ -88,7 +91,12 @@ export async function GET() {
   }
 }
 
-// POST /api/users/me/school - Create and associate school with current user
+/**
+ * Creates a new school and associates it with the current user as owner, member, and admin.
+ * Upgrades the user's role to admin if they were a user or teacher.
+ * @param request - The incoming request with school data (name, contactName, contactEmail)
+ * @returns The created school data
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -278,7 +286,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PATCH /api/users/me/school - Update current user's school
+/**
+ * Updates the current user's school information (name, contactName, contactEmail).
+ * Only the school owner can update the school. Checks for duplicate school names.
+ * @param request - The incoming request with updated school data
+ * @returns The updated school data
+ */
 export async function PATCH(request: NextRequest) {
   try {
     const session = await auth();
@@ -396,7 +409,11 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// DELETE /api/users/me/school - Delete current user's school (only if they are the owner)
+/**
+ * Deletes the current user's school. Only the school owner can delete the school.
+ * Downgrades the owner's role from admin to user after deletion.
+ * @returns Success message after school deletion
+ */
 export async function DELETE() {
   try {
     const session = await auth();

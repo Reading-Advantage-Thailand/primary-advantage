@@ -23,6 +23,10 @@ interface EmptyDashboardProps {
   deckType?: "VOCABULARY" | "SENTENCE";
 }
 
+/**
+ * Renders an empty state dashboard encouraging users to start reading.
+ * Shows instructions for building vocabulary or sentence decks based on deckType.
+ */
 export function EmptyDashboard({ deckType }: EmptyDashboardProps) {
   const getContent = () => {
     if (deckType === "VOCABULARY") {

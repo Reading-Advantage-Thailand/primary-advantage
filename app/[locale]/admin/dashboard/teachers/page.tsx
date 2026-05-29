@@ -3,6 +3,9 @@ import { Header } from "@/components/header";
 import { Separator } from "@/components/ui/separator";
 import React from "react";
 
+/**
+ * Renders the admin teachers management page with a header.
+ */
 export default function TeachersPage() {
   return (
     <div>

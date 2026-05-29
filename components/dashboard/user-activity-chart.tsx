@@ -125,6 +125,10 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+/**
+ * Renders a dashboard chart displaying user activity progress and XP earned over time.
+ * Shows in-progress vs completed article counts and a line chart of XP over a date range.
+ */
 export function UserActivityChart({ data, xpLogs }: UserActiviryChartProps) {
   const t = useTranslations("Reports");
   const tTime = useTranslations("Overall.time");

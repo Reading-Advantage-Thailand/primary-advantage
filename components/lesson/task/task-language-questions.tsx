@@ -6,6 +6,10 @@ import LessonLanguageQuestion from "../lesson-language-question";
 import { Article } from "@/types";
 import { useTranslations } from "next-intl";
 
+/**
+ * Language questions task providing an AI-powered chat interface for asking questions.
+ * Wraps the LessonLanguageQuestion component with themed container.
+ */
 export default function TaskLanguageQuestions({
   article,
 }: {

@@ -3,6 +3,9 @@ import { getQuestionsByArticleId } from "@/server/models/articleModel";
 import { NextRequest, NextResponse } from "next/server";
 import { ActivityType } from "@/types/enum";
 
+/**
+ * Fetches questions for an article based on articleId and questionType query parameters.
+ */
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
@@ -26,6 +29,9 @@ export async function GET(req: NextRequest) {
   }
 }
 
+/**
+ * Handles POST request to update user activity for an article.
+ */
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ articleId: string }> },

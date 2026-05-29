@@ -5,6 +5,10 @@ interface HeaderProps {
   children?: React.ReactNode;
 }
 
+/**
+ * Renders a page header with heading, optional description text, and children.
+ * Supports warning variant for error states.
+ */
 export function Header({
   heading,
   text,

@@ -99,6 +99,10 @@ const SUPPORTED_LANGUAGES = {
   tw: "🇹🇼 Chinese (Traditional)",
 };
 
+/**
+ * Word ordering game where users arrange scrambled words into correct sentences.
+ * Supports multiple languages, audio hints, timer, scoring, and progress tracking.
+ */
 export default function LessonSentenceOrderWord({
   articleId,
 }: {

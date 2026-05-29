@@ -39,6 +39,10 @@ interface QuizScores {
   saqScore: number;
 }
 
+/**
+ * Lesson summary displaying completion stats, XP earned, quiz scores, and saved content.
+ * Shows celebration animation, time spent, vocabulary, and sentence lists.
+ */
 export default function TaskLessonSummary({
   article,
   timerSpent,

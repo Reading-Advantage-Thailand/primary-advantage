@@ -3,6 +3,9 @@ import { getTranslations } from "next-intl/server";
 
 type Props = {};
 
+/**
+ * Renders the About page displaying information about the Reading Advantage platform.
+ */
 export default async function AboutPage({}: Props) {
   const t = await getTranslations("AboutPage");
 

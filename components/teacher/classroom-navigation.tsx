@@ -40,6 +40,10 @@ interface ClassroomNavigationProps {
   showBackButton?: boolean;
 }
 
+/**
+ * Navigation header component for classroom pages.
+ * Displays classroom info, navigation links, and copy buttons for class code/password.
+ */
 export default function ClassroomNavigation({
   classroom,
   showBackButton = true,

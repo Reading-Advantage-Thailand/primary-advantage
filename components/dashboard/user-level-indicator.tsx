@@ -18,6 +18,10 @@ interface Cefrlevel {
   currentLevel: string;
 }
 
+/**
+ * Displays the user's CEFR English level as a semicircular gauge chart.
+ * Shows current level with a description based on the user's performance.
+ */
 export default function CEFRLevels({ currentLevel }: Cefrlevel) {
   const td: string | any = useTranslations("Reports.level.description");
   const t = useTranslations("Reports.level");

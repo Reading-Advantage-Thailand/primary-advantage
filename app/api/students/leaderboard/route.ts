@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSchoolLeaderboardController } from "@/server/controllers/schoolController";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Retrieves the leaderboard for the current user's school.
+ */
 export async function GET(request: NextRequest) {
   try {
     const user = await currentUser();

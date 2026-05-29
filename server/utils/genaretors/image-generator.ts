@@ -28,6 +28,12 @@ interface GeneratedImageResult {
   error?: string;
 }
 
+/**
+ * Generates 3 stylistically consistent storybook illustrations for an article with retry logic.
+ * Creates image prompts using AI, generates images via Google Vertex, and uploads to cloud storage.
+ * @param params - Generation parameters including image description, article ID, and passage
+ * @param maxRetries - Maximum retry attempts (default 5)
+ */
 export async function generateImage(
   params: GenerateImageParams,
   maxRetries = 5,

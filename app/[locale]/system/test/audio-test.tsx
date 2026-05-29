@@ -9,6 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import FlashcardGame from "@/components/flashcards/flashcard-game";
 // import { FlashcardType } from "@/types/enum";
 
+/**
+ * Renders a test UI for regenerating audio for an article by ID.
+ */
 export default function AudioTest() {
   const [articleId, setArticleId] = useState<string>("");
   const [isPending, startTransition] = useTransition();

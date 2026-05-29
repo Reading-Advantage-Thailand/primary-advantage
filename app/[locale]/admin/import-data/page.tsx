@@ -42,6 +42,9 @@ import React, { useState, useRef } from "react";
 import { parse } from "csv/sync";
 import { useTranslations } from "next-intl";
 
+/**
+ * Renders the admin data import page for uploading CSV files for students, teachers, and classes.
+ */
 export default function ImportDataPage() {
   const t = useTranslations("ImportData");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

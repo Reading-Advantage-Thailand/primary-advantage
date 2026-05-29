@@ -16,6 +16,10 @@ import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
+/**
+ * Renders a button that opens a confirmation dialog to retake a quiz.
+ * Refreshes the page after the user confirms the retake action.
+ */
 export default function RetakeButton({
   articleId,
   type,

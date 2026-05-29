@@ -15,6 +15,10 @@ interface CreateSchoolCardProps {
   onCreate: () => void;
 }
 
+/**
+ * A dashed-card component with a button to create a new school.
+ * Displays an icon, title, and description with a call-to-action button.
+ */
 export function CreateSchoolCard({ onCreate }: CreateSchoolCardProps) {
   const t = useTranslations("Settings.schoolProfile.createSchoolcard");
   return (

@@ -3,6 +3,10 @@ import { unlink, readdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 
+/**
+ * Deletes a specific temporary file by filename from the temp directory.
+ * @param request - The request containing the fileName query parameter
+ */
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -39,7 +43,10 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// Clean up old temporary files (older than 24 hours)
+/**
+ * Cleans up old temporary files from the temp directory that are older than 24 hours.
+ * Files with timestamps in their names are evaluated for age.
+ */
 export async function POST() {
   try {
     const tempDir = path.join(process.cwd(), "temp");

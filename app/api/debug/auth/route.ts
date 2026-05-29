@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/debug/auth - Debug authentication
+/**
+ * Debug endpoint to check authentication status and user session data.
+ */
 export async function GET(request: NextRequest) {
   try {
     console.log("Debug Auth API: Starting request...");

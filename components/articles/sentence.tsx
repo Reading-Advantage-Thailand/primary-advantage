@@ -30,6 +30,10 @@ export interface Sentence {
   endTime: number;
 }
 
+/**
+ * Renders a dialog button that opens a modal showing a list of sentences from the article.
+ * Displays each sentence with its translation and an audio button for playback.
+ */
 export default function Sentence({
   sentences,
   audioUrl,

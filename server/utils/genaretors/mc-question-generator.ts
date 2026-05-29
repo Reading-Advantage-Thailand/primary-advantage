@@ -21,6 +21,10 @@ interface GenerateMCQuestionResponse {
   }[];
 }
 
+/**
+ * Generates multiple choice questions for an article using AI.
+ * @param params - Question generation parameters including CEFR level, article type, passage, title, summary, and image description
+ */
 export async function generateMCQuestion(
   params: GenrateMCQuestionParams
 ): Promise<GenerateMCQuestionResponse> {

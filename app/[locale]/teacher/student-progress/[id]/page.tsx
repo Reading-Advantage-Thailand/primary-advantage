@@ -10,6 +10,10 @@ import UserActivityHeatMap from "@/components/dashboard/user-heatmap-chart";
 import { UserXpOverAllChart } from "@/components/dashboard/user-xpoverall-chart";
 import ReadingStatsChart from "@/components/dashboard/user-reading-chart";
 
+/**
+ * Renders the student progress page showing user activity, XP, and reading stats.
+ * Fetches user activity data by user ID and displays charts and heatmaps.
+ */
 export default async function StudentProgressPage({
   params,
 }: {

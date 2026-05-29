@@ -180,6 +180,10 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+/**
+ * Renders a line chart showing total XP earned over the last 6 months.
+ * Displays cumulative monthly XP with a date range description.
+ */
 export function UserXpOverAllChart({ data }: UserActiviryChartProps) {
   const formattedData = formatDataForDays(data, 6);
 

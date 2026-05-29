@@ -27,6 +27,10 @@ interface StudentQueryParams {
 }
 
 // GET Controller - Fetch students
+/**
+ * Fetches a paginated list of students with optional filtering and statistics.
+ * @param request - NextRequest containing query params for page, limit, search, classroomId, cefrLevel
+ */
 export const getStudentsController = async (
   request: NextRequest,
 ): Promise<NextResponse<StudentsResponse | { error: string }>> => {
@@ -97,6 +101,10 @@ export const getStudentsController = async (
 };
 
 // POST Controller - Create student
+/**
+ * Creates a new student with the given data.
+ * @param request - NextRequest containing name, email, cefrLevel, classroomId, password
+ */
 export const createStudentController = async (
   request: NextRequest,
 ): Promise<
@@ -185,6 +193,11 @@ export const createStudentController = async (
 };
 
 // GET by ID Controller - Fetch specific student
+/**
+ * Fetches a single student by ID.
+ * @param request - NextRequest
+ * @param params - Promise containing the student ID
+ */
 export const getStudentByIdController = async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -236,6 +249,11 @@ export const getStudentByIdController = async (
 };
 
 // PUT Controller - Update student
+/**
+ * Updates a student's data.
+ * @param request - NextRequest containing update data
+ * @param params - Promise containing the student ID
+ */
 export const updateStudentController = async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -299,6 +317,11 @@ export const updateStudentController = async (
 };
 
 // DELETE Controller - Delete student
+/**
+ * Deletes a student by ID.
+ * @param request - NextRequest
+ * @param params - Promise containing the student ID
+ */
 export const deleteStudentController = async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

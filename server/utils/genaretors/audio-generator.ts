@@ -416,6 +416,13 @@ function processWordTimestampsIntoSentences(
   return sentenceTimepoints;
 }
 
+/**
+ * Generates audio for an article passage using an external TTS service, processes word timestamps into sentence timepoints, and uploads to cloud storage.
+ * Automatically triggers sentence translation after audio generation.
+ * @param passage - The article text to generate audio for
+ * @param sentences - Pre-split sentences for timestamp mapping
+ * @param articleId - The article ID to associate the audio with
+ */
 export async function generateAudio({
   passage,
   sentences,

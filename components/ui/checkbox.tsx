@@ -29,4 +29,7 @@ function Checkbox({
   )
 }
 
+/**
+ * Checkbox component with Radix primitive, includes check icon indicator.
+ */
 export { Checkbox }

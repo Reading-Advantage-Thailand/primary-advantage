@@ -50,6 +50,10 @@ interface CreateSchoolFormProps {
   onCancel?: () => void;
 }
 
+/**
+ * Form for creating a new school with name, contact name, and contact email.
+ * Submits school data via POST to the schools API.
+ */
 export function CreateSchoolForm({
   onSuccess,
   onCancel,

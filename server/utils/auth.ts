@@ -19,6 +19,10 @@ export interface UserWithRoles {
 }
 
 // Validate user and return user with roles
+/**
+ * Validates a user and returns their data including roles and school admin associations.
+ * @param userId - The ID of the user to validate
+ */
 export const validateUser = async (
   userId: string,
 ): Promise<UserWithRoles | null> => {
@@ -62,6 +66,10 @@ export const validateUser = async (
 };
 
 // Check if user has admin permissions
+/**
+ * Checks if a user has admin permissions (system admin, admin role, or school admin).
+ * @param userWithRoles - User object with roles to check
+ */
 export const checkAdminPermissions = async (
   userWithRoles: UserWithRoles,
 ): Promise<boolean> => {
@@ -88,6 +96,10 @@ export const checkAdminPermissions = async (
 };
 
 // Check if user has teacher permissions
+/**
+ * Checks if a user has teacher permissions (teacher role, admin, system, or school admin).
+ * @param userWithRoles - User object with roles to check
+ */
 export const checkTeacherPermissions = async (
   userWithRoles: UserWithRoles,
 ): Promise<boolean> => {
@@ -113,6 +125,10 @@ export const checkTeacherPermissions = async (
 };
 
 // Check if user has student permissions
+/**
+ * Checks if a user has student permissions. Students can access their own data; higher roles can access student data.
+ * @param userWithRoles - User object with roles to check
+ */
 export const checkStudentPermissions = async (
   userWithRoles: UserWithRoles,
 ): Promise<boolean> => {
@@ -141,6 +157,10 @@ export const checkStudentPermissions = async (
 };
 
 // Get user's accessible school IDs
+/**
+ * Returns all school IDs a user can access. System admins access all schools; others access only their assigned school.
+ * @param userWithRoles - User object with roles and school associations
+ */
 export const getUserSchoolIds = async (
   userWithRoles: UserWithRoles,
 ): Promise<string[]> => {
@@ -184,6 +204,11 @@ export const getUserSchoolIds = async (
 };
 
 // Validate if user can access specific school
+/**
+ * Validates whether a user can access a specific school based on their permissions.
+ * @param userWithRoles - User object with roles and school associations
+ * @param schoolId - The school ID to check access for
+ */
 export const canAccessSchool = async (
   userWithRoles: UserWithRoles,
   schoolId: string,
@@ -199,6 +224,10 @@ export const canAccessSchool = async (
   }
 };
 
+/**
+ * Retrieves all role names assigned to a user.
+ * @param userId - The ID of the user whose roles to fetch
+ */
 export const getUserRoles = async (userId: string): Promise<string[]> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },

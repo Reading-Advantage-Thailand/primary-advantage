@@ -4,6 +4,11 @@ import { addDays } from "date-fns";
 import { currentUser } from "@/lib/session";
 import { UserWithRoles } from "@/server/utils/auth";
 
+/**
+ * Creates or updates a class code for a classroom.
+ * @param classrooomId - The classroom ID
+ * @param classCode - The class code to set
+ */
 export const createClassCode = async (
   classrooomId: string,
   classCode: string,
@@ -35,6 +40,10 @@ export const createClassCode = async (
   }
 };
 
+/**
+ * Creates a new classroom with optional teacher assignment.
+ * @param data - Object containing name, teacherId, classCode, grade, role
+ */
 export const createClassroom = async (data: {
   name: string;
   teacherId?: string;
@@ -104,6 +113,11 @@ export const createClassroom = async (data: {
 };
 
 // Enroll a student in a classroom
+/**
+ * Enrolls a student in a classroom after validating the student exists and is not already enrolled.
+ * @param studentId - The student ID
+ * @param classroomId - The classroom ID
+ */
 export const enrollStudentInClassroom = async (
   studentId: string,
   classroomId: string,
@@ -181,6 +195,12 @@ export const enrollStudentInClassroom = async (
 };
 
 // Un-enroll a student from a classroom
+/**
+ * Unenrolls a student from a classroom after verifying teacher ownership if specified.
+ * @param studentId - The student ID
+ * @param classroomId - The classroom ID
+ * @param teacherId - Optional teacher ID for ownership verification
+ */
 export const unenrollStudentFromClassroom = async (
   studentId: string,
   classroomId: string,
@@ -252,6 +272,11 @@ export const unenrollStudentFromClassroom = async (
 };
 
 // Get available students for enrollment (students not in the classroom)
+/**
+ * Fetches students who are not enrolled in a specific classroom.
+ * @param classroomId - The classroom ID
+ * @param teacherId - Optional teacher ID for ownership verification
+ */
 export const getAvailableStudentsForClassroom = async (
   classroomId: string,
   teacherId?: string,
@@ -312,6 +337,10 @@ export const getAvailableStudentsForClassroom = async (
 };
 
 // Get all classrooms based on user role
+/**
+ * Fetches all classrooms accessible to a user based on their role.
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const getAllClassrooms = async (userWithRoles: UserWithRoles) => {
   try {
     // Check user roles to determine access level
@@ -411,6 +440,11 @@ export const getAllClassrooms = async (userWithRoles: UserWithRoles) => {
 };
 
 // Update a classroom
+/**
+ * Updates a classroom's name, grade, and description.
+ * @param id - The classroom ID
+ * @param data - Object containing name, grade, description
+ */
 export const updateClassroom = async (
   id: string,
   data: {
@@ -452,6 +486,12 @@ export const updateClassroom = async (
 };
 
 // Delete a classroom
+/**
+ * Deletes a classroom, either removing just the teacher (if multiple) or the whole classroom.
+ * @param classroomId - The classroom ID
+ * @param teacherId - The teacher ID performing the deletion
+ * @param role - The role of the user
+ */
 export const deleteClassroom = async (
   classroomId: string,
   teacherId: string,
@@ -516,6 +556,10 @@ export const deleteClassroom = async (
 };
 
 // Get all students for a teacher from their classrooms
+/**
+ * Fetches all students in a teacher's classrooms.
+ * @param teacherId - The teacher ID
+ */
 export const getAllStudentsByTeacher = async (teacherId: string) => {
   try {
     // Get all classrooms for the teacher
@@ -579,6 +623,10 @@ export const getAllStudentsByTeacher = async (teacherId: string) => {
 };
 
 // Get all students by admin
+/**
+ * Fetches all students in classrooms belonging to an admin's school.
+ * @param adminId - The admin user ID
+ */
 export const getAllStudentsByAdmin = async (adminId: string) => {
   try {
     const schoolId = await prisma.schoolAdmins.findFirst({
@@ -651,6 +699,9 @@ export const getAllStudentsByAdmin = async (adminId: string) => {
 };
 
 // Get all students in the system (for system role)
+/**
+ * Fetches all students in the system with their classroom assignments.
+ */
 export const getAllStudentsInSystem = async () => {
   try {
     // Get all users with STUDENT role
@@ -726,6 +777,11 @@ export const getAllStudentsInSystem = async () => {
 };
 
 // Get a specific classroom with its students
+/**
+ * Fetches a classroom with its students, teachers, and latest activity data.
+ * @param classroomId - The classroom ID
+ * @param teacherId - Optional teacher ID for ownership verification
+ */
 export const getClassroomWithStudents = async (
   classroomId: string,
   teacherId?: string,
@@ -809,6 +865,10 @@ export const getClassroomWithStudents = async (
   }
 };
 
+/**
+ * Looks up a classroom by student enrollment code and returns enrolled students.
+ * @param code - The classroom code (passwordStudents)
+ */
 export const getClassroomStudentForLogin = async (code: string) => {
   try {
     //check code
@@ -851,6 +911,11 @@ export const getClassroomStudentForLogin = async (code: string) => {
 };
 
 // Generate a unique class code for a classroom
+/**
+ * Generates a unique 8-character alphanumeric class code for a classroom, valid for 7 days.
+ * @param classroomId - The classroom ID
+ * @param teacherId - Optional teacher ID for ownership verification
+ */
 export const generateClassCode = async (
   classroomId: string,
   teacherId?: string,

@@ -27,6 +27,10 @@ const FormSchema = z.object({
   }),
 });
 
+/**
+ * Renders a form for changing the current user's username.
+ * Validates the username is at least 5 characters and updates via API.
+ */
 export function ChangeUsernameForm({
   username,
   userId,

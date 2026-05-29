@@ -42,6 +42,10 @@ const info = [
   },
 ];
 
+/**
+ * Renders the site footer with logo, navigation links, and social icons.
+ * Includes theme toggle and locale switcher.
+ */
 export function Footer({ className }: FooterProps) {
   return (
     <footer className="text-white">

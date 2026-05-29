@@ -115,6 +115,10 @@ type Classes = {
   alternateLink?: string;
 };
 
+/**
+ * Table displaying all classrooms assigned to the current teacher.
+ * Supports editing, deleting, and navigating to classroom rosters and reports.
+ */
 export default function MyClasses() {
   const t = useTranslations("TeacherMyClasses");
   const [sorting, setSorting] = React.useState<SortingState>([]);

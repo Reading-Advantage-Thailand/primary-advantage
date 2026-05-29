@@ -97,6 +97,10 @@ const CEFR_LEVELS = [
   { value: "B2+", label: "B2+ (High Advanced)", description: "Upper advanced" },
 ];
 
+/**
+ * Dialog component for setting a student's CEFR level.
+ * Displays current level, allows selecting a new level, and shows preview of changes.
+ */
 export default function StudentCefrLevelSetter({
   studentId,
   studentName,

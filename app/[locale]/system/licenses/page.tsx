@@ -3,6 +3,9 @@ import { Separator } from "@/components/ui/separator";
 import { Header } from "@/components/header";
 import LicenseTable from "@/components/system/license-table";
 
+/**
+ * Renders the licenses management page with a header and license table.
+ */
 export default async function LicensePage() {
   return (
     <div>

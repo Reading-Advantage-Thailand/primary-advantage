@@ -23,6 +23,10 @@ import { FormError } from "../form-error";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
+/**
+ * Renders a sign-in form for teachers with email and password fields.
+ * Supports Google OAuth sign-in and includes password reset link.
+ */
 export function TeacherSignInForm({
   className,
   ...props

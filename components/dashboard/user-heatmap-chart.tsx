@@ -48,6 +48,10 @@ interface UserActiviryChartProps {
   data: UserActivityLog[];
 }
 
+/**
+ * Renders a calendar heatmap showing user activity frequency over time.
+ * Groups dates by activity count into three intensity levels.
+ */
 export default function UserActivityHeatMap({ data }: UserActiviryChartProps) {
   const formattedData = formatDataHeatmap(data);
   const t = useTranslations("Reports");

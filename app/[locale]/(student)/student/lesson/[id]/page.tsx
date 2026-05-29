@@ -6,6 +6,9 @@ import React from "react";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Generates metadata for the lesson page including title and description.
+ */
 export async function generateMetadata({
   params,
 }: {
@@ -20,6 +23,9 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Renders the lesson page, displaying either an assignment-based lesson card or a standalone article lesson.
+ */
 export default async function LessonPage({
   params,
   searchParams,

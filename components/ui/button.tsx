@@ -37,6 +37,10 @@ const buttonVariants = cva(
   },
 );
 
+/**
+ * Button component with multiple variants and sizes.
+ * Supports variants like default, destructive, outline, secondary, ghost, link, accept, reject.
+ */
 function Button({
   className,
   variant,
@@ -58,4 +62,8 @@ function Button({
   );
 }
 
+/**
+ * Button component with multiple variants and sizes.
+ * Supports variants like default, destructive, outline, secondary, ghost, link, accept, reject.
+ */
 export { Button, buttonVariants };

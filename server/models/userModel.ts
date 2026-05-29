@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { ActivityType } from "@/types/enum";
 import bcrypt from "bcryptjs";
 
+/**
+ * Creates a new user with the default "user" role. Hashes the password before storing.
+ * @param data - User creation data including name, email, and password
+ */
 export const createUser = async (data: {
   name: string;
   email: string;
@@ -63,6 +67,13 @@ export const createUser = async (data: {
   }
 };
 
+/**
+ * Records a user activity such as article reads, questions answered, or ratings given.
+ * @param activityType - The type of activity being recorded
+ * @param details - Activity details including responses, progress, and timer
+ * @param targetId - Optional ID of the target entity (e.g., article ID)
+ * @param xpEarned - Optional XP earned from this activity
+ */
 export const updateUserActivity = async (
   activityType: ActivityType,
   details: {
@@ -95,6 +106,10 @@ export const updateUserActivity = async (
   }
 };
 
+/**
+ * Retrieves a user by email address, including their roles. Assigns default "user" role if missing.
+ * @param email - The email address to search for
+ */
 export const getUserByEmail = async (email: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -143,6 +158,10 @@ export const getUserByEmail = async (email: string) => {
     console.log(error);
   }
 };
+/**
+ * Retrieves a user by their unique ID.
+ * @param id - The user ID to search for
+ */
 export const getUserById = async (id: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -156,6 +175,10 @@ export const getUserById = async (id: string) => {
   }
 };
 
+/**
+ * Retrieves a user's activity history and XP logs, sorted by most recent.
+ * @param id - The user ID whose activity to retrieve
+ */
 export const getUserActivity = async (id: string) => {
   try {
     const user = await getUserById(id);
@@ -185,6 +208,14 @@ export const getUserActivity = async (id: string) => {
   }
 };
 
+/**
+ * Retrieves paginated article records for a user, including scores and completion status.
+ * Groups activities by article and determines status (READ, UNRATED, COMPLETED_MCQ, etc.).
+ * @param userId - The user ID to fetch article records for
+ * @param page - Page number for pagination (default 1)
+ * @param limit - Number of records per page (default 10)
+ * @param search - Optional search filter by article title
+ */
 export const getUserArticleRecords = async (
   userId: string,
   page: number = 1,
@@ -374,6 +405,11 @@ export const getUserArticleRecords = async (
   }
 };
 
+/**
+ * Retrieves articles that need re-reading based on user performance and activity criteria.
+ * Criteria includes: low MC scores (<60%), unread ratings, incomplete question progression, or stale access.
+ * @param userId - The user ID to fetch reminder articles for
+ */
 export const getUserReminderReread = async (userId: string) => {
   try {
     // Get all article activities for the user

@@ -94,6 +94,10 @@ interface SchoolDetailProps {
   onRefresh: () => void;
 }
 
+/**
+ * Displays school information including name, contact details, license, and admins.
+ * Provides edit and delete functionality for school owners.
+ */
 export function SchoolDetail({
   school,
   onEdit,

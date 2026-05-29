@@ -10,6 +10,10 @@ import { ShieldCheck } from "lucide-react";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
+/**
+ * Renders a forgot password form that sends a reset email to the user.
+ * Displays a success message after the email is sent.
+ */
 export function UserResetPassForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isEmailSent, setIsEmailSent] = React.useState<boolean>(false);

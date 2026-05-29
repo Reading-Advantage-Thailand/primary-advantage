@@ -79,6 +79,10 @@ type LicenseWithSchool = License & {
   } | null;
 };
 
+/**
+ * Table displaying all licenses with filtering, sorting, and pagination.
+ * Supports copying license keys, editing, and deleting licenses.
+ */
 export default function LicenseTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

@@ -25,6 +25,9 @@ interface OrderSentenceGameData {
   difficulty: "easy" | "medium" | "hard";
 }
 
+/**
+ * Gets sentences formatted for the ordering game from user's sentence flashcards.
+ */
 export async function getSentencesForOrderingGame(): Promise<{
   success: boolean;
   data?: OrderSentenceGameData[];
@@ -88,6 +91,9 @@ export async function getSentencesForOrderingGame(): Promise<{
   }
 }
 
+/**
+ * Gets the flashcard deck ID for the current user's sentence deck.
+ */
 export async function getFlashcardDeckId(): Promise<{
   success: boolean;
   deckId?: string;

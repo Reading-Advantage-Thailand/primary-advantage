@@ -21,6 +21,10 @@ interface UserAccountNavProps {
   user: User;
 }
 
+/**
+ * User account dropdown navigation component.
+ * Displays user avatar, name, email, role badge, and role-based navigation links with sign out option.
+ */
 export function UserAccountNav({ user }: UserAccountNavProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const t = useTranslations("MainNav.usernav");

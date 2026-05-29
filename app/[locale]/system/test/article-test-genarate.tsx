@@ -6,6 +6,9 @@ import { generateArticle, generateArticleNew } from "@/actions/article";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
 
+/**
+ * Renders a test page for generating articles with an input for amount and buttons to trigger generation.
+ */
 export default function ArticleTestGenerate() {
   const [amount, setAmount] = useState(1);
   const [isPending, startTransition] = useTransition();

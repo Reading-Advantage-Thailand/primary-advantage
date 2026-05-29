@@ -17,6 +17,9 @@ import {
 } from "lucide-react";
 import React from "react";
 
+/**
+ * Renders the admin dashboard page with summary cards and activity charts.
+ */
 export default function DashboardPage() {
   return (
     <div>

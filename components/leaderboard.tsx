@@ -33,6 +33,10 @@ function getInitials(name: string): string {
     .slice(0, -1);
 }
 
+/**
+ * Renders a leaderboard table showing user rankings by XP within a classroom.
+ * Displays rank, name (or "you" indicator), XP, and classroom for each user.
+ */
 export default function Leaderboard({
   data,
   schoolName,

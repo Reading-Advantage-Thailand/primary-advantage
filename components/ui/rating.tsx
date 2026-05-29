@@ -170,6 +170,10 @@ const StarRating: React.FC<StarRatingProps> = ({
   );
 };
 
+/**
+ * StarRating is an interactive or read-only star rating component with half-star support.
+ * Displays a visual rating using Star icons, supports hover preview and callbacks on rating change.
+ */
 export default StarRating;
 
 /*

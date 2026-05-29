@@ -23,14 +23,23 @@ export const LEVELS_XP = [
   // { min: 221000, max: 242999, cefrLevel: "C2+", raLevel: 18 },
 ];
 
+/**
+ * Merges class names with tailwind-merge, combining clsx and tailwind-merge functionality.
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Removes parenthetical content from genre strings (e.g., "Science Fiction (Sci-Fi)" becomes "Science Fiction").
+ */
 export function cleanGenre(genre: string): string {
   return genre.replace(/\s*\(.*?\)\s*$/, "");
 }
 
+/**
+ * Converts text to a sanitized translation key format: lowercase, underscores, no special chars.
+ */
 export function sanitizeTranslationKey(text: string): string {
   return cleanGenre(text)
     .toLowerCase()
@@ -40,6 +49,9 @@ export function sanitizeTranslationKey(text: string): string {
     .replace(/^_|_$/g, ""); // Remove leading/trailing underscores
 }
 
+/**
+ * Generates a cryptographically secure random code of specified length.
+ */
 export function generateSecureCode(length = 8): string {
   const charset =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -48,10 +60,16 @@ export function generateSecureCode(length = 8): string {
   return Array.from(array, (x) => charset[x % charset.length]).join("");
 }
 
+/**
+ * Generates a random 6-character class code using base36 encoding.
+ */
 export function generateRandomClassCode() {
   return Math.random().toString(36).substring(2, 8);
 }
 
+/**
+ * Calculates the new XP total and determines the level and CEFR level based on XP earned.
+ */
 export function calculateLevelAndCefrLevel(xpEarned: number, userXp: number) {
   const newXp = userXp + xpEarned;
   const level = LEVELS_XP.find(
@@ -63,6 +81,9 @@ export function calculateLevelAndCefrLevel(xpEarned: number, userXp: number) {
   return { newXp, raLevel, cefrLevel };
 }
 
+/**
+ * Converts a CEFR level string to its corresponding RA level number.
+ */
 export function convertCefrLevel(cefrLevel: string) {
   const levels = [
     { cefrLevel: "A0-", raLevel: 1 },
@@ -86,6 +107,9 @@ export function convertCefrLevel(cefrLevel: string) {
   return level?.raLevel || 1;
 }
 
+/**
+ * Converts a locale code to its full display name.
+ */
 export function convertLocaleFull(locale: string) {
   const localeMap: Record<string, string> = {
     en: "English",
@@ -97,6 +121,9 @@ export function convertLocaleFull(locale: string) {
   return localeMap[locale as keyof typeof localeMap] || locale;
 }
 
+/**
+ * Formats a date as a relative time string (e.g., "5 minutes ago", "yesterday").
+ */
 export function formatDate(createdAt: Date): string {
   const t = useTranslations("Overall.time");
   const now = new Date();
@@ -119,6 +146,9 @@ export function formatDate(createdAt: Date): string {
 }
 
 // Generate a random license key
+/**
+ * Generates a formatted license key in the format XXX-XXX-XXX.
+ */
 export function generateLicenseKey() {
   return `${generateSecureCode(6)}-${generateSecureCode(6)}-${generateSecureCode(6)}`;
 }

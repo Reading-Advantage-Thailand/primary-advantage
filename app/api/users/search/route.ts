@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/users/search - Search for users by name or email
+/**
+ * Searches for users by name or email, excluding the current user from results.
+ * Returns up to 10 matching users with their roles.
+ * @param request - The incoming request with the search query parameter 'q'
+ * @returns Array of matching users
+ */
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();

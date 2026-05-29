@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
 import { fsrsService } from "@/lib/fsrs-service";
 
+/**
+ * Retrieves due flashcards for a specific deck using the FSRS algorithm.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ deckId: string }> },

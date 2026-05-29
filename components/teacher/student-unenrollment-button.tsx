@@ -39,6 +39,10 @@ interface StudentUnenrollmentButtonProps {
   disabled?: boolean;
 }
 
+/**
+ * Button that opens a confirmation dialog to unenroll a student from a classroom.
+ * Shows warning about losing access to classroom content and confirms the action.
+ */
 export default function StudentUnenrollmentButton({
   student,
   classroomId,

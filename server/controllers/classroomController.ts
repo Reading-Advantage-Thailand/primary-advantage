@@ -17,6 +17,9 @@ import { currentUser } from "@/lib/session";
 import { validateUser } from "../utils/auth";
 
 // GET /api/classroom - Get all classrooms for a teacher
+/**
+ * Fetches all classrooms for the current user based on their role.
+ */
 export async function fetchClassrooms() {
   try {
     const user = await currentUser();
@@ -41,6 +44,11 @@ export async function fetchClassrooms() {
 }
 
 // GET /api/classroom/[id] - Get a specific classroom with students
+/**
+ * Fetches a specific classroom by ID with its students.
+ * @param req - NextRequest
+ * @param params - Promise containing the classroom ID
+ */
 export async function getClassroomController(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -87,6 +95,14 @@ export async function getClassroomController(
 }
 
 // POST /api/classroom - Create a new classroom
+/**
+ * Creates a new classroom with the given parameters.
+ * @param name - Name of the classroom
+ * @param userId - ID of the teacher user (optional)
+ * @param grade - Grade level (optional)
+ * @param classCode - Class code (optional)
+ * @param role - Role of the creator (optional)
+ */
 export async function createClassroomController(
   name: string,
   userId?: string,
@@ -110,6 +126,11 @@ export async function createClassroomController(
 }
 
 // PATCH /api/classroom/[id] - Update a classroom
+/**
+ * Updates a classroom's name, grade, and description.
+ * @param req - NextRequest containing the update data
+ * @param params - Promise containing the classroom ID
+ */
 export async function updateClassroomController(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -155,6 +176,12 @@ export async function updateClassroomController(
 }
 
 // DELETE /api/classroom/[id] - Delete a classroom
+/**
+ * Deletes a classroom by ID, with permission checks.
+ * @param classroomId - ID of the classroom to delete
+ * @param userId - ID of the user performing the deletion
+ * @param role - Role of the user
+ */
 export async function deleteClassroomController(
   classroomId: string,
   userId: string,
@@ -175,6 +202,9 @@ export async function deleteClassroomController(
 }
 
 // GET /api/classroom/students - Get students based on user role
+/**
+ * Fetches students based on the current user's role (system/admin/teacher).
+ */
 export async function fetchStudentsByRole() {
   try {
     const user = await currentUser();
@@ -218,6 +248,11 @@ export async function fetchStudentsByRole() {
 }
 
 // POST /api/classroom/[id]/enroll - Enroll a student in a classroom
+/**
+ * Enrolls a student in a classroom.
+ * @param req - NextRequest containing the studentId
+ * @param params - Promise containing the classroom ID
+ */
 export async function enrollStudentController(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -268,6 +303,11 @@ export async function enrollStudentController(
 }
 
 // DELETE /api/classroom/[id]/unenroll - Unenroll a student from a classroom
+/**
+ * Unenrolls a student from a classroom.
+ * @param req - NextRequest containing the studentId
+ * @param params - Promise containing the classroom ID
+ */
 export async function unenrollStudentController(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -322,6 +362,11 @@ export async function unenrollStudentController(
 }
 
 // GET /api/classroom/[id]/available-students - Get available students for enrollment
+/**
+ * Fetches students who are not enrolled in a specific classroom.
+ * @param req - NextRequest
+ * @param params - Promise containing the classroom ID
+ */
 export async function getAvailableStudentsController(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -361,6 +406,11 @@ export async function getAvailableStudentsController(
 }
 
 // POST /api/classroom/[id]/generate-code - Generate a new class code
+/**
+ * Generates a new enrollment code for a classroom.
+ * @param req - NextRequest
+ * @param params - Promise containing the classroom ID
+ */
 export async function generateClassCodeController(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

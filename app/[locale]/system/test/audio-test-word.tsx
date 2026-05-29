@@ -7,6 +7,9 @@ import { generateWordAudios } from "@/actions/test";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+/**
+ * Renders a test UI for regenerating audio for a specific word by article ID.
+ */
 export default function AudioTestWord() {
   const [articleId, setArticleId] = useState<string>("");
   const [isPending, startTransition] = useTransition();

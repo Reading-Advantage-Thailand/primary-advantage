@@ -46,6 +46,9 @@ export const metadata: Metadata = {
   // manifest: `http://localhost:3000/site.webmanifest`,
 };
 
+/**
+ * Renders the root layout with locale support, session provider, theme, internationalization, and toast notifications.
+ */
 export default async function RootLayout({
   children,
   params,

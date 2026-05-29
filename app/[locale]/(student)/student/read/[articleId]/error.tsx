@@ -2,6 +2,9 @@
 
 import { Link } from "@/i18n/navigation";
 
+/**
+ * Renders a 404 error page when an article is not found.
+ */
 export default function ArticleError() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16">

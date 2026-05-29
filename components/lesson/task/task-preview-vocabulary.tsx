@@ -20,6 +20,10 @@ interface WordList {
   audioUrl: string;
 }
 
+/**
+ * Preview vocabulary task displaying word list with audio and definitions.
+ * Allows users to click words to reveal definitions in their selected language.
+ */
 export default function TaskPreviewVocabulaty({
   article,
 }: {

@@ -5,6 +5,10 @@ import LessonVocabularyFlashcardGame from "../games/lesson-vocabulary-flashcard-
 import { Book } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+/**
+ * Task component for vocabulary flashcards activity.
+ * Displays a header with title/description and renders the LessonVocabularyFlashcardGame.
+ */
 export default function TaskVocabularyFlashcards({
   articleId,
 }: {

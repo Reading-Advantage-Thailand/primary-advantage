@@ -3,6 +3,9 @@
 import { Link, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
+/**
+ * Renders the 404 not-found page with options to go back or return home.
+ */
 export default function NotFound() {
   const t = useTranslations("NotFound");
   const router = useRouter();

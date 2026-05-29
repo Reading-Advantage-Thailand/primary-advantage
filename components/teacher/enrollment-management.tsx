@@ -64,6 +64,10 @@ interface EnrollmentManagementProps {
   refreshStudents?: () => void;
 }
 
+/**
+ * Component for managing student enrollment in a classroom.
+ * Displays enrolled students and allows enrolling new or unenrolling existing students.
+ */
 export default function EnrollmentManagement({
   classroomId,
   classroomName,

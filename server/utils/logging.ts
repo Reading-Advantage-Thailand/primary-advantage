@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
 
+/**
+ * Creates a JSON log file and appends a summary entry for audio processing events.
+ * @param articleId - The article ID associated with the log
+ * @param data - The data to log
+ * @param logType - The type of log (processing, input, output, error, or problems)
+ */
 export function createLogFile(
   articleId: string,
   data: any,

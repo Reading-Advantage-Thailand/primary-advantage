@@ -48,6 +48,11 @@ interface Classroom {
   students: Student[];
 }
 
+/**
+ * Form component for creating and assigning articles to classrooms.
+ * Allows teachers to select a classroom, name the assignment, add a description,
+ * select students, and set a due date.
+ */
 export default function AssignForm({
   onSave,
   articleId,

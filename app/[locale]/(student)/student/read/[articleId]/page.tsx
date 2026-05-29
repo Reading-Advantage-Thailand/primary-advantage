@@ -18,6 +18,9 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { FileTextIcon } from "lucide-react";
 
+/**
+ * Generates metadata for the article quiz page.
+ */
 export async function generateMetadata({
   params,
 }: {
@@ -34,6 +37,9 @@ export async function generateMetadata({
 
 type Params = Promise<{ articleId: string }>;
 
+/**
+ * Renders the article quiz page with questions, word list, and sentence components.
+ */
 export default async function ArticleQuizPage({ params }: { params: Params }) {
   const user = await currentUser();
 

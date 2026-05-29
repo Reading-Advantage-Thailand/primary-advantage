@@ -4,6 +4,9 @@ import { currentUser } from "@/lib/session";
 import { ActivityType } from "@/types/enum";
 import { getAudioUrl } from "@/lib/storage-config";
 
+/**
+ * Retrieves flashcards formatted as matching game data (sentence-translation or word-definition).
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ deckId: string }> },
@@ -109,6 +112,9 @@ export async function GET(
   }
 }
 
+/**
+ * Records a sentence matching activity and awards XP based on score.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ deckId: string }> },

@@ -22,6 +22,10 @@ interface Props {
   onCompleteChange: (complete: boolean) => void;
 }
 
+/**
+ * AI-powered language learning chat interface for interactive Q&A about articles.
+ * Features real-time messaging with a bot using lesson context.
+ */
 export default function LessonLanguageQuestion({
   article,
 }: {

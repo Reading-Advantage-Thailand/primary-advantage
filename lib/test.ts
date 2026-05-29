@@ -1,6 +1,10 @@
 // test-storage.ts
 import { bucket } from "@/utils/storage";
 
+/**
+ * Tests the connection to Google Cloud Storage bucket.
+ * @returns true if connection is successful, false otherwise
+ */
 export async function testConnection() {
   try {
     await bucket.exists();

@@ -56,6 +56,9 @@ interface SingleDeckViewInlineProps {
   deckType?: "VOCABULARY" | "SENTENCE";
 }
 
+/**
+ * Available language options for vocabulary flashcard translations.
+ */
 export const VOCABULARY_LANGUAGES = {
   en: {
     code: "en",
@@ -89,6 +92,9 @@ export const VOCABULARY_LANGUAGES = {
   },
 };
 
+/**
+ * Available language options for sentence flashcard translations.
+ */
 export const SENTENCE_LANGUAGES = {
   th: {
     code: "th",
@@ -116,6 +122,10 @@ export const SENTENCE_LANGUAGES = {
   },
 };
 
+/**
+ * Renders an inline deck view with study progress, card stats, and a start button.
+ * Loads and displays flashcard game when study session begins.
+ */
 export function SingleDeckViewInline({
   deck,
   showHeader = true,

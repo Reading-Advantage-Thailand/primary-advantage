@@ -85,6 +85,10 @@ interface Classroom {
   }>;
 }
 
+/**
+ * Renders a table of classrooms with create, edit, and delete functionality.
+ * Supports searching by name, grade, or class code. Displays student and teacher counts.
+ */
 export function ClassroomsTable() {
   const t = useTranslations("Admin.Classrooms");
   const tc = useTranslations("TeacherCreateClass");

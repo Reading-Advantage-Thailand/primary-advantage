@@ -6,6 +6,9 @@ import { settingsPageConfig } from "@/configs/settings-page-config";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
+/**
+ * Layout wrapper for the not-found page with navigation and authentication check.
+ */
 export default async function NotfoundPageLayout({
   children,
 }: {

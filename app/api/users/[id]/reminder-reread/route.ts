@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { fetchUserReminderReread } from "@/server/controllers/userController";
 import { currentUser } from "@/lib/session";
 
+/**
+ * Fetches reminder reread data for a specific user.
+ * Only teachers, system users, or the user themselves can access this endpoint.
+ * @param request - The incoming request
+ * @param params - Route parameters containing the user ID
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

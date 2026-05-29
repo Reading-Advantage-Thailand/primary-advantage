@@ -5,6 +5,9 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Provider that sets up tooltip delay and behavior.
+ */
 function TooltipProvider({
   delayDuration = 0,
   ...props
@@ -18,6 +21,9 @@ function TooltipProvider({
   )
 }
 
+/**
+ * Root tooltip component that wraps the Radix primitive with provider.
+ */
 function Tooltip({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
@@ -28,12 +34,18 @@ function Tooltip({
   )
 }
 
+/**
+ * Trigger element that shows the tooltip on hover/focus.
+ */
 function TooltipTrigger({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
 }
 
+/**
+ * Content panel of the tooltip with arrow and positioning.
+ */
 function TooltipContent({
   className,
   sideOffset = 0,

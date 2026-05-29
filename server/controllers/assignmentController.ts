@@ -10,6 +10,10 @@ import getAssignmentById, {
 } from "../models/assignmentModel";
 import { currentUser } from "@/lib/session";
 
+/**
+ * Fetches assignments for a classroom, optionally filtered by article or assignment ID.
+ * @param req - NextRequest containing searchParams for classroomId, articleId, id, search, page, limit
+ */
 export async function fetchAssignments(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -198,6 +202,10 @@ export async function fetchAssignments(req: NextRequest) {
   }
 }
 
+/**
+ * Creates a new assignment for a classroom with specified students.
+ * @param req - NextRequest containing classroomId, articleId, students, name, description, dueDate
+ */
 export async function postAssignment(req: NextRequest) {
   try {
     const { classroomId, articleId, students, name, description, dueDate } =
@@ -243,6 +251,11 @@ export async function postAssignment(req: NextRequest) {
   }
 }
 
+/**
+ * Fetches assignments for a specific student with pagination and filtering.
+ * @param request - NextRequest containing query params for page, limit, status, dueDateFilter, search
+ * @param params - Promise containing the student ID
+ */
 export async function fetchStudentAssignments(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -280,6 +293,11 @@ export async function fetchStudentAssignments(
   }
 }
 
+/**
+ * Fetches a single assignment by its ID.
+ * @param request - NextRequest
+ * @param params - Promise containing the assignment ID
+ */
 export async function fetchAssignmentById(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -298,6 +316,11 @@ export async function fetchAssignmentById(
   }
 }
 
+/**
+ * Updates a student's lesson progress for an assignment.
+ * @param request - NextRequest containing articleId, progress, and timeSpent
+ * @param params - Promise containing the assignment ID
+ */
 export async function postUserLessonProgress(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -331,6 +354,11 @@ export async function postUserLessonProgress(
   }
 }
 
+/**
+ * Fetches a student's lesson progress for an assignment.
+ * @param request - NextRequest
+ * @param params - Promise containing the assignment ID
+ */
 export async function fetchUserLessonProgress(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -358,6 +386,11 @@ export async function fetchUserLessonProgress(
   }
 }
 
+/**
+ * Fetches activity details for an assignment.
+ * @param request - NextRequest
+ * @param params - Promise containing the assignment ID
+ */
 export async function fetchAssignmentActivityById(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

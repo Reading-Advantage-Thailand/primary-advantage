@@ -25,6 +25,10 @@ const eventSchema = z.object({
 
 export type Event = z.infer<typeof eventSchema>;
 
+/**
+ * Tracks an analytics event using Vercel analytics.
+ * @param input - The event data with name and optional properties
+ */
 export function trackEvent(input: Event): void {
   const event = eventSchema.parse(input);
   if (event) {

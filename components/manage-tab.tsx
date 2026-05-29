@@ -116,6 +116,10 @@ function getDueColor(dueDate: Date): "destructive" | "secondary" | "default" {
   return "default"; // Future - blue/gray
 }
 
+/**
+ * Manage tab component for flashcard sentence management.
+ * Displays a sortable, filterable table of sentences with delete functionality.
+ */
 export default function ManageTab({ data }: ManageTabProps) {
   const t = useTranslations("SentencesPage.manage");
   const [sorting, setSorting] = React.useState<SortingState>([

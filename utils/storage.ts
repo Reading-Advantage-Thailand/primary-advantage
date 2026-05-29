@@ -21,6 +21,13 @@ const storage = new Storage({
 export const bucket = storage;
 
 // Utility functions for production
+/**
+ * Uploads a file to Google Cloud Storage bucket, optionally makes it public, and deletes the local file.
+ * @param filePath - Path to the local file to upload
+ * @param destination - Destination path in the bucket
+ * @param isPublic - Whether to make the file publicly accessible (default true)
+ * @param isDeleteLocal - Whether to delete the local file after upload (default true)
+ */
 export const uploadToBucket = async (
   filePath: string,
   destination: string,
@@ -53,6 +60,10 @@ export const uploadToBucket = async (
   }
 };
 
+/**
+ * Deletes all files associated with an article from the storage bucket (images, sentence audio, word audio).
+ * @param fileName - The article ID whose files to delete
+ */
 export async function deleteFile(fileName: string): Promise<{
   deleted: string[];
   failed: string[];

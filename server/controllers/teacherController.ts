@@ -17,6 +17,10 @@ import {
 } from "@/types/index";
 
 // GET Controller - Fetch teachers
+/**
+ * Fetches a paginated list of teachers with optional filtering and statistics.
+ * @param request - NextRequest containing query params for page, limit, search, role
+ */
 export const getTeachersController = async (
   request: NextRequest,
 ): Promise<NextResponse<TeachersResponse | { error: string }>> => {
@@ -85,6 +89,10 @@ export const getTeachersController = async (
 };
 
 // POST Controller - Create teacher
+/**
+ * Creates a new teacher with optional classroom assignments.
+ * @param request - NextRequest containing name, email, role, password, classroomIds, force
+ */
 export const createTeacherController = async (
   request: NextRequest,
 ): Promise<
@@ -186,6 +194,11 @@ export const createTeacherController = async (
 };
 
 // GET by ID Controller - Fetch specific teacher
+/**
+ * Fetches a single teacher by ID.
+ * @param request - NextRequest
+ * @param params - Promise containing the teacher ID
+ */
 export const getTeacherByIdController = async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -232,6 +245,11 @@ export const getTeacherByIdController = async (
 };
 
 // PUT Controller - Update teacher
+/**
+ * Updates a teacher's data.
+ * @param request - NextRequest containing update data
+ * @param params - Promise containing the teacher ID
+ */
 export const updateTeacherController = async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -290,6 +308,11 @@ export const updateTeacherController = async (
 };
 
 // DELETE Controller - Delete teacher
+/**
+ * Deletes a teacher by ID.
+ * @param request - NextRequest
+ * @param params - Promise containing the teacher ID
+ */
 export const deleteTeacherController = async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

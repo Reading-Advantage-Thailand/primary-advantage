@@ -76,6 +76,10 @@ interface Classroom {
   name: string;
 }
 
+/**
+ * Table view displaying all assignments for a selected classroom.
+ * Supports pagination, search, and sorting of assignment data.
+ */
 export default function Assignments() {
   const t = useTranslations("Teacher.Assignments");
   const [sorting, setSorting] = useState<SortingState>([]);

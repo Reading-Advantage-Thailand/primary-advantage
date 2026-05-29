@@ -53,6 +53,9 @@ interface School {
   license?: License;
 }
 
+/**
+ * School profile settings page for managing school information and licenses.
+ */
 export default function SchoolProfileSettingsPage() {
   const t = useTranslations("Settings.schoolProfile");
   const [school, setSchool] = useState<School | null>(null);

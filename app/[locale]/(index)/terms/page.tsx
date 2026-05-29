@@ -2,6 +2,9 @@ import React from "react";
 
 type Props = {};
 
+/**
+ * Renders the Terms of Service page with platform terms and conditions.
+ */
 export default function TermsPage({}: Props) {
   return (
     <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">

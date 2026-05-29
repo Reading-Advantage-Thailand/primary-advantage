@@ -6,6 +6,9 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import React from "react";
 
+/**
+ * Renders the create license page with a header, back button, and the license creation form.
+ */
 export default function CreateLicensesPage() {
   return (
     <div className="space-y-6">

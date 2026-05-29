@@ -6,6 +6,9 @@ import { CircleIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Container for a group of mutually exclusive radio options.
+ */
 function RadioGroup({
   className,
   ...props
@@ -19,6 +22,9 @@ function RadioGroup({
   )
 }
 
+/**
+ * Individual radio button option within a radio group.
+ */
 function RadioGroupItem({
   className,
   ...props
@@ -42,4 +48,7 @@ function RadioGroupItem({
   )
 }
 
+/**
+ * RadioGroup component with RadioGroupItem for accessible radio button groups.
+ */
 export { RadioGroup, RadioGroupItem }

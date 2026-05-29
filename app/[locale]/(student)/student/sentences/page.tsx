@@ -8,6 +8,9 @@ import { getAllSentenceCards } from "@/actions/flashcard";
 import MatchingGamePage from "@/components/pratice/matching-page";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders the sentences page with tabs for flashcards, ordering, cloze tests, and matching games.
+ */
 export default async function SentencesPage() {
   const flashcardsResult = await getAllSentenceCards();
   const t = await getTranslations("SentencesPage");

@@ -10,6 +10,9 @@ import UserActivityHeatMap from "@/components/dashboard/user-heatmap-chart";
 import { UserXpOverAllChart } from "@/components/dashboard/user-xpoverall-chart";
 import ReadingStatsChart from "@/components/dashboard/user-reading-chart";
 
+/**
+ * Renders the reports page displaying user activity data, charts, and heatmaps.
+ */
 export default async function ReportsPage() {
   const user = await currentUser();
 

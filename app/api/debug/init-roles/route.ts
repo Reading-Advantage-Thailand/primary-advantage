@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Initialize required roles in the database
+/**
+ * Initializes required roles (user, student, teacher, admin, system) in the database.
+ */
 export async function POST(request: NextRequest) {
   try {
     const requiredRoles = ["user", "student", "teacher", "admin", "system"];
@@ -45,7 +47,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Get all roles for debugging
+/**
+ * Gets all roles and sample users for debugging purposes.
+ */
 export async function GET(request: NextRequest) {
   try {
     const allRoles = await prisma.role.findMany();

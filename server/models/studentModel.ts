@@ -18,6 +18,10 @@ interface StudentQueryParams {
 }
 
 // Get students with pagination and filtering
+/**
+ * Fetches a paginated list of students with filtering based on user's permissions.
+ * @param params - Object containing page, limit, search, classroomId, cefrLevel, userWithRoles
+ */
 export const getStudents = async (
   params: StudentQueryParams,
 ): Promise<{
@@ -136,6 +140,11 @@ export const getStudents = async (
 };
 
 // Get student by ID
+/**
+ * Fetches a single student by ID based on user's permissions.
+ * @param id - The student ID
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const getStudentById = async (
   id: string,
   userWithRoles: UserWithRoles,
@@ -213,6 +222,10 @@ export const getStudentById = async (
 };
 
 // Create new student
+/**
+ * Creates a new student with hashed password and optional classroom assignment.
+ * @param params - Object containing name, email, cefrLevel, classroomId, password, userWithRoles
+ */
 export const createStudent = async (params: {
   name: string;
   email: string;
@@ -337,6 +350,12 @@ export const createStudent = async (params: {
 };
 
 // Update student
+/**
+ * Updates a student's data including optional classroom reassignment.
+ * @param id - The student ID
+ * @param updateData - Object containing name, email, cefrLevel, password, classroomId
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const updateStudent = async (
   id: string,
   updateData: UpdateStudentInput,
@@ -527,6 +546,11 @@ export const updateStudent = async (
 };
 
 // Delete student
+/**
+ * Deletes a student and all related records after permission check.
+ * @param id - The student ID
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const deleteStudent = async (
   id: string,
   userWithRoles: UserWithRoles,
@@ -595,6 +619,10 @@ export const deleteStudent = async (
 };
 
 // Get student statistics
+/**
+ * Calculates statistics for all students: total, average XP, most common level, and activity.
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const getStudentStatistics = async (userWithRoles: UserWithRoles) => {
   try {
     // Build where clause based on user's permissions

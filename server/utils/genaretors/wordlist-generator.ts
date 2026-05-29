@@ -23,6 +23,10 @@ export type GenerateWordListResponse = {
   wordlist: WordListResponse[];
 };
 
+/**
+ * Extracts the ten most difficult vocabulary words, phrases, or idioms from an article passage using AI.
+ * @param params - Parameters including the article passage to extract vocabulary from
+ */
 export async function generateWordList(
   params: GenerateWordListParams,
 ): Promise<WordListResponse[]> {

@@ -20,6 +20,9 @@ interface Props {
   children: React.ReactNode;
 }
 
+/**
+ * Quiz context provider that manages a timer and pause state for quiz sessions.
+ */
 export function QuizContextProvider({ children }: Props) {
   const [timer, setTimer] = useState<number>(0);
   const [paused, setPaused] = useState<boolean>(false);

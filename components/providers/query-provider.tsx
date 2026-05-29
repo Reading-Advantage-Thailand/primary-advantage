@@ -4,6 +4,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { getQueryClient } from "@/lib/get-query-client";
 import React from "react";
 
+/**
+ * Wraps the application with React Query's QueryClientProvider.
+ */
 export default function QueryProvider({
   children,
 }: {

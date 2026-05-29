@@ -154,6 +154,12 @@ interface Sentence {
   endTime: number;
 }
 
+/**
+ * Creates a new flashcard with the given article association.
+ * @param articleId - The ID of the article to associate with the flashcard
+ * @param words - Optional array of vocabulary items for vocabulary flashcards
+ * @param sentences - Optional array of sentence items for sentence flashcards
+ */
 export async function saveFlashcard(
   articleId: string,
   words?: WordList[],
@@ -295,6 +301,10 @@ export async function saveFlashcard(
   }
 }
 
+/**
+ * Gets all flashcard decks for a user.
+ * @param userId - Optional user ID; uses current user if not provided
+ */
 export async function getUserFlashcardDecks(userId?: string) {
   try {
     const user = userId ? { id: userId } : await currentUser();
@@ -344,6 +354,10 @@ export async function getUserFlashcardDecks(userId?: string) {
   }
 }
 
+/**
+ * Gets dashboard data including decks and statistics for the current user.
+ * @param deckType - Optional filter for VOCABULARY or SENTENCE deck type
+ */
 export async function getDashboardData(deckType?: "VOCABULARY" | "SENTENCE") {
   try {
     const user = await currentUser();
@@ -480,6 +494,10 @@ export async function getDashboardData(deckType?: "VOCABULARY" | "SENTENCE") {
   }
 }
 
+/**
+ * Gets cards for a specific flashcard deck.
+ * @param deckId - The ID of the deck to get cards for
+ */
 export async function getDeckCards(deckId: string) {
   try {
     const user = await currentUser();
@@ -527,6 +545,9 @@ export async function getDeckCards(deckId: string) {
   }
 }
 
+/**
+ * Gets all sentence flashcards for the current user.
+ */
 export async function getAllSentenceCards() {
   try {
     const user = await currentUser();
@@ -562,6 +583,10 @@ export async function getAllSentenceCards() {
   }
 }
 
+/**
+ * Deletes a flashcard card by ID.
+ * @param cardId - The ID of the card to delete
+ */
 export async function deleteFlashcardCard(cardId: string) {
   try {
     const user = await currentUser();
@@ -615,6 +640,12 @@ export async function deleteFlashcardCard(cardId: string) {
   }
 }
 
+/**
+ * Processes a flashcard review with the given rating and updates card scheduling.
+ * @param cardId - The ID of the card being reviewed
+ * @param rating - The review rating (Again, Hard, Good, Easy)
+ * @param timeSpent - Optional time spent on the review in seconds
+ */
 export async function reviewCard(
   cardId: string,
   rating: Rating,
@@ -718,6 +749,11 @@ export async function reviewCard(
   }
 }
 
+/**
+ * Saves an entire article's vocabulary and sentences to flashcards.
+ * @param articleId - The ID of the article to save
+ * @param ArticleActivityLogId - Optional activity log ID to update after saving
+ */
 export async function saveArticleToFlashcard(
   articleId: string,
   ArticleActivityLogId?: string,
@@ -810,6 +846,11 @@ export async function saveArticleToFlashcard(
   }
 }
 
+/**
+ * Gets flashcards for a specific lesson/article.
+ * @param articleId - The ID of the article
+ * @param type - The flashcard type (VOCABULARY or SENTENCE)
+ */
 export async function getLessonFlashcards(
   articleId: string,
   type: FlashcardType,
@@ -849,6 +890,10 @@ export async function getLessonFlashcards(
   }
 }
 
+/**
+ * Gets sentence flashcards organized as ordering game groups for a lesson.
+ * @param articleId - The ID of the article to get ordering sentences for
+ */
 export async function getLessonOrderingSentences(articleId: string) {
   try {
     const user = await currentUser();
@@ -985,6 +1030,11 @@ export async function getLessonOrderingSentences(articleId: string) {
   }
 }
 
+/**
+ * Gets sentence flashcards formatted as cloze test items for a lesson.
+ * @param articleId - The ID of the article to get cloze tests for
+ * @param difficulty - The difficulty level (easy, medium, hard)
+ */
 export async function getLessonClozeTestSentences(
   articleId: string,
   difficulty: "easy" | "medium" | "hard",
@@ -1061,6 +1111,10 @@ export async function getLessonClozeTestSentences(
   }
 }
 
+/**
+ * Gets sentence flashcards formatted as word ordering game items for a lesson.
+ * @param articleId - The ID of the article to get ordering words for
+ */
 export async function getLessonOrderingWords(articleId: string) {
   try {
     const user = await currentUser();

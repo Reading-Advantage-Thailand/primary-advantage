@@ -30,6 +30,10 @@ interface CefrLevelEvaluationPromptType {
   systemPrompt: string;
 }
 
+/**
+ * Evaluates an article's quality rating and confirms its CEFR level using AI.
+ * @param params - Evaluation parameters including passage, optional type, genre, and CEFR level
+ */
 export async function evaluateRating(
   params: EvaluateRatingParams,
 ): Promise<EvaluateRatingResponse> {

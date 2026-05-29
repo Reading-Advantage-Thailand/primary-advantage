@@ -1,6 +1,9 @@
 import { fetchArticles } from "@/server/controllers/articleController";
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Fetches articles with pagination/filtering based on search params.
+ */
 export async function GET(req: NextRequest) {
   try {
     const { articles, totalArticles } = await fetchArticles(

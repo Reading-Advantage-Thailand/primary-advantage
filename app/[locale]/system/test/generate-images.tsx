@@ -6,6 +6,10 @@ import { generateImages } from "@/actions/test";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
+/**
+ * Client component that provides a UI for generating images for an article.
+ * Users enter an article ID and click a button to trigger image generation.
+ */
 export default function GenerateImages() {
   const [articleId, setArticleId] = useState("");
   const [isPending, startTransition] = useTransition();

@@ -12,6 +12,11 @@ interface Article {
   subGenre?: string | null;
 }
 
+/**
+ * Displays a selectable list of articles with infinite scroll pagination.
+ * Filters articles by type, genre, and subgenre from URL search params.
+ * @param props - Contains initialArticles array and total count for pagination
+ */
 export default function ArticleSelect({
   initialArticles,
   total,

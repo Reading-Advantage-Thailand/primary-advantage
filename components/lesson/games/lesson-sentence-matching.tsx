@@ -57,6 +57,10 @@ interface UserMatch {
   isCorrect: boolean;
 }
 
+/**
+ * Renders a matching game where users pair sentences with their translations.
+ * Supports language selection, progress tracking, and result validation.
+ */
 export default function LessonSentenceMatching({
   articleId,
 }: {

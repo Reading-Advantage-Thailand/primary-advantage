@@ -71,6 +71,11 @@ interface Classroom {
   studentCount: number;
 }
 
+/**
+ * Renders a table of teachers with add, edit, delete, and move functionality.
+ * Displays statistics for total teachers, students, and classes. Supports
+ * classroom assignment and handles confirmation dialogs for moving teachers between schools.
+ */
 export function TeachersTable() {
   const t = useTranslations("AdminTeachers.Table");
   const [teachers, setTeachers] = useState<Teacher[]>([]);

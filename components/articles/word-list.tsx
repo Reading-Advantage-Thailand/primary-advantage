@@ -39,6 +39,10 @@ interface WordList {
   audioUrl: string;
 }
 
+/**
+ * Renders a dialog button that opens a modal showing a list of vocabulary words.
+ * Displays each word with its definition in the user's locale and an audio button.
+ */
 export default function WordList({
   articleId,
   words,

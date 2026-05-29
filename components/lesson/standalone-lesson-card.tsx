@@ -6,6 +6,10 @@ import { QuizContextProvider } from "@/contexts/question-context";
 import { getTranslations } from "next-intl/server";
 import { Article } from "@/types";
 
+/**
+ * Standalone lesson card for lessons without assignments.
+ * Fetches article data and renders the lesson progress bar.
+ */
 export default async function StandaloneLessonCard({
   articleId,
 }: {

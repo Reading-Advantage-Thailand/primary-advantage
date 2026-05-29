@@ -5,6 +5,9 @@ import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Root tabs container with flex column layout.
+ */
 function Tabs({
   className,
   ...props
@@ -18,6 +21,9 @@ function Tabs({
   )
 }
 
+/**
+ * Tab list container with pill-style button layout.
+ */
 function TabsList({
   className,
   ...props
@@ -34,6 +40,9 @@ function TabsList({
   )
 }
 
+/**
+ * Individual tab trigger button with active state styling.
+ */
 function TabsTrigger({
   className,
   ...props
@@ -50,6 +59,9 @@ function TabsTrigger({
   )
 }
 
+/**
+ * Content panel associated with a tab trigger.
+ */
 function TabsContent({
   className,
   ...props

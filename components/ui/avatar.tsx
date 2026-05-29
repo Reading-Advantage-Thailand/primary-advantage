@@ -5,6 +5,9 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Avatar root component with circular styling and overflow handling.
+ */
 function Avatar({
   className,
   ...props
@@ -21,6 +24,9 @@ function Avatar({
   )
 }
 
+/**
+ * Avatar image component that displays the user's picture.
+ */
 function AvatarImage({
   className,
   ...props
@@ -34,6 +40,9 @@ function AvatarImage({
   )
 }
 
+/**
+ * Avatar fallback component shown when image fails to load.
+ */
 function AvatarFallback({
   className,
   ...props
@@ -50,4 +59,12 @@ function AvatarFallback({
   )
 }
 
+/**
+ * Avatar component with image fallback and circular styling.
+ * Wraps Radix Avatar primitive with shadcn/ui styling.
+ */
+/**
+ * Avatar component with image fallback and circular styling.
+ * Wraps Radix Avatar primitive with shadcn/ui styling.
+ */
 export { Avatar, AvatarImage, AvatarFallback }

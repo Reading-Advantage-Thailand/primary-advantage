@@ -95,6 +95,10 @@ const AVAILABLE_LANGUAGES = {
   },
 } as const;
 
+/**
+ * Cloze test (fill-in-the-blank) game component.
+ * Presents sentences with missing words as multiple choice questions, tracks score, timer, and supports difficulty levels.
+ */
 export function ClozeTestGame({ deckId, sentences = [] }: ClozeTestGameProps) {
   const router = useRouter();
   const t = useTranslations("SentencesPage.clozeTestGame");

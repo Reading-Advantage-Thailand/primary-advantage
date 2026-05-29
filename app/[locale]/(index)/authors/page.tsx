@@ -2,6 +2,9 @@ import React from "react";
 
 type Props = {};
 
+/**
+ * Renders the Authors page showing information about content authors.
+ */
 export default function AuthorsPage({}: Props) {
   return (
     <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">

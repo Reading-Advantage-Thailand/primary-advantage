@@ -5,6 +5,9 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Scroll area component with viewport and scrollbar for custom scrollable containers.
+ */
 function ScrollArea({
   className,
   children,
@@ -28,6 +31,9 @@ function ScrollArea({
   )
 }
 
+/**
+ * Scrollbar component for scroll area with vertical/horizontal orientation support.
+ */
 function ScrollBar({
   className,
   orientation = "vertical",

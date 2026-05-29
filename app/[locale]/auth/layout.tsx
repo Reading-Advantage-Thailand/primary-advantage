@@ -4,6 +4,9 @@ import { siteConfig } from "@/configs/site-config";
 import { Link } from "@/i18n/navigation";
 import { Icons } from "@/components/icons";
 
+/**
+ * Renders the authentication layout with a split design featuring a branded image panel and centered content area.
+ */
 export default function AuthLayout({
   children,
 }: {

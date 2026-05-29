@@ -5,6 +5,9 @@ import * as ProgressPrimitive from "@radix-ui/react-progress";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Progress bar component with animated fill indicator.
+ */
 function Progress({
   className,
   value,
@@ -28,4 +31,7 @@ function Progress({
   );
 }
 
+/**
+ * Progress bar component with animated indicator using Radix primitive.
+ */
 export { Progress };

@@ -31,6 +31,10 @@ interface Classroom {
   }>;
 }
 
+/**
+ * Renders the enrollment management page for a specific classroom.
+ * Fetches classroom data and displays student enrollment management UI.
+ */
 export default function EnrollmentPage() {
   const params = useParams();
   const router = useRouter();

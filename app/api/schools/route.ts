@@ -9,6 +9,9 @@ const createSchoolSchema = z.object({
   contactEmail: z.string().email().optional(),
 });
 
+/**
+ * Creates a new school (system admin only).
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -71,6 +74,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * Retrieves all schools with user counts and license summaries (system admin only).
+ */
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();

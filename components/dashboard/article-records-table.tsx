@@ -39,6 +39,10 @@ interface ArticleRecord {
   status: string;
 }
 
+/**
+ * Renders a paginated, searchable table of article reading history records.
+ * Displays title, scores, date, rating status, and allows navigation to articles.
+ */
 export function ArticleRecordsTable() {
   const t = useTranslations("Student.history");
   const tStatus = useTranslations("Overall.status");

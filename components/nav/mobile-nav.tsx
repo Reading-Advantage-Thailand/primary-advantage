@@ -11,6 +11,10 @@ interface MobileNavProps {
   children?: React.ReactNode;
 }
 
+/**
+ * Mobile navigation overlay component.
+ * Displays a full-screen slide-in menu with navigation links.
+ */
 export function MobileNav({ items, children }: MobileNavProps) {
   const t = useTranslations("MainNav");
   useLockBody();

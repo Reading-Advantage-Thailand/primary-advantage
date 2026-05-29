@@ -1,6 +1,9 @@
 import AppLayout, { BaseAppLayoutProps } from "@/components/shared/app-layout";
 import { settingsPageConfig } from "@/configs/settings-page-config";
 
+/**
+ * Layout wrapper for settings pages providing shared navigation and structure.
+ */
 export default function SettingsPageLayout({ children }: BaseAppLayoutProps) {
   return (
     <AppLayout

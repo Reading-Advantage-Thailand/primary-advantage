@@ -12,6 +12,10 @@ interface createAssignmentData {
   dueDate: Date;
 }
 
+/**
+ * Creates a new assignment for a classroom with specified students.
+ * @param data - Object containing classroomId, articleId, students, name, description, dueDate
+ */
 export async function createAssignment(data: createAssignmentData) {
   try {
     const user = await currentUser();
@@ -97,6 +101,10 @@ interface GetStudentAssignmentsParams {
   search?: string | null;
 }
 
+/**
+ * Fetches paginated assignments for a student with optional filtering.
+ * @param params - Object containing studentId, page, limit, status, dueDateFilter, search
+ */
 export async function getStudentAssignments(
   params: GetStudentAssignmentsParams,
 ) {
@@ -192,6 +200,10 @@ export async function getStudentAssignments(
   }
 }
 
+/**
+ * Fetches an assignment by ID with article, classroom, and student data.
+ * @param id - The assignment ID
+ */
 export default async function getAssignmentById(id: string) {
   try {
     const user = await currentUser();
@@ -225,6 +237,14 @@ export default async function getAssignmentById(id: string) {
   }
 }
 
+/**
+ * Updates or creates a user's lesson progress and marks assignment as in-progress or completed.
+ * @param userId - The user ID
+ * @param assignmentId - The assignment ID
+ * @param articleId - The article ID
+ * @param progress - Progress percentage (0-100)
+ * @param timeSpent - Time spent in seconds
+ */
 export async function updateUserLessonProgress(
   userId: string,
   assignmentId: string,
@@ -307,6 +327,11 @@ export async function updateUserLessonProgress(
   }
 }
 
+/**
+ * Fetches the lesson progress for a user on a specific assignment.
+ * @param userId - The user ID
+ * @param assignmentId - The assignment ID
+ */
 export async function getUserLessonProgress(
   userId: string,
   assignmentId: string,
@@ -329,6 +354,11 @@ export async function getUserLessonProgress(
   }
 }
 
+/**
+ * Fetches activity completion status for an assignment's sentence exercises.
+ * @param id - The article/assignment ID
+ * @param userId - The user ID
+ */
 export async function getAssignmentActivityById(id: string, userId: string) {
   try {
     const assignmentActivity = await prisma.articleActivityLog.findFirst({

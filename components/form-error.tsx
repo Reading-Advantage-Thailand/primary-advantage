@@ -4,6 +4,10 @@ interface FormErrorProps {
   message?: string;
 }
 
+/**
+ * Renders a destructive error message alert with an icon.
+ * Returns null if no message is provided.
+ */
 export function FormError({ message }: FormErrorProps) {
   if (!message) return null;
   return (

@@ -7,6 +7,10 @@ import { generateWordLists } from "@/server/utils/genaretors/audio-word-generato
 import { deleteFile, uploadToBucket } from "@/utils/storage";
 import { generateImage } from "@/server/utils/genaretors/image-generator";
 
+/**
+ * Generates audio for an article based on its passage text.
+ * @param articleId - The ID of the article to generate audio for
+ */
 export async function generateAudios(articleId: string) {
   try {
     const article = await getArticleById(articleId);
@@ -23,6 +27,10 @@ export async function generateAudios(articleId: string) {
   }
 }
 
+/**
+ * Generates audio files for all word lists in an article.
+ * @param articleId - The ID of the article to generate word audios for
+ */
 export async function generateWordAudios(articleId: string) {
   try {
     // const article = await getArticleById(articleId);
@@ -35,6 +43,10 @@ export async function generateWordAudios(articleId: string) {
     return { error: true };
   }
 }
+/**
+ * Uploads an article's image to the storage bucket.
+ * @param articleId - The ID of the article whose image to upload
+ */
 export async function uploadArticleImages(articleId: string) {
   const result = await uploadToBucket(
     `${process.cwd()}/public/images/${articleId}.png`,
@@ -43,11 +55,18 @@ export async function uploadArticleImages(articleId: string) {
   return result;
 }
 
+/**
+ * Deletes an article's associated files from storage.
+ * @param articleId - The ID of the article whose files to delete
+ */
 export async function deleteArticleFile(articleId: string) {
   const result = await deleteFile(articleId);
   return result;
 }
 
+/**
+ * Deletes all articles and their associated files from the database and storage.
+ */
 export async function deleteAllArticles() {
   try {
     // Get all article IDs first (we need them to delete associated files)
@@ -100,6 +119,10 @@ export async function deleteAllArticles() {
   }
 }
 
+/**
+ * Generates images for an article based on its image description and passage.
+ * @param articleId - The ID of the article to generate images for
+ */
 export async function generateImages(articleId: string) {
   try {
     const articles = await prisma.article.findUnique({

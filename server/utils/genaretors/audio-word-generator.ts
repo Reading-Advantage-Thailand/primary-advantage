@@ -49,6 +49,10 @@ function contentToSSML(content: string[]): string {
   return ssml;
 }
 
+/**
+ * Generates a word list from an article and creates audio for each vocabulary word.
+ * @param articleId - The article ID to generate word list and audio for
+ */
 export async function generateWordLists(articleId: string) {
   const article = await prisma.article.findUnique({
     where: {
@@ -75,6 +79,11 @@ export async function generateWordLists(articleId: string) {
   return wordlist;
 }
 
+/**
+ * Generates audio for a list of vocabulary words, uploads to cloud storage, and updates the article record.
+ * @param wordList - Array of vocabulary words with definitions
+ * @param articleId - The article ID to associate the audio with
+ */
 export async function generateAudioForWord({
   wordList,
   articleId,

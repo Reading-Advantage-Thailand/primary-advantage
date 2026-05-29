@@ -24,6 +24,10 @@ type ActivityType = {
   [key: string]: string;
 };
 
+/**
+ * Renders a card header with a heading, description, and a button to start a quiz.
+ * Shows the quiz content only after the button is clicked.
+ */
 export default function QuestionHeader({
   children,
   heading,

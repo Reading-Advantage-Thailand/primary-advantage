@@ -57,6 +57,10 @@ interface UserMatch {
   isCorrect: boolean;
 }
 
+/**
+ * Vocabulary matching game where users pair words with their definitions.
+ * Supports multiple languages and tracks matching progress and accuracy.
+ */
 export default function LessonVocabularyMatching({
   articleId,
 }: {

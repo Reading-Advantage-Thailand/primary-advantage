@@ -9,6 +9,10 @@ import { deleteAllArticles, generateImages } from "@/actions/test";
 // import { FlashcardType } from "@/types/enum";
 import GenerateImages from "./generate-images";
 
+/**
+ * Renders a test page displaying various test components in a grid layout.
+ * Includes tests for audio, article generation, storage, uploads, and image generation.
+ */
 export default async function TestFunctionality() {
   return (
     <div className="grid grid-cols-2 gap-4">

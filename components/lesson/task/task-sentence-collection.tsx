@@ -7,6 +7,10 @@ import AudioButton from "@/components/audio-button";
 import { Sentence } from "@/components/articles/sentence";
 import { useLocale, useTranslations } from "next-intl";
 
+/**
+ * Sentence collection task displaying sentences with audio and translations.
+ * Allows users to click sentences to reveal translations in their selected language.
+ */
 export default function TaskSentenceCollection({
   article,
 }: {

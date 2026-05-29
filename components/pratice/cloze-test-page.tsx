@@ -4,6 +4,10 @@ import { Header } from "@/components/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Page component for the cloze test (fill-in-the-blank) practice game.
+ * Fetches the flashcard deck ID and renders the ClozeTestGame component.
+ */
 export default async function ClozeTestPage() {
   const t = await getTranslations("SentencesPage.clozeTestGame");
   const deckResult = await getFlashcardDeckId();

@@ -66,6 +66,10 @@ interface EditSchoolFormProps {
   onCancel: () => void;
 }
 
+/**
+ * Form for editing an existing school's name, contact name, and contact email.
+ * Submits changes via PATCH request to the school API.
+ */
 export function EditSchoolForm({
   school,
   onSuccess,

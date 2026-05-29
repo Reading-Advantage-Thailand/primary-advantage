@@ -288,6 +288,10 @@ function LessonSAQContent({ article }: { article: Article }) {
   );
 }
 
+/**
+ * Short answer question component with AI feedback.
+ * Users write answers and receive scoring with detailed feedback.
+ */
 export default function LessonSAQ(props: LessonSAQProps) {
   return (
     <QuizContextProvider>

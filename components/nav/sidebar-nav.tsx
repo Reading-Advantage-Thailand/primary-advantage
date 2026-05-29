@@ -35,6 +35,10 @@ interface SidebarNavProps {
   user?: UserForPermissions | null | undefined;
 }
 
+/**
+ * Sidebar navigation component with collapsible sections and permission-based visibility.
+ * Supports nested items, permission checking, and lock icons for restricted items.
+ */
 export function SidebarNav({ items, user }: SidebarNavProps) {
   const path = usePathname();
   // const pathWithoutLocale = "/" + path.split("/").slice(2).join("/");

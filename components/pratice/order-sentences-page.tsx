@@ -4,6 +4,10 @@ import { Header } from "@/components/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Page component for sentence ordering practice activity.
+ * Fetches the flashcard deck ID and renders the OrderSentenceGame component.
+ */
 export default async function SentencesOrderingPage() {
   const deckResult = await getFlashcardDeckId();
   const t = await getTranslations("SentencesPage.sentenceOrder");

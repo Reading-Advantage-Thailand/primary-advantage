@@ -6,6 +6,9 @@ import {
 import { currentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Triggers recalculation of school rankings based on student performance.
+ */
 export async function POST(request: NextRequest) {
   try {
     const accessKey = request.headers.get("x-access-key");
@@ -31,6 +34,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * Retrieves the leaderboard for a school, optionally filtered by specific schoolId.
+ */
 export async function GET(request: NextRequest) {
   try {
     const user = await currentUser();

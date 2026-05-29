@@ -6,6 +6,10 @@ import React, { useState, useTransition } from "react";
 import { deleteArticleFile, uploadArticleImages } from "@/actions/test";
 import { getDeleteArticleById } from "@/actions/article";
 
+/**
+ * Client component that provides a UI for testing article image uploads and deletions.
+ * Users enter an article ID and choose to upload images, delete all, or delete files.
+ */
 export default function UploadTest() {
   const [articleId, setArticleId] = useState("");
   const [isPending, startTransition] = useTransition();

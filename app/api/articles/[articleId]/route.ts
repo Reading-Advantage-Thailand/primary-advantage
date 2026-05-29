@@ -1,6 +1,9 @@
 import { fetchArticleById } from "@/server/controllers/articleController";
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Handles GET requests to fetch articles by ID from query parameters.
+ */
 export async function GET(req: NextRequest) {
   try {
     const articles = await fetchArticleById(req.nextUrl.searchParams);

@@ -26,6 +26,10 @@ import {
 } from "../models/articleModel";
 import { generateArticleNew } from "../utils/genaretors/new-generator";
 
+/**
+ * Generates new articles using the new generator at A0 level.
+ * @param amountPerGenre - Number of articles to generate per genre
+ */
 export const generateAllArticleNew = async (amountPerGenre: number) => {
   const types: ArticleType[] = [ArticleType.FICTION];
   const levels: ArticleBaseCefrLevel[] = [
@@ -53,6 +57,10 @@ export const generateAllArticleNew = async (amountPerGenre: number) => {
   }
 };
 
+/**
+ * Generates articles across all types and levels for a given amount per genre.
+ * @param amountPerGenre - Number of articles to generate per genre
+ */
 export const generateAllArticle = async (amountPerGenre: number) => {
   const types: ArticleType[] = [ArticleType.FICTION, ArticleType.NONFICTION];
   const levels: ArticleBaseCefrLevel[] = [
@@ -97,6 +105,10 @@ export const generateAllArticle = async (amountPerGenre: number) => {
   }
 };
 
+/**
+ * Fetches articles with optional filtering by title, type, genre, subgenre, and CEFR level.
+ * @param req - URLSearchParams containing query filters and pagination params
+ */
 export const fetchArticles = async (req: URLSearchParams) => {
   const title = req.get("title") ?? undefined;
   const type = req.get("type") ?? undefined;
@@ -117,6 +129,10 @@ export const fetchArticles = async (req: URLSearchParams) => {
   });
 };
 
+/**
+ * Fetches a single article by its ID.
+ * @param req - URLSearchParams containing the articleId
+ */
 export const fetchArticleById = async (req: URLSearchParams) => {
   const articleId = req.get("articleId") ?? undefined;
 
@@ -150,10 +166,18 @@ export const fetchArticleById = async (req: URLSearchParams) => {
 //   return getQuestionsByArticleId(articleId);
 // };
 
+/**
+ * Deletes an article by its ID.
+ * @param articleId - The ID of the article to delete
+ */
 export const deleteArticleById = async (articleId: string) => {
   return deleteArticleByIdModel(articleId);
 };
 
+/**
+ * Fetches all flashcards for the current authenticated user.
+ * @param req - URLSearchParams (unused, kept for signature consistency)
+ */
 export const fetchAllFlashcards = async (req: URLSearchParams) => {
   try {
     const userId = await currentUser();
@@ -169,6 +193,10 @@ export const fetchAllFlashcards = async (req: URLSearchParams) => {
   }
 };
 
+/**
+ * Deletes a flashcard by its ID and returns success status.
+ * @param flashcardId - The ID of the flashcard to delete
+ */
 export const deleteFlashcardByIdAction = async (flashcardId: string) => {
   try {
     if (!flashcardId) {
@@ -183,6 +211,10 @@ export const deleteFlashcardByIdAction = async (flashcardId: string) => {
   }
 };
 
+/**
+ * Generates a custom article based on user-provided parameters (type, genre, subgenre, topic, cefrLevel).
+ * @param req - NextRequest containing the article generation parameters
+ */
 export const generateCustomArticle = async (req: NextRequest) => {
   try {
     const user = await currentUser();
@@ -221,6 +253,10 @@ export const generateCustomArticle = async (req: NextRequest) => {
   }
 };
 
+/**
+ * Saves a custom-generated article and publishes it.
+ * @param req - NextRequest containing the article data
+ */
 export const saveArticleAndPublish = async (req: NextRequest) => {
   try {
     const user = await currentUser();
@@ -253,6 +289,10 @@ export const saveArticleAndPublish = async (req: NextRequest) => {
   }
 };
 
+/**
+ * Saves an article as a draft without publishing it.
+ * @param req - NextRequest containing the article data, type, genre, and subgenre
+ */
 export const saveArticleAsDraft = async (req: NextRequest) => {
   try {
     const user = await currentUser();
@@ -277,6 +317,10 @@ export const saveArticleAsDraft = async (req: NextRequest) => {
   }
 };
 
+/**
+ * Fetches all custom articles authored by the current user.
+ * @param req - NextRequest (unused, kept for signature consistency)
+ */
 export const fetchCustomArticleController = async (req: NextRequest) => {
   try {
     const user = await currentUser();

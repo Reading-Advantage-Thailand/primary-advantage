@@ -12,20 +12,36 @@ import { prisma } from "@/lib/prisma";
 import { currentUser } from "@/lib/session";
 import { ActivityType } from "@/types/enum";
 
+/**
+ * Generates articles for all genres with the specified amount per genre.
+ * @param amountPerGenre - Number of articles to generate per genre
+ */
 export async function generateArticle(amountPerGenre: number) {
   const result = await generateAllArticle(amountPerGenre);
   return result;
 }
 
+/**
+ * Generates new articles for all genres with the specified amount per genre.
+ * @param amountPerGenre - Number of articles to generate per genre
+ */
 export async function generateArticleNew(amountPerGenre: number) {
   const result = await generateAllArticleNew(amountPerGenre);
   return result;
 }
 
+/**
+ * Deletes an article by its ID.
+ * @param articleId - The ID of the article to delete
+ */
 export async function getDeleteArticleById(articleId: string) {
   return await deleteArticleByIdModel(articleId);
 }
 
+/**
+ * Tracks/fetches article activity by recording an access event.
+ * @param articleId - The ID of the article being accessed
+ */
 export async function fetchArticleActivity(articleId: string) {
   try {
     const result = await getArticleActivity(articleId);
@@ -41,6 +57,10 @@ export async function fetchArticleActivity(articleId: string) {
   }
 }
 
+/**
+ * Gets lesson summary data including total XP earned and quiz scores for an article.
+ * @param articleId - The ID of the article to get lesson summary for
+ */
 export async function getLessonSummaryData(articleId: string) {
   try {
     const user = await currentUser();

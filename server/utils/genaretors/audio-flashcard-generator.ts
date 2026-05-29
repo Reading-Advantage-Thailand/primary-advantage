@@ -62,6 +62,12 @@ function contentToSSML(content: string[]): string {
   return ssml;
 }
 
+/**
+ * Generates audio for flashcard sentences and words, uploads to cloud storage, and stores metadata in the database.
+ * @param sentences - Array of sentences with translations for audio generation
+ * @param words - Array of vocabulary words with definitions for audio generation
+ * @param articleId - The article ID to associate the audio with
+ */
 export async function generateAudioForFlashcard({
   sentences,
   words,

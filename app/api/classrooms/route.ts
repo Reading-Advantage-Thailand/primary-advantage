@@ -9,7 +9,9 @@ interface ClassroomData {
   studentCount: number;
 }
 
-// GET /api/classrooms - Fetch classrooms for admin
+/**
+ * Fetches classrooms for admin with student counts.
+ */
 export async function GET(
   request: NextRequest,
 ): Promise<NextResponse<ClassroomData[] | { error: string }>> {

@@ -6,7 +6,9 @@ import {
 } from "@/server/controllers/classroomController";
 import { currentUser } from "@/lib/session";
 
-// GET /api/classroom/[id] - Get a specific classroom with students
+/**
+ * Gets a specific classroom with its students.
+ */
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -14,7 +16,9 @@ export async function GET(
   return await getClassroomController(req, { params });
 }
 
-// PATCH /api/classroom/[id] - Update a classroom
+/**
+ * Updates a classroom.
+ */
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -22,7 +26,9 @@ export async function PATCH(
   return await updateClassroomController(req, { params });
 }
 
-// DELETE /api/classroom/[id] - Delete a classroom
+/**
+ * Deletes a classroom.
+ */
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

@@ -32,6 +32,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders the home/landing page with features, benefits, and contact sections.
+ */
 export default async function Home() {
   const t = await getTranslations("HomePage");
 

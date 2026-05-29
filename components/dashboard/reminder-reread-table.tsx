@@ -37,6 +37,10 @@ interface ReminderRecord {
   status: string;
 }
 
+/**
+ * Renders a table of articles that need to be reread, showing title, scores, date, rating status.
+ * Articles are fetched based on reminder reread status for the current user.
+ */
 export function ReminderRereadTable() {
   const t = useTranslations("Student.history");
   const tStatus = useTranslations("Overall.status");

@@ -73,6 +73,10 @@ type MyStudentProps = {
   matchedStudents: Student[];
 };
 
+/**
+ * Table displaying all students across the teacher's classrooms.
+ * Supports viewing progress, setting CEFR levels, and resetting student progress.
+ */
 export default function MyStudents() {
   const t = useTranslations("teacher.myStudents");
   const [sorting, setSorting] = React.useState<SortingState>([]);

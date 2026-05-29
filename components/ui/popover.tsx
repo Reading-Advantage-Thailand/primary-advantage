@@ -5,18 +5,27 @@ import * as PopoverPrimitive from "@radix-ui/react-popover"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Root popover component providing open/close state management.
+ */
 function Popover({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />
 }
 
+/**
+ * Trigger element that opens the popover when activated.
+ */
 function PopoverTrigger({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
 }
 
+/**
+ * Content panel displayed when the popover is open.
+ */
 function PopoverContent({
   className,
   align = "center",
@@ -39,10 +48,16 @@ function PopoverContent({
   )
 }
 
+/**
+ * Anchor element for positioning the popover content.
+ */
 function PopoverAnchor({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
   return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />
 }
 
+/**
+ * Popover component with trigger and content for overlay panels.
+ */
 export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }

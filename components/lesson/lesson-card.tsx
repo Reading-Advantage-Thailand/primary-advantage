@@ -7,6 +7,10 @@ import getAssignmentById from "@/server/models/assignmentModel";
 import { QuizContextProvider } from "@/contexts/question-context";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders a complete lesson page for an assignment, including header and progress bar.
+ * Fetches assignment data and provides an interactive learning experience.
+ */
 export default async function LessonCard({ id }: { id: string }) {
   const t = await getTranslations("Lesson");
   const assignment = await getAssignmentById(id);

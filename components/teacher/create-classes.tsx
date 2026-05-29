@@ -28,6 +28,10 @@ interface CreateNewClassProps {
   onClassCreated?: () => void;
 }
 
+/**
+ * Dialog component for creating a new classroom.
+ * Collects classroom name, auto-generates a class code, and allows grade selection.
+ */
 export default function CreateNewClass({
   onClassCreated,
   buttonText,

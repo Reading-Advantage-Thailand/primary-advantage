@@ -8,6 +8,10 @@ import { SiteConfig } from "@/components/site-config";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
+/**
+ * Site header component with logo, main navigation, and mobile navigation.
+ * Includes theme and locale switchers.
+ */
 export function SiteHeader() {
   return (
     <header className="bg-background sticky top-0 z-50 w-full">

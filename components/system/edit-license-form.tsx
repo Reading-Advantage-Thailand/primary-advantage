@@ -82,6 +82,10 @@ interface EditLicenseFormProps {
   onCancel?: () => void;
 }
 
+/**
+ * Form for editing an existing license with name, max users, dates, status, and subscription type.
+ * Updates license via PUT request to the licenses API.
+ */
 export function EditLicenseForm({
   license,
   onSuccess,

@@ -5,6 +5,10 @@ import LessonSAQ from "../pratice/lesson-task-saq";
 import { Article } from "@/types";
 import { useTranslations } from "next-intl";
 
+/**
+ * Task component for short answer questions activity.
+ * Displays a header with title/description referencing the article, and renders the LessonSAQ component.
+ */
 export default function TaskShortAnswer({ article }: { article: Article }) {
   const t = useTranslations("Lesson.tasks");
 

@@ -24,6 +24,9 @@ const LayoutContext = React.createContext<LayoutProviderState | undefined>(
   undefined,
 );
 
+/**
+ * Saves a value to localStorage with error handling for unsupported environments.
+ */
 const saveToLS = (storageKey: string, value: string) => {
   try {
     localStorage.setItem(storageKey, value);
@@ -32,6 +35,9 @@ const saveToLS = (storageKey: string, value: string) => {
   }
 };
 
+/**
+ * Hook to access layout context for managing fixed/full layout modes.
+ */
 const useLayout = () => {
   const context = React.useContext(LayoutContext);
   if (context === undefined) {
@@ -40,6 +46,9 @@ const useLayout = () => {
   return context;
 };
 
+/**
+ * Layout provider component that manages layout state and applies CSS classes/attributes.
+ */
 const Layout = ({
   forcedLayout,
   storageKey = "layout",
@@ -149,6 +158,9 @@ const Layout = ({
   );
 };
 
+/**
+ * Provider component that wraps children with layout management, avoiding nested contexts.
+ */
 const LayoutProvider = (props: LayoutProviderProps) => {
   const context = React.useContext(LayoutContext);
 

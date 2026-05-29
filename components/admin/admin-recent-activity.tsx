@@ -32,6 +32,11 @@ interface ActivityItem {
   metadata?: Record<string, any>;
 }
 
+/**
+ * Displays recent activity feed for the admin dashboard with user actions like
+ * teacher additions, article creation, class creation, and system updates.
+ * Shows loading skeleton while fetching and handles empty states.
+ */
 export function AdminRecentActivity() {
   const t = useTranslations("AdminDashboard");
   const [activities, setActivities] = useState<ActivityItem[]>([]);

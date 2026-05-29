@@ -543,6 +543,10 @@ function LessonMCQContent({ article }: { article: Article }) {
   );
 }
 
+/**
+ * Multiple choice quiz component for lesson comprehension testing.
+ * Features 5 random questions, timer, progress tracking, and scoring.
+ */
 export default function LessonMCQ(props: LessonMCQProps) {
   return (
     <QuizContextProvider>

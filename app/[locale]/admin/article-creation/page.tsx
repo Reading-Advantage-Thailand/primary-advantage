@@ -4,6 +4,9 @@ import { Separator } from "@/components/ui/separator";
 import React from "react";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders the admin article creation page with a header and article creation form.
+ */
 export default async function ArticleCreationPage() {
   const t = await getTranslations("AdminArticleCreationPage.header");
   return (

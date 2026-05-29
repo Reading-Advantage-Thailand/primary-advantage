@@ -34,6 +34,10 @@ interface AddAdminDialogProps {
   onAdminAdded: () => void;
 }
 
+/**
+ * Dialog component for searching users and adding them as school admins.
+ * Allows searching by name/email and assigns admin role to selected users.
+ */
 export function AddAdminDialog({
   schoolId,
   onAdminAdded,

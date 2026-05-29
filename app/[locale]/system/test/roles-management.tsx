@@ -2,6 +2,9 @@ import { Header } from "@/components/header";
 import { Separator } from "@/components/ui/separator";
 import React from "react";
 
+/**
+ * Renders the roles management page with a header and separator.
+ */
 export default function RolesManagement() {
   return (
     <div>

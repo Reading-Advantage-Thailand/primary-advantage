@@ -80,6 +80,10 @@ interface DraggableSentence {
   isFromFlashcard?: boolean;
 }
 
+/**
+ * Sentence ordering game component with drag-and-drop.
+ * Presents shuffled sentence fragments that users must arrange in correct order.
+ */
 export function OrderSentenceGame({
   deckId,
   sentences = [],

@@ -15,6 +15,10 @@ import {
 import { Icons } from "@/components/icons";
 import { useTranslations } from "next-intl";
 
+/**
+ * Mobile navigation component using Popover for hamburger menu.
+ * Displays navigation items with a custom MobileLink component.
+ */
 export function MobileNav({
   //   tree,
   items,

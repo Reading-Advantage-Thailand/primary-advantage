@@ -25,6 +25,10 @@ Guidelines:
 Output Format:
 Generate a JSON object matching the provided schema. Ensure all fields are populated and formatted correctly.`;
 
+/**
+ * Generates a complete story with chapters, characters, vocabulary, and comprehension questions for English language learners.
+ * @param params - Generation parameters including CEFR level, optional genre, and optional topic
+ */
 export async function generateStoryContent(
   params: GenerateStoryParams,
 ): Promise<GenerateStoryResponse> {

@@ -13,6 +13,11 @@ import { generateObject } from "ai";
 import fs from "fs";
 import path from "path";
 
+/**
+ * Provides feedback on a short answer question (SAQ) response using AI.
+ * Validates input against the article's CEFR level and generates feedback.
+ * @param req - Request containing article ID, question, answer, and preferred language
+ */
 export async function getSaqFeedback(req: {
   data: {
     articleId: string;
@@ -78,6 +83,11 @@ export async function getSaqFeedback(req: {
   }
 }
 
+/**
+ * Provides feedback on a long answer question (LAQ) response using AI.
+ * Validates input against the article's CEFR level and generates detailed feedback.
+ * @param req - Request containing article ID, question, answer, and preferred language
+ */
 export async function getLaqFeedback(req: {
   data: {
     articleId: string;

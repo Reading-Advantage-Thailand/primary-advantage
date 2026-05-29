@@ -13,6 +13,10 @@ import { QuizContextProvider } from "@/contexts/question-context";
 import { QuestionResponse, SAQuestion } from "@/types";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders a Short Answer question card that displays SA questions for an article.
+ * Shows the user's answer, suggested answer, and feedback when completed.
+ */
 export default async function SAQuestionCard({
   articleId,
 }: {

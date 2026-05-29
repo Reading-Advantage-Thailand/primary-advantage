@@ -12,6 +12,11 @@ interface AdminStats {
   monthlyGrowth: number;
 }
 
+/**
+ * Displays statistics cards showing total teachers, students, articles,
+ * and monthly growth rate. Fetches data from API endpoints and shows
+ * loading skeleton while fetching.
+ */
 export function AdminStatsCards() {
   const t = useTranslations("AdminDashboard");
   const [stats, setStats] = useState<AdminStats>({

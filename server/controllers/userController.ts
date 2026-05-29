@@ -9,6 +9,11 @@ import { ActivityType, UserXpEarned } from "@/types/enum";
 import { error } from "console";
 import { currentUser } from "@/lib/session";
 
+/**
+ * Handles updating user activity based on activity type, calculating XP earned.
+ * @param body - Object containing data (responses, progress, timer) and activityType
+ * @param targetId - Optional target ID for the activity
+ */
 export const handleUpdateUserActivity = async (
   body: {
     data: {
@@ -35,6 +40,10 @@ export const handleUpdateUserActivity = async (
   }
 };
 
+/**
+ * Fetches user activity data by user ID.
+ * @param id - The user ID
+ */
 export const fetchUserActivity = async (id: string) => {
   try {
     const user = await currentUser();
@@ -50,6 +59,10 @@ export const fetchUserActivity = async (id: string) => {
   }
 };
 
+/**
+ * Fetches user article reading records with pagination.
+ * @param params - Object containing userId, page, limit, search
+ */
 export const fetchUserArticleRecords = async (params: {
   userId: string;
   page?: number;
@@ -86,6 +99,10 @@ export const fetchUserArticleRecords = async (params: {
   }
 };
 
+/**
+ * Fetches user reminder reread records.
+ * @param userId - The user ID
+ */
 export const fetchUserReminderReread = async (userId: string) => {
   try {
     // Validate user ID

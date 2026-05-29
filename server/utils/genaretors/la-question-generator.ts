@@ -15,6 +15,10 @@ interface GenerateLAQuestionResponse {
   question: string;
 }
 
+/**
+ * Generates a long answer question for an article using AI.
+ * @param params - Question generation parameters including CEFR level, article type, passage, title, summary, and image description
+ */
 export async function generateLAQuestion(
   params: GenrateLAQuestionParams
 ): Promise<GenerateLAQuestionResponse> {

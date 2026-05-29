@@ -6,6 +6,10 @@ import {
   getClassroomStudentForLogin,
 } from "@/server/models/classroomModel";
 
+/**
+ * Fetches students by classroom code for login purposes.
+ * @param code - The classroom code to look up
+ */
 export async function fetchStudentsByClassCode(code: string) {
   if (!code || typeof code !== "string") {
     return { success: false, error: "Code is required" };
@@ -28,6 +32,10 @@ export async function fetchStudentsByClassCode(code: string) {
   };
 }
 
+/**
+ * Creates a secure code for a classroom.
+ * @param classroomId - The ID of the classroom to create a code for
+ */
 export async function createClassroomCode(classroomId: string) {
   const code = generateSecureCode();
   const result = await createClassCode(classroomId, code);

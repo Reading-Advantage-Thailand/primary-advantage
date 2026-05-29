@@ -168,6 +168,10 @@ const SkeletonStudentsList = () => (
   </div>
 );
 
+/**
+ * Dashboard displaying assignment details and student progress.
+ * Shows assignment metadata, progress stats, and allows filtering students by status.
+ */
 export default function AssignmentDashboard() {
   const t = useTranslations("Teacher.AssignmentDashboard");
   const locale = useLocale();

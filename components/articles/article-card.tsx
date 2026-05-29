@@ -21,6 +21,11 @@ type Props = {
   userId?: string;
 };
 
+/**
+ * Renders an article card displaying the article title, RA level, CEFR level,
+ * save status, localized summary, and full article content. Includes educational disclaimer.
+ * @param props - Contains the article object with activity logs
+ */
 export default async function ArticleCard({ article }: Props) {
   const locale = await getLocale();
   const t = await getTranslations();

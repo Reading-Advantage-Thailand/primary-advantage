@@ -16,6 +16,10 @@ export interface GenerateTopicResponse {
   topics?: string;
 }
 
+/**
+ * Generates a reading passage topic for a given article type, genre, and subgenre using AI.
+ * @param params - Generation parameters including article type, genre, and subgenre
+ */
 export async function generateTopic(
   params: GenerateTopicParams
 ): Promise<GenerateTopicResponse> {

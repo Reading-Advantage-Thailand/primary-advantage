@@ -104,6 +104,10 @@ interface UserMatch {
   isCorrect: boolean;
 }
 
+/**
+ * Translation matching game component.
+ * Presents word/phrase pairs and shuffles the right side for users to match with translations.
+ */
 export function MatchingGame({ deckId, gameData = [] }: MatchingGameProps) {
   // ALL HOOKS MUST BE DECLARED AT THE TOP LEVEL - NO CONDITIONAL HOOKS
   const router = useRouter();

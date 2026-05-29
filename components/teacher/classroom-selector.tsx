@@ -41,6 +41,10 @@ interface Classroom {
   }>;
 }
 
+/**
+ * Card grid displaying all classrooms for a teacher.
+ * Allows selecting a classroom to view its roster and provides links to create new classrooms.
+ */
 export default function ClassroomSelector() {
   const router = useRouter();
   const t = useTranslations("Teacher.ClassroomSelector");

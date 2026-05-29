@@ -4,6 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
 import { BarChart3, TrendingUp, Users, BookOpen } from "lucide-react";
 
+/**
+ * Renders overview charts for the admin dashboard including user growth trends,
+ * top articles, activity by level, and performance metrics with mock data.
+ */
 export function AdminOverviewCharts() {
   const t = useTranslations("AdminDashboard");
 

@@ -1,6 +1,10 @@
 import { generateAllArticle } from "@/server/controllers/articleController";
 import { NextResponse, NextRequest } from "next/server";
 
+/**
+ * Handles POST requests to generate multiple articles across genres.
+ * Reads amountPerGenre from the request body to determine article count.
+ */
 export async function POST(req: NextRequest) {
   try {
     const { amountPerGenre } = await req.json();

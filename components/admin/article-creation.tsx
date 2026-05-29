@@ -96,6 +96,12 @@ interface UserArticle {
   topic: string;
 }
 
+/**
+ * Admin article creation and management component with AI-powered article generation.
+ * Provides tabs for creating articles (with genre, subgenre, CEFR level selection),
+ * previewing/editing generated content, and managing existing articles.
+ * Supports approval workflow, draft saving, and article deletion.
+ */
 export default function AdminArticleCreation() {
   const [articleType, setArticleType] = useState("");
   const [genre, setGenre] = useState("");

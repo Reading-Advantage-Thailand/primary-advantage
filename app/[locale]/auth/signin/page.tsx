@@ -4,6 +4,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookTextIcon, SchoolIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders the sign-in page with tabs for student and teacher authentication forms.
+ */
 export default async function SignInPage() {
   const t = await getTranslations("AuthPage.signin");
 

@@ -9,6 +9,10 @@ type Props = {
   endTimestamp: number;
 };
 
+/**
+ * Renders an audio button that plays a specific segment of an audio file.
+ * Starts playback from startTimestamp and stops at endTimestamp.
+ */
 export default function AudioButton({
   audioUrl,
   startTimestamp,

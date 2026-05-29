@@ -107,6 +107,10 @@ interface StudentsResponse {
   };
 }
 
+/**
+ * Renders the students management page with statistics, filtering, search, and CRUD dialogs.
+ * Displays student data in a table with pagination and role-based badge styling.
+ */
 export default function StudentsPage() {
   const t = useTranslations("AdminStudents");
   // State management

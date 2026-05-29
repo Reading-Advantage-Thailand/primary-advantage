@@ -4,6 +4,10 @@ import { Header } from "@/components/header";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Page component for word ordering practice activity.
+ * Fetches the flashcard deck ID and renders the OrderWordGame component.
+ */
 export default async function WordsOrderingPage() {
   const t = await getTranslations("SentencesPage.orderWordGame");
   const deckResult = await getFlashcardDeckId();

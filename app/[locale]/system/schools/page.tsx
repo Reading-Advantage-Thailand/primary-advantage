@@ -3,6 +3,9 @@ import { Separator } from "@/components/ui/separator";
 import { CreateSchoolDialog } from "@/components/system/create-school-dialog";
 import React from "react";
 
+/**
+ * Renders the schools management page with a header and create school dialog.
+ */
 export default function SchoolsPage() {
   return (
     <div>

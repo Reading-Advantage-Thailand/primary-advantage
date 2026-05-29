@@ -4,6 +4,9 @@ import { getTranslations } from "next-intl/server";
 import { ArticleRecordsTable } from "@/components/dashboard/article-records-table";
 import { ReminderRereadTable } from "@/components/dashboard/reminder-reread-table";
 
+/**
+ * Renders the student history page showing reminder reread information and article records.
+ */
 export default async function HistoryPage() {
   const t = await getTranslations("Student.history");
   return (

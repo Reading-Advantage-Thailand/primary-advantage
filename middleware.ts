@@ -26,6 +26,10 @@ const roleDefaultRedirects = {
 // Create the intl middleware
 const intlMiddleware = createIntlMiddleware(routing);
 
+/**
+ * Next.js middleware that handles internationalization routing, post-login redirects,
+ * and protected route access control based on user roles.
+ */
 export default async function middleware(request: NextRequest) {
   // Get the pathname without locale
 

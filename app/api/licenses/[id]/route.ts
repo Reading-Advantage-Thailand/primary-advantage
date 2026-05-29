@@ -15,6 +15,9 @@ const UpdateLicenseSchema = z.object({
   subscriptionType: z.enum(["basic", "premium", "enterprise"]),
 });
 
+/**
+ * Retrieves a license by ID with associated school information.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -59,6 +62,9 @@ export async function GET(
   }
 }
 
+/**
+ * Updates a license with new information including name, users, dates, and status.
+ */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -160,6 +166,9 @@ export async function PUT(
   }
 }
 
+/**
+ * Deletes a license by ID.
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

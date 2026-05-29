@@ -47,6 +47,10 @@ export interface LessonAssignmentProps {
   classroom?: Classroom | null;
 }
 
+/**
+ * Main lesson progress component with 14 learning tasks.
+ * Manages navigation between tasks, timer, and phase transitions.
+ */
 export default function LessonProgressBar({
   assignment,
 }: {

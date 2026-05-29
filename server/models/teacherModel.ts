@@ -17,6 +17,10 @@ interface TeacherQueryParams {
 }
 
 // Get teachers with pagination and filtering
+/**
+ * Fetches a paginated list of teachers with filtering based on user's permissions.
+ * @param params - Object containing page, limit, search, role, userWithRoles
+ */
 export const getTeachers = async (
   params: TeacherQueryParams,
 ): Promise<{
@@ -138,6 +142,11 @@ export const getTeachers = async (
 };
 
 // Get teacher by ID
+/**
+ * Fetches a single teacher by ID based on user's permissions.
+ * @param id - The teacher ID
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const getTeacherById = async (
   id: string,
   userWithRoles: UserWithRoles,
@@ -229,6 +238,10 @@ export const getTeacherById = async (
 };
 
 // Create new teacher
+/**
+ * Creates a new teacher with optional classroom assignments and school assignment.
+ * @param params - Object containing name, email, role, password, classroomIds, userWithRoles, force
+ */
 export const createTeacher = async (params: {
   name: string;
   email: string;
@@ -236,7 +249,7 @@ export const createTeacher = async (params: {
   password?: string;
   classroomIds?: string[];
   userWithRoles: UserWithRoles;
-  force?: boolean; // If true, move teacher even if they have a school
+  force?: boolean;
 }): Promise<{
   success: boolean;
   teacher?: TeacherData;
@@ -664,6 +677,12 @@ async function updateExistingTeacherToSchool(params: {
 }
 
 // Update teacher
+/**
+ * Updates a teacher's data including optional role and classroom assignments.
+ * @param id - The teacher ID
+ * @param updateData - Object containing name, email, role, password, classroomIds
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const updateTeacher = async (
   id: string,
   updateData: UpdateTeacherInput,
@@ -855,6 +874,11 @@ export const updateTeacher = async (
 };
 
 // Delete teacher
+/**
+ * Deletes a teacher and all related records after permission check.
+ * @param id - The teacher ID
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const deleteTeacher = async (
   id: string,
   userWithRoles: UserWithRoles,
@@ -909,6 +933,10 @@ export const deleteTeacher = async (
 };
 
 // Get teacher statistics
+/**
+ * Calculates statistics for all teachers: totals, students, classes, and activity.
+ * @param userWithRoles - User with roles for permission checking
+ */
 export const getTeacherStatistics = async (userWithRoles: UserWithRoles) => {
   try {
     // Determine school filter based on user's role

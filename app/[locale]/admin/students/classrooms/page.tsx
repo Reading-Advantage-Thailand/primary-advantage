@@ -4,6 +4,9 @@ import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import React from "react";
 
+/**
+ * Renders the classrooms management page with a header and classrooms table.
+ */
 export default function ClassroomsPage() {
   const t = useTranslations("Admin.Classrooms");
   return (

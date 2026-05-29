@@ -6,12 +6,18 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
+/**
+ * Root alert dialog component that manages open/closed state.
+ */
 function AlertDialog({
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />
 }
 
+/**
+ * Trigger element that opens the alert dialog when clicked.
+ */
 function AlertDialogTrigger({
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Trigger>) {
@@ -20,6 +26,9 @@ function AlertDialogTrigger({
   )
 }
 
+/**
+ * Portal component that renders the alert dialog content into the body.
+ */
 function AlertDialogPortal({
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {
@@ -28,6 +37,9 @@ function AlertDialogPortal({
   )
 }
 
+/**
+ * Overlay component that darkens the background behind the dialog.
+ */
 function AlertDialogOverlay({
   className,
   ...props
@@ -44,6 +56,9 @@ function AlertDialogOverlay({
   )
 }
 
+/**
+ * Main content component of the alert dialog with header, description, and footer sections.
+ */
 function AlertDialogContent({
   className,
   ...props
@@ -63,6 +78,9 @@ function AlertDialogContent({
   )
 }
 
+/**
+ * Header section containing the dialog title and description.
+ */
 function AlertDialogHeader({
   className,
   ...props
@@ -76,6 +94,9 @@ function AlertDialogHeader({
   )
 }
 
+/**
+ * Footer section containing action buttons, typically cancel and confirm.
+ */
 function AlertDialogFooter({
   className,
   ...props
@@ -92,6 +113,9 @@ function AlertDialogFooter({
   )
 }
 
+/**
+ * Title text displayed at the top of the alert dialog.
+ */
 function AlertDialogTitle({
   className,
   ...props
@@ -105,6 +129,9 @@ function AlertDialogTitle({
   )
 }
 
+/**
+ * Description text providing additional context or instructions for the dialog.
+ */
 function AlertDialogDescription({
   className,
   ...props
@@ -118,6 +145,9 @@ function AlertDialogDescription({
   )
 }
 
+/**
+ * Primary action button for the alert dialog (e.g., confirm, continue).
+ */
 function AlertDialogAction({
   className,
   ...props
@@ -130,6 +160,9 @@ function AlertDialogAction({
   )
 }
 
+/**
+ * Cancel button to dismiss the alert dialog without taking action.
+ */
 function AlertDialogCancel({
   className,
   ...props

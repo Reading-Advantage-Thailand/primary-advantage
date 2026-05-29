@@ -20,6 +20,10 @@ import { retakeQuiz } from "@/actions/question";
 import RetakeButton from "./retake-button";
 import { getTranslations } from "next-intl/server";
 
+/**
+ * Renders a Multiple Choice question card that displays MC questions for an article.
+ * Shows a retake button when the quiz is completed with the user's score.
+ */
 export default async function MCQuestionCard({
   articleId,
 }: {

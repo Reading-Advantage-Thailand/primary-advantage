@@ -39,6 +39,10 @@ type CefrLevelType = {
   userPromptTemplate: string;
 };
 
+/**
+ * Generates an article with passage, title, summary, image description, and translations using AI.
+ * @param params - Generation parameters including type, genre, subgenre, topic, and CEFR level
+ */
 export async function generateArticle(
   params: GenerateArticleParams,
 ): Promise<GenerateArticleResponse> {

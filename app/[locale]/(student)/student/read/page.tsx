@@ -37,6 +37,9 @@ export type GenreData = {
 
 const genreData = genreDataJson as GenreData;
 
+/**
+ * Renders the article selection page with filtering by type, genre, and subgenre.
+ */
 export default async function ReadPage({ searchParams }: PageProps) {
   const { type, genre, subgenre } = await searchParams;
   const user = await currentUser();

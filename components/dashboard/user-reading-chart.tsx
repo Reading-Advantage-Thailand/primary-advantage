@@ -44,6 +44,10 @@ interface UserActiviryChartProps {
   data: UserActivityLog[];
 }
 
+/**
+ * Renders a bar chart showing reading statistics by category.
+ * Groups articles by type, genre, or subGenre and shows completed vs in-progress counts.
+ */
 const ReadingStatsChart = ({ data }: UserActiviryChartProps) => {
   const { resolvedTheme } = useTheme();
   const [seletedValue, setSeletedValue] = React.useState<string>("type");

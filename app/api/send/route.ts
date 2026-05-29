@@ -1,6 +1,9 @@
 import { EmailTemplate } from "@/components/auth/email-forgot-password-template";
 // import { resend } from "@/utils/resend";
 
+/**
+ * Sends a password reset email (placeholder - Resend integration commented out).
+ */
 export async function POST() {
   try {
     // const { data, error } = await resend.emails.send({

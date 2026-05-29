@@ -8,6 +8,10 @@ import { cn } from "@/lib/utils";
 import { useLayout } from "@/hooks/use-layout";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Button component to toggle between fixed and full layout modes.
+ * Tracks layout changes via events.
+ */
 export function SiteConfig({ className }: React.ComponentProps<typeof Button>) {
   const { layout, setLayout } = useLayout();
 

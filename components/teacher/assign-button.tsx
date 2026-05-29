@@ -21,6 +21,10 @@ interface article {
   id: string;
 }
 
+/**
+ * Button and dialog for assigning an article to students via classroom selection.
+ * Opens a dialog with article summary and AssignForm for classroom/assignment configuration.
+ */
 export default function AssignButton({ article }: { article: article }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
