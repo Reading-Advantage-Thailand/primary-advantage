@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -34,7 +35,7 @@ import { CapabilityBadge } from "./capability-badge";
 import { RelativeTime } from "./relative-time";
 import { TaskEditDialog } from "./task-edit-dialog";
 import { useTasks, useProviders, useRevalidateCache } from "./use-ai-config";
-import { taskLabel } from "./task-labels";
+import { taskLabel, groupTasksByCategory, isLegacyTask } from "./task-labels";
 import type { AiTaskConfig } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -60,6 +61,8 @@ const STRINGS = {
   loadError: "Failed to load task configurations.",
   retry: "Retry",
   noValue: "—",
+  legacyBadge: "Legacy",
+  legacyEditTooltip: "Legacy task — not in use",
   toast: {
     refreshSuccess: "Cache refreshed",
     refreshError: "Failed to refresh cache",
@@ -95,16 +98,16 @@ function TaskCard({
   task,
   onEdit,
   isHighlighted,
+  isLegacy,
 }: {
   task: AiTaskConfig;
   onEdit: () => void;
   isHighlighted: boolean;
+  isLegacy: boolean;
 }) {
   return (
     <Card
-      className={`w-full transition-colors ${
-        isHighlighted ? "ring-2 ring-orange-400 dark:ring-orange-600" : ""
-      }`}
+      className={`w-full transition-colors ${isHighlighted ? "ring-2 ring-orange-400 dark:ring-orange-600" : ""} ${isLegacy ? "opacity-60" : ""}`}
     >
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2">
@@ -112,6 +115,14 @@ function TaskCard({
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-sm font-semibold">{taskLabel(task.taskKey)}</span>
               <CapabilityBadge capability={task.capability} />
+              {isLegacy && (
+                <Badge
+                  variant="outline"
+                  className="border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-400"
+                >
+                  {STRINGS.legacyBadge}
+                </Badge>
+              )}
             </div>
             <span className="font-mono text-xs text-muted-foreground">{task.taskKey}</span>
             <div className="flex flex-wrap items-center gap-1.5 text-sm">
@@ -123,9 +134,31 @@ function TaskCard({
               <span className="text-xs text-muted-foreground">Temp: {task.temperature}</span>
             )}
           </div>
-          <Button size="sm" variant="outline" onClick={onEdit} aria-label={`Edit ${task.taskKey}`}>
-            <Pencil className="h-3.5 w-3.5" />
-          </Button>
+          {isLegacy ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled
+                      aria-label={STRINGS.legacyEditTooltip}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">{STRINGS.legacyEditTooltip}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <Button size="sm" variant="outline" onClick={onEdit} aria-label={`Edit ${task.taskKey}`}>
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+          )}
         </div>
         <div className="mt-2 text-xs text-muted-foreground">
           <RelativeTime dateString={task.updatedAt} />
@@ -242,57 +275,107 @@ export function TasksTab({ highlightTaskKeys = [] }: TasksTabProps) {
                 {isLoading ? (
                   <TaskSkeletonRows />
                 ) : (
-                  tasks?.map((task) => {
-                    const isHighlighted = highlightTaskKeys.includes(task.taskKey);
-                    return (
-                      <TableRow
-                        key={task.taskKey}
-                        className={isHighlighted ? "bg-orange-50 dark:bg-orange-950/20" : ""}
-                      >
-                        <TableCell>
-                          <div className="flex flex-col gap-0.5">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="text-sm font-medium">{taskLabel(task.taskKey)}</span>
-                              <CapabilityBadge capability={task.capability} />
-                            </div>
-                            <span className="font-mono text-xs text-muted-foreground">{task.taskKey}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-sm">{task.providerName}</span>
-                            <KindBadge kind={task.providerKind} />
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                            {task.modelId}
-                          </code>
-                        </TableCell>
-                        <TableCell className="text-sm">
-                          {task.temperature !== null
-                            ? task.temperature
-                            : <span className="text-muted-foreground">{STRINGS.noValue}</span>}
-                        </TableCell>
-                        <TableCell>
-                          <RelativeTime dateString={task.updatedAt} />
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {task.updatedByName ?? STRINGS.noValue}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setEditingTask(task)}
-                            aria-label={`Edit ${task.taskKey}`}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
+                  groupTasksByCategory(tasks ?? []).map(({ label, tasks: groupTasks }) => (
+                    <>
+                      {/* Category header row */}
+                      <TableRow key={`header-${label}`}>
+                        <TableCell
+                          colSpan={7}
+                          className="bg-muted/50 py-2 text-sm font-semibold text-muted-foreground"
+                        >
+                          {label}
                         </TableCell>
                       </TableRow>
-                    );
-                  })
+                      {/* Task rows for this category */}
+                      {groupTasks.map((task) => {
+                        const isHighlighted = highlightTaskKeys.includes(task.taskKey);
+                        const legacy = isLegacyTask(task.taskKey);
+                        return (
+                          <TableRow
+                            key={task.taskKey}
+                            className={[
+                              isHighlighted ? "bg-orange-50 dark:bg-orange-950/20" : "",
+                              legacy ? "opacity-60" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                          >
+                            <TableCell>
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="text-sm font-medium">{taskLabel(task.taskKey)}</span>
+                                  <CapabilityBadge capability={task.capability} />
+                                  {legacy && (
+                                    <Badge
+                                      variant="outline"
+                                      className="border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-400"
+                                    >
+                                      {STRINGS.legacyBadge}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <span className="font-mono text-xs text-muted-foreground">{task.taskKey}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="text-sm">{task.providerName}</span>
+                                <KindBadge kind={task.providerKind} />
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+                                {task.modelId}
+                              </code>
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {task.temperature !== null
+                                ? task.temperature
+                                : <span className="text-muted-foreground">{STRINGS.noValue}</span>}
+                            </TableCell>
+                            <TableCell>
+                              <RelativeTime dateString={task.updatedAt} />
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {task.updatedByName ?? STRINGS.noValue}
+                            </TableCell>
+                            <TableCell>
+                              {legacy ? (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          disabled
+                                          aria-label={STRINGS.legacyEditTooltip}
+                                        >
+                                          <Pencil className="h-3.5 w-3.5" />
+                                        </Button>
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p className="text-xs">{STRINGS.legacyEditTooltip}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setEditingTask(task)}
+                                  aria-label={`Edit ${task.taskKey}`}
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </>
+                  ))
                 )}
               </TableBody>
             </Table>
@@ -300,16 +383,25 @@ export function TasksTab({ highlightTaskKeys = [] }: TasksTabProps) {
         </div>
       )}
 
-      {/* Mobile card stack */}
+      {/* Mobile card stack — grouped */}
       {!isLoading && tasks && tasks.length > 0 && (
-        <div className="flex flex-col gap-3 md:hidden">
-          {tasks.map((task) => (
-            <TaskCard
-              key={task.taskKey}
-              task={task}
-              onEdit={() => setEditingTask(task)}
-              isHighlighted={highlightTaskKeys.includes(task.taskKey)}
-            />
+        <div className="flex flex-col gap-1 md:hidden">
+          {groupTasksByCategory(tasks).map(({ label, tasks: groupTasks }) => (
+            <div key={label} className="flex flex-col gap-3">
+              {/* Category heading */}
+              <p className="mt-4 text-sm font-semibold text-muted-foreground first:mt-0">
+                {label}
+              </p>
+              {groupTasks.map((task) => (
+                <TaskCard
+                  key={task.taskKey}
+                  task={task}
+                  onEdit={() => setEditingTask(task)}
+                  isHighlighted={highlightTaskKeys.includes(task.taskKey)}
+                  isLegacy={isLegacyTask(task.taskKey)}
+                />
+              ))}
+            </div>
           ))}
         </div>
       )}

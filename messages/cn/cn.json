@@ -60,6 +60,7 @@
     "articlecreation": "文章创建",
     "back": "返回",
     "workbookGenerator": "工作簿生成器",
+    "aiproviderconfig": "AI 提供者配置",
     "subItem": {
       "admin": "管理员",
       "teachers": "教师",
