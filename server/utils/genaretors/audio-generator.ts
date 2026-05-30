@@ -3,8 +3,8 @@ import fs from "fs";
 import fsPromises from "fs/promises";
 import path from "path";
 import { generateText, Output } from "ai";
-import { openai, openaiModel } from "@/utils/openai";
-import { google, googleModelLite } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { z } from "zod";
 import ffmpeg from "fluent-ffmpeg";
 import {
@@ -40,106 +40,6 @@ interface GenerateChapterAudioParams {
   chapterNumber: number;
   cefrLevel?: string;
 }
-
-// Simple and reliable sentence splitting that handles abbreviations AND quotes
-// function splitSentencesCorrectly(text: string): string[] {
-//   // Common abbreviations that should not trigger sentence breaks
-//   const abbreviations = [
-//     "Mr",
-//     "Mrs",
-//     "Ms",
-//     "Miss",
-//     "Dr",
-//     "Prof",
-//     "Sr",
-//     "Jr",
-//     "vs",
-//     "etc",
-//     "Inc",
-//     "Corp",
-//     "Ltd",
-//     "Co",
-//     "Ave",
-//     "St",
-//     "Rd",
-//     "Blvd",
-//     "Apt",
-//     "No",
-//     "Vol",
-//     "pp",
-//     "Ph",
-//     "M.D",
-//     "B.A",
-//     "M.A",
-//     "Ph.D",
-//     "U.S",
-//     "U.K",
-//     "i.e",
-//     "e.g",
-//   ];
-
-//   const sentences: string[] = [];
-//   let currentSentence = "";
-//   let quoteCount = 0; // Track if we're inside quotes
-
-//   // Split text into words while preserving spaces and punctuation
-//   const tokens = text.match(/\S+|\s+/g) || [];
-
-//   for (let i = 0; i < tokens.length; i++) {
-//     const token = tokens[i];
-//     currentSentence += token;
-
-//     // Count quotes in this token to track quote state
-//     const quotes = (token.match(/[""'"'']/g) || []).length;
-//     quoteCount += quotes;
-//     const insideQuotes = quoteCount % 2 === 1;
-
-//     // Check if this token ends with sentence punctuation
-//     if (/[.!?]+$/.test(token.trim())) {
-//       // Check if it's an abbreviation
-//       const wordWithoutPunct = token.replace(/[.!?]+$/, "").trim();
-//       const isAbbreviation = abbreviations.some(
-//         (abbr) => wordWithoutPunct.toLowerCase() === abbr.toLowerCase(),
-//       );
-
-//       // Don't split if:
-//       // 1. It's an abbreviation, OR
-//       // 2. We're inside quotes (unless this token also closes the quote)
-//       const shouldNotSplit = isAbbreviation || (insideQuotes && quotes === 0);
-
-//       if (!shouldNotSplit) {
-//         // Look ahead to see if next non-space token starts with capital letter
-//         let nextWordIndex = i + 1;
-//         while (
-//           nextWordIndex < tokens.length &&
-//           /^\s+$/.test(tokens[nextWordIndex])
-//         ) {
-//           nextWordIndex++;
-//         }
-
-//         const nextWord =
-//           nextWordIndex < tokens.length ? tokens[nextWordIndex] : "";
-//         const nextStartsWithCapital = /^[A-Z]/.test(nextWord);
-//         const isEnd = nextWordIndex >= tokens.length;
-
-//         // Split sentence if we're at the end OR next word starts with capital
-//         if (isEnd || nextStartsWithCapital) {
-//           sentences.push(currentSentence.trim());
-//           currentSentence = "";
-//           // Reset quote count for new sentence
-//           quoteCount = 0;
-//         }
-//       }
-//     }
-//   }
-
-//   // Add any remaining text
-//   if (currentSentence.trim()) {
-//     sentences.push(currentSentence.trim());
-//   }
-
-//   return sentences.filter((s) => s.length > 0);
-// }
 
 function splitSentences(text: string): string[] {
   // 1. Normalize line breaks and trim overall text
@@ -246,8 +146,20 @@ export async function splitIntoSentences(passage: string): Promise<string[]> {
   try {
     const userPrompt = `Split the following text into complete sentences, keeping dialogue and attribution together:${passage}`;
 
+    const { model, modelId, providerName, temperature } = await resolveTaskModel(
+      TASK_KEYS.TRANSLATION_SENTENCE,
+    );
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.TRANSLATION_SENTENCE,
+        modelId,
+        providerName,
+      }),
+    );
+
     const { output: object } = await generateText({
-      model: google(googleModelLite),
+      model,
+      temperature,
       output: Output.object({
         schema: z.object({
           output: z

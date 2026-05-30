@@ -3,6 +3,7 @@ import { PrismaClient, ActivityType } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { hashPassword } from "@/lib/password";
 import { LEVELS_XP } from "../lib/utils";
+import { seedAiProviderRegistry } from "./seed/aiProviderRegistry";
 
 const prisma = new PrismaClient();
 
@@ -917,7 +918,12 @@ async function main() {
   console.log("=".repeat(50));
 }
 
-main()
+async function runAll() {
+  // await main();
+  await seedAiProviderRegistry();
+}
+
+runAll()
   .catch((e) => {
     console.error("❌ Error seeding database:", e);
     process.exit(1);

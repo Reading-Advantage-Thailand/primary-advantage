@@ -59,6 +59,7 @@
     "studentsandclasses": "นักเรียนและชั้นเรียน",
     "articlecreation": "การสร้างบทความ",
     "workbookGenerator": "สร้างเวิร์กบุ๊ก",
+    "aiproviderconfig": "การตั้งค่า AI Provider",
     "back": "กลับ",
     "subItem": {
       "admin": "ผู้ดูแลระบบ",

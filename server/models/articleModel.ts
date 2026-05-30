@@ -271,6 +271,12 @@ export const generateQuestions = async (
   return { mcq, saq, laq };
 };
 
+/**
+ * @deprecated NOT wired to any route — superseded by the atomic
+ * `generateArticleContent` flow in `articleGenerationController.processArticle`.
+ * Kept for reference only. Its only consumer of `generateTopic` (task key
+ * `topic.generate`) is dead with it. Do not call without re-wiring.
+ */
 export const generateArticles = async ({
   type,
   level,

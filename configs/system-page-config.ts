@@ -44,6 +44,11 @@ export const systemPageConfig: PageConfig = {
       href: "/system/contact-messages",
       icon: "MessageSquareIcon",
     },
+    {
+      title: "aiproviderconfig",
+      href: "/system/ai-config",
+      icon: "BotIcon",
+    },
     // {
     //   title: "testing",
     //   href: "/system/test",

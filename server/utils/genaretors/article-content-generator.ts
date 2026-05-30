@@ -1,6 +1,7 @@
 import { articleGeneratorSchema } from "@/lib/zod";
 import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
-import { google, googleModelPro } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { generateText, Output } from "ai";
 import fs from "fs";
 import path from "path";
@@ -67,8 +68,20 @@ export async function generateArticleContent(
     .replace("{genre}", genre)
     .replace("{topic}", topic);
 
+  const { model, modelId, providerName, temperature } = await resolveTaskModel(
+    TASK_KEYS.ARTICLE_CONTENT,
+  );
+
+  console.log(
+    formatTaskLog({
+      taskKey: TASK_KEYS.ARTICLE_CONTENT,
+      modelId,
+      providerName,
+    }),
+  );
+
   const { output } = await generateText({
-    model: google(googleModelPro),
+    model,
     output: Output.object({ schema: articleGeneratorSchema }),
     system: systemPrompt,
     prompt: `
@@ -76,15 +89,15 @@ export async function generateArticleContent(
 
     Write a story at level ${cefrLevel} with complexity ${subLevel}.
     RULES for ${subLevel}:
-    - If sub_level is '-': 
-        1. Use ONLY 'is/am/are'. 
-        2. Use a maximum of 5 unique nouns in the whole story (e.g., only 'cat', 'mat', 'hat', 'rat'). 
-        3. No compound nouns like 'lunch box' (use 'box' instead). 
+    - If sub_level is '-':
+        1. Use ONLY 'is/am/are'.
+        2. Use a maximum of 5 unique nouns in the whole story (e.g., only 'cat', 'mat', 'hat', 'rat').
+        3. No compound nouns like 'lunch box' (use 'box' instead).
         4. Repeat the same sentences with minor changes.
-    - If sub_level is '+': 
-        1. You can add 1-2 adjectives (happy, red). 
+    - If sub_level is '+':
+        1. You can add 1-2 adjectives (happy, red).
         2. You can use 'has' or simple action verbs.`,
-    temperature: 0.8,
+    temperature: temperature,
   });
 
   return output;

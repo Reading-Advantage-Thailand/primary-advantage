@@ -1,12 +1,7 @@
 // import { WordListResponse } from "./audio-words-generator";
 import { generateText, Output } from "ai";
-import { openai, openaiModel } from "@/utils/openai";
-import {
-  google,
-  googleModel,
-  googleModelLite,
-  googleModelPro,
-} from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { VocabularySchema } from "@/lib/zod";
 
 interface GenerateWordListParams {
@@ -34,8 +29,20 @@ export async function generateWordList(
   try {
     const userPrompt = `Extract the ten to fifteen most difficult vocabulary words, phrases, or idioms from the following passage: ${params.passage}`;
 
+    const { model, modelId, providerName, temperature } = await resolveTaskModel(
+      TASK_KEYS.WORDLIST_GENERATE,
+    );
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.WORDLIST_GENERATE,
+        modelId,
+        providerName,
+      }),
+    );
+
     const { output: wordlist } = await generateText({
-      model: google(googleModel),
+      model,
+      temperature,
       output: Output.object({ schema: VocabularySchema }),
       system: "You are an article database assisstant.",
       prompt: userPrompt,

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { generateText } from "ai";
-import { openai, openaiModel } from "@/utils/openai";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import {
   AIInsightType,
   AIInsightPriority,
@@ -28,6 +29,7 @@ export interface GeneratedInsight {
   confidence: number;
   data?: any;
   validUntil?: Date;
+  modelVersion: string;
 }
 
 function parseAIResponse(
@@ -36,6 +38,7 @@ function parseAIResponse(
   userId?: string,
   classroomId?: string,
   licenseId?: string,
+  modelId?: string,
 ): GeneratedInsight[] {
   try {
     // Extract JSON from response (in case AI added extra text)
@@ -89,6 +92,7 @@ function parseAIResponse(
         confidence: Math.min(Math.max(item.confidence || 0.7, 0), 1),
         data: item.data || {},
         validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Valid for 7 days
+        modelVersion: modelId ?? "unknown",
       }));
 
     return insights;
@@ -274,14 +278,31 @@ export async function generateSystemInsights(): Promise<GeneratedInsight[]> {
   
   Return ONLY the JSON array.`;
 
+    const { model, modelId, providerName, temperature } =
+      await resolveTaskModel(TASK_KEYS.INSIGHTS_GENERATE);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.INSIGHTS_GENERATE,
+        modelId,
+        providerName,
+      }),
+    );
+
     const { text } = await generateText({
-      model: openai(openaiModel),
+      model,
       prompt,
-      temperature: 0.7,
+      temperature: temperature,
       maxOutputTokens: 2000,
     });
 
-    const insights = parseAIResponse(text, "SYSTEM");
+    const insights = parseAIResponse(
+      text,
+      "SYSTEM",
+      undefined,
+      undefined,
+      undefined,
+      modelId,
+    );
 
     return insights;
   } catch (error) {
@@ -312,6 +333,7 @@ function generateFallbackSystemInsights(): GeneratedInsight[] {
       confidence: 0.75,
       data: "fallback",
       validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      modelVersion: "fallback",
     },
   ];
 }
@@ -356,10 +378,24 @@ export async function generateLicenseInsights(
     const metrics = calculateLicenseMetrics(school);
     const prompt = buildLicenseInsightPrompt(school, metrics);
 
+    const {
+      model: licenseModel,
+      modelId: licenseModelId,
+      providerName: licenseProviderName,
+      temperature: licenseTemperature,
+    } = await resolveTaskModel(TASK_KEYS.INSIGHTS_GENERATE);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.INSIGHTS_GENERATE,
+        modelId: licenseModelId,
+        providerName: licenseProviderName,
+      }),
+    );
+
     const { text } = await generateText({
-      model: openai(openaiModel),
+      model: licenseModel,
       prompt,
-      temperature: 0.7,
+      temperature: licenseTemperature,
       maxOutputTokens: 2500,
     });
 
@@ -369,6 +405,7 @@ export async function generateLicenseInsights(
       undefined,
       undefined,
       licenseId,
+      licenseModelId,
     );
 
     return insights;
@@ -402,6 +439,7 @@ function generateFallbackLicenseInsights(
       confidence: 0.75,
       data: "fallback",
       validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      modelVersion: "fallback",
     },
   ];
 }
@@ -460,15 +498,36 @@ export async function generateTeacherInsights(
     // Generate insights using AI
     const prompt = buildTeacherInsightPrompt(teacher, metrics);
 
+    const {
+      model: teacherModel,
+      modelId: teacherModelId,
+      providerName: teacherProviderName,
+      temperature: teacherTemperature,
+    } = await resolveTaskModel(TASK_KEYS.INSIGHTS_GENERATE);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.INSIGHTS_GENERATE,
+        modelId: teacherModelId,
+        providerName: teacherProviderName,
+      }),
+    );
+
     const { text } = await generateText({
-      model: openai(openaiModel),
+      model: teacherModel,
       prompt,
-      temperature: 0.7,
+      temperature: teacherTemperature,
       maxOutputTokens: 2000,
     });
 
     // Parse AI response
-    const insights = parseAIResponse(text, "TEACHER", userId);
+    const insights = parseAIResponse(
+      text,
+      "TEACHER",
+      userId,
+      undefined,
+      undefined,
+      teacherModelId,
+    );
 
     return insights;
   } catch (error) {
@@ -561,6 +620,7 @@ function generateFallbackTeacherInsights(userId: string): GeneratedInsight[] {
       },
       confidence: 0.75,
       validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      modelVersion: "fallback",
     },
   ];
 }
@@ -656,15 +716,36 @@ export async function generateStudentInsights(
     // Generate insights using AI
     const prompt = buildStudentInsightPrompt(student, metrics);
 
+    const {
+      model: studentModel,
+      modelId: studentModelId,
+      providerName: studentProviderName,
+      temperature: studentTemperature,
+    } = await resolveTaskModel(TASK_KEYS.INSIGHTS_GENERATE);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.INSIGHTS_GENERATE,
+        modelId: studentModelId,
+        providerName: studentProviderName,
+      }),
+    );
+
     const { text } = await generateText({
-      model: openai(openaiModel),
+      model: studentModel,
       prompt,
-      temperature: 0.7,
+      temperature: studentTemperature,
       maxOutputTokens: 1500,
     });
 
     // Parse AI response
-    const insights = parseAIResponse(text, "STUDENT", userId);
+    const insights = parseAIResponse(
+      text,
+      "STUDENT",
+      userId,
+      undefined,
+      undefined,
+      studentModelId,
+    );
 
     return insights;
   } catch (error) {
@@ -697,6 +778,7 @@ function generateFallbackStudentInsights(userId: string): GeneratedInsight[] {
       },
       confidence: 0.8,
       validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      modelVersion: "fallback",
     },
   ];
 }
@@ -863,14 +945,35 @@ export async function generateClassroomInsights(
     const metrics = calculateClassroomMetrics(classroom);
     const prompt = buildClassroomInsightPrompt(classroom, metrics);
 
+    const {
+      model: classroomModel,
+      modelId: classroomModelId,
+      providerName: classroomProviderName,
+      temperature: classroomTemperature,
+    } = await resolveTaskModel(TASK_KEYS.INSIGHTS_GENERATE);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.INSIGHTS_GENERATE,
+        modelId: classroomModelId,
+        providerName: classroomProviderName,
+      }),
+    );
+
     const { text } = await generateText({
-      model: openai(openaiModel),
+      model: classroomModel,
       prompt,
-      temperature: 0.7,
+      temperature: classroomTemperature,
       maxOutputTokens: 2000,
     });
 
-    const insights = parseAIResponse(text, "CLASSROOM", undefined, classroomId);
+    const insights = parseAIResponse(
+      text,
+      "CLASSROOM",
+      undefined,
+      classroomId,
+      undefined,
+      classroomModelId,
+    );
 
     return insights;
   } catch (error) {
@@ -971,6 +1074,7 @@ function generateFallbackClassroomInsights(
       },
       confidence: 0.75,
       validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      modelVersion: "fallback",
     },
   ];
 }

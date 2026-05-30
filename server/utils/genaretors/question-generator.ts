@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { generateText, Output } from "ai";
-import { openai, openaiModel } from "@/utils/openai";
-import { google, googleModel } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import path from "path";
 import fs from "fs";
 import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
@@ -45,8 +45,19 @@ export async function generateQuestion<T>(
     );
 
     const userPrompt = `${prompts?.user_prompt}\n\nPassage: ${params.passage}\nTitle: ${params.title}\nSummary: ${params.summary}\nImage Description: ${params.imageDesc}`;
+    const { model, modelId, providerName, temperature } = await resolveTaskModel(
+      TASK_KEYS.QUESTION_GENERATE,
+    );
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.QUESTION_GENERATE,
+        modelId,
+        providerName,
+      }),
+    );
     const { output: question } = await generateText({
-      model: google(googleModel),
+      model,
+      temperature,
       output: Output.object({ schema: params.schema }),
       system: prompts?.system_prompt,
       prompt: userPrompt,

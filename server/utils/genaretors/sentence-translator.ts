@@ -1,5 +1,6 @@
 import { generateText, Output } from "ai";
-import { google, googleModelLite } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { prisma } from "@/lib/prisma";
 import { SentenceTimepoint } from "@/types";
 import { z } from "zod";
@@ -72,8 +73,20 @@ async function translateSentencesWithAI(
           Provide translations in the exact same order, maintaining sentence structure and meaning appropriate for language learners.`;
 
   try {
+    const { model, modelId, providerName, temperature } = await resolveTaskModel(
+      TASK_KEYS.TRANSLATION_SENTENCE,
+    );
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.TRANSLATION_SENTENCE,
+        modelId,
+        providerName,
+      }),
+    );
+
     const result = await generateText({
-      model: google(googleModelLite),
+      model,
+      temperature,
       output: Output.object({ schema: sentenceTranslationSchema }),
       system: systemPrompt,
       prompt: userPrompt,
@@ -166,7 +179,6 @@ export async function translateAndStoreSentences({
         translatedPassage: JSON.parse(JSON.stringify(translatedSentences)),
       },
     });
-
   } catch (error: any) {
     console.error(
       `Failed to translate sentences for article ${articleId}:`,

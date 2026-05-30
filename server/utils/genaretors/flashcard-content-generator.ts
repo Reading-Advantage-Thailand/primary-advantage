@@ -1,16 +1,23 @@
 import { generateText, Output } from "ai";
-import { google, googleModel } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { z } from "zod";
 
 const flashcardContentSchema = z.object({
   flashcard: z
     .array(
       z.object({
-        sentence: z.string().describe("A sentence taken verbatim from the passage"),
+        sentence: z
+          .string()
+          .describe("A sentence taken verbatim from the passage"),
         translation: z.object({
           th: z.string().describe("Thai translation of the sentence"),
-          cn: z.string().describe("Simplified Chinese translation of the sentence"),
-          tw: z.string().describe("Traditional Chinese translation of the sentence"),
+          cn: z
+            .string()
+            .describe("Simplified Chinese translation of the sentence"),
+          tw: z
+            .string()
+            .describe("Traditional Chinese translation of the sentence"),
           vi: z.string().describe("Vietnamese translation of the sentence"),
         }),
       }),
@@ -21,7 +28,9 @@ const flashcardContentSchema = z.object({
   wordlist: z
     .array(
       z.object({
-        vocabulary: z.string().describe("A word, phrase, or idiom taken verbatim from the passage"),
+        vocabulary: z
+          .string()
+          .describe("A word, phrase, or idiom taken verbatim from the passage"),
         definition: z.object({
           en: z.string().describe("English definition"),
           th: z.string().describe("Thai definition"),
@@ -33,7 +42,9 @@ const flashcardContentSchema = z.object({
     )
     .min(10)
     .max(15)
-    .describe("10 to 15 of the most difficult vocabulary items from the passage"),
+    .describe(
+      "10 to 15 of the most difficult vocabulary items from the passage",
+    ),
 });
 
 export interface FlashcardContent {
@@ -65,12 +76,23 @@ Given a passage, return:
 
 Do not invent sentences or vocabulary that do not appear in the passage.`;
 
+  const { model, modelId, providerName, temperature } = await resolveTaskModel(
+    TASK_KEYS.FLASHCARD_CONTENT,
+  );
+  console.log(
+    formatTaskLog({
+      taskKey: TASK_KEYS.FLASHCARD_CONTENT,
+      modelId,
+      providerName,
+    }),
+  );
+
   const { output } = await generateText({
-    model: google(googleModel),
+    model,
     output: Output.object({ schema: flashcardContentSchema }),
     system: systemPrompt,
     prompt: `Passage:\n\n${passage}`,
-    temperature: 0.4,
+    temperature: temperature,
   });
 
   return output as FlashcardContent;

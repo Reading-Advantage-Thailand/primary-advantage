@@ -1,4 +1,5 @@
-import { google, googleImage, googleModelLite } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { uploadToBucket } from "@/utils/storage";
 import { generateText, Output } from "ai";
 import { randomUUID } from "crypto";
@@ -46,10 +47,25 @@ export async function generatedImage(
   // ── Step 1: Generate scene descriptions via text model ────────────────────
   let storyParts: { prompt: string[]; mainCharacter: string };
   try {
+    const {
+      model: sceneModel,
+      modelId: sceneModelId,
+      providerName: sceneProviderName,
+      temperature: sceneTemperature,
+    } = await resolveTaskModel(TASK_KEYS.IMAGE_SCENE_PROMPT);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.IMAGE_SCENE_PROMPT,
+        modelId: sceneModelId,
+        providerName: sceneProviderName,
+      }),
+    );
+
     const { output } = await withAiRetry(
       () =>
         generateText({
-          model: google(googleModelLite),
+          model: sceneModel,
+          temperature: sceneTemperature,
           output: Output.object({
             schema: z.object({
               prompt: z.array(z.string()).length(3),
@@ -90,10 +106,25 @@ export async function generatedImage(
     const sceneDescription = storyParts.prompt[i];
 
     try {
+      const {
+        model: imgModel,
+        modelId: imgModelId,
+        providerName: imgProviderName,
+        temperature: imgTemperature,
+      } = await resolveTaskModel(TASK_KEYS.IMAGE_GENERATE);
+      console.log(
+        formatTaskLog({
+          taskKey: TASK_KEYS.IMAGE_GENERATE,
+          modelId: imgModelId,
+          providerName: imgProviderName,
+        }),
+      );
+
       const result = await withAiRetry(
         () =>
           generateText({
-            model: google(googleImage),
+            model: imgModel,
+            temperature: imgTemperature,
             prompt: `A professional digital illustration for a children's book.
              Character: ${storyParts.mainCharacter}.
              Action: ${sceneDescription}.

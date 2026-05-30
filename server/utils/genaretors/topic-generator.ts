@@ -1,6 +1,7 @@
 import { generateText, Output } from "ai";
 import { z } from "zod";
-import { google, googleModel } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { ArticleType } from "@/types/enum";
 
 interface GenerateTopicParams {
@@ -24,8 +25,20 @@ export async function generateTopic(
     nonfiction: `Please provide 1 reading passage topics in the ${params.type} ${params.genre} genre and ${params.subgenre} subgenre appropriate for secondary school students. Output as a JSON array.`,
   };
   try {
+    const { model, modelId, providerName, temperature } = await resolveTaskModel(
+      TASK_KEYS.TOPIC_GENERATE,
+    );
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.TOPIC_GENERATE,
+        modelId,
+        providerName,
+      }),
+    );
+
     const { output } = await generateText({
-      model: google(googleModel),
+      model,
+      temperature,
       output: Output.object({
         schema: z.object({
           topics: z.string(),

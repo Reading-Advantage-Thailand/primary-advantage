@@ -6,7 +6,8 @@ import {
   saqFeedbackOutputSchema,
 } from "@/lib/zod";
 import { LAQFeedbackResponse, SAQFeedbackResponse } from "@/types";
-import { google, googleModel } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { generateText, Output } from "ai";
 import fs from "fs";
 import path from "path";
@@ -74,8 +75,23 @@ export async function getSaqFeedbackForStory(
       .replace("{suggestedResponse}", validatedInput.suggestedResponse)
       .replace("{studentResponse}", validatedInput.studentResponse);
 
+    const {
+      model: saqModel,
+      modelId: saqModelId,
+      providerName: saqProviderName,
+      temperature: saqTemperature,
+    } = await resolveTaskModel(TASK_KEYS.QA_FEEDBACK);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.QA_FEEDBACK,
+        modelId: saqModelId,
+        providerName: saqProviderName,
+      }),
+    );
+
     const { output: object } = await generateText({
-      model: google(googleModel),
+      model: saqModel,
+      temperature: saqTemperature,
       output: Output.object({ schema: saqFeedbackOutputSchema }),
       system: saqeution_system,
       prompt,
@@ -122,8 +138,23 @@ export async function getLaqFeedbackForStory(
       .replace("{writingPrompt}", validatedInput.writingPrompt)
       .replace("{studentResponse}", validatedInput.studentResponse);
 
+    const {
+      model: laqModel,
+      modelId: laqModelId,
+      providerName: laqProviderName,
+      temperature: laqTemperature,
+    } = await resolveTaskModel(TASK_KEYS.QA_FEEDBACK);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.QA_FEEDBACK,
+        modelId: laqModelId,
+        providerName: laqProviderName,
+      }),
+    );
+
     const { output: object } = await generateText({
-      model: google(googleModel),
+      model: laqModel,
+      temperature: laqTemperature,
       output: Output.object({ schema: laqFeedbackOutputSchema }),
       system: laquestion_system,
       prompt,
