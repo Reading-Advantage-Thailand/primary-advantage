@@ -832,6 +832,46 @@ model GameRanking {
   @@map("game_rankings")
 }
 
+enum AiProviderKind {
+  VERTEX
+  OPENAI
+  OPENAI_COMPATIBLE
+}
+
+enum AiCapability {
+  TEXT
+  IMAGE
+  STREAMING
+}
+
+model AiProvider {
+  id        String         @id @default(cuid())
+  name      String         @unique
+  kind      AiProviderKind
+  baseUrl   String?        @map("base_url")
+  apiKeyRef String?        @map("api_key_ref")
+  enabled   Boolean        @default(true)
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  tasks     AiTaskConfig[]
+
+  @@map("ai_providers")
+}
+
+model AiTaskConfig {
+  id          String       @id @default(cuid())
+  taskKey     String       @unique @map("task_key")
+  providerId  String       @map("provider_id")
+  provider    AiProvider   @relation(fields: [providerId], references: [id])
+  modelId     String       @map("model_id")
+  capability  AiCapability
+  temperature Float?
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  updatedBy   String?      @map("updated_by")
+
+  @@map("ai_task_configs")
+}
+
 enum InquiryType {
   SALES
   SUPPORT

@@ -1,5 +1,6 @@
 import { generateText, Output } from "ai";
-import { google, googleModelLite } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { z } from "zod";
 
 const summaryTranslationSchema = z.object({
@@ -40,8 +41,20 @@ Translate to:
 
   const userPrompt = `Translate this summary:\n\n${summary}\n\nProvide a single translation per language; do not split into sentences.`;
 
+  const { model, modelId, providerName, temperature } = await resolveTaskModel(
+    TASK_KEYS.TRANSLATION_SUMMARY,
+  );
+  console.log(
+    formatTaskLog({
+      taskKey: TASK_KEYS.TRANSLATION_SUMMARY,
+      modelId,
+      providerName,
+    }),
+  );
+
   const { output } = await generateText({
-    model: google(googleModelLite),
+    model,
+    temperature,
     output: Output.object({ schema: summaryTranslationSchema }),
     system: systemPrompt,
     prompt: userPrompt,

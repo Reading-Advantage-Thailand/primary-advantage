@@ -4,7 +4,8 @@ import {
   ArticleCefrLevel,
   ArticleType,
 } from "@/types/enum";
-import { google, googleModelLite } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 
@@ -47,8 +48,19 @@ export async function evaluateRating(
   // )?.systemPrompt;
 
   try {
+    const { model, modelId, providerName, temperature } = await resolveTaskModel(
+      TASK_KEYS.EVALUATION_RATING,
+    );
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.EVALUATION_RATING,
+        modelId,
+        providerName,
+      }),
+    );
+
     const { output: evaluated } = await generateText({
-      model: google(googleModelLite),
+      model,
       output: Output.object({
         schema: z.object({
           reasoning: z.string(),
@@ -64,7 +76,7 @@ export async function evaluateRating(
       """
       Remember to return ONLY a valid JSON object as instructed.`,
       seed: Math.floor(Math.random() * 1000),
-      temperature: 1,
+      temperature: temperature,
       maxOutputTokens: 4096,
     });
 

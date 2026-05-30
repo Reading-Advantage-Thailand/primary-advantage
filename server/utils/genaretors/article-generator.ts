@@ -1,7 +1,8 @@
 import path from "path";
 import fs from "fs";
 import { generateText, Output } from "ai";
-import { google, googleModel } from "@/utils/google";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { ArticleBaseCefrLevel, ArticleType } from "@/types/enum";
 import { articleGeneratorSchema } from "@/lib/zod";
 
@@ -68,17 +69,21 @@ export async function generateArticle(
 
   // generate article
   try {
+    const { model, modelId, providerName, temperature } = await resolveTaskModel(
+      TASK_KEYS.ARTICLE_GENERATE,
+    );
+
     console.log(
-      `${params.cefrLevel} generating article model ID: ${googleModel} type: ${params.type}`,
+      `${params.cefrLevel} generating article | ${formatTaskLog({ taskKey: TASK_KEYS.ARTICLE_GENERATE, modelId, providerName })} | type: ${params.type}`,
     );
 
     const { output: article } = await generateText({
-      model: google(googleModel),
+      model,
       output: Output.object({ schema: articleGeneratorSchema }),
       system: levelConfig.systemPrompt,
       prompt: userPrompt,
       seed: Math.floor(Math.random() * 1000),
-      temperature: 1,
+      temperature: temperature,
     });
 
     return article;

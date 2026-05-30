@@ -31,6 +31,9 @@ migrate:
 db-push:
 	docker compose exec web npx prisma db push
 
+db-seed:
+	docker compose exec web npx prisma db seed
+
 install:
 	docker compose exec web npm install $(ARGS)
 

@@ -1,10 +1,10 @@
 import { storyGeneratorSchema } from "@/lib/zod";
 import {
-  google,
-  googleImage,
-  googleModelLite,
-  googleModelPro,
-} from "@/utils/google";
+  resolveTaskModel,
+  resolveImageTaskModel,
+  formatTaskLog,
+} from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { uploadToBucket } from "@/utils/storage";
 import { generateImage, generateText, Output } from "ai";
 import fs from "fs";
@@ -32,8 +32,6 @@ type CefrLevelType = {
 
 export type GenerateStoryResponse = z.infer<typeof storyGeneratorSchema>;
 
-const aiModel = googleModelPro;
-
 // Cache prompt file in memory (lazy-loaded singleton)
 let cachedPrompts: CefrLevelPromptType | null = null;
 
@@ -54,7 +52,15 @@ export async function generateStoryContent(
   params: GenerateStoryParams,
 ): Promise<GenerateStoryResponse> {
   try {
-    console.log(`${params.cefrLevel} generating story model ID: ${aiModel}`);
+    const {
+      model: storyModel,
+      modelId: storyModelId,
+      providerName: storyProviderName,
+      temperature: storyTemperature,
+    } = await resolveTaskModel(TASK_KEYS.STORY_GENERATE);
+    console.log(
+      `${params.cefrLevel} generating story | ${formatTaskLog({ taskKey: TASK_KEYS.STORY_GENERATE, modelId: storyModelId, providerName: storyProviderName })}`,
+    );
 
     const prompts = getStoryPrompts();
 
@@ -71,13 +77,13 @@ export async function generateStoryContent(
       .replace("{topic}", params?.topic);
 
     const { output: story } = await generateText({
-      model: google(aiModel),
+      model: storyModel,
       // model: openai(aiModel),
       output: Output.object({ schema: storyGeneratorSchema }),
       system: levelConfig.systemPrompt,
       prompt: userPrompt,
       // seed: Math.floor(Math.random() * 1000),
-      temperature: 0.7,
+      temperature: storyTemperature,
     });
 
     return story;
@@ -101,8 +107,23 @@ export const generateStoryTopic = async (
   - **Output must be a JSON array of strings ONLY.**
   Output as a JSON array.`;
   try {
+    const {
+      model: topicModel,
+      modelId: topicModelId,
+      providerName: topicProviderName,
+      temperature: topicTemperature,
+    } = await resolveTaskModel(TASK_KEYS.STORY_TOPIC);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.STORY_TOPIC,
+        modelId: topicModelId,
+        providerName: topicProviderName,
+      }),
+    );
+
     const { output } = await generateText({
-      model: google(googleModelLite),
+      model: topicModel,
+      temperature: topicTemperature,
       // model: openai(aiModel),
       output: Output.object({
         schema: z.object({
@@ -190,8 +211,22 @@ Assess:
 Return a JSON object with keys 'cefrLevel' (string) and 'rating' (integer 1-5).`;
 
   try {
+    const {
+      model: evalModel,
+      modelId: evalModelId,
+      providerName: evalProviderName,
+      temperature: evalTemperature,
+    } = await resolveTaskModel(TASK_KEYS.STORY_EVALUATE);
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.STORY_EVALUATE,
+        modelId: evalModelId,
+        providerName: evalProviderName,
+      }),
+    );
+
     const { output: evaluation } = await generateText({
-      model: google(googleModelLite),
+      model: evalModel,
       output: Output.object({
         schema: z.object({
           cefrLevel: z
@@ -211,7 +246,7 @@ Return a JSON object with keys 'cefrLevel' (string) and 'rating' (integer 1-5).`
       }),
       system: systemPrompt,
       prompt: userPrompt,
-      temperature: 0.2,
+      temperature: evalTemperature,
     });
 
     return evaluation;
@@ -292,8 +327,21 @@ const processSingleImage = async (
   try {
     await withAiRetry(
       async () => {
+        const {
+          model: imgModel,
+          modelId: imgModelId,
+          providerName: imgProviderName,
+        } = await resolveImageTaskModel(TASK_KEYS.IMAGE_GENERATE);
+        console.log(
+          formatTaskLog({
+            taskKey: TASK_KEYS.IMAGE_GENERATE,
+            modelId: imgModelId,
+            providerName: imgProviderName,
+          }),
+        );
+
         const { images } = await generateImage({
-          model: google.image(googleImage),
+          model: imgModel,
           prompt: constructPrompt(scene.description, charDesc),
           aspectRatio: "4:3",
           n: 1,

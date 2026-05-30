@@ -10,7 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 .vscode/
-bun.lock
+.devcontainer/
+
 
 
 # testing
@@ -70,6 +71,7 @@ service-account.json
 .cursor/
 .github/
 .claude/
+.antigravitycli/
 tasks/
 CLAUDE.md
 skills-lock.json

@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { openai, openaiModel } from "@/utils/openai";
+import { resolveTaskModel, formatTaskLog } from "@/server/ai/modelResolver";
+import { TASK_KEYS } from "@/server/ai/taskKeys";
 import { streamText } from "ai";
 
 const createLessonChatbotQuestionSchema = z.object({
@@ -109,8 +110,20 @@ export async function POST(request: NextRequest) {
     //console.log("Chat Messages:", chatMessages);
 
     // ส่ง prompt เข้า OpenAI พร้อมประวัติ
+    const { model, modelId, providerName, temperature } = await resolveTaskModel(
+      TASK_KEYS.CHATBOT_STREAM,
+    );
+    console.log(
+      formatTaskLog({
+        taskKey: TASK_KEYS.CHATBOT_STREAM,
+        modelId,
+        providerName,
+      }),
+    );
+
     const { textStream } = streamText({
-      model: openai(openaiModel),
+      model,
+      temperature,
       messages: [systemMessage, ...chatMessages],
     });
 

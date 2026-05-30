@@ -1,7 +1,6 @@
 // import { prisma } from "@/lib/prisma";
 
 import { prisma } from "@/lib/prisma";
-import { openaiModel } from "@/utils/openai";
 import { GeneratedInsight } from "../utils/genaretors/ai-generator";
 import { AIInsightScope } from "@prisma/client";
 import { startOfDay, subDays } from "date-fns";
@@ -96,7 +95,7 @@ export async function saveInsights(
         classroomId,
         licenseId,
         generatedBy: "ai",
-        modelVersion: openaiModel,
+        modelVersion: insight.modelVersion,
         validUntil: insight.validUntil,
       })),
     });
