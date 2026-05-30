@@ -184,7 +184,8 @@ const processCefrLevel = async (
             savedStory.chapters.map((chapter) =>
               generateChapterAudio({
                 passage: chapter.passage,
-                sentences: chapter.sentences as string[],
+                // sentences is now optional; omitting it lets generateChapterAudio
+                // derive full-coverage sentences from the passage (Issue #138 fix).
                 chapterId: chapter.id,
                 chapterNumber: chapter.chapterNumber,
                 cefrLevel: level,

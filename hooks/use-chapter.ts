@@ -25,7 +25,7 @@ export function useChapter(options: UseChapterOptions): UseChapterReturn {
     storyId,
     chapterNumber,
     enabled = true,
-    staleTime = 5 * 60 * 1000, // 5 minutes
+    staleTime = 60 * 1000, // 1 minute — lowered from 5 min so repaired chapter data propagates sooner
   } = options;
 
   const { data, isLoading, isFetching, isError, error, refetch } =

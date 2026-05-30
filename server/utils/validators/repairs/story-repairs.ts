@@ -1,11 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { generateStoryImage } from "@/server/utils/genaretors/story-generator";
-import { generateChapterAudio, splitIntoSentences } from "@/server/utils/genaretors/audio-generator";
+import { generateChapterAudio } from "@/server/utils/genaretors/audio-generator";
 import { generateAudioForFlashcard } from "@/server/utils/genaretors/audio-flashcard-generator";
 import { regenerateFlashcardContent } from "@/server/utils/genaretors/flashcard-content-generator";
 import { translateSummary } from "@/server/utils/genaretors/summary-translator";
-import { Issue, RepairAction, RepairResult } from "@/server/utils/validators/types";
+import {
+  Issue,
+  RepairAction,
+  RepairResult,
+} from "@/server/utils/validators/types";
 
 interface StoryForRepair {
   id: string;
@@ -53,19 +57,21 @@ async function repairChapterAudio(
   story: StoryForRepair,
   chapter: ChapterForRepair,
 ): Promise<void> {
-  let sentences = Array.isArray(chapter.sentences)
+  // generateChapterAudio now handles sentence derivation internally:
+  // - If the stored sentences cover ≥90% of the passage, they are reused as-is.
+  // - Otherwise it calls splitIntoSentences(passage) to get full-coverage sentences.
+  // Passing the existing sentences as an optional hint avoids an unnecessary LLM
+  // call when the chapter was only partially broken (e.g. audio missing but
+  // sentences are still good).
+  const hintSentences = Array.isArray(chapter.sentences)
     ? (chapter.sentences as Array<{ sentence?: string } | string>)
         .map((s) => (typeof s === "string" ? s : (s?.sentence ?? "")))
         .filter((s) => s.length > 0)
     : [];
-  // Fall back to splitting the passage when stored sentences are empty —
-  // otherwise the timepoint aligner re-saves [] and the chapter stays broken.
-  if (sentences.length === 0) {
-    sentences = await splitIntoSentences(chapter.passage);
-  }
+
   await generateChapterAudio({
     passage: chapter.passage,
-    sentences,
+    sentences: hintSentences,
     chapterId: chapter.id,
     chapterNumber: chapter.chapterNumber,
     cefrLevel: story.cefrLevel ?? undefined,
@@ -76,15 +82,23 @@ async function repairChapterTranslatedSummary(
   story: StoryForRepair,
   chapter: ChapterForRepair,
 ): Promise<void> {
-  const translated = await translateSummary(chapter.summary, story.cefrLevel ?? undefined);
+  const translated = await translateSummary(
+    chapter.summary,
+    story.cefrLevel ?? undefined,
+  );
   await prisma.storyChapter.update({
     where: { id: chapter.id },
     data: { translatedSummary: translated as unknown as Prisma.InputJsonValue },
   });
 }
 
-async function repairStoryTranslatedSummary(story: StoryForRepair): Promise<void> {
-  const translated = await translateSummary(story.summary, story.cefrLevel ?? undefined);
+async function repairStoryTranslatedSummary(
+  story: StoryForRepair,
+): Promise<void> {
+  const translated = await translateSummary(
+    story.summary,
+    story.cefrLevel ?? undefined,
+  );
   await prisma.story.update({
     where: { id: story.id },
     data: { translatedSummary: translated as unknown as Prisma.InputJsonValue },
@@ -99,7 +113,9 @@ async function repairChapterFlashcardAudio(
     where: { storyChapterId: chapter.id },
   });
   if (!row) {
-    throw new Error("Cannot repair chapter flashcard audio — flashcard row missing");
+    throw new Error(
+      "Cannot repair chapter flashcard audio — flashcard row missing",
+    );
   }
 
   // Flashcards are an AI-curated subset, not the full passage. If either
@@ -118,11 +134,13 @@ async function repairChapterFlashcardAudio(
     const updateData: Prisma.SentencsAndWordsForFlashcardUpdateInput = {};
     if (sentenceMissing) {
       sentenceData = regenerated.flashcard;
-      updateData.sentence = regenerated.flashcard as unknown as Prisma.InputJsonValue;
+      updateData.sentence =
+        regenerated.flashcard as unknown as Prisma.InputJsonValue;
     }
     if (wordsMissing) {
       wordsData = regenerated.wordlist;
-      updateData.words = regenerated.wordlist as unknown as Prisma.InputJsonValue;
+      updateData.words =
+        regenerated.wordlist as unknown as Prisma.InputJsonValue;
     }
     await prisma.sentencsAndWordsForFlashcard.update({
       where: { id: row.id },
@@ -210,6 +228,8 @@ export function planStoryRepair(
         break;
       case "chapter_audio_missing":
       case "chapter_sentences_empty":
+      case "chapter_sentences_partial":
+      case "chapter_sentences_timing_integrity":
         getChapterNeed(issue.chapterId).audio = true;
         break;
       case "chapter_translation_missing":
@@ -235,38 +255,51 @@ export function planStoryRepair(
 
   const actions: RepairAction[] = [];
 
-  if (need.storyCover) actions.push(wrap("repair_story_cover", () => repairStoryCover(ctx.story)));
+  if (need.storyCover)
+    actions.push(wrap("repair_story_cover", () => repairStoryCover(ctx.story)));
 
   for (const [chapterId, n] of chapterNeeds) {
     const chapter = ctx.chaptersById.get(chapterId);
     if (!chapter) continue;
 
     if (n.image)
-      actions.push(wrap(`repair_chapter_image[${chapterId}]`, () =>
-        repairChapterImage(ctx.story, chapter),
-      ));
+      actions.push(
+        wrap(`repair_chapter_image[${chapterId}]`, () =>
+          repairChapterImage(ctx.story, chapter),
+        ),
+      );
     if (n.audio)
-      actions.push(wrap(`repair_chapter_audio[${chapterId}]`, () =>
-        repairChapterAudio(ctx.story, chapter),
-      ));
+      actions.push(
+        wrap(`repair_chapter_audio[${chapterId}]`, () =>
+          repairChapterAudio(ctx.story, chapter),
+        ),
+      );
     if (n.translatedSummary)
-      actions.push(wrap(`repair_chapter_translated_summary[${chapterId}]`, () =>
-        repairChapterTranslatedSummary(ctx.story, chapter),
-      ));
+      actions.push(
+        wrap(`repair_chapter_translated_summary[${chapterId}]`, () =>
+          repairChapterTranslatedSummary(ctx.story, chapter),
+        ),
+      );
     if (n.flashcardRow)
-      actions.push(wrap(`repair_chapter_flashcard_row[${chapterId}]`, () =>
-        repairChapterFlashcardRow(ctx.story, chapter),
-      ));
+      actions.push(
+        wrap(`repair_chapter_flashcard_row[${chapterId}]`, () =>
+          repairChapterFlashcardRow(ctx.story, chapter),
+        ),
+      );
     else if (n.flashcardAudio)
-      actions.push(wrap(`repair_chapter_flashcard_audio[${chapterId}]`, () =>
-        repairChapterFlashcardAudio(ctx.story, chapter),
-      ));
+      actions.push(
+        wrap(`repair_chapter_flashcard_audio[${chapterId}]`, () =>
+          repairChapterFlashcardAudio(ctx.story, chapter),
+        ),
+      );
   }
 
   if (need.storyTranslatedSummary)
-    actions.push(wrap("repair_story_translated_summary", () =>
-      repairStoryTranslatedSummary(ctx.story),
-    ));
+    actions.push(
+      wrap("repair_story_translated_summary", () =>
+        repairStoryTranslatedSummary(ctx.story),
+      ),
+    );
 
   return actions;
 }

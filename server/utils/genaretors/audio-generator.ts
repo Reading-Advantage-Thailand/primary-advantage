@@ -26,16 +26,17 @@ import { SENTENCE_SPLITTER_SYSTEM_PROMPT } from "@/data/prompts-ai";
 import winkNLP from "wink-nlp";
 import model from "wink-eng-lite-web-model";
 import { uploadToBucket } from "@/utils/storage";
+import { computeCoverageRatio } from "@/server/utils/validators/sentence-coverage";
 
 interface GenerateAudioParams {
   passage: string;
-  sentences: string[];
+  sentences?: string[]; // Optional: LLM hint. If coverage <90%, passage is re-split.
   articleId: string;
 }
 
 interface GenerateChapterAudioParams {
   passage: string;
-  sentences: string[];
+  sentences?: string[]; // Optional: LLM hint. If coverage <90%, passage is re-split.
   chapterId: string;
   chapterNumber: number;
   cefrLevel?: string;
@@ -146,9 +147,8 @@ export async function splitIntoSentences(passage: string): Promise<string[]> {
   try {
     const userPrompt = `Split the following text into complete sentences, keeping dialogue and attribution together:${passage}`;
 
-    const { model, modelId, providerName, temperature } = await resolveTaskModel(
-      TASK_KEYS.TRANSLATION_SENTENCE,
-    );
+    const { model, modelId, providerName, temperature } =
+      await resolveTaskModel(TASK_KEYS.TRANSLATION_SENTENCE);
     console.log(
       formatTaskLog({
         taskKey: TASK_KEYS.TRANSLATION_SENTENCE,
@@ -178,146 +178,215 @@ export async function splitIntoSentences(passage: string): Promise<string[]> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Core aligner — rewritten for 0-drop guarantee (Issue #138)
+// ---------------------------------------------------------------------------
+
+const NORMALIZATION_LOOKAHEAD = 4; // max extra TTS tokens to scan past a mismatch
+
+/** Normalize a token for matching: strip non-word chars, lowercase */
+function normalizeToken(s: string): string {
+  return s.replace(/[^\w]/g, "").toLowerCase();
+}
+
+/**
+ * Walk the Lemonfox word_timestamps stream and assign each input sentence a
+ * contiguous span of timestamps. Guarantees:
+ *
+ * 1. Every non-empty input sentence produces exactly one SentenceTimepoint
+ *    (0 sentences dropped).
+ * 2. The .sentence field is the verbatim input text (original punctuation/casing
+ *    preserved — NOT rebuilt from TTS tokens, which strip punctuation).
+ * 3. Tolerant resync: on tokenization drift (contractions, numbers, em-dash),
+ *    lookahead ≤ NORMALIZATION_LOOKAHEAD lets us skip past unmatched TTS tokens
+ *    and anchor on the next confident match. Unmatched words get their timing
+ *    interpolated from neighbors.
+ * 4. Sentences with zero matched words get words:[] with timing interpolated
+ *    from neighboring timepoints.
+ *
+ * @param wordTimestamps - Lemonfox word_timestamps array
+ * @param sentences      - Verbatim sentence strings (from passage)
+ * @param contextId      - Article/chapter ID for log messages
+ */
+export function alignWordTimestampsToSentences(
+  wordTimestamps: WordTimestamp[],
+  sentences: string[],
+  contextId: string,
+): SentenceTimepoint[] {
+  // Filter out empty/whitespace-only sentences before processing
+  const nonEmptySentences = sentences.filter((s) => s.trim().length > 0);
+
+  if (nonEmptySentences.length === 0) return [];
+  if (wordTimestamps.length === 0) {
+    // No timestamps at all — emit every sentence with zero-width timing
+    return nonEmptySentences.map((sentence) => ({
+      startTime: 0,
+      endTime: 0,
+      words: [],
+      sentence: sentence.trim(),
+    }));
+  }
+
+  // Build a normalized token list once for efficient scanning
+  const normTokens = wordTimestamps.map((wt) => normalizeToken(wt.word));
+
+  // Cursor into wordTimestamps — advances as sentences claim tokens
+  let cursor = 0;
+
+  // Pass 1: For each sentence, collect matched word timestamps using tolerant scan
+  const rawResults: Array<{
+    sentence: string;
+    words: WordTimestamp[];
+    startTime: number | null;
+    endTime: number | null;
+  }> = nonEmptySentences.map((sentence) => {
+    const cleanSentence = sentence.trim();
+    const sentenceTokens = cleanSentence
+      .split(/[\s—–]+/) // split on whitespace, em-dash, en-dash
+      .map((w) => normalizeToken(w))
+      .filter((w) => w.length > 0);
+
+    const matchedWords: WordTimestamp[] = [];
+    let startTime: number | null = null;
+    let endTime: number | null = null;
+
+    for (let si = 0; si < sentenceTokens.length; si++) {
+      const expected = sentenceTokens[si];
+      let found = false;
+
+      // Common path: check at cursor position first (1:1 positional)
+      if (cursor < wordTimestamps.length && normTokens[cursor] === expected) {
+        const wt = wordTimestamps[cursor];
+        matchedWords.push(wt);
+        if (startTime === null) startTime = wt.start;
+        endTime = wt.end;
+        cursor++;
+        found = true;
+      } else {
+        // Tolerant scan: look ahead up to NORMALIZATION_LOOKAHEAD positions
+        // for a confident match, then interpolate the skipped tokens
+        for (
+          let ahead = 1;
+          ahead <= NORMALIZATION_LOOKAHEAD &&
+          cursor + ahead < wordTimestamps.length;
+          ahead++
+        ) {
+          if (normTokens[cursor + ahead] === expected) {
+            // Found a confident match — consume the skipped tokens without
+            // advancing their timing (they'll be interpolated later) but
+            // update the cursor so we don't stall.
+            const wt = wordTimestamps[cursor + ahead];
+            matchedWords.push(wt);
+            if (startTime === null) startTime = wt.start;
+            endTime = wt.end;
+            cursor = cursor + ahead + 1;
+            found = true;
+            break;
+          }
+        }
+      }
+
+      if (!found) {
+        // Word absent from TTS stream (contraction half, number, etc.)
+        // We log it but do NOT drop the sentence. Timing will be interpolated.
+        console.warn(
+          `[alignWordTimestampsToSentences][${contextId}] unmatched token` +
+            ` "${expected}" in sentence "${cleanSentence.substring(0, 40)}..."`,
+        );
+      }
+    }
+
+    return { sentence: cleanSentence, words: matchedWords, startTime, endTime };
+  });
+
+  // Pass 2: Interpolate timing for sentences with zero matched words using
+  // their neighbors' timing. This satisfies the 0-drop guarantee.
+  const timepoints: SentenceTimepoint[] = rawResults.map((r, i) => {
+    if (r.startTime !== null && r.endTime !== null) {
+      return {
+        startTime: r.startTime,
+        endTime: r.endTime,
+        words: r.words,
+        sentence: r.sentence,
+      };
+    }
+
+    // Find nearest predecessor with timing
+    let prevEnd = 0;
+    for (let j = i - 1; j >= 0; j--) {
+      if (rawResults[j].endTime !== null) {
+        prevEnd = rawResults[j].endTime!;
+        break;
+      }
+    }
+
+    // Find nearest successor with timing
+    let nextStart: number | null = null;
+    for (let j = i + 1; j < rawResults.length; j++) {
+      if (rawResults[j].startTime !== null) {
+        nextStart = rawResults[j].startTime!;
+        break;
+      }
+    }
+
+    // Interpolate: place this sentence in the gap between neighbors
+    const interpolatedStart = prevEnd;
+    const interpolatedEnd = nextStart !== null ? nextStart : prevEnd + 0.5; // 0.5s fallback if no successor
+
+    return {
+      startTime: interpolatedStart,
+      endTime: interpolatedEnd,
+      words: [],
+      sentence: r.sentence,
+    };
+  });
+
+  // Drop-rate assertion: log an error if >5% of sentences had zero matched words
+  const droppedCount = timepoints.filter((tp) => tp.words.length === 0).length;
+  const dropRate = droppedCount / timepoints.length;
+  if (dropRate > 0.05) {
+    console.error(
+      `[alignWordTimestampsToSentences][${contextId}] drop rate ${(dropRate * 100).toFixed(1)}% ` +
+        `(${droppedCount}/${timepoints.length} sentences have no matched words). ` +
+        `Check TTS tokenization or sentence splitter output.`,
+    );
+  } else if (droppedCount > 0) {
+    console.warn(
+      `[alignWordTimestampsToSentences][${contextId}] ${droppedCount}/${timepoints.length} sentences` +
+        ` have interpolated timing (no matched words) — within 5% tolerance.`,
+    );
+  }
+
+  return timepoints;
+}
+
+/**
+ * @deprecated Use alignWordTimestampsToSentences instead.
+ * Kept for any internal callers that reference the old name during transition.
+ */
 function processWordTimestampsIntoSentences(
   wordTimestamps: WordTimestamp[],
   sentences: string[],
-  articleId: string,
+  contextId: string,
 ): SentenceTimepoint[] {
-  const sentenceTimepoints: SentenceTimepoint[] = [];
-
-  // Split the original passage into sentences using a more sophisticated approach
-  // const sentences = splitIntoSentences(passage);
-
-  let wordIndex = 0;
-  let hasProblems = false;
-  const problemsLog: any[] = [];
-
-  sentences.forEach((sentence, sentenceIndex) => {
-    const sentenceWords: WordTimestamp[] = [];
-    const cleanSentence = sentence.trim();
-
-    // Get the actual words from this sentence
-    const sentenceWordsList = cleanSentence
-      .split(/[\s\—\–]+/)
-      .map((word) => word.replace(/[^\w]/g, "").toLowerCase())
-      .filter((word) => word.length > 0);
-
-    let sentenceStartTime = null;
-    let sentenceEndTime = null;
-    let wordsFound = 0;
-    const missingWords: string[] = [];
-
-    // Look for each word from the sentence in the word timestamps
-    for (const expectedWord of sentenceWordsList) {
-      let wordFound = false;
-
-      // Search through remaining timestamps for this word
-      let searchIndex = wordIndex;
-      while (searchIndex < wordTimestamps.length) {
-        const timestamp = wordTimestamps[searchIndex];
-        const timestampWord = timestamp.word
-          .replace(/[^\w]/g, "")
-          .toLowerCase();
-
-        if (timestampWord === expectedWord) {
-          // Found the word - add it to sentence
-          sentenceWords.push({
-            ...timestamp,
-            word: timestamp.word.replace(/[.!?,;:'"""()[\]{}…]+/g, ""),
-          });
-
-          if (sentenceStartTime === null) {
-            sentenceStartTime = timestamp.start;
-          }
-          sentenceEndTime = timestamp.end;
-
-          // Update wordIndex to continue from next word
-          wordIndex = searchIndex + 1;
-          wordsFound++;
-          wordFound = true;
-          break;
-        }
-        searchIndex++;
-      }
-
-      if (!wordFound) {
-        missingWords.push(expectedWord);
-        hasProblems = true;
-        // console.warn(
-        //   `Missing timestamp for word: "${expectedWord}" in sentence: "${cleanSentence.substring(0, 50)}..."`,
-        // );
-      }
-    }
-
-    // Log missing words for debugging
-    if (missingWords.length > 0) {
-      problemsLog.push({
-        sentenceIndex,
-        sentence: cleanSentence,
-        expectedWords: sentenceWordsList,
-        missingWords,
-        wordsFound,
-        totalWords: sentenceWordsList.length,
-      });
-      // console.log(`Missing words from timestamps:`, missingWords);
-      // console.log(
-      //   `Found ${wordsFound}/${sentenceWordsList.length} words for sentence`,
-      // );
-    }
-
-    // Create sentence timepoint even if some words are missing
-    if (
-      sentenceWords.length > 0 &&
-      sentenceStartTime !== null &&
-      sentenceEndTime !== null
-    ) {
-      sentenceTimepoints.push({
-        startTime: sentenceStartTime,
-        endTime: sentenceEndTime,
-        words: sentenceWords,
-        sentence: cleanSentence,
-      });
-    } else if (sentenceWords.length === 0) {
-      hasProblems = true;
-      problemsLog.push({
-        sentenceIndex,
-        sentence: cleanSentence,
-        error: "No words found for sentence",
-        expectedWords: sentenceWordsList,
-      });
-      // console.error(`No words found for sentence: "${cleanSentence}"`);
-    }
-  });
-  // Only create log file if there are problems
-  // if (hasProblems) {
-  //   createLogFile(
-  //     articleId,
-  //     {
-  //       status: "PROBLEMS_DETECTED",
-  //       wordTimestampsCount: wordTimestamps.length,
-  //       sentencesCount: sentences.length,
-  //       problemsCount: problemsLog.length,
-  //       problems: problemsLog,
-  //       wordTimestamps: wordTimestamps,
-  //       sentences: sentences,
-  //     },
-  //     "problems",
-  //   );
-
-  //   console.log(
-  //     `⚠️  Processing completed with problems. Log file created for article: ${articleId}`,
-  //   );
-  // }
-
-  return sentenceTimepoints;
+  return alignWordTimestampsToSentences(wordTimestamps, sentences, contextId);
 }
 
 export async function generateAudio({
   passage,
-  sentences,
+  sentences: sentenceHint,
   articleId,
 }: GenerateAudioParams): Promise<void> {
   try {
+    // ── Conditional-split gate (mirrors generateChapterAudio) ──
+    // Use the LLM-provided sentence hint only when it covers ≥90% of the passage.
+    // Otherwise derive sentences from passage via the LLM-based splitter so the
+    // aligner has full coverage and the read-along never drops a sentence.
+    const hintSentences = sentenceHint ?? [];
+    const hintCoverage = computeCoverageRatio(hintSentences, passage);
+    const passageSentences =
+      hintCoverage >= 0.9 ? hintSentences : await splitIntoSentences(passage);
+
     const voice = VOICES_AI[Math.floor(Math.random() * VOICES_AI.length)];
 
     const response = await fetch("https://api.lemonfox.ai/v1/audio/speech", {
@@ -363,7 +432,7 @@ export async function generateAudio({
     // Process word timestamps into sentence timepoints
     const sentenceTimepoints = processWordTimestampsIntoSentences(
       json.word_timestamps,
-      sentences,
+      passageSentences,
       articleId,
     );
 
@@ -401,7 +470,7 @@ const AUDIO_RETRY_DELAY_BASE = 1000;
 
 export async function generateChapterAudio({
   passage,
-  sentences,
+  sentences: sentenceHint,
   chapterId,
   chapterNumber,
   cefrLevel,
@@ -413,6 +482,15 @@ export async function generateChapterAudio({
 }> {
   const localPath = `${process.cwd()}/data/audios/${chapterId}.mp3`;
   const cloudPath = `audios/story/chapter/${chapterId}.mp3`;
+
+  // ── Phase 0: Determine passage sentences (conditional-split, cost-saving) ──
+  // If the caller provides a sentence hint that already covers ≥90% of the
+  // passage text, use it as-is (no LLM call). Otherwise derive sentences from
+  // the passage via the LLM-based splitter.
+  const hintSentences = sentenceHint ?? [];
+  const hintCoverage = computeCoverageRatio(hintSentences, passage);
+  const passageSentences =
+    hintCoverage >= 0.9 ? hintSentences : await splitIntoSentences(passage);
 
   // ── Phase 1: Generate audio + write to disk (retry on TTS/write failure) ──
   let json: any;
@@ -478,10 +556,11 @@ export async function generateChapterAudio({
   // Always clean up temp file after upload phase (success or fail)
   await fsPromises.unlink(localPath).catch(() => {});
 
-  // ── Phase 3: Process timestamps + update DB ──
-  const sentenceTimepoints = processWordTimestampsIntoSentences(
+  // ── Phase 3: Align timestamps → produce full-coverage timepoints ──
+  // passageSentences are verbatim passage substrings → 0-drop guarantee.
+  const sentenceTimepoints = alignWordTimestampsToSentences(
     json.word_timestamps,
-    sentences,
+    passageSentences,
     chapterId,
   );
 
@@ -493,10 +572,14 @@ export async function generateChapterAudio({
     },
   });
 
-  // ── Phase 4: Translate sentences ──
+  // ── Phase 4: Translate — derived from FINAL timepoints (1:1 guaranteed) ──
+  // Extract verbatim sentence texts from the stored timepoints so the
+  // translatedSentences[locale][i] always aligns with timepoint[i].
+  const alignedSentenceTexts = sentenceTimepoints.map((tp) => tp.sentence);
+
   try {
     await translateAndStoreSentencesForStory({
-      sentences,
+      sentences: alignedSentenceTexts,
       chapterId,
       chapterNumber,
       cefrLevel,

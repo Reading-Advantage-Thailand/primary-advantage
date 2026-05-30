@@ -123,6 +123,17 @@ export function useAudioPlayer({
     const { sentenceIndex, wordIndex } = findCurrentPosition(currentTime);
 
     setState((prev) => {
+      // Sticky sentence: when findCurrentPosition returns -1 (time is in a gap
+      // between timed sentences or past the last one), keep the previous sentence
+      // highlighted rather than clearing to nothing. This prevents the read-along
+      // highlight from blanking out mid-playback when timing data has gaps.
+      // Exception: before audio starts (prev.currentSentenceIndex === -1) there
+      // is no "last known good" sentence — leave it as -1 (no highlight yet).
+      const effectiveSentenceIndex =
+        sentenceIndex === -1 && prev.currentSentenceIndex !== -1
+          ? prev.currentSentenceIndex
+          : sentenceIndex;
+
       // Don't update wordIndex if we're in a gap (wordIndex is -1) within the
       // SAME sentence — keep current word highlighted during inter-word gaps.
       // BUT if the sentence just changed, reset to -1: carrying over a word
@@ -130,21 +141,24 @@ export function useAudioPlayer({
       // in the new sentence's alignment map and cause a one-frame blink.
       const effectiveWordIndex =
         wordIndex === -1
-          ? sentenceIndex !== prev.currentSentenceIndex
+          ? effectiveSentenceIndex !== prev.currentSentenceIndex
             ? -1
             : prev.currentWordIndex
           : wordIndex;
 
       const hasChanges =
         prev.currentTime !== currentTime ||
-        prev.currentSentenceIndex !== sentenceIndex ||
+        prev.currentSentenceIndex !== effectiveSentenceIndex ||
         prev.currentWordIndex !== effectiveWordIndex;
 
       if (!hasChanges) return prev;
 
       // Trigger callbacks if indices changed
-      if (prev.currentSentenceIndex !== sentenceIndex && sentenceIndex !== -1) {
-        onSentenceChange?.(sentenceIndex);
+      if (
+        prev.currentSentenceIndex !== effectiveSentenceIndex &&
+        effectiveSentenceIndex !== -1
+      ) {
+        onSentenceChange?.(effectiveSentenceIndex);
       }
       if (
         prev.currentWordIndex !== effectiveWordIndex &&
@@ -156,7 +170,7 @@ export function useAudioPlayer({
       return {
         ...prev,
         currentTime,
-        currentSentenceIndex: sentenceIndex,
+        currentSentenceIndex: effectiveSentenceIndex,
         currentWordIndex: effectiveWordIndex,
       };
     });

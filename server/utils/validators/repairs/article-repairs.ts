@@ -1,12 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { generatedImage } from "@/server/utils/genaretors/image-generator";
-import { generateAudio, splitIntoSentences } from "@/server/utils/genaretors/audio-generator";
+import {
+  generateAudio,
+  splitIntoSentences,
+} from "@/server/utils/genaretors/audio-generator";
 import { generateAudioForFlashcard } from "@/server/utils/genaretors/audio-flashcard-generator";
 import { regenerateFlashcardContent } from "@/server/utils/genaretors/flashcard-content-generator";
 import { translateAndStoreSentences } from "@/server/utils/genaretors/sentence-translator";
 import { translateSummary } from "@/server/utils/genaretors/summary-translator";
-import { Issue, RepairAction, RepairResult } from "@/server/utils/validators/types";
+import {
+  Issue,
+  RepairAction,
+  RepairResult,
+} from "@/server/utils/validators/types";
 
 interface ArticleForRepair {
   id: string;
@@ -52,11 +59,15 @@ async function repairAudio(article: ArticleForRepair): Promise<void> {
   });
 }
 
-async function repairTranslatedPassage(article: ArticleForRepair): Promise<void> {
+async function repairTranslatedPassage(
+  article: ArticleForRepair,
+): Promise<void> {
   await translateAndStoreSentences({ articleId: article.id });
 }
 
-async function repairTranslatedSummary(article: ArticleForRepair): Promise<void> {
+async function repairTranslatedSummary(
+  article: ArticleForRepair,
+): Promise<void> {
   const translated = await translateSummary(article.summary, article.cefrLevel);
   await prisma.article.update({
     where: { id: article.id },
@@ -90,11 +101,13 @@ async function repairFlashcardAudio(article: ArticleForRepair): Promise<void> {
     const updateData: Prisma.SentencsAndWordsForFlashcardUpdateInput = {};
     if (sentenceMissing) {
       sentenceData = regenerated.flashcard;
-      updateData.sentence = regenerated.flashcard as unknown as Prisma.InputJsonValue;
+      updateData.sentence =
+        regenerated.flashcard as unknown as Prisma.InputJsonValue;
     }
     if (wordsMissing) {
       wordsData = regenerated.wordlist;
-      updateData.words = regenerated.wordlist as unknown as Prisma.InputJsonValue;
+      updateData.words =
+        regenerated.wordlist as unknown as Prisma.InputJsonValue;
     }
     await prisma.sentencsAndWordsForFlashcard.update({
       where: { id: row.id },
@@ -151,6 +164,8 @@ export function planArticleRepair(
       case "audio_missing":
       case "sentences_empty":
       case "sentences_count_mismatch":
+      case "sentences_partial_coverage":
+      case "sentences_timing_integrity":
         need.audio = true;
         break;
       case "translation_locale_missing":
@@ -176,16 +191,26 @@ export function planArticleRepair(
   if (need.flashcardRow) need.flashcardAudio = false;
 
   const actions: RepairAction[] = [];
-  if (need.images) actions.push(wrap("repair_images", () => repairImages(article)));
-  if (need.audio) actions.push(wrap("repair_audio", () => repairAudio(article)));
+  if (need.images)
+    actions.push(wrap("repair_images", () => repairImages(article)));
+  if (need.audio)
+    actions.push(wrap("repair_audio", () => repairAudio(article)));
   if (need.translatedPassage)
-    actions.push(wrap("repair_translated_passage", () => repairTranslatedPassage(article)));
+    actions.push(
+      wrap("repair_translated_passage", () => repairTranslatedPassage(article)),
+    );
   if (need.translatedSummary)
-    actions.push(wrap("repair_translated_summary", () => repairTranslatedSummary(article)));
+    actions.push(
+      wrap("repair_translated_summary", () => repairTranslatedSummary(article)),
+    );
   if (need.flashcardRow)
-    actions.push(wrap("repair_flashcard_row", () => repairFlashcardRow(article)));
+    actions.push(
+      wrap("repair_flashcard_row", () => repairFlashcardRow(article)),
+    );
   if (need.flashcardAudio)
-    actions.push(wrap("repair_flashcard_audio", () => repairFlashcardAudio(article)));
+    actions.push(
+      wrap("repair_flashcard_audio", () => repairFlashcardAudio(article)),
+    );
   return actions;
 }
 

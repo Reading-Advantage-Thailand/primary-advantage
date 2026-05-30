@@ -275,21 +275,28 @@ export default function StorieContent({ chapter }: StorieContentProps) {
             </div>
           )}
 
-          {/* Highlighted Passage or Plain Text */}
-          {hasAudioSupport ? (
+          {/* Highlighted Passage or Plain Text.
+              When sentences are available, always render HighlightedPassage so
+              the DOM tree is identical regardless of audio mode — eliminating
+              the reflow that occurred when toggling "Listen and Read Along".
+              In non-audio mode we pass neutral index values (-1) so nothing is
+              actively highlighted, and omit the click handlers so seeking is
+              inactive. The plain <p> is only the true fallback for when the
+              backend has not yet generated sentence timepoints. */}
+          {sentences.length > 0 ? (
             <HighlightedPassage
               sentences={sentences}
               translations={translations}
-              currentSentenceIndex={currentSentenceIndex}
-              currentWordIndex={currentWordIndex}
-              isPlaying={isPlaying}
-              showTranslation={showTranslation}
+              currentSentenceIndex={isAudioMode ? currentSentenceIndex : -1}
+              currentWordIndex={isAudioMode ? currentWordIndex : -1}
+              isPlaying={isAudioMode && isPlaying}
+              showTranslation={showTranslation && isAudioMode}
               translationLanguage={translationLanguage}
-              onWordClick={handleWordClick}
-              onSentenceClick={handleSentenceClick}
+              onWordClick={isAudioMode ? handleWordClick : undefined}
+              onSentenceClick={isAudioMode ? handleSentenceClick : undefined}
             />
           ) : (
-            // Fallback to plain text when no sentences available
+            // Fallback: no sentence timepoints available yet.
             <p className="font-article text-lg leading-loose md:text-xl">
               {chapter.passage}
             </p>
