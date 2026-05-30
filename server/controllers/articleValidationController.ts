@@ -6,7 +6,10 @@ import {
   MAX_REPAIR_ATTEMPTS,
   MAX_BATCH_LIMIT,
 } from "@/server/utils/validators/types";
-import { checkArticle, ArticleForCheck } from "@/server/utils/validators/checks/article-checks";
+import {
+  checkArticle,
+  ArticleForCheck,
+} from "@/server/utils/validators/checks/article-checks";
 import { planArticleRepair } from "@/server/utils/validators/repairs/article-repairs";
 import {
   createValidationRun,
@@ -15,7 +18,10 @@ import {
 } from "@/server/models/validationRunModel";
 import { ValidationLogger } from "@/lib/logger";
 
-export type ValidationMode = "pending_and_broken" | "all_published" | "specific_ids";
+export type ValidationMode =
+  | "pending_and_broken"
+  | "all_published"
+  | "specific_ids";
 
 export interface RunArticleValidationParams {
   mode: ValidationMode;
@@ -60,7 +66,9 @@ export async function runArticleValidation(
   const run = await createValidationRun("article", params.triggeredBy);
   const startedAt = Date.now();
 
-  let articles: Array<Prisma.ArticleGetPayload<{ select: typeof ARTICLE_SELECT }>> = [];
+  let articles: Array<
+    Prisma.ArticleGetPayload<{ select: typeof ARTICLE_SELECT }>
+  > = [];
   const totals = {
     itemsChecked: 0,
     itemsOk: 0,
@@ -168,7 +176,10 @@ async function fetchCandidates(
     where,
     select: ARTICLE_SELECT,
     take: limit,
-    orderBy: [{ validatedAt: { sort: "asc", nulls: "first" } }, { createdAt: "asc" }],
+    orderBy: [
+      { validatedAt: { sort: "asc", nulls: "first" } },
+      { createdAt: "asc" },
+    ],
   });
 }
 
@@ -204,10 +215,17 @@ async function processArticle(
           validatedAt: new Date(),
           repairAttempts: 0,
           lastValidationIssues: Prisma.DbNull,
+          isPublished: true,
         },
       });
     }
-    return { id: article.id, status: ValidationStatus.OK, attempts: article.repairAttempts, issues: [], repairsRun: [] };
+    return {
+      id: article.id,
+      status: ValidationStatus.OK,
+      attempts: article.repairAttempts,
+      issues: [],
+      repairsRun: [],
+    };
   }
 
   // ── Permanently broken? ──
@@ -219,7 +237,8 @@ async function processArticle(
           validationStatus: ValidationStatus.PERMANENTLY_BROKEN,
           validatedAt: new Date(),
           isPublished: false,
-          lastValidationIssues: initialIssues as unknown as Prisma.InputJsonValue,
+          lastValidationIssues:
+            initialIssues as unknown as Prisma.InputJsonValue,
         },
       });
     }
@@ -316,7 +335,11 @@ async function processArticle(
         remainingIssues.length > 0
           ? (remainingIssues as unknown as Prisma.InputJsonValue)
           : Prisma.DbNull,
-      ...(finalStatus === ValidationStatus.PERMANENTLY_BROKEN ? { isPublished: false } : {}),
+      ...(finalStatus === ValidationStatus.OK
+        ? { isPublished: true }
+        : finalStatus === ValidationStatus.PERMANENTLY_BROKEN
+          ? { isPublished: false }
+          : {}),
     },
   });
 

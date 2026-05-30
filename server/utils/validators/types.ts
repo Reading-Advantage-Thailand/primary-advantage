@@ -8,8 +8,18 @@ export type Issue =
   | { type: "audio_missing" }
   | { type: "sentences_empty" }
   | { type: "sentences_count_mismatch"; expected: number; actual: number }
-  | { type: "translation_locale_missing"; field: "passage" | "summary"; locale: string }
-  | { type: "translation_count_mismatch"; field: "passage"; locale: string; expected: number; actual: number }
+  | {
+      type: "translation_locale_missing";
+      field: "passage" | "summary";
+      locale: string;
+    }
+  | {
+      type: "translation_count_mismatch";
+      field: "passage";
+      locale: string;
+      expected: number;
+      actual: number;
+    }
   | { type: "flashcard_sentence_audio_missing" }
   | { type: "flashcard_word_audio_missing" }
   | { type: "flashcard_row_missing" }
@@ -19,12 +29,60 @@ export type Issue =
   // Story chapter
   | { type: "chapter_image_missing"; chapterId: string; chapterNumber: number }
   | { type: "chapter_audio_missing"; chapterId: string; chapterNumber: number }
-  | { type: "chapter_sentences_empty"; chapterId: string; chapterNumber: number }
-  | { type: "chapter_translation_missing"; chapterId: string; chapterNumber: number; field: "summary" | "sentences"; locale: string }
-  | { type: "chapter_translation_count_mismatch"; chapterId: string; chapterNumber: number; locale: string; expected: number; actual: number }
-  | { type: "chapter_flashcard_sentence_audio_missing"; chapterId: string; chapterNumber: number }
-  | { type: "chapter_flashcard_word_audio_missing"; chapterId: string; chapterNumber: number }
-  | { type: "chapter_flashcard_row_missing"; chapterId: string; chapterNumber: number };
+  | {
+      type: "chapter_sentences_empty";
+      chapterId: string;
+      chapterNumber: number;
+    }
+  | {
+      type: "chapter_translation_missing";
+      chapterId: string;
+      chapterNumber: number;
+      field: "summary" | "sentences";
+      locale: string;
+    }
+  | {
+      type: "chapter_translation_count_mismatch";
+      chapterId: string;
+      chapterNumber: number;
+      locale: string;
+      expected: number;
+      actual: number;
+    }
+  | {
+      type: "chapter_flashcard_sentence_audio_missing";
+      chapterId: string;
+      chapterNumber: number;
+    }
+  | {
+      type: "chapter_flashcard_word_audio_missing";
+      chapterId: string;
+      chapterNumber: number;
+    }
+  | {
+      type: "chapter_flashcard_row_missing";
+      chapterId: string;
+      chapterNumber: number;
+    }
+  // ── Coverage + timing (issue #138) ──
+  // Article: stored sentence text covers < COVERAGE_THRESHOLD of the passage
+  | { type: "sentences_partial_coverage"; coverageRatio: number }
+  // Article: timing integrity violation (non-monotonic, overlap, gap, early-start)
+  | { type: "sentences_timing_integrity"; detail: string }
+  // Story chapter: stored sentence text covers < COVERAGE_THRESHOLD of the passage
+  | {
+      type: "chapter_sentences_partial";
+      chapterId: string;
+      chapterNumber: number;
+      coverageRatio: number;
+    }
+  // Story chapter: timing integrity violation
+  | {
+      type: "chapter_sentences_timing_integrity";
+      chapterId: string;
+      chapterNumber: number;
+      detail: string;
+    };
 
 // ─── Repair plan + result ────────────────────────────────────────────────────
 
@@ -45,7 +103,7 @@ export interface ValidationOutcome {
   id: string;
   status: ValidationStatus;
   attempts: number;
-  issues: Issue[];      // post-repair remaining issues; empty if OK
+  issues: Issue[]; // post-repair remaining issues; empty if OK
   repairsRun: RepairResult[];
 }
 

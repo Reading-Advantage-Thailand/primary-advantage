@@ -73,9 +73,8 @@ async function translateSentencesWithAI(
           Provide translations in the exact same order, maintaining sentence structure and meaning appropriate for language learners.`;
 
   try {
-    const { model, modelId, providerName, temperature } = await resolveTaskModel(
-      TASK_KEYS.TRANSLATION_SENTENCE,
-    );
+    const { model, modelId, providerName, temperature } =
+      await resolveTaskModel(TASK_KEYS.TRANSLATION_SENTENCE);
     console.log(
       formatTaskLog({
         taskKey: TASK_KEYS.TRANSLATION_SENTENCE,
@@ -145,31 +144,82 @@ export async function translateAndStoreSentences({
       throw new Error(`No sentences to translate for article ${articleId}`);
     }
 
-    // Translate sentences
-    const translatedSentences = await translateSentencesWithAI(
-      sentences,
-      targetLanguages,
-      article.cefrLevel,
-    );
-
-    // Validate that all translations have the same number of sentences
     const originalCount = sentences.length;
-    const translationCounts = {
-      th: translatedSentences.th.length,
-      cn: translatedSentences.cn.length,
-      tw: translatedSentences.tw.length,
-      vi: translatedSentences.vi.length,
-    };
 
-    const invalidCounts = Object.entries(translationCounts).filter(
-      ([_, count]) => count !== originalCount,
-    );
+    // ── Attempt batch translation (3 retries, same as story path) ──
+    let translatedSentences: TranslatedSentences | null = null;
+    let attempts = 0;
+    const maxAttempts = 3;
 
-    if (invalidCounts.length > 0) {
-      console.warn(`Translation count mismatch for article ${articleId}:`, {
-        original: originalCount,
-        translations: translationCounts,
-      });
+    while (attempts < maxAttempts) {
+      try {
+        const candidate = await translateSentencesWithAI(
+          sentences,
+          targetLanguages,
+          article.cefrLevel,
+        );
+
+        const counts = {
+          th: candidate.th.length,
+          cn: candidate.cn.length,
+          tw: candidate.tw.length,
+          vi: candidate.vi.length,
+        };
+
+        const mismatched = Object.entries(counts).filter(
+          ([_, count]) => count !== originalCount,
+        );
+
+        if (mismatched.length > 0) {
+          throw new Error(
+            `Translation count mismatch for article ${articleId}: ` +
+              `Original ${originalCount}, Got ${JSON.stringify(counts)}`,
+          );
+        }
+
+        translatedSentences = candidate;
+        break;
+      } catch (error) {
+        attempts++;
+        console.warn(
+          `[translateAndStoreSentences] attempt ${attempts} failed: ${error}.`,
+        );
+        if (attempts < maxAttempts) {
+          console.warn(`Retrying...`);
+        }
+      }
+    }
+
+    // ── Per-sentence fallback on persistent count-mismatch ──
+    // NEVER trim/pad — that silently misaligns translations (wrong tooltip for learners).
+    // Translate each sentence individually (1:1 guaranteed). If one fails, leave null.
+    if (translatedSentences === null) {
+      console.warn(
+        `[translateAndStoreSentences][${articleId}] batch translation ` +
+          `failed after ${maxAttempts} attempts — falling back to per-sentence translation.`,
+      );
+
+      const perSentence = await Promise.all(
+        sentences.map((s) => translateSingleSentence(s, article.cefrLevel)),
+      );
+
+      translatedSentences = {
+        th: perSentence.map((r) => r.th ?? ""),
+        cn: perSentence.map((r) => r.cn ?? ""),
+        tw: perSentence.map((r) => r.tw ?? ""),
+        vi: perSentence.map((r) => r.vi ?? ""),
+      };
+
+      const nullCount = perSentence.filter(
+        (r) => r.th === null || r.cn === null || r.tw === null || r.vi === null,
+      ).length;
+      if (nullCount > 0) {
+        console.warn(
+          `[translateAndStoreSentences][${articleId}] ` +
+            `${nullCount}/${sentences.length} sentences have null translations — ` +
+            `stored as empty strings. No tooltip for those sentences.`,
+        );
+      }
     }
 
     // Store translations in database
@@ -185,6 +235,36 @@ export async function translateAndStoreSentences({
       error,
     );
     throw new Error(`Failed to translate sentences: ${error.message}`);
+  }
+}
+
+/**
+ * Translate a single sentence for all target languages.
+ * Returns null entries for languages that fail — never throws.
+ */
+async function translateSingleSentence(
+  sentence: string,
+  cefrLevel?: string,
+): Promise<{
+  th: string | null;
+  cn: string | null;
+  tw: string | null;
+  vi: string | null;
+}> {
+  try {
+    const result = await translateSentencesWithAI(
+      [sentence],
+      ["th", "cn", "tw", "vi"],
+      cefrLevel,
+    );
+    return {
+      th: result.th[0] ?? null,
+      cn: result.cn[0] ?? null,
+      tw: result.tw[0] ?? null,
+      vi: result.vi[0] ?? null,
+    };
+  } catch {
+    return { th: null, cn: null, tw: null, vi: null };
   }
 }
 
@@ -204,7 +284,6 @@ export async function translateAndStoreSentencesForStory({
   forceRetranslate?: boolean;
 }): Promise<void> {
   try {
-    // Check if translations already exist and forceRetranslate is false
     if (sentences.length === 0 && !forceRetranslate) {
       console.log(
         `Translations already exist for article. Use forceRetranslate=true to retranslate.`,
@@ -212,44 +291,82 @@ export async function translateAndStoreSentencesForStory({
       return;
     }
 
+    const originalCount = sentences.length;
+    let translatedSentences: TranslatedSentences | null = null;
+
+    // ── Attempt batch translation (3 retries) ──
     let attempts = 0;
     const maxAttempts = 3;
-    let translatedSentences: TranslatedSentences | null = null;
 
     while (attempts < maxAttempts) {
       try {
-        translatedSentences = await translateSentencesWithAI(
+        const candidate = await translateSentencesWithAI(
           sentences,
           targetLanguages,
           cefrLevel,
         );
 
-        const originalCount = sentences.length;
-        const translationCounts = {
-          th: translatedSentences.th.length,
-          cn: translatedSentences.cn.length,
-          tw: translatedSentences.tw.length,
-          vi: translatedSentences.vi.length,
+        const counts = {
+          th: candidate.th.length,
+          cn: candidate.cn.length,
+          tw: candidate.tw.length,
+          vi: candidate.vi.length,
         };
 
-        const invalidCounts = Object.entries(translationCounts).filter(
+        const mismatched = Object.entries(counts).filter(
           ([_, count]) => count !== originalCount,
         );
 
-        if (invalidCounts.length > 0) {
-          const errorMsg = `Translation count mismatch for article ${chapterId}: Original ${originalCount}, Got ${JSON.stringify(translationCounts)}`;
-          throw new Error(errorMsg);
-        }
-
-        break; // Exit loop if successful
-      } catch (error) {
-        attempts++;
-        console.warn(`Attempt ${attempts} failed: ${error}. Retrying...`);
-        if (attempts === maxAttempts) {
+        if (mismatched.length > 0) {
           throw new Error(
-            `Failed to translate sentences after ${maxAttempts} attempts`,
+            `Translation count mismatch for chapter ${chapterId}: ` +
+              `Original ${originalCount}, Got ${JSON.stringify(counts)}`,
           );
         }
+
+        translatedSentences = candidate;
+        break;
+      } catch (error) {
+        attempts++;
+        console.warn(
+          `[translateAndStoreSentencesForStory] attempt ${attempts} failed: ${error}.`,
+        );
+        if (attempts < maxAttempts) {
+          console.warn(`Retrying...`);
+        }
+      }
+    }
+
+    // ── Per-sentence fallback on persistent count-mismatch ──
+    // NEVER trim/pad — that silently misaligns translations (wrong tooltip for learners).
+    // Instead translate each sentence individually (1:1 guaranteed). If one fails,
+    // leave null for that position rather than shift everything.
+    if (translatedSentences === null) {
+      console.warn(
+        `[translateAndStoreSentencesForStory][${chapterId}] batch translation ` +
+          `failed after ${maxAttempts} attempts — falling back to per-sentence translation.`,
+      );
+
+      const perSentence = await Promise.all(
+        sentences.map((s) => translateSingleSentence(s, cefrLevel)),
+      );
+
+      translatedSentences = {
+        th: perSentence.map((r) => r.th ?? ""),
+        cn: perSentence.map((r) => r.cn ?? ""),
+        tw: perSentence.map((r) => r.tw ?? ""),
+        vi: perSentence.map((r) => r.vi ?? ""),
+      };
+
+      const nullCount = perSentence.filter(
+        (r) => r.th === null || r.cn === null || r.tw === null || r.vi === null,
+      ).length;
+      if (nullCount > 0) {
+        console.warn(
+          `[translateAndStoreSentencesForStory][${chapterId}] ` +
+            `${nullCount}/${sentences.length} sentences have null translations — ` +
+            `stored as empty strings. No tooltip for those sentences.`,
+        );
       }
     }
 
@@ -262,7 +379,7 @@ export async function translateAndStoreSentencesForStory({
     });
   } catch (error: any) {
     console.error(
-      `Failed to translate sentences for article ${chapterId}:`,
+      `Failed to translate sentences for chapter ${chapterId}:`,
       error,
     );
     throw new Error(`Failed to translate sentences: ${error.message}`);

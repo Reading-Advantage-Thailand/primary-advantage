@@ -133,7 +133,10 @@ export default function HighlightedPassage({
   const { firstParsedSentence, paragraphs } = useMemo(() => {
     const parsed = sentences.map((sentence, index) => ({
       ...sentence,
-      parts: splitSentenceIntoWords(sentence.sentence),
+      // Guard against missing/empty sentence text: fall back to empty string
+      // so the sentence still occupies its slot (shown but not highlighted)
+      // rather than producing an error or vanishing entirely.
+      parts: splitSentenceIntoWords(sentence.sentence ?? ""),
       originalIndex: index,
     }));
 

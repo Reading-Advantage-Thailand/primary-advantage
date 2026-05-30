@@ -5,6 +5,13 @@ import {
   REQUIRED_LOCALES,
   EXPECTED_IMAGES_PER_ARTICLE,
 } from "@/server/utils/validators/types";
+import {
+  computeCoverageRatio,
+  checkTimingIntegrity,
+  COVERAGE_THRESHOLD,
+  FIRST_START_MAX_S,
+  INTER_GAP_MAX_S,
+} from "@/server/utils/validators/sentence-coverage";
 
 interface ArticleSentence {
   startTime?: number;
@@ -59,12 +66,47 @@ export async function checkArticle(article: ArticleForCheck): Promise<Issue[]> {
     issues.push({ type: "sentences_empty" });
   }
 
+  // ── A4b: Coverage check — sentence text must cover ≥ COVERAGE_THRESHOLD of passage ──
+  // Detects partial coverage (issue #138): when the stored timepoints or legacy string[]
+  // only cover a fraction of the article's passage text.
+  if (sentences.length > 0 && article.passage) {
+    const coverageRatio = computeCoverageRatio(
+      article.sentences,
+      article.passage,
+    );
+    if (coverageRatio < COVERAGE_THRESHOLD) {
+      issues.push({
+        type: "sentences_partial_coverage",
+        coverageRatio,
+      });
+    }
+  }
+
+  // ── A4c: Timing-integrity checks on SentenceTimepoint[] ──
+  // Catches: non-monotonic timestamps, overlapping windows, first start > 2s,
+  // inter-timepoint gaps > 3s (a missing/dropped sentence).
+  // Silently skips legacy string[] arrays (no timing data present).
+  const timingViolations = checkTimingIntegrity(article.sentences, {
+    firstStartMaxS: FIRST_START_MAX_S,
+    interGapMaxS: INTER_GAP_MAX_S,
+  });
+  for (const v of timingViolations) {
+    issues.push({
+      type: "sentences_timing_integrity",
+      detail: `${v.kind}${v.detail ? ": " + v.detail : ""}`,
+    });
+  }
+
   // ── A6: translatedPassage complete (per-locale arrays match sentence count) ──
   const tp = (article.translatedPassage ?? {}) as Record<string, unknown>;
   for (const locale of REQUIRED_LOCALES) {
     const arr = tp[locale];
     if (!Array.isArray(arr)) {
-      issues.push({ type: "translation_locale_missing", field: "passage", locale });
+      issues.push({
+        type: "translation_locale_missing",
+        field: "passage",
+        locale,
+      });
       continue;
     }
     if (sentences.length > 0 && arr.length !== sentences.length) {
@@ -83,7 +125,11 @@ export async function checkArticle(article: ArticleForCheck): Promise<Issue[]> {
   for (const locale of REQUIRED_LOCALES) {
     const value = ts[locale];
     if (typeof value !== "string" || value.trim().length === 0) {
-      issues.push({ type: "translation_locale_missing", field: "summary", locale });
+      issues.push({
+        type: "translation_locale_missing",
+        field: "summary",
+        locale,
+      });
     }
   }
 
@@ -97,8 +143,16 @@ export async function checkArticle(article: ArticleForCheck): Promise<Issue[]> {
     issues.push({ type: "flashcard_row_missing" });
   } else {
     await Promise.all([
-      checkFlashcardAudio(flashcardRow.audioSentencesUrl, "flashcard_sentence_audio_missing", issues),
-      checkFlashcardAudio(flashcardRow.wordsUrl, "flashcard_word_audio_missing", issues),
+      checkFlashcardAudio(
+        flashcardRow.audioSentencesUrl,
+        "flashcard_sentence_audio_missing",
+        issues,
+      ),
+      checkFlashcardAudio(
+        flashcardRow.wordsUrl,
+        "flashcard_word_audio_missing",
+        issues,
+      ),
     ]);
   }
 

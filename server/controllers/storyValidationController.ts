@@ -19,7 +19,10 @@ import {
 } from "@/server/models/validationRunModel";
 import { ValidationLogger, ValidationStep } from "@/lib/logger";
 
-export type ValidationMode = "pending_and_broken" | "all_published" | "specific_ids";
+export type ValidationMode =
+  | "pending_and_broken"
+  | "all_published"
+  | "specific_ids";
 
 export interface RunStoryValidationParams {
   mode: ValidationMode;
@@ -149,7 +152,9 @@ export async function runStoryValidation(
   };
 }
 
-type StoryWithChapters = Prisma.StoryGetPayload<{ include: typeof STORY_INCLUDE }>;
+type StoryWithChapters = Prisma.StoryGetPayload<{
+  include: typeof STORY_INCLUDE;
+}>;
 
 async function fetchCandidates(
   params: RunStoryValidationParams,
@@ -181,7 +186,10 @@ async function fetchCandidates(
     where,
     include: STORY_INCLUDE,
     take: limit,
-    orderBy: [{ validatedAt: { sort: "asc", nulls: "first" } }, { createdAt: "asc" }],
+    orderBy: [
+      { validatedAt: { sort: "asc", nulls: "first" } },
+      { createdAt: "asc" },
+    ],
   });
 }
 
@@ -201,14 +209,17 @@ async function processStory(
     summary: story.summary,
     translatedSummary: story.translatedSummary,
   };
-  const chaptersForCheck: StoryChapterForCheck[] = story.storyChapters.map((ch) => ({
-    id: ch.id,
-    chapterNumber: ch.chapterNumber,
-    audioSentencesUrl: ch.audioSentencesUrl,
-    sentences: ch.sentences,
-    translatedSentences: ch.translatedSentences,
-    translatedSummary: ch.translatedSummary,
-  }));
+  const chaptersForCheck: StoryChapterForCheck[] = story.storyChapters.map(
+    (ch) => ({
+      id: ch.id,
+      chapterNumber: ch.chapterNumber,
+      audioSentencesUrl: ch.audioSentencesUrl,
+      sentences: ch.sentences,
+      translatedSentences: ch.translatedSentences,
+      translatedSummary: ch.translatedSummary,
+      passage: ch.passage,
+    }),
+  );
 
   const initialIssues = await checkStory(storyForCheck, chaptersForCheck);
 
@@ -221,6 +232,7 @@ async function processStory(
           validatedAt: new Date(),
           repairAttempts: 0,
           lastValidationIssues: Prisma.DbNull,
+          isPublished: true,
         },
       });
     }
@@ -241,7 +253,8 @@ async function processStory(
           validationStatus: ValidationStatus.PERMANENTLY_BROKEN,
           validatedAt: new Date(),
           isPublished: false,
-          lastValidationIssues: initialIssues as unknown as Prisma.InputJsonValue,
+          lastValidationIssues:
+            initialIssues as unknown as Prisma.InputJsonValue,
         },
       });
     }
@@ -328,6 +341,7 @@ async function processStory(
           sentences: ch.sentences,
           translatedSentences: ch.translatedSentences,
           translatedSummary: ch.translatedSummary,
+          passage: ch.passage,
         })),
       )
     : initialIssues;
@@ -355,7 +369,11 @@ async function processStory(
         remainingIssues.length > 0
           ? (remainingIssues as unknown as Prisma.InputJsonValue)
           : Prisma.DbNull,
-      ...(finalStatus === ValidationStatus.PERMANENTLY_BROKEN ? { isPublished: false } : {}),
+      ...(finalStatus === ValidationStatus.OK
+        ? { isPublished: true }
+        : finalStatus === ValidationStatus.PERMANENTLY_BROKEN
+          ? { isPublished: false }
+          : {}),
     },
   });
 
