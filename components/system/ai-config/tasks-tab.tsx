@@ -9,7 +9,7 @@
  * Responsive: mobile-first (unprefixed = mobile baseline, md: = tablet+).
  */
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Pencil, RefreshCw, AlertCircle, Info } from "lucide-react";
 import {
@@ -276,7 +276,7 @@ export function TasksTab({ highlightTaskKeys = [] }: TasksTabProps) {
                   <TaskSkeletonRows />
                 ) : (
                   groupTasksByCategory(tasks ?? []).map(({ label, tasks: groupTasks }) => (
-                    <>
+                    <Fragment key={label}>
                       {/* Category header row */}
                       <TableRow key={`header-${label}`}>
                         <TableCell
@@ -374,7 +374,7 @@ export function TasksTab({ highlightTaskKeys = [] }: TasksTabProps) {
                           </TableRow>
                         );
                       })}
-                    </>
+                    </Fragment>
                   ))
                 )}
               </TableBody>

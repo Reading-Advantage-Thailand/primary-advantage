@@ -72,6 +72,6 @@ service-account.json
 .github/
 .claude/
 .antigravitycli/
-tasks/
+/tasks/
 CLAUDE.md
 skills-lock.json
