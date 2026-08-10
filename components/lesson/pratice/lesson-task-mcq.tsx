@@ -471,7 +471,7 @@ function LessonMCQContent({ article }: { article: Article }) {
                       }
                     }}
                   >
-                    <p className="flex w-full items-center space-x-3">
+                    <div className="flex w-full items-center space-x-3">
                       <div className="flex items-center space-x-2">
                         <div
                           className={cn(
@@ -496,7 +496,7 @@ function LessonMCQContent({ article }: { article: Article }) {
                           <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-500" />
                         )}
                       </div>
-                    </p>
+                    </div>
                   </Button>
                 );
               })}

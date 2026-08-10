@@ -2597,7 +2597,9 @@
         "more": "+{count} 句已保存"
       },
       "actions": {
-        "backToRead": "返回阅读页面"
+        "backToRead": "返回阅读页面",
+        "startAgain": "\u91cd\u65b0\u5f00\u59cb",
+        "restarting": "\u6b63\u5728\u91cd\u65b0\u5f00\u59cb..."
       },
       "toast": {
         "failed": "无法加载课程总结"

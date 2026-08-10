@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import {
   getArticleForLesson,
+  resetStandaloneLessonProgress,
   updateStandaloneLessonProgress,
 } from "@/server/models/lessonModel";
 
@@ -55,14 +56,20 @@ export async function POST(
 
     const { articleId } = await params;
     const body = await req.json();
-    const { progress, timeSpent } = body;
+    const { progress, timeSpent, reset } = body;
+
+    if (reset === true) {
+      await resetStandaloneLessonProgress(user.id, articleId);
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
 
     // Validate input
     if (
       typeof progress !== "number" ||
       typeof timeSpent !== "number" ||
       progress < 0 ||
-      progress > 100
+      progress > 100 ||
+      timeSpent < 0
     ) {
       return NextResponse.json(
         { error: "Invalid progress or timeSpent data" },

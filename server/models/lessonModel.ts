@@ -1,5 +1,60 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
+import { ActivityType } from "@prisma/client";
+
+const RESETTABLE_LESSON_ACTIVITY_TYPES: ActivityType[] = [
+  ActivityType.MC_QUESTION,
+  ActivityType.SA_QUESTION,
+  ActivityType.LA_QUESTION,
+  ActivityType.SENTENCE_FLASHCARDS,
+  ActivityType.SENTENCE_MATCHING,
+  ActivityType.SENTENCE_ORDERING,
+  ActivityType.SENTENCE_WORD_ORDERING,
+  ActivityType.SENTENCE_CLOZE_TEST,
+  ActivityType.VOCABULARY_FLASHCARDS,
+  ActivityType.VOCABULARY_MATCHING,
+];
+
+/**
+ * Clear attempt-specific records so a restarted lesson starts with fresh
+ * quizzes and activities while preserving article read/rating history.
+ */
+export async function resetArticleLearningActivities(
+  userId: string,
+  articleId: string,
+) {
+  await prisma.$transaction(async (tx) => {
+    await tx.userActivity.deleteMany({
+      where: {
+        userId,
+        targetId: articleId,
+        activityType: { in: RESETTABLE_LESSON_ACTIVITY_TYPES },
+      },
+    });
+
+    const updatedActivityLogs = await tx.articleActivityLog.updateMany({
+      where: { articleId, userId },
+      data: {
+        isMultipleChoiceQuestionCompleted: false,
+        isShortAnswerQuestionCompleted: false,
+        isLongAnswerQuestionCompleted: false,
+        isSentenceMatchingCompleted: false,
+        isSentenceOrderingCompleted: false,
+        isSentenceWordOrderingCompleted: false,
+        isSentenceClozeTestCompleted: false,
+      },
+    });
+
+    if (updatedActivityLogs.count === 0) {
+      await tx.articleActivityLog.create({
+        data: {
+          articleId,
+          userId,
+        },
+      });
+    }
+  });
+}
 
 /**
  * Get an article by ID for standalone lesson (without assignment)
@@ -101,6 +156,57 @@ export async function updateStandaloneLessonProgress(
       throw error;
     }
     throw new Error("Failed to update standalone lesson progress");
+  }
+}
+
+/**
+ * Reset a standalone lesson to its introduction task for a new attempt.
+ */
+export async function resetStandaloneLessonProgress(
+  userId: string,
+  articleId: string,
+) {
+  try {
+    const existingProgress = await prisma.userLessonProgress.findFirst({
+      where: {
+        userId,
+        articleId,
+        assignmentId: null,
+      },
+    });
+
+    if (existingProgress) {
+      await prisma.userLessonProgress.update({
+        where: { id: existingProgress.id },
+        data: {
+          progress: 0,
+          timeSpent: 0,
+          isCompleted: false,
+          score: null,
+        },
+      });
+    } else {
+      await prisma.userLessonProgress.create({
+        data: {
+          userId,
+          articleId,
+          assignmentId: null,
+          progress: 0,
+          timeSpent: 0,
+          isCompleted: false,
+        },
+      });
+    }
+
+    await resetArticleLearningActivities(userId, articleId);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Model Error - resetStandaloneLessonProgress:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Failed to reset standalone lesson progress");
   }
 }
 

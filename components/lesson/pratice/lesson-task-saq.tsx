@@ -1,14 +1,13 @@
 "use client";
 
-import { Article, SAQuestion } from "@/types";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Article, QuestionResponse, SAQuestion } from "@/types";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Loader2, MessageSquare, CheckCircle } from "lucide-react";
 import React, { useContext, useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from 'zod';
-import { toast } from "sonner";
+import { z } from "zod";
 import { ActivityType, QuestionState } from "@/types/enum";
 import { QuizContext, QuizContextProvider } from "@/contexts/question-context";
 import TextareaAutosize from "react-textarea-autosize";
@@ -23,12 +22,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useTranslations } from "next-intl";
-import { authClient } from "@/lib/auth-client";
-
-interface SAQFeedback {
-  score: number;
-  feedback: string;
-}
 
 interface LessonSAQProps {
   article: Article;
@@ -41,17 +34,57 @@ function LessonSAQContent({ article }: { article: Article }) {
   const [isPanding, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<any>(null);
   const [questions, setQuestions] = useState<SAQuestion | null>(null);
-  const { data: session } = authClient.useSession();
-  useEffect(() => {
-    if (article.shortAnswerQuestions) {
-      const randomQuestions = article.shortAnswerQuestions
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 1);
 
-      setQuestions({ ...randomQuestions[0] });
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializeQuestion = async () => {
+      try {
+        const params = new URLSearchParams({
+          articleId: article.id,
+          questionType: ActivityType.SA_QUESTION,
+        });
+        const response = await fetch(
+          `/api/articles/questions/${article.id}?${params.toString()}`,
+          { cache: "no-store" },
+        );
+
+        if (response.ok) {
+          const questionResponse = (await response.json()) as QuestionResponse;
+
+          if (
+            questionResponse.questionStatus === QuestionState.COMPLETED &&
+            questionResponse.result?.completed
+          ) {
+            if (!isMounted) return;
+
+            setFeedback({ ...questionResponse.result.details });
+            setState(QuestionState.COMPLETED);
+            setPaused(true);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error loading short answer progress:", error);
+      }
+
+      if (!isMounted || !article.shortAnswerQuestions?.length) return;
+
+      // Copy before sorting so the server-provided article object is not mutated.
+      const question = [...article.shortAnswerQuestions].sort(
+        () => Math.random() - 0.5,
+      )[0];
+
+      setQuestions({ ...question });
       setState(QuestionState.INCOMPLETE);
-    }
-  }, [article]);
+    };
+
+    void initializeQuestion();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [article.id, setPaused]);
 
   const formSchema = z.object({
     answer: z
@@ -262,6 +295,7 @@ function LessonSAQContent({ article }: { article: Article }) {
               <div className="flex justify-end">
                 <Button
                   type="submit"
+                  disabled={isPanding}
                   size="lg"
                   className="transform rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
                 >

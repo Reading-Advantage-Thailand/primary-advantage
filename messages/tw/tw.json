@@ -2598,7 +2598,9 @@
         "more": "+{count} 句已保存"
       },
       "actions": {
-        "backToRead": "返回閱讀頁面"
+        "backToRead": "返回閱讀頁面",
+        "startAgain": "\u91cd\u65b0\u958b\u59cb",
+        "restarting": "\u6b63\u5728\u91cd\u65b0\u958b\u59cb..."
       },
       "toast": {
         "failed": "無法載入課程總結"

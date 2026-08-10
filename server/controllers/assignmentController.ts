@@ -5,6 +5,7 @@ import getAssignmentById, {
   createAssignment,
   getStudentAssignments,
   getUserLessonProgress,
+  resetUserLessonProgress,
   updateUserLessonProgress,
   getAssignmentActivityById,
 } from "../models/assignmentModel";
@@ -31,7 +32,8 @@ export async function fetchAssignments(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
 
     // Scope teachers to their own assignments only
-    const teacherFilter = user.role === Role.teacher ? { teacherId: user.id } : {};
+    const teacherFilter =
+      user.role === Role.teacher ? { teacherId: user.id } : {};
 
     if (articleId || assignmentId) {
       // Get assignment for specific article and classroom
@@ -212,7 +214,11 @@ export async function postAssignment(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role !== Role.teacher && user.role !== Role.admin && user.role !== Role.system) {
+    if (
+      user.role !== Role.teacher &&
+      user.role !== Role.admin &&
+      user.role !== Role.system
+    ) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
@@ -321,7 +327,10 @@ export async function fetchAssignmentById(
     const assignment = await getAssignmentById(id);
 
     if (!assignment) {
-      return NextResponse.json({ error: "Assignment not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Assignment not found" },
+        { status: 404 },
+      );
     }
 
     // Teachers may only access their own assignments
@@ -349,7 +358,35 @@ export async function postUserLessonProgress(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { id: assignmentId } = await params;
-    const { articleId, progress, timeSpent } = await request.json();
+    const { articleId, progress, timeSpent, reset } = await request.json();
+
+    if (typeof articleId !== "string" || articleId.length === 0) {
+      return NextResponse.json(
+        { error: "Article ID is required" },
+        { status: 400 },
+      );
+    }
+
+    if (reset === true) {
+      await resetUserLessonProgress(user.id, assignmentId, articleId);
+      return NextResponse.json(
+        { message: "User lesson progress reset successfully" },
+        { status: 200 },
+      );
+    }
+
+    if (
+      typeof progress !== "number" ||
+      typeof timeSpent !== "number" ||
+      progress < 0 ||
+      progress > 100 ||
+      timeSpent < 0
+    ) {
+      return NextResponse.json(
+        { error: "Invalid progress or timeSpent data" },
+        { status: 400 },
+      );
+    }
 
     await updateUserLessonProgress(
       user.id,

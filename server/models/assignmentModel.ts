@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
 import { AssignmentStatus } from "@prisma/client";
 import { endOfDay } from "date-fns";
+import { resetArticleLearningActivities } from "./lessonModel";
 
 interface createAssignmentData {
   classroomId: string;
@@ -245,6 +246,7 @@ export async function updateUserLessonProgress(
           data: {
             progress,
             timeSpent,
+            isCompleted: false,
           },
         });
       } else {
@@ -254,6 +256,7 @@ export async function updateUserLessonProgress(
             data: {
               progress,
               timeSpent,
+              isCompleted: true,
             },
           });
 
@@ -263,6 +266,7 @@ export async function updateUserLessonProgress(
             },
             data: {
               status: AssignmentStatus.COMPLETED,
+              completedAt: new Date(),
             },
           });
         });
@@ -276,6 +280,7 @@ export async function updateUserLessonProgress(
             assignmentId,
             progress,
             timeSpent,
+            isCompleted: progress === 100,
           },
         });
 
@@ -304,6 +309,64 @@ export async function updateUserLessonProgress(
       throw error;
     }
     throw new Error("Failed to update assignment by ID");
+  }
+}
+
+export async function resetUserLessonProgress(
+  userId: string,
+  assignmentId: string,
+  articleId: string,
+) {
+  try {
+    const existingUserLessonProgress =
+      await prisma.userLessonProgress.findFirst({
+        where: { userId, articleId, assignmentId },
+      });
+
+    if (existingUserLessonProgress) {
+      await prisma.userLessonProgress.update({
+        where: { id: existingUserLessonProgress.id },
+        data: {
+          progress: 0,
+          timeSpent: 0,
+          score: null,
+          isCompleted: false,
+        },
+      });
+    } else {
+      await prisma.userLessonProgress.create({
+        data: {
+          userId,
+          articleId,
+          assignmentId,
+          progress: 0,
+          timeSpent: 0,
+          isCompleted: false,
+        },
+      });
+    }
+
+    await prisma.assignmentStudent.update({
+      where: {
+        assignmentId_studentId: { assignmentId, studentId: userId },
+      },
+      data: {
+        status: AssignmentStatus.IN_PROGRESS,
+        startedAt: new Date(),
+        completedAt: null,
+        score: null,
+      },
+    });
+
+    await resetArticleLearningActivities(userId, articleId);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Model Error - resetUserLessonProgress:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Failed to reset assignment lesson progress");
   }
 }
 

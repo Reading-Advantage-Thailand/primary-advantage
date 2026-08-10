@@ -2778,7 +2778,9 @@
         "more": "+{count} more {count, plural, one {sentence} other {sentences}} saved"
       },
       "actions": {
-        "backToRead": "Back to Read Page"
+        "backToRead": "Back to Read Page",
+        "startAgain": "Start Again",
+        "restarting": "Restarting..."
       },
       "toast": {
         "failed": "Failed to load lesson summary"

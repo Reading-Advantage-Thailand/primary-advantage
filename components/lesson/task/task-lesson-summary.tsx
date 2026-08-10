@@ -15,6 +15,7 @@ import {
   CheckCircle,
   Zap,
   Trophy,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -42,9 +43,11 @@ interface QuizScores {
 export default function TaskLessonSummary({
   article,
   timerSpent,
+  onRestart,
 }: {
   article: Article;
   timerSpent: number;
+  onRestart?: () => Promise<void>;
 }) {
   const [loading, setLoading] = useState(true);
   const [totalXp, setTotalXp] = useState(0);
@@ -53,6 +56,7 @@ export default function TaskLessonSummary({
     saqScore: 0,
   });
   const [showCelebration, setShowCelebration] = useState(false);
+  const [isRestarting, setIsRestarting] = useState(false);
   const wordList = article?.sentencsAndWordsForFlashcard?.[0]
     ?.words as WordList[];
   const sentenceList = article?.sentencsAndWordsForFlashcard?.[0]
@@ -114,6 +118,22 @@ export default function TaskLessonSummary({
 
   const backToReadPage = () => {
     router.push("/student/read");
+  };
+
+  const restartLesson = async () => {
+    if (!onRestart || isRestarting) return;
+
+    setIsRestarting(true);
+    try {
+      await onRestart();
+    } catch (error) {
+      console.error("Error restarting lesson from summary:", error);
+      toast.error(
+        t("toast.restartFailed", { default: "Failed to restart lesson" }),
+      );
+    } finally {
+      setIsRestarting(false);
+    }
   };
 
   const getPerformanceColor = (score: number) => {
@@ -457,6 +477,20 @@ export default function TaskLessonSummary({
 
       {/* Action Buttons */}
       <div className="flex flex-col items-center justify-center gap-4 pt-6 sm:flex-row">
+        {onRestart && (
+          <Button
+            onClick={restartLesson}
+            disabled={isRestarting}
+            size="lg"
+            variant="outline"
+            className="w-full rounded-xl border-2 px-8 py-3 font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:w-auto"
+          >
+            <RotateCcw className="mr-2 h-5 w-5" />
+            {isRestarting
+              ? t("actions.restarting", { default: "Restarting..." })
+              : t("actions.startAgain", { default: "Start Again" })}
+          </Button>
+        )}
         <Button
           onClick={backToReadPage}
           size="lg"

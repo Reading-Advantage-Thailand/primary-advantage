@@ -2732,7 +2732,9 @@
         "more": "+{count} câu được lưu thêm"
       },
       "actions": {
-        "backToRead": "Quay lại trang đọc"
+        "backToRead": "Quay lại trang đọc",
+        "startAgain": "H\u1ecdc l\u1ea1i",
+        "restarting": "\u0110ang kh\u1edfi \u0111\u1ed9ng l\u1ea1i..."
       },
       "toast": {
         "failed": "Không thể tải tổng kết bài học"

@@ -30,6 +30,10 @@ import {
 
 import { Article } from "@/types";
 import { saveArticleToFlashcard } from "@/actions/flashcard";
+import {
+  getLessonProgressForTask,
+  getLessonTaskFromProgress,
+} from "./lesson-progress-utils";
 
 export interface StandaloneLessonProps {
   article: Article;
@@ -81,10 +85,8 @@ export default function StandaloneLessonProgressBar({
         if (response.ok) {
           const data = await response.json();
 
-          // Ensure we get a valid phase number
-          const taskWidth = 100 / 14;
-          const taskNumber = Math.ceil(
-            data.userLessonProgress.progress / taskWidth,
+          const taskNumber = getLessonTaskFromProgress(
+            data.userLessonProgress.progress,
           );
 
           // Update phase on initial load
@@ -150,7 +152,8 @@ export default function StandaloneLessonProgressBar({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          progress: Math.round((1 / 14) * 100),
+          // Task 2 is the first task shown after starting the lesson.
+          progress: getLessonProgressForTask(2),
           timeSpent: 0,
         }),
       });
@@ -220,7 +223,7 @@ export default function StandaloneLessonProgressBar({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          progress: Math.round((newTask / 14) * 100),
+          progress: getLessonProgressForTask(newTask),
           timeSpent: timer,
         }),
       });
@@ -290,6 +293,35 @@ export default function StandaloneLessonProgressBar({
     }
   };
 
+  const restartLesson = async () => {
+    if (phaseLoading || isTransitioning) return;
+
+    setIsTransitioning(true);
+    setPhaseLoading(true);
+
+    try {
+      const response = await fetch(`/api/lessons/${article?.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reset: true }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to reset lesson: ${response.status}`);
+      }
+
+      setCurrentTask(1);
+      setTimer(0);
+      setPaused(false);
+    } catch (error) {
+      console.error("Error restarting lesson:", error);
+      throw error;
+    } finally {
+      setPhaseLoading(false);
+      setIsTransitioning(false);
+    }
+  };
+
   // Helper function for smooth phase transitions
   const getTaskComponent = (taskNum: number) => {
     switch (taskNum) {
@@ -322,7 +354,13 @@ export default function StandaloneLessonProgressBar({
       case 13:
         return <TaskLanguageQuestions article={article} />;
       case 14:
-        return <TaskLessonSummary article={article} timerSpent={timer} />;
+        return (
+          <TaskLessonSummary
+            article={article}
+            timerSpent={timer}
+            onRestart={restartLesson}
+          />
+        );
       default:
         return null;
     }
