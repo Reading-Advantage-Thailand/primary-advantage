@@ -13,7 +13,7 @@ import { QuizContext } from "@/contexts/question-context";
 import { useTranslations } from "next-intl";
 import {
   TaskIntroduction,
-  TaskPreviewVocabulary,
+  TaskTutorFlashcards,
   TaskFirstReading,
   TaskVocabularyCollection,
   TaskDeepReading,
@@ -330,7 +330,7 @@ export default function StandaloneLessonProgressBar({
           <TaskIntroduction article={article} onCompleteChange={() => {}} />
         );
       case 2:
-        return <TaskPreviewVocabulary article={article} />;
+        return <TaskTutorFlashcards article={article} />;
       case 3:
         return <TaskFirstReading article={article} />;
       case 4:
@@ -371,7 +371,9 @@ export default function StandaloneLessonProgressBar({
       case 1:
         return t("tasks.introduction", { default: "Introduction" });
       case 2:
-        return t("tasks.previewVocabulary", { default: "Preview Vocabulary" });
+        return t("tasks.vocabularyFlashcards", {
+          default: "Vocabulary Flashcards",
+        });
       case 3:
         return t("tasks.firstReading", { default: "First Reading" });
       case 4:

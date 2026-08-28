@@ -1,5 +1,6 @@
 export { default as TaskIntroduction } from "./task-introduction";
 export { default as TaskPreviewVocabulary } from "./task-preview-vocabulary";
+export { default as TaskTutorFlashcards } from "./task-tutor-flashcards";
 export { default as TaskFirstReading } from "./task-first-reading";
 export { default as TaskVocabularyCollection } from "./task-vocabulary-collection";
 export { default as TaskDeepReading } from "./task-deep-reading";
